@@ -38,7 +38,7 @@ class Quote extends React.Component {
   */
   render() {
     return (
-      <Header as="h2"><i>{this.state.quote}</i> - {this.state.character}</Header>
+      <Header as="h2"><i>{"\""+this.state.quote+"\""}</i> - {this.state.character}</Header>
     );
   }
 }
