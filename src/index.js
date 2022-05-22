@@ -12,7 +12,7 @@ import Quote from "./Components/Quote.js";
 import { Container, Header, Card } from 'semantic-ui-react';
 
 const App = ({children}) => (
-  <Container>
+  <Container style={{padding: "25px"}}>
     <Header as="h1">Pocket Coach</Header>
     <Quote></Quote>
     {children}
@@ -30,4 +30,4 @@ ReactDOM.render(
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+reportWebVitals(console.log);
