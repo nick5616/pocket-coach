@@ -53,12 +53,13 @@ class Set extends React.Component {
             </Label.Group>
           </Card.Description>
           <div>
-            <Button icon>
-              <Icon name='add circle' />
-            </Button>
-            <Button icon>
-              <Icon name='remove circle' />
-            </Button>
+            
+            <div className ="ui icon button" data-tooltip="Duplicate this set">
+              <i className='add icon' />
+            </div>
+            <div className ="ui icon button" data-tooltip="Delete this set">
+              <i className='remove icon' />
+            </div>
           </div>
         </Card.Content>
       </Card>
