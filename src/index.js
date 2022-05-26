@@ -12,7 +12,7 @@ import Quote from "./Components/Quote.js";
 import { Container, Header, Card } from 'semantic-ui-react';
 
 const App = ({children}) => (
-  <Container style={{padding: "25px"}}>
+  <Container style={{padding: "1em"}}>
     <Header as="h1">Pocket Coach</Header>
     <Quote></Quote>
     {children}
