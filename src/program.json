@@ -1,0 +1,404 @@
+{
+  "program_name": "nick program",
+  "workouts": [
+    {
+      "name": "pull",
+      "exercises": [
+        {
+          "exercise_name": "pull-ups",
+          "sets": [
+            {
+            "type": "warm up",
+            "weight": 0,
+            "reps": 8,
+            "target_rpe": 4
+            },
+            {
+              "type": "working weight",
+              "weight": 45,
+              "reps": 5,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 45,
+              "reps": 5,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 45,
+              "reps": 5,
+              "target_rpe": 7
+            },
+            {
+              "type": "One rep max",
+              "weight": 90,
+              "reps": 5,
+              "target_rpe": 7
+            }
+          ]
+        },
+        {
+          "exercise_name": "T-bar rows",
+          "sets": [
+            {
+            "type": "warm up",
+            "weight": 45,
+            "reps": 12,
+            "target_rpe": 4
+            },
+            {
+              "type": "working weight",
+              "weight": 90,
+              "reps": 5,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 90,
+              "reps": 5,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 90,
+              "reps": 5,
+              "target_rpe": 7
+            }
+          ]
+        },
+        {
+          "exercise_name": "Cable pull-downs",
+          "sets": [
+            {
+              "type": "working weight",
+              "weight": 60,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 60,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 60,
+              "reps": 12,
+              "target_rpe": 7
+            }
+          ]
+        },
+        {
+          "exercise_name": "Dumbbell bicep curls",
+          "sets": [
+            {
+              "type": "working weight",
+              "weight": 45,
+              "reps": 8,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 45,
+              "reps": 8,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 45,
+              "reps": 8,
+              "target_rpe": 7
+            }
+          ]
+        },
+        {
+          "exercise_name": "Rear delt flys",
+          "sets": [
+            {
+              "type": "working weight",
+              "weight": 13,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 13,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 13,
+              "reps": 12,
+              "target_rpe": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "push",
+      "exercises": [
+        {
+          "exercise_name": "Incline dumbbell bench press",
+          "sets": [
+            {
+            "type": "warm up",
+            "weight": 35,
+            "reps": 8,
+            "target_rpe": 2
+            },
+            {
+              "type": "warm up",
+              "weight": 55,
+              "reps": 4,
+              "target_rpe": 2
+              },
+            {
+              "type": "working weight",
+              "weight": 70,
+              "reps": 8,
+              "target_rpe": 8
+            },
+            {
+              "type": "working weight",
+              "weight": 70,
+              "reps": 8,
+              "target_rpe": 8
+            },
+            {
+              "type": "working weight",
+              "weight": 70,
+              "reps": 8,
+              "target_rpe": 8
+            }
+          ]
+        },
+        {
+          "exercise_name": "Chest flys",
+          "sets": [
+            {
+              "type": "working weight",
+              "weight": 43,
+              "reps": "AMRAP",
+              "target_reps": 12
+            },
+            {
+              "type": "working weight",
+              "weight": 33,
+              "reps": "AMRAP",
+              "target_reps": 12
+            },
+            {
+              "type": "working weight",
+              "weight": 23,
+              "reps": "AMRAP",
+              "target_reps": 12
+            }
+          ]
+        },
+        {
+          "exercise_name": "Tricep push-downs",
+          "sets": [
+            {
+              "type": "working weight",
+              "weight": 60,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 60,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 60,
+              "reps": 12,
+              "target_rpe": 7
+            }
+          ]
+        },
+        {
+          "exercise_name": "Cable lateral raises",
+          "sets": [
+            {
+              "type": "working weight",
+              "weight": 13,
+              "reps": 12,
+              "target_rpe": 8
+            },
+            {
+              "type": "working weight",
+              "weight": 10,
+              "reps": 15,
+              "target_rpe": 8
+            },
+            {
+              "type": "working weight",
+              "weight": 7,
+              "reps": "AMRAP",
+              "target_reps": 20
+            }
+          ]
+        },
+        {
+          "exercise_name": "Rear delt flys",
+          "sets": [
+            {
+              "type": "working weight",
+              "weight": 13,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 13,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 13,
+              "reps": 12,
+              "target_rpe": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "legs",
+      "exercises": [
+        {
+          "exercise_name": "Leg press",
+          "sets": [
+            {
+            "type": "warm up",
+            "weight": 90,
+            "reps": 8,
+            "target_rpe": 2
+            },
+            {
+              "type": "warm up",
+              "weight": 180,
+              "reps": 8,
+              "target_rpe": 4
+            },
+            {
+              "type": "working weight",
+              "weight": 270,
+              "reps": 8,
+              "target_rpe": 8
+            },
+            {
+              "type": "working weight",
+              "weight": 270,
+              "reps": 8,
+              "target_rpe": 8
+            },
+            {
+              "type": "working weight",
+              "weight": 270,
+              "reps": 8,
+              "target_rpe": 8
+            }
+          ]
+        },
+        {
+          "exercise_name": "Hip abductors",
+          "sets": [
+            {
+              "type": "working weight",
+              "weight": 90,
+              "reps": 12
+            },
+            {
+              "type": "working weight",
+              "weight": 90,
+              "reps": 12
+            },
+            {
+              "type": "working weight",
+              "weight": 90,
+              "reps": 12
+            }
+          ]
+        },
+        {
+          "exercise_name": "Suitcase deadlift",
+          "sets": [
+            {
+              "type": "working weight",
+              "weight": 30,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 30,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 60,
+              "reps": 12,
+              "target_rpe": 7
+            }
+          ]
+        },
+        {
+          "exercise_name": "calf raises",
+          "sets": [
+            {
+              "type": "working weight",
+              "weight": 90,
+              "reps": 12,
+              "target_rpe": 6
+            },
+            {
+              "type": "working weight",
+              "weight": 90,
+              "reps": 12,
+              "target_rpe": 6
+            },
+            {
+              "type": "working weight",
+              "weight": 90,
+              "reps": 6,
+              "target_rpe": 6
+            }
+          ]
+        },
+        {
+          "exercise_name": "leg extensions",
+          "sets": [
+            {
+              "type": "working weight",
+              "weight": 50,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 50,
+              "reps": 12,
+              "target_rpe": 7
+            },
+            {
+              "type": "working weight",
+              "weight": 50,
+              "reps": 12,
+              "target_rpe": 7
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
