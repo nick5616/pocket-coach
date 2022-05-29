@@ -43,8 +43,8 @@ class Set extends React.Component {
         </div>
         <div className = "extra content">
             <div className="ui left icon input" style={{marginBottom: "1em"}}>
-              <input type="text" placeholder="Note..." spellcheck="false" data-ms-editor="true" data-tooltip="How did you feel about this set?"/>
-              <i class="edit icon"></i>
+              <input type="text" placeholder="Note..." spellCheck="false" data-ms-editor="true" data-tooltip="How did you feel about this set?"/>
+              <i className="edit icon"></i>
             </div>
               
             
