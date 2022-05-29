@@ -1,11 +1,20 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React from 'react'
 import { Card, Icon, Image, Container, Header, Button } from 'semantic-ui-react'
 import Workout from "./Workout";
 import FileUploader from "./Utility/FileUploader";
 import ExerciseHighLevel from './ExerciseHighLevel';
 import ProgramSummary from "./ProgramSummary";
-function Program() {
-  
+import SweetAlert from 'sweetalert2-react';
+
+class Program extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      file: null
+    }
+  }
+
+  render() {
   let programData = null;
   let current_workout_name;
   let current_workout_exercises;
@@ -17,7 +26,7 @@ function Program() {
   //  current_workout_exercises = current_workout.exercises;
     //const workouts = programData.workouts.map((w)=> <Workout name={w.workout_name} exercises={w.exercises}></Workout>);
   //});
-  const [file, setFile] = useState("");
+ 
   
   const handleUpload = e => {
     console.log("in handle upload", e);
@@ -29,7 +38,7 @@ function Program() {
     fileReader.onload = e => {
       console.log("e.target.result", e.target.result);
       
-      setFile(programData);
+      this.setState({file: programData});
       
       console.log("hi there! fancy seeing you here");     
     };
@@ -38,14 +47,23 @@ function Program() {
     
   };
   
+  let showme = false;
 
   let programContent = <div>
-    <Header size = "large"> {file.program_name} </Header>
-    <ProgramSummary workouts={file.workouts}></ProgramSummary>
-    <Button icon labelPosition='left'>
+    <Header size = "large"> {this.state.file ? this.state.file.program_name : ""} </Header>
+    <ProgramSummary workouts={this.state.file ? this.state.file.workouts: ""}></ProgramSummary>
+    <Button style = {{background: "#E92FB5"} } icon labelPosition='left'>
       <Icon name='cloud download' />
       Download
     </Button>
+    <SweetAlert
+        show={showme}
+        title="Success!"
+        onConfirm={()=>{showme = true}}
+      >
+
+      </SweetAlert>
+
   </div>;
 
   let noProgramContent = <div>
@@ -59,9 +77,9 @@ function Program() {
   
   return (
     <Container>
-      { file ? programContent : noProgramContent }
+      { this.state.file ? programContent : noProgramContent }
     </Container>
   );
-  
+  }
 }
 export default Program;

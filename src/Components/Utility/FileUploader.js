@@ -15,8 +15,11 @@ const FileUploader = props => {
   };
   return (
     <>
-      <Button icon labelPosition='left' onClick={handleClick}>
-        <Icon name='cloud upload' />
+      <Button icon labelPosition='left' onClick={handleClick} style={{backgroundColor: "#E92FB5"}} className="fileUploader">
+        <Icon name='cloud upload' 
+  
+
+        />
         Upload
       </Button>
       <input type="file"
