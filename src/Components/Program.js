@@ -5,6 +5,7 @@ import FileUploader from "./Utility/FileUploader";
 import ExerciseHighLevel from './ExerciseHighLevel';
 import ProgramSummary from "./ProgramSummary";
 import SweetAlert from 'sweetalert2-react';
+import Swal from 'sweetalert2'
 
 class Program extends React.Component {
   constructor(props){
@@ -42,7 +43,10 @@ class Program extends React.Component {
       
       console.log("hi there! fancy seeing you here");     
     };
-    
+    Swal.fire({
+      title: 'Success!',
+      icon: 'success',
+    });
     
     
   };
@@ -52,7 +56,7 @@ class Program extends React.Component {
   let programContent = <div>
     <Header size = "large"> {this.state.file ? this.state.file.program_name : ""} </Header>
     <ProgramSummary workouts={this.state.file ? this.state.file.workouts: ""}></ProgramSummary>
-    <Button style = {{background: "#E92FB5"} } icon labelPosition='left'>
+    <Button  icon labelPosition='left'>
       <Icon name='cloud download' />
       Download
     </Button>
@@ -65,19 +69,13 @@ class Program extends React.Component {
       </SweetAlert>
 
   </div>;
-
-  let noProgramContent = <div>
-    <div style={{display: "inline"}}>
-      <Header size="large">Upload a workout program, you dingus</Header>
-      <FileUploader handleFile={handleUpload}></FileUploader>
-    </div>
-    
-  </div>;
   
   
   return (
-    <Container>
-      { this.state.file ? programContent : noProgramContent }
+    <Container style={{display: "flex",
+      justifyContent: "center",
+      background: "red", width: "100vw", height: "100vh", backgroundColor: "white"}}>
+      { this.state.file ? programContent : <FileUploader handleFile={handleUpload}></FileUploader> }
     </Container>
   );
   }

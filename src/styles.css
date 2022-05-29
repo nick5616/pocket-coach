@@ -1,0 +1,50 @@
+Button{
+  color: #094E2A!important;
+  background-color: #9AFECC!important;
+}
+Button:not(.fileUploader):hover{
+  background-color: #E92FB5!important;
+}
+
+body, Container, input, .container, .tab, .card{
+  background-color: #EDFDF5!important;
+  border-color: #094E2A;
+  color: #094E2A!important;
+  background: #EDFDF5!important;
+  outline: #E92FB5!important;
+  outline-width: 1px!important;
+  outline-color: #E92FB5!important;
+  outline-style: none;
+}
+Label {
+  background-color: #9AFECC!important;
+  color: #9AFECC!important;
+}
+outline{
+  color: #E92FB5!important;
+}
+input{
+  font-size: 10pt;
+  padding: 2px;
+  border: solid 2px transparent!important;
+}
+input:focus{
+  background:  #fcfafa!important;
+  color: black!important;
+  border-bottom: solid 3px #9AFECC!important;
+  border-bottom: solid 3px #E92FB5!important;
+
+}
+
+input.error:focus{
+  border: 2px solid red!important;
+  background: rgb(255,240,240)!important;
+}
+
+.error {
+  border: 2px solid red!important;
+  background: rgb(255,240,240)!important;
+}
+.fileUploader:hover{
+  background-color: #E92FB5!important;
+}

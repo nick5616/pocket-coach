@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Icon, Image, Container, Header, Button } from 'semantic-ui-react'
+import '../../styles.css';
 
 const FileUploader = props => {
   const hiddenFileInput = React.useRef(null);
@@ -14,20 +15,33 @@ const FileUploader = props => {
     props.handleFile(fileUploaded);
   };
   return (
-    <>
-      <Button icon labelPosition='left' onClick={handleClick} style={{backgroundColor: "#E92FB5"}} className="fileUploader">
-        <Icon name='cloud upload' 
-  
+    
+      <div onClick={handleClick}>
+      <div style={{
+        paddingTop: "10em",
+        height: "40vh",
+        
+        width: "100vw",
+        alignContent: "center",
+      
 
-        />
-        Upload
-      </Button>
+      }} className="fileUploader">
+        <Header as='h2' textAlign='center' icon>
+          <Icon name='angle double up' />
+            Upload a program file
+          <Header.Subheader>
+            Click to browse or drag and drop a file
+          </Header.Subheader>
+          </Header>
+        <br></br>
+      </div>
+    
       <input type="file"
              ref={hiddenFileInput}
              onChange={handleChange}
              style={{display:'none'}} 
       /> 
-    </>
+    </div>
   );
 };
 export default FileUploader;
