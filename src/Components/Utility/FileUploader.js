@@ -18,10 +18,10 @@ const FileUploader = props => {
     
       <div onClick={handleClick}>
       <div style={{
-        paddingTop: "10em",
-        height: "40vh",
-        
-        width: "100vw",
+        paddingTop: "8em",
+        height: "30vh",
+        borderRadius: "2em",
+        width: "30vw",
         alignContent: "center",
       
 

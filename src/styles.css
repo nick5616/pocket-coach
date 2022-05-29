@@ -7,10 +7,10 @@ Button:not(.fileUploader):hover{
 }
 
 body, Container, input, .container, .tab, .card{
-  background-color: #EDFDF5!important;
+  background-color: #F3F6F5!important;
   border-color: #094E2A;
   color: #094E2A!important;
-  background: #EDFDF5!important;
+  background: #F3F6F5!important;
   outline: #E92FB5!important;
   outline-width: 1px!important;
   outline-color: #E92FB5!important;
@@ -29,9 +29,8 @@ input{
   border: solid 2px transparent!important;
 }
 input:focus{
-  background:  #fcfafa!important;
+  background:  #fe9ad3!important;
   color: black!important;
-  border-bottom: solid 3px #9AFECC!important;
   border-bottom: solid 3px #E92FB5!important;
 
 }
@@ -45,6 +44,15 @@ input.error:focus{
   border: 2px solid red!important;
   background: rgb(255,240,240)!important;
 }
+.fileUploader{
+  margin-top: 2px;
+  background-color: #e7e7e7;
+  
+}
 .fileUploader:hover{
-  background-color: #E92FB5!important;
+  margin-top: 0;
+  background:#E92FB5!important;
+  width: 40vw;
+  height: 40vh;
+  transition-duration:.25s!important;
 }

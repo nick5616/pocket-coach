@@ -34,8 +34,3 @@
     transform: rotate(360deg);
   }
 }
-
-
-.fileUploader:hover{
-  background-color: #282c34;
-}
