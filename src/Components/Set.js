@@ -20,14 +20,14 @@ class Set extends React.Component {
           <div className="description">
             {this.props.description}
             <Label.Group>
-              <Label color="green">
+              <Label style = {{background: "#70F0B0", color: "#042514"}}>
                 Weight
                 <Label.Detail>
                   {this.props.weight} pounds
                 </Label.Detail> 
               </Label>
               
-              <Label color="blue">
+              <Label style = {{background: "#70F0B0", color: "#042514"}}>
                 Reps
                 <Label.Detail>
                   {this.props.reps}  
@@ -44,7 +44,7 @@ class Set extends React.Component {
         <div className = "extra content">
             <div className="ui left icon input" style={{marginBottom: "1em"}}>
               <input type="text" placeholder="Note..." spellCheck="false" data-ms-editor="true" data-tooltip="How did you feel about this set?"/>
-              <i className="edit icon"></i>
+              <i className="write square icon" style={{color: "#e92fb5"}}></i>
             </div>
               
             

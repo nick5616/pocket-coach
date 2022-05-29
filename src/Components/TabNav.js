@@ -31,8 +31,11 @@ const panes = [
   },
 ]
 
+const color = {color: "pink"};
+
 const TabNav = () => (
-  <Tab menu={{ secondary: true, pointing: true }} panes={panes} />
+  
+  <Tab menu={{ color: "pink", secondary: true, pointing: true }} panes={panes} />
 )
 
 export default TabNav;
