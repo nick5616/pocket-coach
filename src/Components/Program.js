@@ -2,11 +2,11 @@ import React, {useState, useEffect, useRef} from 'react'
 import { Card, Icon, Image, Container, Header, Button } from 'semantic-ui-react'
 import Workout from "./Workout";
 import FileUploader from "./Utility/FileUploader";
-
-
+import swal from '@sweetalert/with-react';
+import ExerciseHighLevel from './ExerciseHighLevel';
+import ProgramSummary from "./ProgramSummary";
 function Program() {
   
-  const fileUploaded = useRef(false);
   let programData = null;
   let current_workout_name;
   let current_workout_exercises;
@@ -18,8 +18,8 @@ function Program() {
   //  current_workout_exercises = current_workout.exercises;
     //const workouts = programData.workouts.map((w)=> <Workout name={w.workout_name} exercises={w.exercises}></Workout>);
   //});
-  const [files, setFiles] = useState("");
-
+  const [file, setFile] = useState("");
+  
   const handleUpload = e => {
     console.log("in handle upload", e);
     
@@ -29,25 +29,40 @@ function Program() {
     fileReader.readAsText(e);
     fileReader.onload = e => {
       console.log("e.target.result", e.target.result);
-      setFiles(e.target.result);
-      fileUploaded.current = "true";
+      
+      setFile(programData);
+      swal("Your program has uploaded successfully", {
+        icon: "success"
+      });
+      console.log("hi there! fancy seeing you here");     
     };
     
+    
+    
   };
+  
 
-  let billyBob = 
-  <div>
-    <Header size="large">Upload a workout program, you dingus</Header>
+  let programContent = <div>
+    <Header size = "large"> {file.program_name} </Header>
+    <ProgramSummary workouts={file.workouts}></ProgramSummary>
+    <Button icon labelPosition='left'>
+      <Icon name='cloud download' />
+      Download
+    </Button>
   </div>;
 
+  let noProgramContent = <div>
+    <div style={{display: "inline"}}>
+      <Header size="large">Upload a workout program, you dingus</Header>
+      <FileUploader handleFile={handleUpload}></FileUploader>
+    </div>
+    
+  </div>;
+  
+  
   return (
     <Container>
-      {fileUploaded.current ? files : billyBob}
-      <Button icon labelPosition='left'>
-        <Icon name='cloud download' />
-        Download
-      </Button>
-      <FileUploader handleFile={handleUpload}></FileUploader>
+      { file ? programContent : noProgramContent }
     </Container>
   );
   

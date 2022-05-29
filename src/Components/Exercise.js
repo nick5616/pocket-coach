@@ -8,7 +8,7 @@ class Exercise extends React.Component {
   render() {
     return (
       <Container style = {{margin: "2em"}}>
-        <Header size='large'>Exercise 1: '{this.props.name}'</Header>
+        <Header size='large'>{this.props.name}</Header>
         <div className = "ui cards">
           <Set 
             type = "Warm up"
