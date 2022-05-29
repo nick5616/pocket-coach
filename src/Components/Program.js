@@ -2,7 +2,6 @@ import React, {useState, useEffect, useRef} from 'react'
 import { Card, Icon, Image, Container, Header, Button } from 'semantic-ui-react'
 import Workout from "./Workout";
 import FileUploader from "./Utility/FileUploader";
-import swal from '@sweetalert/with-react';
 import ExerciseHighLevel from './ExerciseHighLevel';
 import ProgramSummary from "./ProgramSummary";
 function Program() {
@@ -31,9 +30,7 @@ function Program() {
       console.log("e.target.result", e.target.result);
       
       setFile(programData);
-      swal("Your program has uploaded successfully", {
-        icon: "success"
-      });
+      
       console.log("hi there! fancy seeing you here");     
     };
     

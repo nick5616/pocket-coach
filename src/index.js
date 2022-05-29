@@ -10,9 +10,7 @@ import './App.css';
 import Exercise from "./Components/Exercise.js";
 import Quote from "./Components/Quote.js";
 import { Container, Header, Card } from 'semantic-ui-react';
-import 'semantic-ui-less/semantic.less'
-import 'semantic-ui-css/semantic.css';
-import 'semantic-ui-css/semantic.js';
+
 
 const App = ({children}) => (
   <Container style={{padding: "1em"}}>
