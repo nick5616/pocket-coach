@@ -16,14 +16,14 @@ const FileUploader = props => {
   };
   return (
     
-      <div onClick={handleClick}>
+      <div onClick={handleClick} style={{justifyContent: "center"}}>
       <div style={{
         paddingTop: "8em",
         height: "30vh",
         borderRadius: "2em",
-        width: "30vw",
+        width: "50vw",
+        minWidth: "400px",
         alignContent: "center",
-      
 
       }} className="fileUploader">
         <Header as='h2' textAlign='center' icon>

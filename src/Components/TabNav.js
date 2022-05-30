@@ -8,7 +8,7 @@ const panes = [
     menuItem: 'Today\'s Workout',
     render: () => 
     <Tab.Pane attached={false}>
-      <Container>
+      
         <Header size='huge'>Pull</Header>
         <Exercise name = "Weighted pull-ups"></Exercise>
         <Exercise name = "T-bar rows"></Exercise>
@@ -18,7 +18,7 @@ const panes = [
           <Icon name='cloud download' />
           Export to CSV
         </Button>
-      </Container>
+      
     </Tab.Pane>,
   },
   {

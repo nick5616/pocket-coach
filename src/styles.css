@@ -30,7 +30,7 @@ input{
 }
 input:focus{
   background:  #fe9ad3!important;
-  color: black!important;
+  color: #080808!important;
   border-bottom: solid 3px #E92FB5!important;
 
 }
@@ -55,4 +55,12 @@ input.error:focus{
   width: 40vw;
   height: 40vh;
   transition-duration:.25s!important;
+}
+
+.pc-card{
+  background-color: #e9e9e9!important;
+  margin: 1em;
+  padding: 1em;
+  border-bottom: 4px solid #d7d7d7;
+  border-radius: 1em;
 }

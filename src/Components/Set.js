@@ -1,11 +1,11 @@
 import React from 'react'
-import { Button, Card, Image, Label, Icon } from 'semantic-ui-react';
+import { Button, Image, Label, Icon } from 'semantic-ui-react';
 
 class Set extends React.Component {
  
   render() {
     return (
-      <div className="card">
+      <div className="pc-card">
         <div className="content">
           <div className="header">            
             
