@@ -105,11 +105,11 @@ function TabBarIconFA(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }) {
-  return <FontAwesome5 color="black" size={30} style={{ marginBottom: -3 }} {...props} />
+  return <FontAwesome5 size={30} style={{ marginBottom: -3 }} {...props} />
 }
 function TabBarIconM(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }) {
-  return <MaterialCommunityIcons name="notebook" size={24} color="black" size={30} style={{ marginBottom: -3 }} {...props} />
+  return <MaterialCommunityIcons name="notebook" size={30} style={{ marginBottom: -3 }} {...props} />
 }

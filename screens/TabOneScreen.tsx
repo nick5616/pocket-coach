@@ -1,15 +1,15 @@
-import { StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
+import { MonoText } from '../components/StyledText';
 import { RootTabScreenProps } from '../types';
+import { WorkoutSummary } from '../components/WorkoutSummary';
 
 export default function TabOneScreen({ navigation }: RootTabScreenProps<'CurrentWorkout'>) {
   return (
     <View style={styles.container}>
-      
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      
+      <WorkoutSummary></WorkoutSummary>
     </View>
   );
 }
@@ -17,11 +17,11 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'Current
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: "3%",
+    color: "red"
   },
   title: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: 'bold',
   },
   separator: {
