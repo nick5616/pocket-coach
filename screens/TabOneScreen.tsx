@@ -5,11 +5,12 @@ import { Text, View } from '../components/Themed';
 import { MonoText } from '../components/StyledText';
 import { RootTabScreenProps } from '../types';
 import { WorkoutSummary } from '../components/WorkoutSummary';
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function TabOneScreen({ navigation }: RootTabScreenProps<'CurrentWorkout'>) {
   return (
     <View style={styles.container}>
-      <WorkoutSummary></WorkoutSummary>
+        <WorkoutSummary></WorkoutSummary>
     </View>
   );
 }
@@ -17,8 +18,7 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'Current
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: "3%",
-    color: "red"
+    color: "red",
   },
   title: {
     fontSize: 30,

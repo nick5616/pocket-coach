@@ -3,20 +3,21 @@ import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import { ScrollView, StyleSheet } from 'react-native';
 import { SummaryItem } from './SummaryItem';
+import ExerciseData from '../Utilities/Exercises';
 
 export function WorkoutSummary(props: TextProps) {
+  //const exercise = require('ExerciseData');
   const summary = 
   <View>
-    <Text style={styles.workout_title}>Pull</Text>
-    <ScrollView style={styles.scroll}>
-      <SummaryItem exercise_name="Pull-ups"></SummaryItem>
-      <SummaryItem exercise_name="Plate loaded t-bar rows"></SummaryItem>
-      <SummaryItem exercise_name="Cable pull-over on mat"></SummaryItem>
-      <SummaryItem exercise_name="Bicep curls"></SummaryItem>
-      <SummaryItem exercise_name="Rear delt flys"></SummaryItem>
-      <SummaryItem exercise_name="Neutral grip lat pull-down"></SummaryItem>
+    <ScrollView style={ styles.scroll }>
+      <SummaryItem exercise_name="Pull-ups" description="You should do these very slowly!" path = {ExerciseData['pullUp'].imagePath}></SummaryItem>
+      <SummaryItem exercise_name="Plate loaded t-bar rows" description="You should do these very slowly!"></SummaryItem>
+      <SummaryItem exercise_name="Cable pull-over on mat" description="You should do these very slowly!"></SummaryItem>
+      <SummaryItem exercise_name="Bicep curls" description="You should do these very slowly!"></SummaryItem>
+      <SummaryItem exercise_name="Rear delt flys" description="You should do these very slowly!"></SummaryItem>
+      <SummaryItem exercise_name="Neutral grip lat pull-down" description="You should do these very slowly!"></SummaryItem>
     </ScrollView>
-    <View style={styles.footer}></View>
+    <View style={ styles.footer }></View>
   </View>
   return summary;
   
@@ -32,8 +33,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#e9e9e9"
   },
   scroll: {
-    
-    
+    padding: 10,
+    overflow: "scroll",
+    marginBottom: 60
   },
   workout_title: {
     fontSize: 40,
