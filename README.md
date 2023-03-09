@@ -1,4 +1,7 @@
 # Pocket Coach
+Pocket Coach is a free fitness app that helps you reach your goals.
+# Installing the backend
+Clone [the backend repo](https://github.com/ShreySham/pocket-coach-backend) into a new directory and follow the instructions below to get the server running locally!
 ## Installing deno
 Follow the instructions [here](https://deno.land/manual@v1.31.1/getting_started/installation) to install [deno](https://deno.land/).
 
