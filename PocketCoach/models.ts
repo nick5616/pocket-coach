@@ -168,6 +168,8 @@ export enum MuscleGroup {
     ADDUCTORS,
     QUADS,
     CALVES,
+    ROTATOR_CUFF,
+    FOREARM,
 }
 
 export interface Muscle {
@@ -216,22 +218,22 @@ export enum WeightType {
  */
 export interface ExerciseSet {
     reps: number;
-    weightType: WeightType;
     weight: number;
-    jointsUnderPressure?: Joint[];
-    mechanicalTensionPoints?: Joint[];
-    musclesInvolved: MuscleRecruitment[];
     rpe?: number;
 }
 
 export interface Exercise {
     name: string;
     sets: ExerciseSet[];
+    weightType: WeightType;
+    jointsUnderPressure?: Joint[];
+    mechanicalTensionPoints?: Joint[];
+    musclesInvolved: MuscleRecruitment[];
 }
 
 export interface RecreationalActivity {}
 
-export type Activity = Workout | RecreationalActivity;
+export type Activity = Workout | RecreationalActivity | "Rest";
 
 export interface Workout {
     exercises: Exercise[];
@@ -239,20 +241,468 @@ export interface Workout {
 
 export interface Day {
     activities: Activity[];
-    day: string;
+    calendarDay: number;
 }
 
 export interface Program {
     name: string;
     days: Day[];
 }
+export interface WorkoutSession {
+    timeStarted: Date;
+    timeEnded: Date;
+    exercises: Exercise[];
+}
 
+export interface RecreationSession {}
+export type ActivitySession = WorkoutSession | RecreationSession;
 export interface DayLog {
     plannedActivities: Activity[];
-    completedActivities: Activity[];
-    day: string;
+    completedActivities: ActivitySession[];
+    calendarDate: number;
 }
 
 export interface ProgramLog {
     days: DayLog[];
 }
+
+export interface UserLog {
+    pastPrograms: ProgramLog[];
+    currentProgram: ProgramLog;
+}
+
+const program: Program = {
+    name: "Push Legs Pull",
+    days: [
+        {
+            activities: [
+                {
+                    exercises: [
+                        {
+                            name: "Weighted Pull-ups",
+                            sets: [
+                                { reps: 5, weight: 25, rpe: 8 },
+                                { reps: 5, weight: 25, rpe: 8 },
+                                { reps: 5, weight: 25, rpe: 8 },
+                            ],
+                            weightType: WeightType.WEIGHTED_CALISTHENICS,
+                            jointsUnderPressure: [
+                                Joint.BILATERAL_ELBOW,
+                                Joint.BILATERAL_SHOULDER,
+                            ],
+                            mechanicalTensionPoints: [
+                                Joint.BILATERAL_ELBOW,
+                                Joint.BILATERAL_SHOULDER,
+                            ],
+                            musclesInvolved: [
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.LATISSIMUS_DORSI,
+                                    },
+                                    involvementLevel: InvolvementLevel.PRIMARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.BICEPS_LONG_HEAD,
+                                    },
+                                    involvementLevel: InvolvementLevel.PRIMARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.BICEPS_SHORT_HEAD,
+                                    },
+                                    involvementLevel: InvolvementLevel.PRIMARY,
+                                },
+
+                                {
+                                    muscle: {
+                                        formalName: FormalMuscleName.RHOMBOIDS,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.LOWER_TRAPEZIUS,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.MIDDLE_TRAPEZIUS,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.UPPER_TRAPEZIUS,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+
+                                {
+                                    muscle: {
+                                        formalName: FormalMuscleName.RHOMBOIDS,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.UPPER_PECTORALIS_MAJOR,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.LOWER_PECTORALIS_MAJOR,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.POSTERIOR_DELTOID,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.SERRATUS_ANTERIOR,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.TERES_MAJOR,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName: FormalMuscleName.BRACHIALIS,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.BRACHIORADIALIS,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.ERECTOR_SPINAE,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.TRICEPS_LATERAL_HEAD,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.TRICEPS_LONG_HEAD,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.TRICEPS_MEDIAL_HEAD,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.SUPRASPINATUS,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.INFRASPINATUS,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.ANTERIOR_DELTOID,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.PECTORALIS_MINOR,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName: FormalMuscleName.OBLIQUES,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName: FormalMuscleName.RHOMBOIDS,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.LEVATOR_SCAPULAE,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.WRIST_EXTENSORS,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.WRIST_FLEXORS,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.TERES_MINOR,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                            ],
+                        },
+                        {
+                            name: "Cable Row",
+                            sets: [
+                                { reps: 12, weight: 100, rpe: 6 },
+                                { reps: 9, weight: 120, rpe: 7 },
+                                { reps: 8, weight: 140, rpe: 9 },
+                            ],
+                            weightType: WeightType.DOUBLE_PULLEY_CABLE,
+                            jointsUnderPressure: [
+                                Joint.BILATERAL_ELBOW,
+                                Joint.BILATERAL_SHOULDER,
+                            ],
+                            mechanicalTensionPoints: [
+                                Joint.BILATERAL_ELBOW,
+                                Joint.BILATERAL_SHOULDER,
+                            ],
+                            musclesInvolved: [
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.LATISSIMUS_DORSI,
+                                    },
+                                    involvementLevel: InvolvementLevel.PRIMARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.LOWER_TRAPEZIUS,
+                                    },
+                                    involvementLevel: InvolvementLevel.PRIMARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.MIDDLE_TRAPEZIUS,
+                                    },
+                                    involvementLevel: InvolvementLevel.PRIMARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.UPPER_TRAPEZIUS,
+                                    },
+                                    involvementLevel: InvolvementLevel.PRIMARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.POSTERIOR_DELTOID,
+                                    },
+                                    involvementLevel: InvolvementLevel.PRIMARY,
+                                },
+
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.BICEPS_LONG_HEAD,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.BICEPS_SHORT_HEAD,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.ERECTOR_SPINAE,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.WRIST_FLEXORS,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.INFRASPINATUS,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.SUPRASPINATUS,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.TERES_MINOR,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                            ],
+                        },
+                        {
+                            name: "Bicep curl",
+                            sets: [{ reps: 7, weight: 20, rpe: 5 }],
+                            weightType: WeightType.BILATERAL_DUMBBELL,
+                            jointsUnderPressure: [
+                                Joint.BILATERAL_ELBOW,
+                                Joint.BILATERAL_WRIST,
+                            ],
+                            mechanicalTensionPoints: [Joint.BILATERAL_ELBOW],
+                            musclesInvolved: [
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.BICEPS_LONG_HEAD,
+                                    },
+                                    involvementLevel: InvolvementLevel.PRIMARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.BICEPS_SHORT_HEAD,
+                                    },
+                                    involvementLevel: InvolvementLevel.PRIMARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName: FormalMuscleName.BRACHIALIS,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.BRACHIORADIALIS,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+                            ],
+                        },
+                        {
+                            name: "example blank",
+                            sets: [
+                                { reps: 7, weight: 20, rpe: 5 },
+                                { reps: 7, weight: 20, rpe: 5 },
+                                { reps: 7, weight: 20, rpe: 5 },
+                            ],
+                            weightType: WeightType.BILATERAL_DUMBBELL,
+                            jointsUnderPressure: [
+                                Joint.BILATERAL_ELBOW,
+                                Joint.BILATERAL_WRIST,
+                            ],
+                            mechanicalTensionPoints: [Joint.BILATERAL_ELBOW],
+                            musclesInvolved: [
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.BICEPS_LONG_HEAD,
+                                    },
+                                    involvementLevel: InvolvementLevel.PRIMARY,
+                                },
+
+                                {
+                                    muscle: {
+                                        formalName: FormalMuscleName.BRACHIALIS,
+                                    },
+                                    involvementLevel:
+                                        InvolvementLevel.SECONDARY,
+                                },
+
+                                {
+                                    muscle: {
+                                        formalName:
+                                            FormalMuscleName.BRACHIORADIALIS,
+                                    },
+                                    involvementLevel: InvolvementLevel.TERTIARY,
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+            calendarDay: 321434,
+        },
+        { activities: ["rest"], calendarDay: 43 },
+    ],
+};
