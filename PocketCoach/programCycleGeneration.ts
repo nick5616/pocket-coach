@@ -148,9 +148,7 @@ export function addFiveIfSucceeded(
     log: ProgramLog,
     exerciseName: string
 ): ExerciseSet[] {
-    const exercise = predefinedOrDownloadedExercises.find(
-        (val: { name: string }) => val.name === exerciseName
-    );
+    const exercise = predefinedOrDownloadedExercises.get(exerciseName);
     const lastCompletedWorkout: Workout = log.days[0].completedActivities.find(
         (activity) => "exercises" in activity
     ) as Workout;
@@ -176,5 +174,7 @@ export function addFiveIfSucceeded(
             );
         return startingExercise?.programmedSets ?? [];
     }
-    return [{ reps: 8, weight: exercise.startingWeight, rpe: 5 }];
+    return [
+        { reps: 8, weight: exercise ? exercise.startingWeight : 0, rpe: 5 },
+    ];
 }

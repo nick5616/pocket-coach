@@ -1,4 +1,8 @@
-import { predefinedOrDownloadedExercises } from "./exercisesDatabase";
+import {
+    ExerciseBuilder,
+    ExerciseDB,
+    predefinedOrDownloadedExercises,
+} from "./exercisesDatabase";
 
 export enum Joint {
     UNILATERAL_SHOULDER,
@@ -174,6 +178,82 @@ export enum MuscleGroup {
     FOREARM,
 }
 
+export function getFormalNamesInMuscleGroup(
+    muscleGroup: MuscleGroup
+): FormalMuscleName[] {
+    switch (muscleGroup) {
+        case MuscleGroup.ADDUCTORS:
+            return [
+                FormalMuscleName.ADDUCTOR_BREVIS,
+                FormalMuscleName.ADDUCTOR_LONGUS,
+                FormalMuscleName.ADDUCTOR_MAGNUS,
+            ];
+        case MuscleGroup.BICEP:
+            return [
+                FormalMuscleName.BICEPS_LONG_HEAD,
+                FormalMuscleName.BICEPS_SHORT_HEAD,
+                FormalMuscleName.BRACHIALIS,
+            ];
+        case MuscleGroup.CALVES:
+            return [
+                FormalMuscleName.SOLEUS,
+                FormalMuscleName.GASTROCNEMEUS_LONG_HEAD,
+                FormalMuscleName.GASTROCNEMEUS_MEDIAL_HEAD,
+            ];
+        case MuscleGroup.CHEST:
+            return [
+                FormalMuscleName.UPPER_PECTORALIS_MAJOR,
+                FormalMuscleName.LOWER_PECTORALIS_MAJOR,
+                FormalMuscleName.PECTORALIS_MINOR,
+            ];
+        case MuscleGroup.FOREARM:
+            return [
+                FormalMuscleName.WRIST_EXTENSORS,
+                FormalMuscleName.WRIST_FLEXORS,
+                FormalMuscleName.BRACHIORADIALIS,
+            ];
+        case MuscleGroup.GLUTES:
+            return [
+                FormalMuscleName.GLUTEUS_MAXIMUS,
+                FormalMuscleName.GLUTEUS_MEDIUS,
+                FormalMuscleName.GLUTEUS_MINIMUS,
+            ];
+        case MuscleGroup.HAMSTRINGS:
+            return [
+                FormalMuscleName.BICEPS_FEMORIS,
+                FormalMuscleName.SEMIMEMBRANOSUS,
+                FormalMuscleName.SEMITENDINOSUS,
+            ];
+        case MuscleGroup.QUADS:
+            return [
+                FormalMuscleName.VASTUS_INTERMEDIUS,
+                FormalMuscleName.VASTUS_MEDIALIS,
+                FormalMuscleName.VASTUS_LATERALIS,
+                FormalMuscleName.RECTUS_FEMORIS,
+            ];
+        case MuscleGroup.ROTATOR_CUFF:
+            return [
+                FormalMuscleName.SUPRASPINATUS,
+                FormalMuscleName.INFRASPINATUS,
+                FormalMuscleName.TERES_MINOR,
+            ];
+        case MuscleGroup.SHOULDER:
+            return [
+                FormalMuscleName.MEDIAL_DELTOID,
+                FormalMuscleName.ANTERIOR_DELTOID,
+                FormalMuscleName.POSTERIOR_DELTOID,
+            ];
+        case MuscleGroup.TRICEP:
+            return [
+                FormalMuscleName.TRICEPS_LATERAL_HEAD,
+                FormalMuscleName.TRICEPS_LONG_HEAD,
+                FormalMuscleName.TRICEPS_MEDIAL_HEAD,
+            ];
+        default:
+            return [];
+    }
+}
+
 export interface Muscle {
     formalName: FormalMuscleName;
     commonName?: CommonMuscleName;
@@ -200,22 +280,60 @@ export enum WeightType {
     PLATE_MACHINE = "PLATE_MACHINE",
     SINGLE_PULLEY_CABLE = "SINGLE_PULLEY_CABLE",
     DOUBLE_PULLEY_CABLE = "DOUBLE_PULLEY_CABLE",
-    FREE_WEIGHT = "FREE_WEIGHT",
+    BARBELL = "BARBELL",
     BODYWEIGHT_CALISTHENICS = "BODYWEIGHT_CALISTHENICS",
     WEIGHTED_CALISTHENICS = "WEIGHTED_CALISTHENICS",
 }
+export interface ProgramLog {
+    days: DayLog[];
+}
+
+export interface UserLog {
+    pastPrograms: ProgramLog[];
+    currentProgram: ProgramLog;
+}
+
+export const mockPplProgramLog: ProgramLog = {
+    days: [
+        {
+            plannedActivities: [],
+            completedActivities: [
+                {
+                    timeStarted: 2,
+                    timeEnded: 3,
+                    exercises: [
+                        {
+                            ...predefinedOrDownloadedExercises.get(
+                                "Weighted Pull-up"
+                            ),
+                            sets: [
+                                { reps: 5, weight: 25, rpe: 8 },
+                                { reps: 5, weight: 25, rpe: 8 },
+                                { reps: 5, weight: 25, rpe: 8 },
+                            ],
+                        },
+                    ],
+                },
+            ],
+            calendarDate: 2,
+        },
+    ],
+};
+
 export const userLog: UserLog = {
     currentProgram: { days: [] },
     pastPrograms: [],
 };
 export interface User {
     userLog: UserLog;
+    programLog: ProgramLog;
     bodyweight: number;
     height: number;
 }
 export const USER: User = {
     bodyweight: 160,
     userLog: userLog,
+    programLog: mockPplProgramLog,
     height: 71,
 };
 export const StartingWeight = {
@@ -235,12 +353,53 @@ export interface ExerciseSet {
 export interface Exercise {
     name: string;
     weightType: WeightType;
-    jointsUnderPressure?: Joint[];
-    mechanicalTensionPoints?: Joint[];
     musclesInvolved: MuscleInvolved[];
     startingWeight: number;
+    predefined: boolean;
+
+    description?: string;
+    jointsUnderPressure?: Joint[];
+    mechanicalTensionPoints?: Joint[];
 }
 
+export interface CreateExerciseRequest {
+    name: string;
+    weightType: WeightType;
+    primaryMusclesInvolved: FormalMuscleName[];
+    secondaryMusclesInvolved: FormalMuscleName[];
+    tertiaryMusclesInvolved: FormalMuscleName[];
+    quaternaryMusclesInvolved: FormalMuscleName[];
+
+    startingWeight: number;
+
+    description?: string;
+    jointsUnderPressure?: Joint[];
+    mechanicalTensionPoints?: Joint[];
+}
+export function createExercise(request: CreateExerciseRequest) {
+    const exercise = new ExerciseBuilder(request.name)
+        .addPrimaryMusclesInvolved(request.primaryMusclesInvolved)
+        .addSecondaryMusclesInvolved(request.secondaryMusclesInvolved)
+        .addTertiaryMusclesInvolved(request.tertiaryMusclesInvolved)
+        .addQuaternaryMusclesInvolved(request.quaternaryMusclesInvolved)
+        .setStartingWeight(request.startingWeight)
+        .setWeightType(request.weightType)
+        .build();
+    return exercise;
+}
+const exercises = new ExerciseDB();
+exercises.addExercise(
+    createExercise({
+        name: "Bingy",
+        primaryMusclesInvolved: [],
+        secondaryMusclesInvolved: [],
+        tertiaryMusclesInvolved: [],
+        quaternaryMusclesInvolved: [],
+        startingWeight: 0,
+        weightType: WeightType.BARBELL,
+    })
+);
+exercises.exercises.get("Bingy");
 export interface AttemptedExercise extends Exercise {
     programmedSets: ExerciseSet[];
     achievedSets: ExerciseSet[];
@@ -288,37 +447,8 @@ export interface DayLog {
 }
 export interface PersonalRecord {}
 const personalRecords: PersonalRecord[] = [];
-export interface ProgramLog {
-    days: DayLog[];
-}
-
-export interface UserLog {
-    pastPrograms: ProgramLog[];
-    currentProgram: ProgramLog;
-}
-
-export const mockPplProgramLog: ProgramLog = {
-    days: [
-        {
-            plannedActivities: [],
-            completedActivities: [
-                {
-                    timeStarted: 2,
-                    timeEnded: 3,
-                    exercises: [
-                        predefinedOrDownloadedExercises.weightedPullup([
-                            { reps: 5, weight: 25, rpe: 8 },
-                            { reps: 5, weight: 25, rpe: 8 },
-                            { reps: 5, weight: 25, rpe: 8 },
-                        ]),
-                    ],
-                },
-            ],
-            calendarDate: 2,
-        },
-    ],
-};
-
+const weightedPullup: Exercise =
+    predefinedOrDownloadedExercises.get("Weighted Pull-up")!;
 export const pplProgram: Program = {
     name: "Push Legs Pull",
     daysInCycle: [
@@ -327,21 +457,36 @@ export const pplProgram: Program = {
                 {
                     name: "pull",
                     plannedExercises: [
-                        predefinedOrDownloadedExercises.weightedPullup([
-                            { reps: 12, weight: 25, rpe: 7 },
-                            { reps: 9, weight: 35, rpe: 9 },
-                            { reps: 5, weight: 15, rpe: 6 },
-                        ]),
-                        predefinedOrDownloadedExercises.cableRow([
-                            { reps: 12, weight: 100, rpe: 6 },
-                            { reps: 9, weight: 120, rpe: 7 },
-                            { reps: 8, weight: 140, rpe: 9 },
-                        ]),
-                        predefinedOrDownloadedExercises.bicepCurl([
-                            { reps: 12, weight: 30, rpe: 6 },
-                            { reps: 12, weight: 30, rpe: 7 },
-                            { reps: 12, weight: 30, rpe: 9 },
-                        ]),
+                        {
+                            ...predefinedOrDownloadedExercises.get(
+                                "Weighted Pull-up"
+                            )!,
+                            programmedSets: [
+                                { reps: 12, weight: 25, rpe: 7 },
+                                { reps: 9, weight: 35, rpe: 9 },
+                                { reps: 5, weight: 15, rpe: 6 },
+                            ],
+                        },
+                        {
+                            ...predefinedOrDownloadedExercises.get(
+                                "Cable row"
+                            )!,
+                            programmedSets: [
+                                { reps: 12, weight: 25, rpe: 7 },
+                                { reps: 9, weight: 35, rpe: 9 },
+                                { reps: 5, weight: 15, rpe: 6 },
+                            ],
+                        },
+                        {
+                            ...predefinedOrDownloadedExercises.get(
+                                "Bicep curl"
+                            )!,
+                            programmedSets: [
+                                { reps: 12, weight: 25, rpe: 7 },
+                                { reps: 9, weight: 35, rpe: 9 },
+                                { reps: 5, weight: 15, rpe: 6 },
+                            ],
+                        },
                     ],
                     attemptedExercises: [],
                 },
