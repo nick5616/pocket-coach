@@ -77,9 +77,9 @@ export default function Home() {
     const hour = new Date().getHours();
     const name = user?.username || "User";
     
-    if (hour < 12) return `Good morning, ${name}! 💪`;
-    if (hour < 17) return `Good afternoon, ${name}! 💪`;
-    return `Good evening, ${name}! 💪`;
+    if (hour < 12) return `Good morning, ${name}!`;
+    if (hour < 17) return `Good afternoon, ${name}!`;
+    return `Good evening, ${name}!`;
   };
 
   return (
@@ -95,8 +95,8 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-gray-900">Pocket Coach</h1>
-              <p className="text-xs text-gray-500">
-                {user?.currentStreak || 0} day streak! 🔥
+              <p className="text-xs text-gray-600">
+                {user?.currentStreak || 0} day streak
               </p>
             </div>
           </div>
@@ -264,11 +264,11 @@ export default function Home() {
                     <ChartLine className="h-5 w-5 text-duolingo-green" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">Strength Gains Detected 🎯</h4>
-                    <p className="text-sm text-gray-600 mb-2">
+                    <h4 className="font-semibold text-gray-900 mb-1">Strength Gains Detected</h4>
+                    <p className="text-sm text-gray-700 mb-2">
                       Your bench press has improved 8% over the last 3 weeks. You're ready for heavier weight!
                     </p>
-                    <div className="flex items-center text-xs text-gray-500">
+                    <div className="flex items-center text-xs text-gray-600">
                       <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
                       </svg>
@@ -286,11 +286,11 @@ export default function Home() {
                     <Target className="h-5 w-5 text-energetic-orange" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">Focus Area Suggestion 💡</h4>
-                    <p className="text-sm text-gray-600 mb-2">
+                    <h4 className="font-semibold text-gray-900 mb-1">Focus Area Suggestion</h4>
+                    <p className="text-sm text-gray-700 mb-2">
                       Your shoulder development is progressing well, but rear delts could use more attention for balanced growth.
                     </p>
-                    <div className="flex items-center text-xs text-gray-500">
+                    <div className="flex items-center text-xs text-gray-600">
                       <Lightbulb className="w-3 h-3 mr-1" />
                       <span>AI Pattern Analysis</span>
                     </div>
@@ -340,14 +340,14 @@ export default function Home() {
                       </div>
                       
                       <div className="mb-3">
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                        <div className="flex items-center justify-between text-xs text-gray-700 mb-1">
                           <span>Progress</span>
                           <span>{Math.round(progress)}%</span>
                         </div>
                         <Progress value={progress} className="h-2" />
                       </div>
                       
-                      <p className="text-sm text-gray-600">{goal.description}</p>
+                      <p className="text-sm text-gray-700">{goal.description}</p>
                     </CardContent>
                   </Card>
                 );
@@ -359,7 +359,7 @@ export default function Home() {
                     <Target className="h-6 w-6 text-gray-400" />
                   </div>
                   <h4 className="font-medium text-gray-900 mb-1">No goals set</h4>
-                  <p className="text-sm text-gray-500 mb-3">Set your first fitness goal to track progress!</p>
+                  <p className="text-sm text-gray-700 mb-3">Set your first fitness goal to track progress!</p>
                   <Link href="/profile">
                     <Button size="sm" className="bg-duolingo-green hover:bg-duolingo-green/90">
                       Set Goals
