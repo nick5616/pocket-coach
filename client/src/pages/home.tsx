@@ -122,25 +122,37 @@ export default function Home() {
 
       <main className="pb-20 min-h-screen">
         {/* Welcome Section */}
-        <section className="bg-gradient-to-br from-duolingo-green to-green-600 px-4 py-6" style={{color: 'white'}}>
+        <section className="px-4 py-6" style={{
+          background: 'linear-gradient(135deg, #65a30d 0%, #16a34a 100%)',
+          color: 'white'
+        }}>
           <div className="mb-4">
-            <h2 className="text-xl font-bold mb-1" style={{color: 'white'}}>{greeting()}</h2>
-            <p className="text-sm font-medium" style={{color: 'white'}}>Ready to crush today's workout?</p>
+            <h2 className="text-xl font-bold mb-1" style={{color: '#ffffff', fontWeight: 'bold'}}>{greeting()}</h2>
+            <p className="text-sm font-medium" style={{color: '#ffffff', opacity: 0.95}}>Ready to crush today's workout?</p>
           </div>
           
           {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-green-800/50 backdrop-blur-sm rounded-xl p-3 text-center border border-green-500/30">
-              <div className="text-2xl font-bold" style={{color: 'white'}}>{todayStats.workouts}</div>
-              <div className="text-xs font-medium" style={{color: '#dcfce7'}}>Workouts</div>
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(21, 128, 61, 0.7)',
+              border: '1px solid rgba(34, 197, 94, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{todayStats.workouts}</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Workouts</div>
             </div>
-            <div className="bg-green-800/50 backdrop-blur-sm rounded-xl p-3 text-center border border-green-500/30">
-              <div className="text-2xl font-bold" style={{color: 'white'}}>{todayStats.exercises}</div>
-              <div className="text-xs font-medium" style={{color: '#dcfce7'}}>Exercises</div>
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(21, 128, 61, 0.7)',
+              border: '1px solid rgba(34, 197, 94, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{todayStats.exercises}</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Exercises</div>
             </div>
-            <div className="bg-green-800/50 backdrop-blur-sm rounded-xl p-3 text-center border border-green-500/30">
-              <div className="text-2xl font-bold" style={{color: 'white'}}>{todayStats.timeMinutes}</div>
-              <div className="text-xs font-medium" style={{color: '#dcfce7'}}>Minutes</div>
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(21, 128, 61, 0.7)',
+              border: '1px solid rgba(34, 197, 94, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{todayStats.timeMinutes}</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Minutes</div>
             </div>
           </div>
         </section>
