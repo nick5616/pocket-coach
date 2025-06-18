@@ -157,7 +157,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Quick Actions */}
+        {/* Primary Action */}
         <section className="px-4 py-6 -mt-4 relative z-10">
           <Link href="/workout-journal">
             <Button 
@@ -166,10 +166,18 @@ export default function Home() {
             >
               <div className="flex items-center justify-center space-x-3">
                 <Play className="h-6 w-6" />
-                <span className="text-lg font-semibold">Start New Workout</span>
+                <span className="text-lg font-semibold">Continue Today's Workout</span>
               </div>
             </Button>
           </Link>
+          
+          <div className="mt-3 text-center">
+            <Link href="/programs">
+              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800">
+                View Training Programs
+              </Button>
+            </Link>
+          </div>
         </section>
 
         {/* AI Recommendation */}

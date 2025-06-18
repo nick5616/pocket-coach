@@ -68,16 +68,25 @@ export default function Workouts() {
 
       <main className="pb-20">
         {/* Stats Overview */}
-        <section className="bg-gradient-to-r from-duolingo-blue to-blue-600 text-white px-4 py-6">
-          <h2 className="text-xl font-bold mb-4">Workout Stats</h2>
+        <section className="px-4 py-6" style={{
+          background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)',
+          color: 'white'
+        }}>
+          <h2 className="text-xl font-bold mb-4" style={{color: '#ffffff'}}>Workout Stats</h2>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">{workoutStats.completed}</div>
-              <div className="text-xs text-blue-100">Completed</div>
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(30, 64, 175, 0.7)',
+              border: '1px solid rgba(59, 130, 246, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{workoutStats.completed}</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Completed</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">{Math.round(workoutStats.totalTime / 60)}h</div>
-              <div className="text-xs text-blue-100">Total Time</div>
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(30, 64, 175, 0.7)',
+              border: '1px solid rgba(59, 130, 246, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{Math.round(workoutStats.totalTime / 60)}h</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Total Time</div>
             </div>
           </div>
         </section>
