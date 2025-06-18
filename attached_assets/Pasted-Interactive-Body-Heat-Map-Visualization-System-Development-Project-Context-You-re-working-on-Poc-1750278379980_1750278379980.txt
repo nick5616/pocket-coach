@@ -1,0 +1,44 @@
+Interactive Body Heat Map Visualization System Development
+
+## Project Context
+You're working on Pocket Coach, a React/TypeScript PWA fitness app with OpenAI integration. The core journaling and workout tracking system is complete. Now implement an interactive 3D body visualization system for the Progress tab.
+
+## Current Architecture
+- **Frontend**: React 18, TypeScript, Tailwind CSS, Radix UI components
+- **Backend**: Node.js/Express with in-memory storage (MemStorage class)
+- **Database Schema**: Users, workouts, exercises, goals, programs, achievements
+- **AI Integration**: OpenAI GPT-4o for workout analysis and program generation
+
+## Feature Requirements
+
+### Core Functionality
+1. **3D Human Body Model**: SVG-based anatomical model with clickable muscle regions
+2. **Progress Heat Map**: Visual overlay showing workout intensity per muscle group based on:
+   - Workout frequency (how often muscles are trained)
+   - Training volume (sets × reps × weight)
+   - Recency (recent workouts weighted higher)
+3. **Interactive Camera System**: 
+   - Smooth zoom/pan animations
+   - Predefined focus positions for muscle groups
+   - "Back" button functionality with 180° model rotation
+4. **Muscle Selection Interface**: Direct clicking for goal setting and program generation
+5. **AI Integration**: Enhanced program creation based on selected muscle targets
+
+### Technical Implementation
+
+#### Database Schema Extensions
+```typescript
+// Add to shared/schema.ts
+export const muscleGroups = pgTable("muscle_groups", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // "chest", "back", "shoulders", etc.
+  region: text("region").notNull(), // "upper", "lower", "core"
+  displayName: text("display_name").notNull(), // "Chest", "Back", "Shoulders"
+});
+
+export const exerciseMuscleMapping = pgTable("exercise_muscle_mapping", {
+  id: serial("id").primaryKey(),
+  exerciseName: text("exercise_name").notNull(),
+  muscleGroupId: integer("muscle_group_id").references(() => muscleGroups.id),
+  primaryMuscle: boolean("primary_muscle").default(true),
+});
