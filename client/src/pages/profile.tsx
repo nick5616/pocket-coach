@@ -185,29 +185,44 @@ export default function Profile() {
 
       <main className="pb-20">
         {/* User Info */}
-        <section className="bg-gradient-to-r from-duolingo-green to-green-600 text-white px-4 py-6">
+        <section className="px-4 py-6" style={{
+          background: 'linear-gradient(135deg, #65a30d 0%, #16a34a 100%)',
+          color: 'white'
+        }}>
           <div className="flex items-center mb-4">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mr-4">
-              <User className="h-8 w-8" />
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{
+              backgroundColor: 'rgba(21, 128, 61, 0.7)',
+              border: '1px solid rgba(34, 197, 94, 0.4)'
+            }}>
+              <User className="h-8 w-8" style={{color: '#ffffff'}} />
             </div>
             <div>
-              <h2 className="text-xl font-bold">{user?.username || "User"}</h2>
-              <p className="text-green-100">{user?.email || "user@example.com"}</p>
+              <h2 className="text-xl font-bold" style={{color: '#ffffff'}}>{user?.username || "User"}</h2>
+              <p className="font-medium" style={{color: '#ffffff', opacity: 0.9}}>{user?.email || "user@example.com"}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">{userStats.totalWorkouts}</div>
-              <div className="text-xs text-green-100">Workouts</div>
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(21, 128, 61, 0.7)',
+              border: '1px solid rgba(34, 197, 94, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{userStats.totalWorkouts}</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Workouts</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">{userStats.currentStreak}</div>
-              <div className="text-xs text-green-100">Day Streak</div>
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(21, 128, 61, 0.7)',
+              border: '1px solid rgba(34, 197, 94, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{userStats.currentStreak}</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Day Streak</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">{userStats.achievements}</div>
-              <div className="text-xs text-green-100">Badges</div>
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(21, 128, 61, 0.7)',
+              border: '1px solid rgba(34, 197, 94, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{userStats.achievements}</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Badges</div>
             </div>
           </div>
         </section>

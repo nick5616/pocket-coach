@@ -111,13 +111,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- June 18, 2025: Major UI/UX overhaul for text readability and unified workflow
+- June 18, 2025: **COMPLETED** - Comprehensive text visibility fix using inline CSS across all pages
+- June 18, 2025: **COMPLETED** - Navigation redesign prioritizing active workout flow over program exploration
+- June 18, 2025: **COMPLETED** - Bottom navigation update: "Workout" for active session, "History" for past workouts
+- June 18, 2025: **COMPLETED** - Primary action button changed to "Continue Today's Workout"
+- June 18, 2025: **COMPLETED** - Programs moved to secondary action (one click away from main flow)
 - June 18, 2025: Enhanced OpenAI service with sophisticated workout history context
-- June 18, 2025: Simplified navigation with unified workout journal access
 - June 18, 2025: Fixed mobile viewport constraints for toasts and floating elements
-- June 18, 2025: Improved text contrast across all components (gray-500 → gray-600/700)
 - June 18, 2025: Removed emoji dependencies and replaced with clean icons
-- June 18, 2025: Redesigned bottom navigation to include direct journal access
 - June 18, 2025: Fixed TypeScript compilation errors and date formatting issues
 - June 18, 2025: Added current date display on workout creation screen
 - June 18, 2025: Implemented AI workout name generation checkbox and backend support

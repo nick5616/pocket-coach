@@ -160,26 +160,41 @@ export default function Progress() {
 
       <main className="pb-20">
         {/* Stats Overview */}
-        <section className="bg-gradient-to-r from-duolingo-green to-green-600 text-white px-4 py-6">
-          <h2 className="text-xl font-bold mb-4">Your Stats</h2>
+        <section className="px-4 py-6" style={{
+          background: 'linear-gradient(135deg, #65a30d 0%, #16a34a 100%)',
+          color: 'white'
+        }}>
+          <h2 className="text-xl font-bold mb-4" style={{color: '#ffffff'}}>Your Stats</h2>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">{progressStats.totalWorkouts}</div>
-              <div className="text-xs text-green-100">Total Workouts</div>
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(21, 128, 61, 0.7)',
+              border: '1px solid rgba(34, 197, 94, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{progressStats.totalWorkouts}</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Total Workouts</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">{Math.round(progressStats.totalTime / 60)}h</div>
-              <div className="text-xs text-green-100">Time Trained</div>
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(21, 128, 61, 0.7)',
+              border: '1px solid rgba(34, 197, 94, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{Math.round(progressStats.totalTime / 60)}h</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Time Trained</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(21, 128, 61, 0.7)',
+              border: '1px solid rgba(34, 197, 94, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>
                 {progressStats.totalVolume > 0 ? `${Math.round(progressStats.totalVolume / 1000)}K` : "0"}
               </div>
-              <div className="text-xs text-green-100">Volume (lbs)</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Volume (lbs)</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">{progressStats.currentStreak}</div>
-              <div className="text-xs text-green-100">Day Streak 🔥</div>
+            <div className="rounded-xl p-3 text-center" style={{
+              backgroundColor: 'rgba(21, 128, 61, 0.7)',
+              border: '1px solid rgba(34, 197, 94, 0.4)'
+            }}>
+              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{progressStats.currentStreak}</div>
+              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Day Streak</div>
             </div>
           </div>
         </section>
