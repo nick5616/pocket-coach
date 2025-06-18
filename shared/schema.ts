@@ -65,6 +65,21 @@ export const programs = pgTable("programs", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const muscleGroups = pgTable("muscle_groups", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // "chest", "back", "shoulders", etc.
+  region: text("region").notNull(), // "upper", "lower", "core"
+  displayName: text("display_name").notNull(), // "Chest", "Back", "Shoulders"
+  svgId: text("svg_id").notNull(), // SVG element ID for mapping
+});
+
+export const exerciseMuscleMapping = pgTable("exercise_muscle_mapping", {
+  id: serial("id").primaryKey(),
+  exerciseName: text("exercise_name").notNull(),
+  muscleGroupId: integer("muscle_group_id").notNull().references(() => muscleGroups.id),
+  primaryMuscle: boolean("primary_muscle").default(true),
+});
+
 export const achievements = pgTable("achievements", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
@@ -108,6 +123,14 @@ export const insertProgramSchema = createInsertSchema(programs).omit({
   createdAt: true,
 });
 
+export const insertMuscleGroupSchema = createInsertSchema(muscleGroups).omit({
+  id: true,
+});
+
+export const insertExerciseMuscleMapSchema = createInsertSchema(exerciseMuscleMapping).omit({
+  id: true,
+});
+
 export const insertAchievementSchema = createInsertSchema(achievements).omit({
   id: true,
   isViewed: true,
@@ -129,6 +152,12 @@ export type InsertExercise = z.infer<typeof insertExerciseSchema>;
 
 export type Program = typeof programs.$inferSelect;
 export type InsertProgram = z.infer<typeof insertProgramSchema>;
+
+export type MuscleGroup = typeof muscleGroups.$inferSelect;
+export type InsertMuscleGroup = z.infer<typeof insertMuscleGroupSchema>;
+
+export type ExerciseMuscleMapping = typeof exerciseMuscleMapping.$inferSelect;
+export type InsertExerciseMuscleMapping = z.infer<typeof insertExerciseMuscleMapSchema>;
 
 export type Achievement = typeof achievements.$inferSelect;
 export type InsertAchievement = z.infer<typeof insertAchievementSchema>;

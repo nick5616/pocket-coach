@@ -1,11 +1,13 @@
 import { 
-  users, goals, workouts, exercises, programs, achievements,
+  users, goals, workouts, exercises, programs, achievements, muscleGroups, exerciseMuscleMapping,
   type User, type InsertUser,
   type Goal, type InsertGoal,
   type Workout, type InsertWorkout,
   type Exercise, type InsertExercise,
   type Program, type InsertProgram,
-  type Achievement, type InsertAchievement
+  type Achievement, type InsertAchievement,
+  type MuscleGroup, type InsertMuscleGroup,
+  type ExerciseMuscleMapping, type InsertExerciseMuscleMapping
 } from "@shared/schema";
 
 export interface IStorage {
@@ -44,6 +46,21 @@ export interface IStorage {
   getUserAchievements(userId: number): Promise<Achievement[]>;
   createAchievement(achievement: InsertAchievement): Promise<Achievement>;
   markAchievementViewed(id: number): Promise<void>;
+
+  // Muscle Groups
+  getAllMuscleGroups(): Promise<MuscleGroup[]>;
+  getMuscleGroup(id: number): Promise<MuscleGroup | undefined>;
+  createMuscleGroup(muscleGroup: InsertMuscleGroup): Promise<MuscleGroup>;
+
+  // Exercise Muscle Mapping
+  getExerciseMuscleMapping(exerciseName: string): Promise<ExerciseMuscleMapping[]>;
+  createExerciseMuscleMapping(mapping: InsertExerciseMuscleMapping): Promise<ExerciseMuscleMapping>;
+  getMuscleGroupProgress(userId: number, muscleGroupId: number): Promise<{
+    frequency: number;
+    volume: number;
+    lastWorked: Date | null;
+    intensity: number; // 0-1 scale for heat map
+  }>;
 }
 
 export class MemStorage implements IStorage {
@@ -53,6 +70,8 @@ export class MemStorage implements IStorage {
   private exercises: Map<number, Exercise>;
   private programs: Map<number, Program>;
   private achievements: Map<number, Achievement>;
+  private muscleGroups: Map<number, MuscleGroup>;
+  private exerciseMuscleMapping: Map<number, ExerciseMuscleMapping>;
   private currentId: number;
 
   constructor() {
@@ -62,6 +81,8 @@ export class MemStorage implements IStorage {
     this.exercises = new Map();
     this.programs = new Map();
     this.achievements = new Map();
+    this.muscleGroups = new Map();
+    this.exerciseMuscleMapping = new Map();
     this.currentId = 1;
 
     // Create demo user
@@ -70,6 +91,63 @@ export class MemStorage implements IStorage {
       password: "password123",
       email: "alex@example.com"
     });
+
+    // Initialize muscle groups
+    this.initializeMuscleGroups();
+  }
+
+  private async initializeMuscleGroups() {
+    const muscleGroupsData = [
+      { name: "chest", region: "upper", displayName: "Chest", svgId: "chest" },
+      { name: "back", region: "upper", displayName: "Back", svgId: "back" },
+      { name: "shoulders", region: "upper", displayName: "Shoulders", svgId: "shoulders" },
+      { name: "biceps", region: "upper", displayName: "Biceps", svgId: "biceps" },
+      { name: "triceps", region: "upper", displayName: "Triceps", svgId: "triceps" },
+      { name: "forearms", region: "upper", displayName: "Forearms", svgId: "forearms" },
+      { name: "abs", region: "core", displayName: "Abs", svgId: "abs" },
+      { name: "obliques", region: "core", displayName: "Obliques", svgId: "obliques" },
+      { name: "lower_back", region: "core", displayName: "Lower Back", svgId: "lower-back" },
+      { name: "quads", region: "lower", displayName: "Quadriceps", svgId: "quads" },
+      { name: "hamstrings", region: "lower", displayName: "Hamstrings", svgId: "hamstrings" },
+      { name: "glutes", region: "lower", displayName: "Glutes", svgId: "glutes" },
+      { name: "calves", region: "lower", displayName: "Calves", svgId: "calves" },
+    ];
+
+    for (const data of muscleGroupsData) {
+      await this.createMuscleGroup(data);
+    }
+
+    // Initialize common exercise-muscle mappings
+    const exerciseMappings = [
+      // Chest exercises
+      { exerciseName: "bench press", muscleGroupId: 1, primaryMuscle: true },
+      { exerciseName: "push ups", muscleGroupId: 1, primaryMuscle: true },
+      { exerciseName: "dumbbell press", muscleGroupId: 1, primaryMuscle: true },
+      { exerciseName: "incline press", muscleGroupId: 1, primaryMuscle: true },
+      { exerciseName: "chest fly", muscleGroupId: 1, primaryMuscle: true },
+      
+      // Back exercises
+      { exerciseName: "pull ups", muscleGroupId: 2, primaryMuscle: true },
+      { exerciseName: "rows", muscleGroupId: 2, primaryMuscle: true },
+      { exerciseName: "lat pulldown", muscleGroupId: 2, primaryMuscle: true },
+      { exerciseName: "deadlift", muscleGroupId: 2, primaryMuscle: true },
+      
+      // Shoulder exercises
+      { exerciseName: "shoulder press", muscleGroupId: 3, primaryMuscle: true },
+      { exerciseName: "lateral raises", muscleGroupId: 3, primaryMuscle: true },
+      { exerciseName: "front raises", muscleGroupId: 3, primaryMuscle: true },
+      
+      // Leg exercises
+      { exerciseName: "squats", muscleGroupId: 10, primaryMuscle: true },
+      { exerciseName: "lunges", muscleGroupId: 10, primaryMuscle: true },
+      { exerciseName: "leg press", muscleGroupId: 10, primaryMuscle: true },
+      { exerciseName: "leg curls", muscleGroupId: 11, primaryMuscle: true },
+      { exerciseName: "calf raises", muscleGroupId: 13, primaryMuscle: true },
+    ];
+
+    for (const mapping of exerciseMappings) {
+      await this.createExerciseMuscleMapping(mapping);
+    }
   }
 
   // Users
@@ -293,6 +371,93 @@ export class MemStorage implements IStorage {
       achievement.isViewed = true;
       this.achievements.set(id, achievement);
     }
+  }
+
+  // Muscle Groups
+  async getAllMuscleGroups(): Promise<MuscleGroup[]> {
+    return Array.from(this.muscleGroups.values());
+  }
+
+  async getMuscleGroup(id: number): Promise<MuscleGroup | undefined> {
+    return this.muscleGroups.get(id);
+  }
+
+  async createMuscleGroup(insertMuscleGroup: InsertMuscleGroup): Promise<MuscleGroup> {
+    const id = this.currentId++;
+    const muscleGroup: MuscleGroup = {
+      ...insertMuscleGroup,
+      id
+    };
+    this.muscleGroups.set(id, muscleGroup);
+    return muscleGroup;
+  }
+
+  // Exercise Muscle Mapping
+  async getExerciseMuscleMapping(exerciseName: string): Promise<ExerciseMuscleMapping[]> {
+    return Array.from(this.exerciseMuscleMapping.values())
+      .filter(mapping => mapping.exerciseName.toLowerCase().includes(exerciseName.toLowerCase()));
+  }
+
+  async createExerciseMuscleMapping(insertMapping: InsertExerciseMuscleMapping): Promise<ExerciseMuscleMapping> {
+    const id = this.currentId++;
+    const mapping: ExerciseMuscleMapping = {
+      ...insertMapping,
+      id
+    };
+    this.exerciseMuscleMapping.set(id, mapping);
+    return mapping;
+  }
+
+  async getMuscleGroupProgress(userId: number, muscleGroupId: number): Promise<{
+    frequency: number;
+    volume: number;
+    lastWorked: Date | null;
+    intensity: number;
+  }> {
+    const userWorkouts = await this.getUserWorkouts(userId);
+    const completedWorkouts = userWorkouts.filter(w => w.isCompleted);
+    
+    let frequency = 0;
+    let totalVolume = 0;
+    let lastWorked: Date | null = null;
+    
+    // Get all exercises from completed workouts
+    for (const workout of completedWorkouts) {
+      const exercises = await this.getWorkoutExercises(workout.id);
+      
+      for (const exercise of exercises) {
+        // Check if this exercise targets the muscle group
+        const mappings = await this.getExerciseMuscleMapping(exercise.name);
+        const targetsThisMuscle = mappings.some(m => m.muscleGroupId === muscleGroupId);
+        
+        if (targetsThisMuscle) {
+          frequency++;
+          if (exercise.sets && exercise.reps && exercise.weight) {
+            totalVolume += exercise.sets * exercise.reps * exercise.weight;
+          }
+          
+          if (!lastWorked || workout.completedAt! > lastWorked) {
+            lastWorked = workout.completedAt!;
+          }
+        }
+      }
+    }
+    
+    // Calculate intensity (0-1 scale) based on frequency and recency
+    const daysSinceLastWorked = lastWorked 
+      ? Math.floor((Date.now() - lastWorked.getTime()) / (1000 * 60 * 60 * 24))
+      : 999;
+    
+    const recencyScore = Math.max(0, 1 - (daysSinceLastWorked / 14)); // Decay over 2 weeks
+    const frequencyScore = Math.min(1, frequency / 10); // Max at 10 workouts
+    const intensity = (frequencyScore * 0.7) + (recencyScore * 0.3);
+    
+    return {
+      frequency,
+      volume: totalVolume,
+      lastWorked,
+      intensity
+    };
   }
 }
 
