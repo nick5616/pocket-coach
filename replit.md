@@ -111,10 +111,37 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- June 18, 2025: Major UI/UX overhaul for text readability and unified workflow
+- June 18, 2025: Enhanced OpenAI service with sophisticated workout history context
+- June 18, 2025: Simplified navigation with unified workout journal access
+- June 18, 2025: Fixed mobile viewport constraints for toasts and floating elements
+- June 18, 2025: Improved text contrast across all components (gray-500 → gray-600/700)
+- June 18, 2025: Removed emoji dependencies and replaced with clean icons
+- June 18, 2025: Redesigned bottom navigation to include direct journal access
 - June 18, 2025: Fixed TypeScript compilation errors and date formatting issues
 - June 18, 2025: Added current date display on workout creation screen
 - June 18, 2025: Implemented AI workout name generation checkbox and backend support
 - June 18, 2025: Addressed data storage architecture with security considerations
+
+## UI/UX Improvements (June 18, 2025)
+
+**User Feedback**: Text readability issues, unclear navigation, non-cohesive experience
+
+**Solutions Implemented**:
+- **Text Contrast**: Upgraded all light text (text-gray-500) to darker variants (text-gray-600/700) for better readability
+- **Mobile Constraints**: Fixed toast viewport to respect max-width mobile container
+- **Navigation Clarity**: Replaced "Programs" with "Journal" in bottom navigation for direct workout notes access
+- **Unified Design**: Simplified quick actions from dual buttons to single prominent "Start New Workout" button
+- **Stats Visibility**: Enhanced welcome section stats with stronger contrast (bg-white/30, text-white with font-medium)
+
+## Enhanced AI Context System (June 18, 2025)
+
+**OpenAI Service Improvements**:
+- **Historical Context**: Workout analysis now includes last 5 workouts for pattern recognition
+- **Sophisticated Prompts**: Added comparative analysis requirements for performance trends
+- **Goal Integration**: Enhanced goal progress tracking with current/target value context
+- **Recovery Analysis**: AI considers rest time between sessions and muscle groups
+- **Progressive Overload**: Recommendations based on performance data patterns
 
 ## Data Storage Architecture Decision
 
@@ -126,6 +153,16 @@ Preferred communication style: Simple, everyday language.
 - **Sync Strategy**: Store locally when offline, sync to server when online for AI processing
 - **PWA Benefits**: Allows gym use without internet while maintaining AI features when connected
 
+## User Experience Philosophy
+
+**Design Principles**:
+- **Unified Workflow**: Seamless integration between continuous journaling and exercise entry
+- **Mobile-First**: All components respect mobile viewport constraints
+- **Clear Navigation**: Direct access to core features without confusion
+- **Readable Text**: Sufficient contrast for all text elements
+- **Progressive Enhancement**: AI features enhance but don't block core functionality
+
 ## Changelog
 
+- June 18, 2025: Major application overhaul for cohesive user experience
 - June 18, 2025: Initial setup and core functionality implementation
