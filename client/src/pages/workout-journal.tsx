@@ -285,10 +285,18 @@ export default function WorkoutJournal() {
         // Regroup write-up content with context
         regroupWriteUpContent(data.parsedData);
         
+        // Clear input and maintain focus for seamless flow
+        setJournalText('');
+        
         setTimeout(() => {
           setShowParseAnimation(false);
           setParseStatus('idle');
           setParseProgress(0);
+          // Refocus on input for seamless continuation
+          const textarea = document.querySelector('textarea[placeholder*="journal"]') as HTMLTextAreaElement;
+          if (textarea) {
+            textarea.focus();
+          }
         }, 2000);
       },
       onError: () => {
@@ -561,14 +569,17 @@ export default function WorkoutJournal() {
                   {/* Save Status */}
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center space-x-2">
-                      <div className={`w-2 h-2 rounded-full ${
-                        saveStatus === 'saving' ? 'bg-yellow-500 animate-pulse' :
-                        saveStatus === 'saved' ? 'bg-green-500' : 'bg-gray-300'
-                      }`} />
-                      <span className="text-gray-600">
-                        {saveStatus === 'saving' ? 'Saving...' :
-                         saveStatus === 'saved' ? 'Saved' : 'Ready to save'}
-                      </span>
+                      {saveStatus === 'saving' ? (
+                        <div className="flex items-center space-x-1">
+                          <div className="flex space-x-1">
+                            <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                            <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                            <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                          </div>
+                        </div>
+                      ) : saveStatus === 'saved' ? (
+                        <span className="text-gray-600 font-medium">Saved</span>
+                      ) : null}
                     </div>
                     <AnimatePresence>
                       {showSaveAnimation && (
@@ -969,15 +980,15 @@ export default function WorkoutJournal() {
               <CheckCircle className="h-10 w-10 text-white" />
             </motion.div>
             
-            <h3 className="text-xl font-bold mb-2">Workout Complete! 🎉</h3>
-            <p className="text-green-100 mb-4">
+            <h3 className="text-xl font-bold mb-2" style={{color: '#ffffff'}}>Workout Complete! 🎉</h3>
+            <p className="mb-4 font-medium" style={{color: '#ffffff', opacity: 0.95}}>
               Great job crushing your workout today!
             </p>
 
             {completionData?.analysis && (
-              <div className="bg-white/10 rounded-lg p-3 mb-4 text-left">
-                <h4 className="font-semibold mb-2">AI Coach Says:</h4>
-                <p className="text-sm text-green-100">
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 mb-4 text-left border border-white/20">
+                <h4 className="font-semibold mb-2" style={{color: '#ffffff'}}>AI Coach Says:</h4>
+                <p className="text-sm font-medium" style={{color: '#ffffff', opacity: 0.9}}>
                   {completionData.analysis.nextWorkoutRecommendation}
                 </p>
               </div>
