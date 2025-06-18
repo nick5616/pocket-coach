@@ -45,11 +45,11 @@ const workoutSchema = z.object({
 
 const exerciseSchema = z.object({
   name: z.string().min(1, "Exercise name is required"),
-  sets: z.number().min(1).nullable().optional(),
-  reps: z.number().min(1).nullable().optional(),
-  weight: z.number().min(0).nullable().optional(),
-  rpe: z.number().min(1).max(10).nullable().optional(),
-  restTime: z.number().min(0).nullable().optional(),
+  sets: z.union([z.number().min(1), z.null()]).optional(),
+  reps: z.union([z.number().min(1), z.null()]).optional(),
+  weight: z.union([z.number().min(0), z.null()]).optional(),
+  rpe: z.union([z.number().min(1).max(10), z.null()]).optional(),
+  restTime: z.union([z.number().min(0), z.null()]).optional(),
   notes: z.string().optional(),
 });
 
@@ -95,15 +95,15 @@ export default function WorkoutJournal() {
     },
   });
 
-  const exerciseForm = useForm({
+  const exerciseForm = useForm<any>({
     resolver: zodResolver(exerciseSchema),
     defaultValues: {
       name: "",
-      sets: undefined,
-      reps: undefined,
-      weight: undefined,
-      rpe: undefined,
-      restTime: undefined,
+      sets: null,
+      reps: null,
+      weight: null,
+      rpe: null,
+      restTime: null,
       notes: "",
     },
   });
@@ -436,13 +436,13 @@ export default function WorkoutJournal() {
     setCurrentExercise(exercise);
     exerciseForm.reset({
       name: exercise.name,
-      sets: exercise.sets ?? undefined,
-      reps: exercise.reps ?? undefined,
-      weight: exercise.weight ?? undefined,
-      rpe: exercise.rpe ?? undefined,
-      restTime: exercise.restTime ?? undefined,
+      sets: exercise.sets ?? null,
+      reps: exercise.reps ?? null,
+      weight: exercise.weight ?? null,
+      rpe: exercise.rpe ?? null,
+      restTime: exercise.restTime ?? null,
       notes: exercise.notes || "",
-    });
+    } as any);
     setShowExerciseDialog(true);
   };
 
