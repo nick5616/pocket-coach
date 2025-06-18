@@ -30,7 +30,9 @@ import {
   Calendar,
   Check,
   Activity,
-  StopCircle
+  StopCircle,
+  Trash2,
+  Edit
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Workout, Exercise, Achievement } from "@shared/schema";
@@ -73,6 +75,8 @@ export default function WorkoutJournal() {
   const [parseStatus, setParseStatus] = useState<'idle' | 'parsing' | 'parsed'>('idle');
   const [showSaveAnimation, setShowSaveAnimation] = useState(false);
   const [showParseAnimation, setShowParseAnimation] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const [lastSavedText, setLastSavedText] = useState('');
   
   // Debounce refs
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -242,7 +246,7 @@ export default function WorkoutJournal() {
 
   // Debounced auto-save (500ms)
   const debouncedSave = useCallback(() => {
-    if (!workoutId || !journalText.trim()) return;
+    if (!workoutId || !journalText.trim() || journalText === lastSavedText) return;
     
     setSaveStatus('saving');
     
@@ -252,14 +256,14 @@ export default function WorkoutJournal() {
     }, {
       onSuccess: () => {
         setSaveStatus('saved');
-        setShowSaveAnimation(true);
+        setLastSavedText(journalText);
+        setIsDirty(false);
         setTimeout(() => {
-          setShowSaveAnimation(false);
           setSaveStatus('idle');
         }, 2000);
       }
     });
-  }, [workoutId, journalText, form, updateWorkoutMutation]);
+  }, [workoutId, journalText, lastSavedText, form, updateWorkoutMutation]);
 
   // Debounced AI parsing (5 seconds)
   const debouncedParse = useCallback(() => {
@@ -277,7 +281,8 @@ export default function WorkoutJournal() {
       }
     }, 200);
     
-    parseJournalMutation.mutate(journalText, {
+    const textToParse = journalText; // Capture the full text before clearing
+    parseJournalMutation.mutate(textToParse, {
       onSuccess: (data) => {
         setParseStatus('parsed');
         setShowParseAnimation(true);
@@ -287,6 +292,8 @@ export default function WorkoutJournal() {
         
         // Clear input and maintain focus for seamless flow
         setJournalText('');
+        setLastSavedText('');
+        setIsDirty(false);
         
         setTimeout(() => {
           setShowParseAnimation(false);
@@ -327,6 +334,8 @@ export default function WorkoutJournal() {
   // Handle journal text changes with debouncing
   const handleJournalChange = (value: string) => {
     setJournalText(value);
+    setIsDirty(value !== lastSavedText);
+    setSaveStatus('idle'); // Reset save status when typing
     
     // Clear existing timeouts
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
@@ -569,8 +578,8 @@ export default function WorkoutJournal() {
                   {/* Save Status */}
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center space-x-2">
-                      {saveStatus === 'saving' ? (
-                        <div className="flex items-center space-x-1">
+                      {saveStatus === 'saving' && isDirty ? (
+                        <div className="flex items-center space-x-2">
                           <div className="flex space-x-1">
                             <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                             <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -578,7 +587,10 @@ export default function WorkoutJournal() {
                           </div>
                         </div>
                       ) : saveStatus === 'saved' ? (
-                        <span className="text-gray-600 font-medium">Saved</span>
+                        <div className="flex items-center space-x-1 text-green-600">
+                          <Check className="h-3 w-3" />
+                          <span className="font-medium">Saved!</span>
+                        </div>
                       ) : null}
                     </div>
                     <AnimatePresence>
