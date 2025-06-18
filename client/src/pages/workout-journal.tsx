@@ -434,7 +434,7 @@ export default function WorkoutJournal() {
                   value={journalText}
                   onChange={(e) => setJournalText(e.target.value)}
                   rows={6}
-                  disabled={!isEditing || workout?.isCompleted}
+                  disabled={!isEditing || Boolean(workout?.isCompleted)}
                   className="resize-none"
                 />
                 

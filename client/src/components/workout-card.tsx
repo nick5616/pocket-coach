@@ -10,8 +10,11 @@ interface WorkoutCardProps {
 }
 
 export default function WorkoutCard({ workout, onViewDetails }: WorkoutCardProps) {
-  const formatDate = (date: Date | string) => {
+  const formatDate = (date: Date | string | null | undefined) => {
+    if (!date) return "Unknown date";
     const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) return "Invalid date";
+    
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - dateObj.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -21,8 +24,10 @@ export default function WorkoutCard({ workout, onViewDetails }: WorkoutCardProps
     return dateObj.toLocaleDateString();
   };
 
-  const formatTime = (date: Date | string) => {
+  const formatTime = (date: Date | string | null | undefined) => {
+    if (!date) return "Unknown time";
     const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) return "Invalid time";
     return dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
