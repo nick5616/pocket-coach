@@ -99,11 +99,11 @@ export default function WorkoutJournal() {
     resolver: zodResolver(exerciseSchema),
     defaultValues: {
       name: "",
-      sets: null,
-      reps: null,
-      weight: null,
-      rpe: null,
-      restTime: null,
+      sets: undefined,
+      reps: undefined,
+      weight: undefined,
+      rpe: undefined,
+      restTime: undefined,
       notes: "",
     },
   });
@@ -436,11 +436,11 @@ export default function WorkoutJournal() {
     setCurrentExercise(exercise);
     exerciseForm.reset({
       name: exercise.name,
-      sets: exercise.sets || undefined,
-      reps: exercise.reps || undefined,
-      weight: exercise.weight || undefined,
-      rpe: exercise.rpe || undefined,
-      restTime: exercise.restTime || undefined,
+      sets: exercise.sets ?? undefined,
+      reps: exercise.reps ?? undefined,
+      weight: exercise.weight ?? undefined,
+      rpe: exercise.rpe ?? undefined,
+      restTime: exercise.restTime ?? undefined,
       notes: exercise.notes || "",
     });
     setShowExerciseDialog(true);
@@ -950,6 +950,7 @@ export default function WorkoutJournal() {
                           type="number"
                           placeholder="3"
                           {...field}
+                          value={field.value ?? ""}
                           onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                         />
                       </FormControl>
@@ -969,6 +970,7 @@ export default function WorkoutJournal() {
                           type="number"
                           placeholder="8"
                           {...field}
+                          value={field.value ?? ""}
                           onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                         />
                       </FormControl>
@@ -991,6 +993,7 @@ export default function WorkoutJournal() {
                           step="0.1"
                           placeholder="135"
                           {...field}
+                          value={field.value ?? ""}
                           onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                         />
                       </FormControl>
@@ -1012,6 +1015,7 @@ export default function WorkoutJournal() {
                           max="10"
                           placeholder="7"
                           {...field}
+                          value={field.value ?? ""}
                           onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                         />
                       </FormControl>
