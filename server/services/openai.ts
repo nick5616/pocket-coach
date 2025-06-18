@@ -183,6 +183,46 @@ Duration should be in minutes if mentioned, otherwise omit.
   }
 }
 
+export async function generateWorkoutName(exercises: Array<{
+  name: string;
+  sets?: number;
+  reps?: number;
+  weight?: number;
+  muscleGroups?: string[];
+}>): Promise<string> {
+  try {
+    const exerciseList = exercises.map(ex => ex.name).join(", ");
+    const muscleGroups = Array.from(new Set(exercises.flatMap(ex => ex.muscleGroups || [])));
+    
+    const prompt = `
+Generate a concise, motivating workout name based on these exercises: ${exerciseList}
+
+Primary muscle groups: ${muscleGroups.join(", ")}
+
+Create a name that is:
+- 2-4 words maximum
+- Descriptive of the workout focus
+- Motivating and energetic
+- Professional gym terminology
+
+Examples: "Push Power Session", "Leg Day Destroyer", "Upper Body Blast"
+
+Return only the workout name, no quotes or extra text.
+`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 50,
+    });
+
+    return response.choices[0].message.content?.trim() || "AI Generated Workout";
+  } catch (error) {
+    console.error("Error generating workout name:", error);
+    return "AI Generated Workout";
+  }
+}
+
 export async function generatePersonalizedProgram(
   userGoals: Array<{
     title: string;

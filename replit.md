@@ -102,7 +102,30 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 Preferred communication style: Simple, everyday language.
 
+## User Preferences
+
+- Communication style: Simple, everyday language
+- UI improvements: Show current date on workout creation screen
+- Workout naming: AI-generated workout names based on exercises
+- Data storage preference: Hybrid approach with offline capabilities
+
+## Recent Changes
+
+- June 18, 2025: Fixed TypeScript compilation errors and date formatting issues
+- June 18, 2025: Added current date display on workout creation screen
+- June 18, 2025: Implemented AI workout name generation checkbox and backend support
+- June 18, 2025: Addressed data storage architecture with security considerations
+
+## Data Storage Architecture Decision
+
+**User Question**: Store workouts locally in IndexedDB and call OpenAI directly from browser?
+
+**Decision**: Hybrid approach for security and functionality:
+- **Local Storage**: Use IndexedDB for offline workout logging via service worker
+- **API Security**: Keep OpenAI calls server-side to protect API keys and implement rate limiting
+- **Sync Strategy**: Store locally when offline, sync to server when online for AI processing
+- **PWA Benefits**: Allows gym use without internet while maintaining AI features when connected
+
 ## Changelog
 
-Changelog:
-- June 18, 2025. Initial setup
+- June 18, 2025: Initial setup and core functionality implementation
