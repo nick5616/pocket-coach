@@ -186,8 +186,9 @@ export default function WorkoutJournal() {
       return response.json();
     },
     onSuccess: (data) => {
-      refetchExercises();
+      queryClient.invalidateQueries({ queryKey: ["/api/exercises", workoutId] });
       queryClient.invalidateQueries({ queryKey: ["/api/workouts", workoutId] });
+      refetchExercises();
       toast({
         title: "Journal Processed",
         description: `Found ${data.parsedData.exercises.length} exercises in your notes!`,
