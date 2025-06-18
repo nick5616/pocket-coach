@@ -111,6 +111,11 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- June 18, 2025: **COMPLETED** - Real-time debounced journaling system with auto-save (500ms) and AI parsing (5s)
+- June 18, 2025: **COMPLETED** - Stream of consciousness write-up feature with automatic regrouping
+- June 18, 2025: **COMPLETED** - Linear progress indicators for save and parse operations with checkmark animations
+- June 18, 2025: **COMPLETED** - Home page workout resumption for ongoing sessions
+- June 18, 2025: **COMPLETED** - Removed save/parse button in favor of real-time processing
 - June 18, 2025: **COMPLETED** - Comprehensive text visibility fix using inline CSS across all pages
 - June 18, 2025: **COMPLETED** - Navigation redesign prioritizing active workout flow over program exploration
 - June 18, 2025: **COMPLETED** - Bottom navigation update: "Workout" for active session, "History" for past workouts

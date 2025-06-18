@@ -39,6 +39,9 @@ export default function Home() {
     queryFn: () => fetch(`/api/workouts?userId=${userId}&limit=3`).then(res => res.json()),
   });
 
+  // Find ongoing workout (not completed)
+  const ongoingWorkout = recentWorkouts.find(w => !w.isCompleted);
+
   const { data: goals = [] } = useQuery<Goal[]>({
     queryKey: ["/api/goals", { userId }],
     queryFn: () => fetch(`/api/goals?userId=${userId}`).then(res => res.json()),
@@ -159,17 +162,31 @@ export default function Home() {
 
         {/* Primary Action */}
         <section className="px-4 py-6 -mt-4 relative z-10">
-          <Link href="/workout-journal">
-            <Button 
-              size="lg"
-              className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
-            >
-              <div className="flex items-center justify-center space-x-3">
-                <Play className="h-6 w-6" />
-                <span className="text-lg font-semibold">Continue Today's Workout</span>
-              </div>
-            </Button>
-          </Link>
+          {ongoingWorkout ? (
+            <Link href={`/workout-journal/${ongoingWorkout.id}`}>
+              <Button 
+                size="lg"
+                className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
+              >
+                <div className="flex items-center justify-center space-x-3">
+                  <Play className="h-6 w-6" />
+                  <span className="text-lg font-semibold">Resume "{ongoingWorkout.name}"</span>
+                </div>
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/workout-journal">
+              <Button 
+                size="lg"
+                className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
+              >
+                <div className="flex items-center justify-center space-x-3">
+                  <Play className="h-6 w-6" />
+                  <span className="text-lg font-semibold">Start New Workout</span>
+                </div>
+              </Button>
+            </Link>
+          )}
           
           <div className="mt-3 text-center">
             <Link href="/programs">
