@@ -204,6 +204,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Exercise routes
+  app.get("/api/exercises", async (req, res) => {
+    try {
+      const workoutId = parseInt(req.query.workoutId as string);
+      if (!workoutId) {
+        return res.status(400).json({ message: "workoutId is required" });
+      }
+      
+      const exercises = await storage.getWorkoutExercises(workoutId);
+      res.json(exercises);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch exercises" });
+    }
+  });
+
   app.post("/api/exercises", async (req, res) => {
     try {
       const validatedData = insertExerciseSchema.parse(req.body);

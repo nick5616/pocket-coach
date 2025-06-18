@@ -54,6 +54,7 @@ export default function WorkoutJournal() {
   const { toast } = useToast();
   
   const [journalText, setJournalText] = useState("");
+  const [writeUpContent, setWriteUpContent] = useState<string[]>([]);
   const [isEditing, setIsEditing] = useState(!id);
   const [showExerciseDialog, setShowExerciseDialog] = useState(false);
   const [currentExercise, setCurrentExercise] = useState<Exercise | null>(null);
@@ -61,6 +62,7 @@ export default function WorkoutJournal() {
   const [completionData, setCompletionData] = useState<any>(null);
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
+  const [lastProcessedLength, setLastProcessedLength] = useState(0);
 
   const userId = 1; // Mock user ID
   const workoutId = id ? parseInt(id) : null;
@@ -97,8 +99,8 @@ export default function WorkoutJournal() {
   // Fetch exercises for the workout
   const { data: exercises = [], refetch: refetchExercises } = useQuery<Exercise[]>({
     queryKey: ["/api/exercises", workoutId],
-    queryFn: () => workout?.exercises || [],
-    enabled: !!workout,
+    queryFn: () => fetch(`/api/exercises?workoutId=${workoutId}`).then(res => res.json()),
+    enabled: !!workoutId,
   });
 
   useEffect(() => {
@@ -108,6 +110,30 @@ export default function WorkoutJournal() {
       setJournalText(workout.notes || "");
     }
   }, [workout, form]);
+
+  // Real-time journal processing for stream of consciousness
+  useEffect(() => {
+    if (journalText.length > lastProcessedLength && workoutId) {
+      const newContent = journalText.slice(lastProcessedLength);
+      const lines = newContent.split('\n').filter(line => line.trim());
+      
+      // Process new lines for exercise data vs write-up content
+      lines.forEach(line => {
+        const trimmedLine = line.trim().toLowerCase();
+        
+        // Check if line contains exercise-like content
+        const hasExerciseKeywords = /\b(set|rep|lb|kg|bench|press|squat|curl|row|pull|push|lift|weight)\b/.test(trimmedLine);
+        const hasNumbers = /\d+/.test(trimmedLine);
+        
+        if (!hasExerciseKeywords || !hasNumbers) {
+          // This line goes to the "write-up" - non-exercise thoughts
+          setWriteUpContent(prev => [...prev, line.trim()]);
+        }
+      });
+      
+      setLastProcessedLength(journalText.length);
+    }
+  }, [journalText, lastProcessedLength, workoutId]);
 
   // Create workout mutation
   const createWorkoutMutation = useMutation({
@@ -390,23 +416,26 @@ export default function WorkoutJournal() {
         {/* Workout Stats */}
         {workoutId && (
           <section className="px-4 mb-6">
-            <Card className="bg-gradient-to-r from-duolingo-blue to-blue-600 text-white border-0">
+            <Card className="border-0" style={{
+              background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)',
+              color: 'white'
+            }}>
               <CardContent className="p-4">
-                <h3 className="font-semibold mb-3">Workout Progress</h3>
+                <h3 className="font-semibold mb-3" style={{color: '#ffffff'}}>Workout Progress</h3>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="text-center">
-                    <div className="text-xl font-bold">{exercises.length}</div>
-                    <div className="text-xs text-blue-100">Exercises</div>
+                    <div className="text-xl font-bold" style={{color: '#ffffff'}}>{exercises.length}</div>
+                    <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Exercises</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold">{stats.totalSets}</div>
-                    <div className="text-xs text-blue-100">Sets</div>
+                    <div className="text-xl font-bold" style={{color: '#ffffff'}}>{stats.totalSets}</div>
+                    <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Sets</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold">
+                    <div className="text-xl font-bold" style={{color: '#ffffff'}}>
                       {stats.totalVolume > 0 ? `${Math.round(stats.totalVolume / 1000)}K` : "0"}
                     </div>
-                    <div className="text-xs text-blue-100">Volume (lbs)</div>
+                    <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Volume (lbs)</div>
                   </div>
                 </div>
               </CardContent>
@@ -544,6 +573,35 @@ export default function WorkoutJournal() {
                 </Card>
               )}
             </AnimatePresence>
+          </section>
+        )}
+
+        {/* Write-up Section - Stream of consciousness content */}
+        {workoutId && writeUpContent.length > 0 && (
+          <section className="px-4 mb-6">
+            <Card className="border-amber-200 bg-amber-50/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-lg text-amber-800">
+                  <Edit3 className="h-5 w-5 mr-2" />
+                  Your Write-up
+                </CardTitle>
+                <p className="text-sm text-amber-700">
+                  Stream of consciousness thoughts that didn't match exercise patterns
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {writeUpContent.map((content, index) => (
+                    <div key={index} className="bg-white/60 rounded-lg p-3 border border-amber-200">
+                      <p className="text-sm text-gray-700 italic">"{content}"</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 text-xs text-amber-600 font-medium">
+                  📝 These thoughts will be included in your workout summary
+                </div>
+              </CardContent>
+            </Card>
           </section>
         )}
 
