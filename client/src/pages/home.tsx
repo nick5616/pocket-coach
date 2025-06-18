@@ -122,25 +122,25 @@ export default function Home() {
 
       <main className="pb-20 min-h-screen">
         {/* Welcome Section */}
-        <section className="bg-gradient-to-br from-duolingo-green to-green-600 text-white px-4 py-6">
+        <section className="bg-gradient-to-br from-duolingo-green to-green-600 px-4 py-6">
           <div className="mb-4">
-            <h2 className="text-xl font-bold mb-1">{greeting()}</h2>
+            <h2 className="text-xl font-bold mb-1 text-white">{greeting()}</h2>
             <p className="text-white text-sm font-medium">Ready to crush today's workout?</p>
           </div>
           
           {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white/30 backdrop-blur-sm rounded-xl p-3 text-center">
+            <div className="bg-green-800/50 backdrop-blur-sm rounded-xl p-3 text-center border border-green-500/30">
               <div className="text-2xl font-bold text-white">{todayStats.workouts}</div>
-              <div className="text-xs text-white font-medium">Workouts</div>
+              <div className="text-xs text-green-100 font-medium">Workouts</div>
             </div>
-            <div className="bg-white/30 backdrop-blur-sm rounded-xl p-3 text-center">
+            <div className="bg-green-800/50 backdrop-blur-sm rounded-xl p-3 text-center border border-green-500/30">
               <div className="text-2xl font-bold text-white">{todayStats.exercises}</div>
-              <div className="text-xs text-white font-medium">Exercises</div>
+              <div className="text-xs text-green-100 font-medium">Exercises</div>
             </div>
-            <div className="bg-white/30 backdrop-blur-sm rounded-xl p-3 text-center">
+            <div className="bg-green-800/50 backdrop-blur-sm rounded-xl p-3 text-center border border-green-500/30">
               <div className="text-2xl font-bold text-white">{todayStats.timeMinutes}</div>
-              <div className="text-xs text-white font-medium">Minutes</div>
+              <div className="text-xs text-green-100 font-medium">Minutes</div>
             </div>
           </div>
         </section>
