@@ -85,6 +85,7 @@ export class MemStorage implements IStorage {
     const user: User = {
       ...insertUser,
       id,
+      email: insertUser.email || null,
       currentStreak: 0,
       createdAt: new Date()
     };
@@ -110,6 +111,12 @@ export class MemStorage implements IStorage {
     const goal: Goal = {
       ...insertGoal,
       id,
+      description: insertGoal.description || null,
+      targetValue: insertGoal.targetValue || null,
+      unit: insertGoal.unit || null,
+      muscleGroup: insertGoal.muscleGroup || null,
+      status: insertGoal.status || "active",
+      targetDate: insertGoal.targetDate || null,
       currentValue: 0,
       createdAt: new Date()
     };
@@ -149,6 +156,9 @@ export class MemStorage implements IStorage {
     const workout: Workout = {
       ...insertWorkout,
       id,
+      notes: insertWorkout.notes || null,
+      duration: insertWorkout.duration || null,
+      calories: insertWorkout.calories || null,
       totalVolume: 0,
       aiAnalysis: null,
       isCompleted: false,
@@ -194,6 +204,13 @@ export class MemStorage implements IStorage {
     const exercise: Exercise = {
       ...insertExercise,
       id,
+      notes: insertExercise.notes || null,
+      sets: insertExercise.sets || null,
+      reps: insertExercise.reps || null,
+      weight: insertExercise.weight || null,
+      rpe: insertExercise.rpe || null,
+      restTime: insertExercise.restTime || null,
+      muscleGroups: insertExercise.muscleGroups || null,
       createdAt: new Date()
     };
     this.exercises.set(id, exercise);
@@ -224,6 +241,10 @@ export class MemStorage implements IStorage {
     const program: Program = {
       ...insertProgram,
       id,
+      description: insertProgram.description || null,
+      isActive: insertProgram.isActive || false,
+      schedule: insertProgram.schedule || null,
+      aiGenerated: insertProgram.aiGenerated || false,
       createdAt: new Date()
     };
     this.programs.set(id, program);
@@ -252,6 +273,8 @@ export class MemStorage implements IStorage {
     const achievement: Achievement = {
       ...insertAchievement,
       id,
+      description: insertAchievement.description || null,
+      data: insertAchievement.data || null,
       isViewed: false,
       createdAt: new Date()
     };

@@ -10,7 +10,7 @@ import AchievementModal from "@/components/achievement-modal";
 import WorkoutCard from "@/components/workout-card";
 import { 
   Bell, 
-  User, 
+  User as UserIcon, 
   Play, 
   PenTool, 
   TrendingUp, 
@@ -20,8 +20,8 @@ import {
   ChartLine,
   Flame
 } from "lucide-react";
-import type { User, WorkoutStats, AIRecommendation } from "@/lib/types";
-import type { Workout, Goal, Achievement } from "@shared/schema";
+import type { WorkoutStats, AIRecommendation } from "@/lib/types";
+import type { User, Workout, Goal, Achievement } from "@shared/schema";
 
 export default function Home() {
   const [showAchievement, setShowAchievement] = useState(false);
@@ -113,7 +113,7 @@ export default function Home() {
             </div>
             <Link href="/profile">
               <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700">
-                <User className="h-5 w-5" />
+                <UserIcon className="h-5 w-5" />
               </Button>
             </Link>
           </div>

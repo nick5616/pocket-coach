@@ -183,7 +183,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Update user streak
         const user = await storage.getUser(workout.userId);
         if (user) {
-          await storage.updateUserStreak(workout.userId, user.currentStreak + 1);
+          await storage.updateUserStreak(workout.userId, (user.currentStreak || 0) + 1);
         }
 
         // Create achievement
