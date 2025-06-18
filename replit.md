@@ -116,9 +116,13 @@ Preferred communication style: Simple, everyday language.
 - June 18, 2025: **COMPLETED** - Linear progress indicators for save and parse operations with checkmark animations
 - June 18, 2025: **COMPLETED** - Home page workout resumption for ongoing sessions
 - June 18, 2025: **COMPLETED** - Removed save/parse button in favor of real-time processing
-- June 18, 2025: **COMPLETED** - Enhanced save status with iMessage-style typing dots and "Saved" indicator
+- June 18, 2025: **COMPLETED** - Enhanced save status with iMessage-style typing dots and "✓ Saved!" indicator
 - June 18, 2025: **COMPLETED** - Input field auto-clear after AI parsing with maintained focus for seamless flow
 - June 18, 2025: **COMPLETED** - Fixed workout completion card white text visibility issues
+- June 18, 2025: **COMPLETED** - Exercise editing and deletion functionality with edit/delete buttons
+- June 18, 2025: **COMPLETED** - "Manual Add" button text to indicate direct exercise entry option
+- June 18, 2025: **COMPLETED** - Character truncation bug fix in AI parsing (preserves full text)
+- June 18, 2025: **COMPLETED** - Proper dirty state tracking for save status indicators
 - June 18, 2025: **COMPLETED** - Comprehensive text visibility fix using inline CSS across all pages
 - June 18, 2025: **COMPLETED** - Navigation redesign prioritizing active workout flow over program exploration
 - June 18, 2025: **COMPLETED** - Bottom navigation update: "Workout" for active session, "History" for past workouts

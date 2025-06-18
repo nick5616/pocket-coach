@@ -45,11 +45,11 @@ const workoutSchema = z.object({
 
 const exerciseSchema = z.object({
   name: z.string().min(1, "Exercise name is required"),
-  sets: z.number().min(1).optional(),
-  reps: z.number().min(1).optional(),
-  weight: z.number().min(0).optional(),
-  rpe: z.number().min(1).max(10).optional(),
-  restTime: z.number().min(0).optional(),
+  sets: z.number().min(1).nullable().optional(),
+  reps: z.number().min(1).nullable().optional(),
+  weight: z.number().min(0).nullable().optional(),
+  rpe: z.number().min(1).max(10).nullable().optional(),
+  restTime: z.number().min(0).nullable().optional(),
   notes: z.string().optional(),
 });
 
@@ -99,11 +99,11 @@ export default function WorkoutJournal() {
     resolver: zodResolver(exerciseSchema),
     defaultValues: {
       name: "",
-      sets: undefined,
-      reps: undefined,
-      weight: undefined,
-      rpe: undefined,
-      restTime: undefined,
+      sets: null,
+      reps: null,
+      weight: null,
+      rpe: null,
+      restTime: null,
       notes: "",
     },
   });
@@ -431,11 +431,11 @@ export default function WorkoutJournal() {
     setCurrentExercise(exercise);
     exerciseForm.reset({
       name: exercise.name,
-      sets: exercise.sets ?? undefined,
-      reps: exercise.reps ?? undefined, 
-      weight: exercise.weight ?? undefined,
-      rpe: exercise.rpe ?? undefined,
-      restTime: exercise.restTime ?? undefined,
+      sets: exercise.sets || null,
+      reps: exercise.reps || null,
+      weight: exercise.weight || null,
+      rpe: exercise.rpe || null,
+      restTime: exercise.restTime || null,
       notes: exercise.notes || "",
     });
     setShowExerciseDialog(true);
@@ -788,9 +788,31 @@ export default function WorkoutJournal() {
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="font-semibold text-gray-900">{exercise.name}</h4>
-                            {exercise.rpe && (
-                              <Badge variant="secondary">RPE {exercise.rpe}</Badge>
-                            )}
+                            <div className="flex items-center space-x-2">
+                              {exercise.rpe && (
+                                <Badge variant="secondary">RPE {exercise.rpe}</Badge>
+                              )}
+                              {isEditing && !workout?.isCompleted && (
+                                <div className="flex items-center space-x-1">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => handleEditExercise(exercise)}
+                                    className="h-6 w-6 p-0 text-gray-500 hover:text-blue-600"
+                                  >
+                                    <Edit className="h-3 w-3" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => handleDeleteExercise(exercise.id!)}
+                                    className="h-6 w-6 p-0 text-gray-500 hover:text-red-600"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                           
                           <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
@@ -893,7 +915,7 @@ export default function WorkoutJournal() {
       <Dialog open={showExerciseDialog} onOpenChange={setShowExerciseDialog}>
         <DialogContent className="max-w-sm mx-4">
           <DialogHeader>
-            <DialogTitle>Add Exercise</DialogTitle>
+            <DialogTitle>{currentExercise ? "Edit Exercise" : "Manual Add Exercise"}</DialogTitle>
           </DialogHeader>
           <Form {...exerciseForm}>
             <form onSubmit={exerciseForm.handleSubmit(handleAddExercise)} className="space-y-4">
@@ -1023,10 +1045,12 @@ export default function WorkoutJournal() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={addExerciseMutation.isPending}
+                  disabled={addExerciseMutation.isPending || updateExerciseMutation.isPending}
                   className="flex-1 bg-duolingo-green hover:bg-duolingo-green/90"
                 >
-                  {addExerciseMutation.isPending ? "Adding..." : "Add Exercise"}
+                  {addExerciseMutation.isPending || updateExerciseMutation.isPending ? 
+                    (currentExercise ? "Updating..." : "Adding...") : 
+                    (currentExercise ? "Update Exercise" : "Add Exercise")}
                 </Button>
               </div>
             </form>
