@@ -398,7 +398,12 @@ export default function Home() {
               credentials: 'include'
             });
           }}
-          achievement={currentAchievement}
+          achievement={{
+            type: currentAchievement.type,
+            title: currentAchievement.title,
+            description: currentAchievement.description || "Great achievement!",
+            data: currentAchievement.data
+          }}
         />
       )}
     </>
