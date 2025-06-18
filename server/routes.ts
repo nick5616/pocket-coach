@@ -231,6 +231,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/exercises/:id", async (req, res) => {
+    try {
+      const exerciseId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const exercise = await storage.updateExercise(exerciseId, updates);
+      if (!exercise) {
+        return res.status(404).json({ message: "Exercise not found" });
+      }
+      
+      res.json(exercise);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update exercise" });
+    }
+  });
+
+  app.delete("/api/exercises/:id", async (req, res) => {
+    try {
+      const exerciseId = parseInt(req.params.id);
+      
+      const success = await storage.deleteExercise(exerciseId);
+      if (!success) {
+        return res.status(404).json({ message: "Exercise not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete exercise" });
+    }
+  });
+
   // Goal routes
   app.get("/api/goals", async (req, res) => {
     try {

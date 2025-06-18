@@ -32,6 +32,7 @@ export interface IStorage {
   getWorkoutExercises(workoutId: number): Promise<Exercise[]>;
   createExercise(exercise: InsertExercise): Promise<Exercise>;
   updateExercise(id: number, updates: Partial<Exercise>): Promise<Exercise | undefined>;
+  deleteExercise(id: number): Promise<boolean>;
 
   // Programs
   getUserPrograms(userId: number): Promise<Program[]>;
@@ -225,6 +226,10 @@ export class MemStorage implements IStorage {
       return updated;
     }
     return undefined;
+  }
+
+  async deleteExercise(id: number): Promise<boolean> {
+    return this.exercises.delete(id);
   }
 
   // Programs

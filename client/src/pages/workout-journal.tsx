@@ -323,10 +323,11 @@ export default function WorkoutJournal() {
         // Regroup write-up content with context
         regroupWriteUpContent(data.parsedData);
         
-        // Clear input and maintain focus for seamless flow
+        // Clear input and reset state for seamless flow
         setJournalText('');
         setLastSavedText('');
         setIsDirty(false);
+        setSaveStatus('idle');
         
         setTimeout(() => {
           setShowParseAnimation(false);
@@ -368,7 +369,11 @@ export default function WorkoutJournal() {
   const handleJournalChange = (value: string) => {
     setJournalText(value);
     setIsDirty(value !== lastSavedText);
-    setSaveStatus('idle'); // Reset save status when typing
+    
+    // Show typing indicator immediately when user starts typing
+    if (value !== lastSavedText) {
+      setSaveStatus('saving');
+    }
     
     // Clear existing timeouts
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
@@ -431,11 +436,11 @@ export default function WorkoutJournal() {
     setCurrentExercise(exercise);
     exerciseForm.reset({
       name: exercise.name,
-      sets: exercise.sets || null,
-      reps: exercise.reps || null,
-      weight: exercise.weight || null,
-      rpe: exercise.rpe || null,
-      restTime: exercise.restTime || null,
+      sets: exercise.sets || undefined,
+      reps: exercise.reps || undefined,
+      weight: exercise.weight || undefined,
+      rpe: exercise.rpe || undefined,
+      restTime: exercise.restTime || undefined,
       notes: exercise.notes || "",
     });
     setShowExerciseDialog(true);
@@ -913,7 +918,7 @@ export default function WorkoutJournal() {
 
       {/* Add Exercise Dialog */}
       <Dialog open={showExerciseDialog} onOpenChange={setShowExerciseDialog}>
-        <DialogContent className="max-w-sm mx-4">
+        <DialogContent className="w-[90vw] max-w-sm mx-auto">
           <DialogHeader>
             <DialogTitle>{currentExercise ? "Edit Exercise" : "Manual Add Exercise"}</DialogTitle>
           </DialogHeader>
