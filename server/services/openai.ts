@@ -47,22 +47,34 @@ export async function analyzeWorkout(
   }>
 ): Promise<WorkoutAnalysis> {
   try {
-    const prompt = `
-You are an expert AI fitness coach analyzing a workout session. Based on the workout data provided, generate personalized recommendations and insights.
+    const recentWorkouts = previousWorkouts.slice(0, 5);
+    const workoutHistory = recentWorkouts.length > 0 ? 
+      recentWorkouts.map(w => `${w.createdAt.toDateString()}: ${w.name} - ${w.notes || 'No notes'}`).join('\n') 
+      : 'No previous workouts recorded';
 
-WORKOUT NOTES:
+    const prompt = `
+You are an expert AI fitness coach analyzing a workout session. Provide comprehensive, actionable insights based on the complete training context.
+
+CURRENT WORKOUT NOTES:
 ${workoutNotes}
 
-EXERCISES PERFORMED:
+EXERCISES PERFORMED TODAY:
 ${exercises.map(ex => `- ${ex.name}: ${ex.sets ? `${ex.sets} sets` : ''} ${ex.reps ? `of ${ex.reps} reps` : ''} ${ex.weight ? `at ${ex.weight}lbs` : ''} ${ex.rpe ? `(RPE: ${ex.rpe})` : ''}`).join('\n')}
 
+RECENT WORKOUT HISTORY (Last 5 sessions):
+${workoutHistory}
+
 USER GOALS:
-${userGoals.map(goal => `- ${goal.title} (${goal.category}${goal.muscleGroup ? `, ${goal.muscleGroup}` : ''})`).join('\n')}
+${userGoals.map(goal => `- ${goal.title} (${goal.category}${goal.muscleGroup ? `, ${goal.muscleGroup}` : ''}): ${goal.currentValue || 0}/${goal.targetValue || 'no target'}`).join('\n')}
 
-RECENT WORKOUT HISTORY:
-${previousWorkouts.slice(0, 3).map(w => `- ${w.name} (${w.createdAt.toDateString()})`).join('\n')}
+ANALYSIS REQUIREMENTS:
+1. Compare today's performance with recent training history
+2. Identify patterns, improvements, or concerning trends
+3. Consider recovery time between sessions and muscle groups trained
+4. Evaluate progress toward stated goals
+5. Recommend specific progressions based on performance data
 
-Analyze this workout and provide recommendations in the following JSON format:
+Provide your analysis in the following JSON format:
 {
   "nextWorkoutRecommendation": "Specific recommendation for the next workout session",
   "keyInsights": ["insight 1", "insight 2", "insight 3"],

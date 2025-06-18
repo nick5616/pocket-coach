@@ -125,59 +125,39 @@ export default function Home() {
         <section className="bg-gradient-to-br from-duolingo-green to-green-600 text-white px-4 py-6">
           <div className="mb-4">
             <h2 className="text-xl font-bold mb-1">{greeting()}</h2>
-            <p className="text-green-100 text-sm">Ready to crush today's workout?</p>
+            <p className="text-white text-sm font-medium">Ready to crush today's workout?</p>
           </div>
           
           {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">{todayStats.workouts}</div>
-              <div className="text-xs text-green-100">Workouts</div>
+            <div className="bg-white/30 backdrop-blur-sm rounded-xl p-3 text-center">
+              <div className="text-2xl font-bold text-white">{todayStats.workouts}</div>
+              <div className="text-xs text-white font-medium">Workouts</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">{todayStats.exercises}</div>
-              <div className="text-xs text-green-100">Exercises</div>
+            <div className="bg-white/30 backdrop-blur-sm rounded-xl p-3 text-center">
+              <div className="text-2xl font-bold text-white">{todayStats.exercises}</div>
+              <div className="text-xs text-white font-medium">Exercises</div>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">{todayStats.timeMinutes}</div>
-              <div className="text-xs text-green-100">Minutes</div>
+            <div className="bg-white/30 backdrop-blur-sm rounded-xl p-3 text-center">
+              <div className="text-2xl font-bold text-white">{todayStats.timeMinutes}</div>
+              <div className="text-xs text-white font-medium">Minutes</div>
             </div>
           </div>
         </section>
 
         {/* Quick Actions */}
         <section className="px-4 py-6 -mt-4 relative z-10">
-          <div className="grid grid-cols-2 gap-4">
-            <Link href="/workout-journal">
-              <Button 
-                variant="outline" 
-                className="h-auto p-4 w-full bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-200 active:scale-95"
-              >
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-duolingo-blue/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Play className="h-6 w-6 text-duolingo-blue" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Start Workout</h3>
-                  <p className="text-xs text-gray-500">Begin your session</p>
-                </div>
-              </Button>
-            </Link>
-            
-            <Link href="/workout-journal">
-              <Button 
-                variant="outline" 
-                className="h-auto p-4 w-full bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-200 active:scale-95"
-              >
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-energetic-orange/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <PenTool className="h-6 w-6 text-energetic-orange" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Quick Log</h3>
-                  <p className="text-xs text-gray-500">Journal your workout</p>
-                </div>
-              </Button>
-            </Link>
-          </div>
+          <Link href="/workout-journal">
+            <Button 
+              size="lg"
+              className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
+            >
+              <div className="flex items-center justify-center space-x-3">
+                <Play className="h-6 w-6" />
+                <span className="text-lg font-semibold">Start New Workout</span>
+              </div>
+            </Button>
+          </Link>
         </section>
 
         {/* AI Recommendation */}

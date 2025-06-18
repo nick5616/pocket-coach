@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Dumbbell, BarChart3, Calendar, User } from "lucide-react";
+import { Home, Dumbbell, BarChart3, PenTool, User } from "lucide-react";
 
 export default function BottomNavigation() {
   const [location] = useLocation();
@@ -7,8 +7,8 @@ export default function BottomNavigation() {
   const navItems = [
     { path: "/", icon: Home, label: "Home" },
     { path: "/workouts", icon: Dumbbell, label: "Workouts" },
+    { path: "/workout-journal", icon: PenTool, label: "Journal" },
     { path: "/progress", icon: BarChart3, label: "Progress" },
-    { path: "/programs", icon: Calendar, label: "Programs" },
     { path: "/profile", icon: User, label: "Profile" },
   ];
 
