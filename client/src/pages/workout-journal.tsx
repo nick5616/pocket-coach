@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -35,6 +36,7 @@ import type { Workout, Exercise, Achievement } from "@shared/schema";
 const workoutSchema = z.object({
   name: z.string().min(1, "Workout name is required"),
   notes: z.string().optional(),
+  aiGenerateName: z.boolean().optional(),
 });
 
 const exerciseSchema = z.object({
@@ -69,6 +71,7 @@ export default function WorkoutJournal() {
     defaultValues: {
       name: "",
       notes: "",
+      aiGenerateName: false,
     },
   });
 
@@ -315,6 +318,20 @@ export default function WorkoutJournal() {
         <section className="px-4 py-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {!workoutId && (
+                <div className="text-center py-2 mb-4">
+                  <div className="text-sm text-gray-500">Today's workout</div>
+                  <div className="text-lg font-semibold text-gray-900">
+                    {new Date().toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </div>
+                </div>
+              )}
+
               <FormField
                 control={form.control}
                 name="name"
@@ -332,6 +349,31 @@ export default function WorkoutJournal() {
                   </FormItem>
                 )}
               />
+
+              {!workoutId && (
+                <FormField
+                  control={form.control}
+                  name="aiGenerateName"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          Generate workout name with AI
+                        </FormLabel>
+                        <div className="text-sm text-gray-500">
+                          AI will create a name based on your exercises
+                        </div>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {!workoutId && (
                 <Button
@@ -726,7 +768,12 @@ export default function WorkoutJournal() {
         <AchievementModal
           isOpen={showAchievement}
           onClose={() => setShowAchievement(false)}
-          achievement={currentAchievement}
+          achievement={{
+            type: currentAchievement.type,
+            title: currentAchievement.title,
+            description: currentAchievement.description || "Great achievement!",
+            data: currentAchievement.data
+          }}
         />
       )}
 
