@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, useParams, Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,10 @@ import {
   Plus,
   Edit3,
   Sparkles,
-  Calendar
+  Calendar,
+  Check,
+  Activity,
+  StopCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Workout, Exercise, Achievement } from "@shared/schema";
@@ -63,6 +66,18 @@ export default function WorkoutJournal() {
   const [showAchievement, setShowAchievement] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
   const [lastProcessedLength, setLastProcessedLength] = useState(0);
+  
+  // Real-time status states
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [parseProgress, setParseProgress] = useState(0);
+  const [parseStatus, setParseStatus] = useState<'idle' | 'parsing' | 'parsed'>('idle');
+  const [showSaveAnimation, setShowSaveAnimation] = useState(false);
+  const [showParseAnimation, setShowParseAnimation] = useState(false);
+  
+  // Debounce refs
+  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const parseTimeoutRef = useRef<NodeJS.Timeout>();
+  const parseProgressRef = useRef<NodeJS.Timeout>();
 
   const userId = 1; // Mock user ID
   const workoutId = id ? parseInt(id) : null;
@@ -110,30 +125,6 @@ export default function WorkoutJournal() {
       setJournalText(workout.notes || "");
     }
   }, [workout, form]);
-
-  // Real-time journal processing for stream of consciousness
-  useEffect(() => {
-    if (journalText.length > lastProcessedLength && workoutId) {
-      const newContent = journalText.slice(lastProcessedLength);
-      const lines = newContent.split('\n').filter(line => line.trim());
-      
-      // Process new lines for exercise data vs write-up content
-      lines.forEach(line => {
-        const trimmedLine = line.trim().toLowerCase();
-        
-        // Check if line contains exercise-like content
-        const hasExerciseKeywords = /\b(set|rep|lb|kg|bench|press|squat|curl|row|pull|push|lift|weight)\b/.test(trimmedLine);
-        const hasNumbers = /\d+/.test(trimmedLine);
-        
-        if (!hasExerciseKeywords || !hasNumbers) {
-          // This line goes to the "write-up" - non-exercise thoughts
-          setWriteUpContent(prev => [...prev, line.trim()]);
-        }
-      });
-      
-      setLastProcessedLength(journalText.length);
-    }
-  }, [journalText, lastProcessedLength, workoutId]);
 
   // Create workout mutation
   const createWorkoutMutation = useMutation({
@@ -249,6 +240,106 @@ export default function WorkoutJournal() {
     },
   });
 
+  // Debounced auto-save (500ms)
+  const debouncedSave = useCallback(() => {
+    if (!workoutId || !journalText.trim()) return;
+    
+    setSaveStatus('saving');
+    
+    updateWorkoutMutation.mutate({
+      name: form.getValues("name"),
+      notes: journalText,
+    }, {
+      onSuccess: () => {
+        setSaveStatus('saved');
+        setShowSaveAnimation(true);
+        setTimeout(() => {
+          setShowSaveAnimation(false);
+          setSaveStatus('idle');
+        }, 2000);
+      }
+    });
+  }, [workoutId, journalText, form, updateWorkoutMutation]);
+
+  // Debounced AI parsing (5 seconds)
+  const debouncedParse = useCallback(() => {
+    if (!workoutId || !journalText.trim()) return;
+    
+    setParseStatus('parsing');
+    
+    // Animate progress bar
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+      progress += 20;
+      setParseProgress(progress);
+      if (progress >= 100) {
+        clearInterval(progressInterval);
+      }
+    }, 200);
+    
+    parseJournalMutation.mutate(journalText, {
+      onSuccess: (data) => {
+        setParseStatus('parsed');
+        setShowParseAnimation(true);
+        
+        // Regroup write-up content with context
+        regroupWriteUpContent(data.parsedData);
+        
+        setTimeout(() => {
+          setShowParseAnimation(false);
+          setParseStatus('idle');
+          setParseProgress(0);
+        }, 2000);
+      },
+      onError: () => {
+        setParseStatus('idle');
+        setParseProgress(0);
+      }
+    });
+  }, [workoutId, journalText, parseJournalMutation]);
+
+  // Regroup write-up content with context
+  const regroupWriteUpContent = (parsedData: any) => {
+    const lines = journalText.split('\n').filter(line => line.trim());
+    const nonExerciseLines: string[] = [];
+    
+    lines.forEach(line => {
+      const trimmedLine = line.trim().toLowerCase();
+      const hasExerciseKeywords = /\b(set|rep|lb|kg|bench|press|squat|curl|row|pull|push|lift|weight)\b/.test(trimmedLine);
+      const hasNumbers = /\d+/.test(trimmedLine);
+      
+      if (!hasExerciseKeywords || !hasNumbers) {
+        nonExerciseLines.push(line.trim());
+      }
+    });
+    
+    setWriteUpContent(nonExerciseLines);
+  };
+
+  // Handle journal text changes with debouncing
+  const handleJournalChange = (value: string) => {
+    setJournalText(value);
+    
+    // Clear existing timeouts
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    if (parseTimeoutRef.current) clearTimeout(parseTimeoutRef.current);
+    
+    // Auto-save after 500ms
+    saveTimeoutRef.current = setTimeout(debouncedSave, 500);
+    
+    // AI parse after 5 seconds
+    parseTimeoutRef.current = setTimeout(debouncedParse, 5000);
+  };
+
+  // Cleanup timeouts
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      if (parseTimeoutRef.current) clearTimeout(parseTimeoutRef.current);
+      if (parseProgressRef.current) clearTimeout(parseProgressRef.current);
+    };
+  }, []);
+
   const onSubmit = (data: z.infer<typeof workoutSchema>) => {
     if (workoutId) {
       updateWorkoutMutation.mutate(data);
@@ -257,16 +348,22 @@ export default function WorkoutJournal() {
     }
   };
 
-  const handleJournalSave = () => {
-    if (!workoutId || !journalText.trim()) return;
+  const handleEndWorkout = () => {
+    if (!workoutId) return;
     
+    // Save final state and navigate back
     updateWorkoutMutation.mutate({
       name: form.getValues("name"),
       notes: journalText,
+    }, {
+      onSuccess: () => {
+        navigate('/workouts');
+        toast({
+          title: "Workout Ended",
+          description: "Your workout has been saved successfully!",
+        });
+      }
     });
-    
-    // Parse the journal with AI
-    parseJournalMutation.mutate(journalText);
   };
 
   const handleAddExercise = (data: z.infer<typeof exerciseSchema>) => {
@@ -444,47 +541,130 @@ export default function WorkoutJournal() {
           </section>
         )}
 
-        {/* Free-form Journal */}
+        {/* Real-time Journal with Status Indicators */}
         {workoutId && (
           <section className="px-4 mb-6">
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center text-lg">
                   <Sparkles className="h-5 w-5 mr-2 text-duolingo-green" />
                   Workout Journal
                 </CardTitle>
                 <p className="text-sm text-gray-600">
-                  Write about your workout naturally - our AI will extract exercises and data!
+                  Write continuously - auto-saves and AI processes your thoughts in real-time
                 </p>
               </CardHeader>
+              
               <CardContent className="space-y-4">
+                {/* Status Indicators */}
+                <div className="space-y-2">
+                  {/* Save Status */}
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center space-x-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        saveStatus === 'saving' ? 'bg-yellow-500 animate-pulse' :
+                        saveStatus === 'saved' ? 'bg-green-500' : 'bg-gray-300'
+                      }`} />
+                      <span className="text-gray-600">
+                        {saveStatus === 'saving' ? 'Saving...' :
+                         saveStatus === 'saved' ? 'Saved' : 'Ready to save'}
+                      </span>
+                    </div>
+                    <AnimatePresence>
+                      {showSaveAnimation && (
+                        <motion.div
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          className="flex items-center space-x-1 text-green-600"
+                        >
+                          <Check className="h-4 w-4" />
+                          <span className="font-medium">Saved!</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Parse Status with Progress */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-2 h-2 rounded-full ${
+                          parseStatus === 'parsing' ? 'bg-blue-500 animate-pulse' :
+                          parseStatus === 'parsed' ? 'bg-green-500' : 'bg-gray-300'
+                        }`} />
+                        <span className="text-gray-600">
+                          {parseStatus === 'parsing' ? 'AI Processing...' :
+                           parseStatus === 'parsed' ? 'AI Analysis Complete' : 'Ready for AI analysis'}
+                        </span>
+                      </div>
+                      <AnimatePresence>
+                        {showParseAnimation && (
+                          <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="flex items-center space-x-1 text-blue-600"
+                          >
+                            <Activity className="h-4 w-4" />
+                            <span className="font-medium">Parsed!</span>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    
+                    {/* Linear Progress Bar */}
+                    {parseStatus === 'parsing' && (
+                      <div className="w-full bg-gray-200 rounded-full h-1">
+                        <div 
+                          className="bg-blue-500 h-1 rounded-full transition-all duration-200"
+                          style={{ width: `${parseProgress}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Write-up Preview (shows above input when parsing) */}
+                {writeUpContent.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-amber-50 border border-amber-200 rounded-lg p-3"
+                  >
+                    <div className="flex items-center text-xs text-amber-700 mb-2">
+                      <Edit3 className="h-3 w-3 mr-1" />
+                      Stream of consciousness thoughts
+                    </div>
+                    <div className="space-y-1 max-h-20 overflow-y-auto">
+                      {writeUpContent.slice(-3).map((content, index) => (
+                        <p key={index} className="text-xs text-amber-800 italic">"{content}"</p>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Journal Input */}
                 <Textarea
-                  placeholder="e.g., Hit the gym hard today! Started with bench press - felt strong at 185lbs for 3 sets of 8. Moved to lateral raises with 20lb dumbbells, really felt the burn on the last set. Finished with some tricep work..."
+                  placeholder="Start writing... 'Did bench press today, felt strong at 185lbs for 3 sets of 8. Really pushing myself hard this week. Tomorrow I need to remember to...' - AI will separate exercises from thoughts automatically"
                   value={journalText}
-                  onChange={(e) => setJournalText(e.target.value)}
-                  rows={6}
+                  onChange={(e) => handleJournalChange(e.target.value)}
+                  rows={8}
                   disabled={!isEditing || Boolean(workout?.isCompleted)}
                   className="resize-none"
                 />
-                
+
+                {/* End Workout Button */}
                 {isEditing && !workout?.isCompleted && (
-                  <div className="flex gap-2">
+                  <div className="pt-2">
                     <Button
-                      onClick={handleJournalSave}
-                      disabled={updateWorkoutMutation.isPending || parseJournalMutation.isPending}
-                      className="bg-duolingo-green hover:bg-duolingo-green/90"
+                      onClick={handleEndWorkout}
+                      variant="outline"
+                      size="sm"
+                      className="border-red-200 text-red-700 hover:bg-red-50"
                     >
-                      {parseJournalMutation.isPending ? (
-                        <>
-                          <Sparkles className="h-4 w-4 mr-2 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="h-4 w-4 mr-2" />
-                          Save & Parse
-                        </>
-                      )}
+                      <StopCircle className="h-4 w-4 mr-2" />
+                      End Workout
                     </Button>
                   </div>
                 )}
