@@ -210,10 +210,43 @@ export default function WorkoutJournal() {
     onSuccess: () => {
       refetchExercises();
       setShowExerciseDialog(false);
+      setCurrentExercise(null);
       exerciseForm.reset();
       toast({
         title: "Exercise Added",
         description: "Exercise has been added to your workout!",
+      });
+    },
+  });
+
+  // Update exercise mutation
+  const updateExerciseMutation = useMutation({
+    mutationFn: async (exerciseData: any) => {
+      const response = await apiRequest("PATCH", `/api/exercises/${currentExercise!.id}`, exerciseData);
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchExercises();
+      setShowExerciseDialog(false);
+      setCurrentExercise(null);
+      exerciseForm.reset();
+      toast({
+        title: "Exercise Updated",
+        description: "Exercise has been updated successfully!",
+      });
+    },
+  });
+
+  // Delete exercise mutation
+  const deleteExerciseMutation = useMutation({
+    mutationFn: async (exerciseId: number) => {
+      await apiRequest("DELETE", `/api/exercises/${exerciseId}`, {});
+    },
+    onSuccess: () => {
+      refetchExercises();
+      toast({
+        title: "Exercise Deleted",
+        description: "Exercise has been removed from your workout.",
       });
     },
   });
@@ -384,10 +417,32 @@ export default function WorkoutJournal() {
   };
 
   const handleAddExercise = (data: z.infer<typeof exerciseSchema>) => {
-    addExerciseMutation.mutate({
-      ...data,
-      muscleGroups: [], // This would be determined by exercise type
+    if (currentExercise) {
+      updateExerciseMutation.mutate(data);
+    } else {
+      addExerciseMutation.mutate({
+        ...data,
+        muscleGroups: [], // This would be determined by exercise type
+      });
+    }
+  };
+
+  const handleEditExercise = (exercise: Exercise) => {
+    setCurrentExercise(exercise);
+    exerciseForm.reset({
+      name: exercise.name,
+      sets: exercise.sets ? exercise.sets : undefined,
+      reps: exercise.reps ? exercise.reps : undefined,
+      weight: exercise.weight ? exercise.weight : undefined,
+      rpe: exercise.rpe ? exercise.rpe : undefined,
+      restTime: exercise.restTime ? exercise.restTime : undefined,
+      notes: exercise.notes || "",
     });
+    setShowExerciseDialog(true);
+  };
+
+  const handleDeleteExercise = (exerciseId: number) => {
+    deleteExerciseMutation.mutate(exerciseId);
   };
 
   const calculateWorkoutStats = () => {
@@ -703,13 +758,17 @@ export default function WorkoutJournal() {
               <h3 className="text-lg font-semibold text-gray-900">Exercises</h3>
               {isEditing && !workout?.isCompleted && (
                 <Button
-                  onClick={() => setShowExerciseDialog(true)}
+                  onClick={() => {
+                    setCurrentExercise(null);
+                    exerciseForm.reset();
+                    setShowExerciseDialog(true);
+                  }}
                   size="sm"
                   variant="outline"
                   className="border-duolingo-green text-duolingo-green hover:bg-duolingo-green hover:text-white"
                 >
                   <Plus className="h-4 w-4 mr-1" />
-                  Add Exercise
+                  Manual Add
                 </Button>
               )}
             </div>
