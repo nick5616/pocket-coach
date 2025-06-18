@@ -397,6 +397,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Muscle Groups routes
+  app.get("/api/muscle-groups", async (req, res) => {
+    try {
+      const muscleGroups = await storage.getAllMuscleGroups();
+      res.json(muscleGroups);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch muscle groups" });
+    }
+  });
+
+  app.get("/api/muscle-groups/:id/progress", async (req, res) => {
+    try {
+      const muscleGroupId = parseInt(req.params.id);
+      const userId = parseInt(req.query.userId as string);
+      
+      if (!userId) {
+        return res.status(400).json({ message: "userId is required" });
+      }
+      
+      const progress = await storage.getMuscleGroupProgress(userId, muscleGroupId);
+      res.json(progress);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch muscle group progress" });
+    }
+  });
+
+  app.get("/api/progress/heat-map", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string);
+      
+      if (!userId) {
+        return res.status(400).json({ message: "userId is required" });
+      }
+      
+      const muscleGroups = await storage.getAllMuscleGroups();
+      const heatMapData = [];
+      
+      for (const muscleGroup of muscleGroups) {
+        const progress = await storage.getMuscleGroupProgress(userId, muscleGroup.id);
+        heatMapData.push({
+          muscleGroup,
+          progress
+        });
+      }
+      
+      res.json(heatMapData);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch heat map data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

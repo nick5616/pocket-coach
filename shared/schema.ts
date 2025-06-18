@@ -77,7 +77,7 @@ export const exerciseMuscleMapping = pgTable("exercise_muscle_mapping", {
   id: serial("id").primaryKey(),
   exerciseName: text("exercise_name").notNull(),
   muscleGroupId: integer("muscle_group_id").notNull().references(() => muscleGroups.id),
-  primaryMuscle: boolean("primary_muscle").default(true),
+  primaryMuscle: boolean("primary_muscle").notNull().default(true),
 });
 
 export const achievements = pgTable("achievements", {

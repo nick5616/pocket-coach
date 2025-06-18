@@ -3,27 +3,39 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import BottomNavigation from "@/components/bottom-navigation";
-import ProgressChart from "@/components/progress-chart";
+import BodyVisualization from "@/components/body-visualization";
 import { 
-  TrendingUp, 
   Target, 
   Calendar, 
-  Award,
-  ChartLine,
   Flame,
-  Zap,
   Trophy,
-  Activity
+  Activity,
+  ChevronRight,
+  Plus,
+  TrendingUp,
+  Zap,
+  Clock,
+  Weight,
+  BarChart3
 } from "lucide-react";
-import type { Workout, Goal } from "@shared/schema";
+import type { Workout, Goal, MuscleGroup } from "@shared/schema";
+
+interface MuscleProgress {
+  frequency: number;
+  volume: number;
+  lastWorked: Date | null;
+  intensity: number;
+}
 
 export default function Progress() {
-  const [timeRange, setTimeRange] = useState("4w");
-  const [selectedMetric, setSelectedMetric] = useState("volume");
+  const [selectedMuscles, setSelectedMuscles] = useState<number[]>([]);
+  const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | null>(null);
+  const [showMuscleDetails, setShowMuscleDetails] = useState(false);
   
-  const userId = 1; // Mock user ID
+  const userId = 1;
 
   const { data: workouts = [], isLoading: workoutsLoading } = useQuery<Workout[]>({
     queryKey: ["/api/workouts", { userId }],
@@ -35,7 +47,18 @@ export default function Progress() {
     queryFn: () => fetch(`/api/goals?userId=${userId}`).then(res => res.json()),
   });
 
-  // Calculate progress data
+  const { data: muscleProgress, isLoading: progressLoading } = useQuery<MuscleProgress>({
+    queryKey: ["/api/muscle-groups", selectedMuscle?.id, "progress", userId],
+    queryFn: async () => {
+      if (!selectedMuscle) return null;
+      const response = await fetch(`/api/muscle-groups/${selectedMuscle.id}/progress?userId=${userId}`);
+      if (!response.ok) throw new Error('Failed to fetch muscle progress');
+      return response.json();
+    },
+    enabled: !!selectedMuscle,
+  });
+
+  // Calculate overall progress stats
   const completedWorkouts = workouts.filter(w => w.isCompleted);
   
   const progressStats = {
@@ -44,97 +67,30 @@ export default function Progress() {
     totalVolume: completedWorkouts.reduce((sum, w) => sum + (w.totalVolume || 0), 0),
     totalCalories: completedWorkouts.reduce((sum, w) => sum + (w.calories || 0), 0),
     currentStreak: 7, // Would be calculated from workout dates
-    longestStreak: 12, // Would be calculated from historical data
   };
 
-  // Generate chart data based on time range
-  const generateChartData = (metric: string) => {
-    const now = new Date();
-    const daysBack = timeRange === "1w" ? 7 : timeRange === "4w" ? 28 : timeRange === "3m" ? 90 : 365;
-    const data = [];
+  const handleMuscleSelect = (muscleGroup: MuscleGroup) => {
+    setSelectedMuscle(muscleGroup);
+    setShowMuscleDetails(true);
+  };
 
-    for (let i = daysBack; i >= 0; i--) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - i);
-      
-      const dayWorkouts = completedWorkouts.filter(w => {
-        const workoutDate = new Date(w.completedAt!);
-        return workoutDate.toDateString() === date.toDateString();
-      });
-
-      let value = 0;
-      switch (metric) {
-        case "volume":
-          value = dayWorkouts.reduce((sum, w) => sum + (w.totalVolume || 0), 0);
-          break;
-        case "duration":
-          value = dayWorkouts.reduce((sum, w) => sum + (w.duration || 0), 0);
-          break;
-        case "calories":
-          value = dayWorkouts.reduce((sum, w) => sum + (w.calories || 0), 0);
-          break;
-        case "workouts":
-          value = dayWorkouts.length;
-          break;
+  const handleMuscleToggle = (muscleGroup: MuscleGroup) => {
+    setSelectedMuscles(prev => {
+      if (prev.includes(muscleGroup.id)) {
+        return prev.filter(id => id !== muscleGroup.id);
+      } else {
+        return [...prev, muscleGroup.id];
       }
-
-      data.push({
-        date: date.toISOString(),
-        value: value,
-      });
-    }
-
-    return data;
+    });
   };
 
-  const chartData = generateChartData(selectedMetric);
-
-  const getMetricUnit = () => {
-    switch (selectedMetric) {
-      case "volume": return " lbs";
-      case "duration": return " min";
-      case "calories": return " cal";
-      case "workouts": return "";
-      default: return "";
-    }
+  const formatLastWorked = (date: Date | null) => {
+    if (!date) return "Never trained";
+    const days = Math.floor((Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24));
+    if (days === 0) return "Today";
+    if (days === 1) return "Yesterday";
+    return `${days} days ago`;
   };
-
-  const getMetricColor = () => {
-    switch (selectedMetric) {
-      case "volume": return "#1CB0F6";
-      case "duration": return "#58CC02";
-      case "calories": return "#FF9600";
-      case "workouts": return "#9C27B0";
-      default: return "#58CC02";
-    }
-  };
-
-  const progressInsights = [
-    {
-      type: "strength",
-      title: "Strength Gains Detected",
-      description: "Your bench press has improved 8% over the last 3 weeks",
-      icon: <TrendingUp className="h-5 w-5" />,
-      color: "text-success-green",
-      bgColor: "bg-success-green/10"
-    },
-    {
-      type: "consistency",
-      title: "Consistency Champion",
-      description: "7 day workout streak! Keep the momentum going",
-      icon: <Flame className="h-5 w-5" />,
-      color: "text-energetic-orange",
-      bgColor: "bg-energetic-orange/10"
-    },
-    {
-      type: "volume",
-      title: "Volume Milestone",
-      description: "You've lifted over 50,000 lbs this month!",
-      icon: <Zap className="h-5 w-5" />,
-      color: "text-duolingo-blue",
-      bgColor: "bg-duolingo-blue/10"
-    }
-  ];
 
   if (workoutsLoading) {
     return (
@@ -199,83 +155,101 @@ export default function Progress() {
           </div>
         </section>
 
-        <Tabs defaultValue="charts" className="px-4 py-6">
+        <Tabs defaultValue="body" className="px-4 py-6">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="charts">Charts</TabsTrigger>
+            <TabsTrigger value="body">Body Map</TabsTrigger>
             <TabsTrigger value="goals">Goals</TabsTrigger>
             <TabsTrigger value="insights">Insights</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="charts" className="space-y-6 mt-6">
-            {/* Chart Controls */}
-            <div className="flex gap-3">
-              <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="flex-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1w">Last Week</SelectItem>
-                  <SelectItem value="4w">Last 4 Weeks</SelectItem>
-                  <SelectItem value="3m">Last 3 Months</SelectItem>
-                  <SelectItem value="1y">Last Year</SelectItem>
-                </SelectContent>
-              </Select>
+          <TabsContent value="body" className="space-y-6 mt-6">
+            {/* Body Visualization */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center">
+                    <Activity className="h-5 w-5 mr-2 text-blue-600" />
+                    Muscle Group Progress
+                  </span>
+                  {selectedMuscles.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedMuscles([])}
+                    >
+                      Clear Selection
+                    </Button>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <BodyVisualization
+                  userId={userId}
+                  onMuscleSelect={handleMuscleSelect}
+                  selectedMuscles={selectedMuscles}
+                />
+                
+                {selectedMuscles.length > 0 && (
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-2">Selected Muscle Groups</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMuscles.map(muscleId => (
+                        <Badge key={muscleId} variant="secondary">
+                          Muscle {muscleId}
+                        </Badge>
+                      ))}
+                    </div>
+                    <Button
+                      className="mt-3 w-full"
+                      onClick={() => {
+                        // TODO: Integrate with AI program generation
+                        console.log("Generate program for muscles:", selectedMuscles);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Generate Program for Selected Muscles
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-              <Select value={selectedMetric} onValueChange={setSelectedMetric}>
-                <SelectTrigger className="flex-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="volume">Volume</SelectItem>
-                  <SelectItem value="duration">Duration</SelectItem>
-                  <SelectItem value="calories">Calories</SelectItem>
-                  <SelectItem value="workouts">Workouts</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Progress Chart */}
-            <ProgressChart
-              title={`${selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} Progress`}
-              data={chartData}
-              color={getMetricColor()}
-              unit={getMetricUnit()}
-            />
-
-            {/* Recent Achievements */}
+            {/* Quick Actions */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Trophy className="h-5 w-5 mr-2 text-energetic-orange" />
-                  Recent Achievements
+                  <Target className="h-5 w-5 mr-2 text-green-600" />
+                  Quick Actions
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-success-green/10 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-success-green/20 rounded-full flex items-center justify-center mr-3">
-                      <Flame className="h-5 w-5 text-success-green" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">Week Warrior</h4>
-                      <p className="text-sm text-gray-600">7 day workout streak</p>
-                    </div>
-                  </div>
-                  <Badge className="bg-success-green text-white">New!</Badge>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-duolingo-blue/20 rounded-full flex items-center justify-center mr-3">
-                      <Activity className="h-5 w-5 text-duolingo-blue" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">Volume Master</h4>
-                      <p className="text-sm text-gray-600">50K lbs lifted this month</p>
-                    </div>
-                  </div>
-                  <Badge variant="secondary">3 days ago</Badge>
-                </div>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-between"
+                  onClick={() => {
+                    // TODO: Navigate to workout creation with muscle focus
+                  }}
+                >
+                  <span className="flex items-center">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Start Targeted Workout
+                  </span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-between"
+                  onClick={() => {
+                    // TODO: Navigate to goal creation
+                  }}
+                >
+                  <span className="flex items-center">
+                    <Target className="h-4 w-4 mr-2" />
+                    Set Muscle Group Goal
+                  </span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -291,8 +265,8 @@ export default function Progress() {
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center">
-                          <div className="w-10 h-10 bg-duolingo-green/10 rounded-lg flex items-center justify-center mr-3">
-                            <Target className="h-5 w-5 text-duolingo-green" />
+                          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                            <Target className="h-5 w-5 text-green-600" />
                           </div>
                           <div>
                             <h4 className="font-semibold text-gray-900">{goal.title}</h4>
@@ -301,8 +275,8 @@ export default function Progress() {
                         </div>
                         <Badge 
                           className={
-                            progress >= 80 ? "bg-success-green/10 text-success-green" :
-                            progress >= 50 ? "bg-warning-orange/10 text-warning-orange" :
+                            progress >= 80 ? "bg-green-100 text-green-600" :
+                            progress >= 50 ? "bg-orange-100 text-orange-600" :
                             "bg-gray-100 text-gray-600"
                           }
                         >
@@ -319,7 +293,7 @@ export default function Progress() {
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div 
-                            className="bg-duolingo-green h-2 rounded-full transition-all duration-300" 
+                            className="bg-green-600 h-2 rounded-full transition-all duration-300" 
                             style={{ width: `${progress}%` }}
                           />
                         </div>
@@ -355,41 +329,149 @@ export default function Progress() {
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-4 mt-6">
-            {progressInsights.map((insight, index) => (
-              <Card key={index}>
-                <CardContent className="p-4">
-                  <div className="flex items-start">
-                    <div className={`w-10 h-10 ${insight.bgColor} rounded-lg flex items-center justify-center mr-3 flex-shrink-0`}>
-                      <span className={insight.color}>{insight.icon}</span>
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 mb-1">{insight.title}</h4>
-                      <p className="text-sm text-gray-600">{insight.description}</p>
-                    </div>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-start">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-green-600"><TrendingUp className="h-5 w-5" /></span>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 mb-1">Strength Gains Detected</h4>
+                    <p className="text-sm text-gray-600">Your bench press has improved 8% over the last 3 weeks</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-start">
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-orange-600"><Flame className="h-5 w-5" /></span>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 mb-1">Consistency Champion</h4>
+                    <p className="text-sm text-gray-600">7 day workout streak! Keep the momentum going</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-start">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <span className="text-blue-600"><Zap className="h-5 w-5" /></span>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 mb-1">Volume Milestone</h4>
+                    <p className="text-sm text-gray-600">You've lifted over 50,000 lbs this month!</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* AI Insights */}
             <Card className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-0">
               <CardContent className="p-4">
                 <h4 className="font-semibold mb-2 flex items-center">
-                  <ChartLine className="h-5 w-5 mr-2" />
+                  <BarChart3 className="h-5 w-5 mr-2" />
                   AI Pattern Analysis
                 </h4>
                 <p className="text-purple-100 text-sm mb-3">
-                  Your workout intensity has been increasing steadily. Consider adding a deload week 
-                  after 2 more sessions to prevent overtraining and optimize recovery.
+                  Your workout intensity has been increasing steadily. Consider adding a deload week to prevent overtraining.
                 </p>
-                <Badge className="bg-white/20 text-white">
-                  Recommendation
-                </Badge>
+                <div className="flex gap-2">
+                  <Badge className="bg-white/20 text-white border-white/30">
+                    Strength Focus
+                  </Badge>
+                  <Badge className="bg-white/20 text-white border-white/30">
+                    Progressive Overload
+                  </Badge>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Muscle Details Modal */}
+      <Dialog open={showMuscleDetails} onOpenChange={setShowMuscleDetails}>
+        <DialogContent className="max-w-sm mx-auto">
+          <DialogHeader>
+            <DialogTitle>{selectedMuscle?.displayName} Progress</DialogTitle>
+          </DialogHeader>
+          
+          {selectedMuscle && (
+            <div className="space-y-4">
+              {progressLoading ? (
+                <div className="flex items-center justify-center h-24">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              ) : muscleProgress ? (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <div className="text-lg font-bold text-gray-900">{muscleProgress.frequency}</div>
+                      <div className="text-xs text-gray-500">Workouts</div>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <div className="text-lg font-bold text-gray-900">
+                        {muscleProgress.volume > 0 ? `${Math.round(muscleProgress.volume / 1000)}K` : "0"}
+                      </div>
+                      <div className="text-xs text-gray-500">Volume (lbs)</div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Training Intensity</span>
+                      <span className="text-sm text-gray-500">
+                        {Math.round(muscleProgress.intensity * 100)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${muscleProgress.intensity * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Clock className="h-4 w-4 mr-2" />
+                    Last trained: {formatLastWorked(muscleProgress.lastWorked)}
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      className="flex-1"
+                      onClick={() => {
+                        handleMuscleToggle(selectedMuscle);
+                        setShowMuscleDetails(false);
+                      }}
+                    >
+                      Add to Selection
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        // TODO: Set goal for this muscle group
+                      }}
+                    >
+                      <Target className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center text-gray-500">
+                  No progress data available
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <BottomNavigation />
     </>

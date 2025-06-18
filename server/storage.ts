@@ -402,7 +402,8 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const mapping: ExerciseMuscleMapping = {
       ...insertMapping,
-      id
+      id,
+      primaryMuscle: insertMapping.primaryMuscle ?? true
     };
     this.exerciseMuscleMapping.set(id, mapping);
     return mapping;
