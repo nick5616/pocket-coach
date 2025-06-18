@@ -431,11 +431,11 @@ export default function WorkoutJournal() {
     setCurrentExercise(exercise);
     exerciseForm.reset({
       name: exercise.name,
-      sets: exercise.sets ? exercise.sets : undefined,
-      reps: exercise.reps ? exercise.reps : undefined,
-      weight: exercise.weight ? exercise.weight : undefined,
-      rpe: exercise.rpe ? exercise.rpe : undefined,
-      restTime: exercise.restTime ? exercise.restTime : undefined,
+      sets: exercise.sets ?? undefined,
+      reps: exercise.reps ?? undefined, 
+      weight: exercise.weight ?? undefined,
+      rpe: exercise.rpe ?? undefined,
+      restTime: exercise.restTime ?? undefined,
       notes: exercise.notes || "",
     });
     setShowExerciseDialog(true);
