@@ -79,8 +79,8 @@ export default function WorkoutJournal() {
   const [isDirty, setIsDirty] = useState(false);
   const [lastSavedText, setLastSavedText] = useState('');
   const [showWriteUpSection, setShowWriteUpSection] = useState(false);
-  const [thoughtBatches, setThoughtBatches] = useState<string[][]>([]);
-  const [pendingThoughts, setPendingThoughts] = useState<string[]>([]);
+  const [batchProgress, setBatchProgress] = useState(0);
+  const [nextBatchIn, setNextBatchIn] = useState(5000);
   
   // Debounce refs
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -302,57 +302,32 @@ export default function WorkoutJournal() {
     });
   }, [workoutId, journalText, lastSavedText, form, updateWorkoutMutation]);
 
-  // Debounced AI parsing (5 seconds)
-  const debouncedParse = useCallback(() => {
-    if (!workoutId || !journalText.trim()) return;
+  // Batch thoughts after 5 seconds (no AI processing)
+  const debouncedBatch = useCallback(() => {
+    if (!journalText.trim()) return;
     
-    setParseStatus('parsing');
+    // Add current text to writeup content (batch it)
+    const textToBatch = journalText.trim();
+    regroupWriteUpContent({ parsedData: null });
     
-    // Animate progress bar
-    let progress = 0;
-    const progressInterval = setInterval(() => {
-      progress += 20;
-      setParseProgress(progress);
-      if (progress >= 100) {
-        clearInterval(progressInterval);
-      }
-    }, 200);
+    // Clear input after batching
+    setJournalText('');
+    setLastSavedText('');
+    setIsDirty(false);
+    setSaveStatus('idle');
+    setBatchProgress(0);
     
-    const textToParse = journalText; // Capture the full text before clearing
-    parseJournalMutation.mutate(textToParse, {
-      onSuccess: (data) => {
-        setParseStatus('parsed');
-        setShowParseAnimation(true);
-        
-        // Regroup write-up content with context
-        regroupWriteUpContent(data.parsedData);
-        
-        // Clear input and reset state for seamless flow
-        setJournalText('');
-        setLastSavedText('');
-        setIsDirty(false);
-        setSaveStatus('idle');
-        
-        setTimeout(() => {
-          setShowParseAnimation(false);
-          setParseStatus('idle');
-          setParseProgress(0);
-          // Refocus on input for seamless continuation
-          const textarea = document.querySelector('textarea[placeholder*="journal"]') as HTMLTextAreaElement;
-          if (textarea) {
-            textarea.focus();
-          }
-        }, 2000);
-      },
-      onError: () => {
-        setParseStatus('idle');
-        setParseProgress(0);
-      }
-    });
-  }, [workoutId, journalText, parseJournalMutation]);
+    // Refocus on input for seamless continuation
+    const textarea = document.querySelector('textarea[placeholder*="Start writing"]') as HTMLTextAreaElement;
+    if (textarea) {
+      textarea.focus();
+    }
+  }, [journalText]);
 
-  // Regroup write-up content with continuous batching
+  // Regroup write-up content with batching
   const regroupWriteUpContent = (parsedData: any) => {
+    if (!journalText.trim()) return;
+    
     const lines = journalText.split('\n').filter(line => line.trim());
     const nonExerciseLines: string[] = [];
     
@@ -366,46 +341,18 @@ export default function WorkoutJournal() {
       }
     });
     
-    // Add to pending thoughts for batching
+    // Add to existing writeup content
     if (nonExerciseLines.length > 0) {
-      setPendingThoughts(prev => [...prev, ...nonExerciseLines]);
+      setWriteUpContent(prev => [...prev, ...nonExerciseLines]);
     }
-    
-    setWriteUpContent(nonExerciseLines);
   };
 
-  // Merge two thought batches
-  const mergeBatches = (sourceIndex: number, targetIndex: number) => {
-    if (sourceIndex === targetIndex) return;
-    
-    setThoughtBatches(prev => {
-      const newBatches = [...prev];
-      const sourceBatch = newBatches[sourceIndex];
-      const targetBatch = newBatches[targetIndex];
-      
-      // Merge source into target
-      newBatches[targetIndex] = [...targetBatch, ...sourceBatch];
-      // Remove source batch
-      newBatches.splice(sourceIndex, 1);
-      
-      return newBatches;
-    });
-  };
-
-  // Create new batch from pending thoughts
-  const createBatchFromPending = () => {
-    if (pendingThoughts.length === 0) return;
-    
-    setThoughtBatches(prev => [...prev, [...pendingThoughts]]);
-    setPendingThoughts([]);
-  };
-
-  // Handle journal text changes with proper save indicator behavior
+  // Handle journal text changes with proper save indicator and batching behavior
   const handleJournalChange = (value: string) => {
     setJournalText(value);
     setIsDirty(value !== lastSavedText);
     
-    // Show typing dots immediately when user types (if text has changed from saved state)
+    // Show typing dots immediately when user types
     if (value !== lastSavedText && value.trim().length > 0) {
       setSaveStatus('saving');
     }
@@ -418,18 +365,34 @@ export default function WorkoutJournal() {
     if (value.trim().length > 0) {
       saveTimeoutRef.current = setTimeout(() => {
         debouncedSave();
-        // Show "✓ saved!" after successful save
         setTimeout(() => {
           setSaveStatus('saved');
           setTimeout(() => setSaveStatus('idle'), 2000);
         }, 100);
       }, 500);
+      
+      // Start batching countdown with linear progress
+      setBatchProgress(0);
+      const startTime = Date.now();
+      const batchInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progress = (elapsed / 5000) * 100;
+        setBatchProgress(Math.min(progress, 100));
+        
+        if (progress >= 100) {
+          clearInterval(batchInterval);
+        }
+      }, 50);
+      
+      // Batch after 5 seconds (clear input, add to writeup)
+      parseTimeoutRef.current = setTimeout(() => {
+        clearInterval(batchInterval);
+        debouncedBatch();
+      }, 5000);
     } else {
       setSaveStatus('idle');
+      setBatchProgress(0);
     }
-    
-    // AI parse after 5 seconds
-    parseTimeoutRef.current = setTimeout(debouncedParse, 5000);
   };
 
   // Manual send handler for write-up content
@@ -725,22 +688,34 @@ export default function WorkoutJournal() {
                     <Sparkles className="h-5 w-5 mr-2 text-duolingo-green" />
                     Workout Journal
                   </CardTitle>
-                  {writeUpContent.length > 0 && (
-                    <button
-                      onClick={() => {
-                        const element = document.getElementById('thought-batches');
-                        if (element) {
-                          element.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }}
-                      className="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700"
-                    >
-                      <Edit3 className="h-4 w-4" />
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                        {writeUpContent.length}
-                      </span>
-                    </button>
-                  )}
+                  <div className="flex items-center space-x-2">
+                    {writeUpContent.length > 0 && (
+                      <button
+                        onClick={() => setShowWriteUpSection(!showWriteUpSection)}
+                        className="flex items-center space-x-1 text-sm text-amber-600 hover:text-amber-700"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                        <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-xs font-medium">
+                          {writeUpContent.length}
+                        </span>
+                      </button>
+                    )}
+                    {writeUpContent.length > 0 && (
+                      <button
+                        onClick={() => setShowWriteUpSection(!showWriteUpSection)}
+                        className={`p-1 rounded ${showWriteUpSection ? 'bg-amber-200' : 'bg-amber-100'} text-amber-700 hover:bg-amber-200`}
+                      >
+                        <svg 
+                          className={`h-4 w-4 transition-transform ${showWriteUpSection ? 'rotate-180' : ''}`} 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <p className="text-sm text-gray-600">
                   Write your thoughts freely - AI organizes everything when you're ready
@@ -788,6 +763,16 @@ export default function WorkoutJournal() {
                       ))}
                     </div>
                   </motion.div>
+                )}
+
+                {/* Linear Progress Bar for Batching */}
+                {batchProgress > 0 && (
+                  <div className="w-full bg-gray-200 rounded-full h-1 mb-2">
+                    <div 
+                      className="bg-amber-500 h-1 rounded-full transition-all duration-100"
+                      style={{ width: `${batchProgress}%` }}
+                    />
+                  </div>
                 )}
 
                 {/* Journal Input - Borderless Full Width */}
@@ -973,97 +958,7 @@ export default function WorkoutJournal() {
           </section>
         )}
 
-        {/* Continuous Thought Batches */}
-        {workoutId && (pendingThoughts.length > 0 || thoughtBatches.length > 0) && (
-          <section id="thought-batches" className="mb-6">
-            <div className="px-4 mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Stream of Consciousness</h3>
-              <p className="text-sm text-gray-600">
-                Batch your thoughts and send them to AI when ready. Drag batches together to merge.
-              </p>
-            </div>
 
-            {/* Pending Thoughts */}
-            {pendingThoughts.length > 0 && (
-              <div className="mx-4 mb-4">
-                <Card className="border-amber-200 bg-amber-50/50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center text-sm text-amber-700">
-                        <Edit3 className="h-4 w-4 mr-2" />
-                        Pending thoughts ({pendingThoughts.length})
-                      </div>
-                      <Button
-                        onClick={createBatchFromPending}
-                        size="sm"
-                        variant="outline"
-                        className="border-amber-300 text-amber-700 hover:bg-amber-100"
-                      >
-                        Create Batch
-                      </Button>
-                    </div>
-                    <div className="space-y-2 max-h-32 overflow-y-auto">
-                      {pendingThoughts.map((thought, index) => (
-                        <p key={index} className="text-sm text-amber-800 bg-white/60 p-2 rounded border-l-2 border-amber-300">
-                          "{thought}"
-                        </p>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {/* Thought Batches */}
-            {thoughtBatches.map((batch, batchIndex) => (
-              <div
-                key={batchIndex}
-                className="mx-4 mb-3"
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData('text/plain', batchIndex.toString());
-                }}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const sourceIndex = parseInt(e.dataTransfer.getData('text/plain'));
-                  mergeBatches(sourceIndex, batchIndex);
-                }}
-              >
-                <Card className="border-blue-200 bg-blue-50/50 cursor-move hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center text-sm text-blue-700">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                        Batch {batchIndex + 1} ({batch.length} thoughts)
-                      </div>
-                      <Button
-                        onClick={async () => {
-                          const fullText = batch.join(' ');
-                          await handleSendWriteUp();
-                          // Remove this batch after sending
-                          setThoughtBatches(prev => prev.filter((_, i) => i !== batchIndex));
-                        }}
-                        size="sm"
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        <Send className="h-3 w-3 mr-2" />
-                        Send to AI
-                      </Button>
-                    </div>
-                    <div className="space-y-2 max-h-32 overflow-y-auto">
-                      {batch.map((thought, thoughtIndex) => (
-                        <p key={thoughtIndex} className="text-sm text-blue-800 bg-white/60 p-2 rounded border-l-2 border-blue-300">
-                          "{thought}"
-                        </p>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            ))}
-          </section>
-        )}
 
         {/* Complete Workout Button */}
         {workoutId && exercises.length > 0 && !workout?.isCompleted && (
