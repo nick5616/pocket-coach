@@ -388,7 +388,58 @@ export default function WorkoutJournal() {
     parseTimeoutRef.current = setTimeout(debouncedParse, 5000);
   };
 
-  // Cleanup timeouts
+  // Manual send handler for write-up content
+  const handleSendWriteUp = async () => {
+    if (writeUpContent.length === 0 || !workoutId) return;
+    
+    setParseStatus('parsing');
+    setParseProgress(0);
+    
+    // Simulate progress
+    const progressInterval = setInterval(() => {
+      setParseProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90;
+        }
+        return prev + 10;
+      });
+    }, 200);
+    
+    try {
+      const fullText = writeUpContent.join(' ');
+      const response = await apiRequest("POST", `/api/workouts/${workoutId}/journal`, {
+        text: fullText
+      });
+      
+      clearInterval(progressInterval);
+      setParseProgress(100);
+      setParseStatus('parsed');
+      
+      // Clear write-up content after successful processing
+      setWriteUpContent([]);
+      setShowWriteUpSection(false);
+      
+      // Refresh exercises
+      refetchExercises();
+      
+      setTimeout(() => {
+        setParseStatus('idle');
+        setParseProgress(0);
+      }, 2000);
+      
+    } catch (error) {
+      clearInterval(progressInterval);
+      setParseStatus('idle');
+      setParseProgress(0);
+      toast({
+        title: "Processing Failed",
+        description: "Failed to process your journal entry",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
@@ -726,10 +777,10 @@ export default function WorkoutJournal() {
           </section>
         )}
 
-        {/* Exercises List */}
+        {/* Exercises List - Optimized for Mobile */}
         {workoutId && (
-          <section className="px-4 mb-6">
-            <div className="flex items-center justify-between mb-4">
+          <section className="mb-6">
+            <div className="flex items-center justify-between mb-4 px-4">
               <h3 className="text-lg font-semibold text-gray-900">Exercises</h3>
               {isEditing && !workout?.isCompleted && (
                 <Button
@@ -743,14 +794,14 @@ export default function WorkoutJournal() {
                   className="border-duolingo-green text-duolingo-green hover:bg-duolingo-green hover:text-white"
                 >
                   <Plus className="h-4 w-4 mr-1" />
-                  Manual Add
+                  Add
                 </Button>
               )}
             </div>
 
             <AnimatePresence>
               {exercises.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {exercises.map((exercise, index) => (
                     <motion.div
                       key={exercise.id}
@@ -759,13 +810,13 @@ export default function WorkoutJournal() {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <Card>
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold text-gray-900">{exercise.name}</h4>
-                            <div className="flex items-center space-x-2">
+                      <Card className="mx-4">
+                        <CardContent className="p-3">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="font-semibold text-gray-900 text-sm">{exercise.name}</h4>
+                            <div className="flex items-center space-x-1">
                               {exercise.rpe && (
-                                <Badge variant="secondary">RPE {exercise.rpe}</Badge>
+                                <Badge variant="secondary" className="text-xs px-2 py-1">RPE {exercise.rpe}</Badge>
                               )}
                               {isEditing && !workout?.isCompleted && (
                                 <div className="flex items-center space-x-1">
@@ -792,30 +843,30 @@ export default function WorkoutJournal() {
                           
                           {/* Individual Set Rows */}
                           <div className="space-y-2">
-                            {/* Header Row */}
-                            <div className="grid grid-cols-4 gap-3 text-xs font-medium text-gray-500 border-b border-gray-100 pb-1">
+                            {/* Header Row - Compact Mobile */}
+                            <div className="grid grid-cols-4 gap-2 text-xs font-medium text-gray-500 border-b border-gray-100 pb-1">
                               <span>Set</span>
                               <span>Reps</span>
-                              <span>Weight</span>
+                              <span>Wt</span>
                               <span>RPE</span>
                             </div>
                             
-                            {/* Set Rows */}
+                            {/* Set Rows - Compact Mobile Layout */}
                             {exercise.sets ? (
                               Array.from({ length: exercise.sets }, (_, setIndex) => (
-                                <div key={setIndex} className="grid grid-cols-4 gap-3 text-sm py-2 border-b border-gray-50 last:border-b-0">
-                                  <span className="font-medium text-gray-700">{setIndex + 1}</span>
-                                  <span className="text-gray-900">{exercise.reps || '-'}</span>
-                                  <span className="text-gray-900">{exercise.weight ? `${exercise.weight} lbs` : '-'}</span>
-                                  <span className="text-gray-900">{exercise.rpe || '-'}</span>
+                                <div key={setIndex} className="grid grid-cols-4 gap-2 text-sm py-1.5 border-b border-gray-50 last:border-b-0">
+                                  <span className="font-medium text-gray-700 text-center">{setIndex + 1}</span>
+                                  <span className="text-gray-900 text-center">{exercise.reps || '-'}</span>
+                                  <span className="text-gray-900 text-center">{exercise.weight ? `${exercise.weight}` : '-'}</span>
+                                  <span className="text-gray-900 text-center">{exercise.rpe || '-'}</span>
                                 </div>
                               ))
                             ) : (
-                              <div className="grid grid-cols-4 gap-3 text-sm py-2 border-b border-gray-50">
-                                <span className="font-medium text-gray-700">1</span>
-                                <span className="text-gray-900">{exercise.reps || '-'}</span>
-                                <span className="text-gray-900">{exercise.weight ? `${exercise.weight} lbs` : '-'}</span>
-                                <span className="text-gray-900">{exercise.rpe || '-'}</span>
+                              <div className="grid grid-cols-4 gap-2 text-sm py-1.5 border-b border-gray-50">
+                                <span className="font-medium text-gray-700 text-center">1</span>
+                                <span className="text-gray-900 text-center">{exercise.reps || '-'}</span>
+                                <span className="text-gray-900 text-center">{exercise.weight ? `${exercise.weight}` : '-'}</span>
+                                <span className="text-gray-900 text-center">{exercise.rpe || '-'}</span>
                               </div>
                             )}
                           </div>
@@ -895,29 +946,29 @@ export default function WorkoutJournal() {
         )}
       </main>
 
-      {/* Add Exercise Dialog */}
+      {/* Add Exercise Dialog - Mobile Optimized */}
       <Dialog open={showExerciseDialog} onOpenChange={setShowExerciseDialog}>
-        <DialogContent className="w-[90vw] max-w-sm mx-auto">
+        <DialogContent className="w-[95vw] max-w-md mx-auto p-4">
           <DialogHeader>
-            <DialogTitle>{currentExercise ? "Edit Exercise" : "Manual Add Exercise"}</DialogTitle>
+            <DialogTitle className="text-lg">{currentExercise ? "Edit Exercise" : "Add Exercise"}</DialogTitle>
           </DialogHeader>
           <Form {...exerciseForm}>
-            <form onSubmit={exerciseForm.handleSubmit(handleAddExercise)} className="space-y-4">
+            <form onSubmit={exerciseForm.handleSubmit(handleAddExercise)} className="space-y-3">
               <FormField
                 control={exerciseForm.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Exercise Name</FormLabel>
+                    <FormLabel className="text-sm">Exercise Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Bench Press" {...field} />
+                      <Input placeholder="e.g., Bench Press" {...field} className="text-sm" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={exerciseForm.control}
                   name="sets"
