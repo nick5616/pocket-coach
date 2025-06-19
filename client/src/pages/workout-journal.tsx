@@ -399,6 +399,17 @@ export default function WorkoutJournal() {
   const handleSendWriteUp = async () => {
     if (writeUpContent.length === 0 || !workoutId) return;
     
+    // Check if writeup content is not empty
+    const fullText = writeUpContent.join(' ').trim();
+    if (!fullText) {
+      toast({
+        title: "No Content",
+        description: "No content to send to AI",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setParseStatus('parsing');
     setParseProgress(0);
     
@@ -414,7 +425,6 @@ export default function WorkoutJournal() {
     }, 200);
     
     try {
-      const fullText = writeUpContent.join(' ');
       const response = await apiRequest("POST", `/api/workouts/${workoutId}/journal`, {
         text: fullText
       });
@@ -765,16 +775,6 @@ export default function WorkoutJournal() {
                   </motion.div>
                 )}
 
-                {/* Linear Progress Bar for Batching */}
-                {batchProgress > 0 && (
-                  <div className="w-full bg-gray-200 rounded-full h-1 mb-2">
-                    <div 
-                      className="bg-amber-500 h-1 rounded-full transition-all duration-100"
-                      style={{ width: `${batchProgress}%` }}
-                    />
-                  </div>
-                )}
-
                 {/* Journal Input - Borderless Full Width */}
                 <Textarea
                   placeholder="Start writing... 'Did bench press today, felt strong at 185lbs for 3 sets of 8. Really pushing myself hard this week. Tomorrow I need to remember to...'"
@@ -784,6 +784,16 @@ export default function WorkoutJournal() {
                   disabled={!isEditing || Boolean(workout?.isCompleted)}
                   className="resize-none w-full border-0 outline-none focus:ring-0 focus:border-0 shadow-none px-0 bg-transparent"
                 />
+
+                {/* Linear Progress Bar for Batching - Underneath Input */}
+                {batchProgress > 0 && (
+                  <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
+                    <div 
+                      className="bg-amber-500 h-1 rounded-full transition-all duration-200 ease-out"
+                      style={{ width: `${batchProgress}%` }}
+                    />
+                  </div>
+                )}
 
                 {/* Status Indicators - Fixed Timing */}
                 <div className="flex items-center justify-between text-sm">
