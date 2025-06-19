@@ -121,6 +121,11 @@ Preferred communication style: Simple, everyday language.
 - June 19, 2025: **COMPLETED** - Streamlined exercise cards with center-aligned tabular data
 - June 19, 2025: **COMPLETED** - Dialog optimization for small phone screens (95vw width)
 - June 19, 2025: **COMPLETED** - Application ethos documentation emphasizing skill development over convenience
+- June 19, 2025: **COMPLETED** - Borderless full-width journal input maximizing screen real estate
+- June 19, 2025: **COMPLETED** - Fixed save indicator timing: typing dots immediately, "✓ saved!" after 500ms debounce
+- June 19, 2025: **COMPLETED** - Continuous thought batching system with drag-and-drop merge functionality
+- June 19, 2025: **COMPLETED** - Corner numeric indicator navigation to bottom thought batches section
+- June 19, 2025: **COMPLETED** - Pending thoughts accumulation with manual batch creation and AI sending
 - June 18, 2025: Real-time debounced journaling system with auto-save (500ms) and AI parsing (5s)
 - June 18, 2025: Stream of consciousness write-up feature with automatic regrouping
 - June 18, 2025: Linear progress indicators for save and parse operations with checkmark animations
