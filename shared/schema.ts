@@ -44,22 +44,13 @@ export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey(),
   workoutId: integer("workout_id").notNull(),
   name: text("name").notNull(),
-  muscleGroups: text("muscle_groups").array(), // ["shoulders", "chest"]
-  notes: text("notes"),
-  orderIndex: integer("order_index").default(0), // Exercise order in workout
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const sets = pgTable("sets", {
-  id: serial("id").primaryKey(),
-  exerciseId: integer("exercise_id").notNull().references(() => exercises.id),
-  setNumber: integer("set_number").notNull(), // 1, 2, 3, etc.
+  sets: integer("sets"),
   reps: integer("reps"),
   weight: real("weight"),
   rpe: integer("rpe"), // Rate of Perceived Exertion (1-10)
-  restTime: integer("rest_time"), // in seconds between this set and next
-  completed: boolean("completed").default(false),
+  restTime: integer("rest_time"), // in seconds
   notes: text("notes"),
+  muscleGroups: text("muscle_groups").array(), // ["shoulders", "chest"]
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -127,11 +118,6 @@ export const insertExerciseSchema = createInsertSchema(exercises).omit({
   createdAt: true,
 });
 
-export const insertSetSchema = createInsertSchema(sets).omit({
-  id: true,
-  createdAt: true,
-});
-
 export const insertProgramSchema = createInsertSchema(programs).omit({
   id: true,
   createdAt: true,
@@ -163,9 +149,6 @@ export type InsertWorkout = z.infer<typeof insertWorkoutSchema>;
 
 export type Exercise = typeof exercises.$inferSelect;
 export type InsertExercise = z.infer<typeof insertExerciseSchema>;
-
-export type Set = typeof sets.$inferSelect;
-export type InsertSet = z.infer<typeof insertSetSchema>;
 
 export type Program = typeof programs.$inferSelect;
 export type InsertProgram = z.infer<typeof insertProgramSchema>;

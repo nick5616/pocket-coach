@@ -820,23 +820,32 @@ export default function WorkoutJournal() {
                             </div>
                           </div>
                           
-                          <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
-                            {exercise.sets && (
-                              <div>
-                                <span className="font-medium">{exercise.sets}</span>
-                                <span className="text-gray-400 ml-1">sets</span>
-                              </div>
-                            )}
-                            {exercise.reps && (
-                              <div>
-                                <span className="font-medium">{exercise.reps}</span>
-                                <span className="text-gray-400 ml-1">reps</span>
-                              </div>
-                            )}
-                            {exercise.weight && (
-                              <div>
-                                <span className="font-medium">{exercise.weight}</span>
-                                <span className="text-gray-400 ml-1">lbs</span>
+                          {/* Individual Set Rows */}
+                          <div className="space-y-2">
+                            {/* Header Row */}
+                            <div className="grid grid-cols-4 gap-3 text-xs font-medium text-gray-500 border-b border-gray-100 pb-1">
+                              <span>Set</span>
+                              <span>Reps</span>
+                              <span>Weight</span>
+                              <span>RPE</span>
+                            </div>
+                            
+                            {/* Set Rows */}
+                            {exercise.sets ? (
+                              Array.from({ length: exercise.sets }, (_, setIndex) => (
+                                <div key={setIndex} className="grid grid-cols-4 gap-3 text-sm py-2 border-b border-gray-50 last:border-b-0">
+                                  <span className="font-medium text-gray-700">{setIndex + 1}</span>
+                                  <span className="text-gray-900">{exercise.reps || '-'}</span>
+                                  <span className="text-gray-900">{exercise.weight ? `${exercise.weight} lbs` : '-'}</span>
+                                  <span className="text-gray-900">{exercise.rpe || '-'}</span>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="grid grid-cols-4 gap-3 text-sm py-2 border-b border-gray-50">
+                                <span className="font-medium text-gray-700">1</span>
+                                <span className="text-gray-900">{exercise.reps || '-'}</span>
+                                <span className="text-gray-900">{exercise.weight ? `${exercise.weight} lbs` : '-'}</span>
+                                <span className="text-gray-900">{exercise.rpe || '-'}</span>
                               </div>
                             )}
                           </div>
