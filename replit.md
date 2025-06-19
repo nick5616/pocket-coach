@@ -198,11 +198,16 @@ Preferred communication style: Simple, everyday language.
 - **Sync Strategy**: Store locally when offline, sync to server when online for AI processing
 - **PWA Benefits**: Allows gym use without internet while maintaining AI features when connected
 
+## Application Ethos
+
+**Core Philosophy**: The application promotes lasting growth in the user's fitness journey, both physically and mentally. This follows the principle of "teaching how to fish rather than giving a fish." Skills are like muscles and need to be trained. AI implementation walks a fine line, since convenience can be the killer of skills, the same way it is the killer of hard-earned muscles, feats of strength, and general athleticism.
+
 ## User Experience Philosophy
 
 **Design Principles**:
+- **Skill Development**: AI enhances learning rather than replacing user competence
+- **Mobile-First**: Optimized for small phone screens with minimal width waste
 - **Unified Workflow**: Seamless integration between continuous journaling and exercise entry
-- **Mobile-First**: All components respect mobile viewport constraints
 - **Clear Navigation**: Direct access to core features without confusion
 - **Readable Text**: Sufficient contrast for all text elements
 - **Progressive Enhancement**: AI features enhance but don't block core functionality

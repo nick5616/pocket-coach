@@ -32,7 +32,8 @@ import {
   Activity,
   StopCircle,
   Trash2,
-  Edit
+  Edit,
+  Send
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Workout, Exercise, Achievement } from "@shared/schema";
@@ -77,6 +78,7 @@ export default function WorkoutJournal() {
   const [showParseAnimation, setShowParseAnimation] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [lastSavedText, setLastSavedText] = useState('');
+  const [showWriteUpSection, setShowWriteUpSection] = useState(false);
   
   // Debounce refs
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -618,139 +620,107 @@ export default function WorkoutJournal() {
           </section>
         )}
 
-        {/* Real-time Journal with Status Indicators */}
+        {/* Stream-of-Consciousness Journal */}
         {workoutId && (
-          <section className="px-4 mb-6">
-            <Card>
+          <section className="mb-6">
+            <Card className="mx-4">
               <CardHeader className="pb-3">
-                <CardTitle className="flex items-center text-lg">
-                  <Sparkles className="h-5 w-5 mr-2 text-duolingo-green" />
-                  Workout Journal
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center text-lg">
+                    <Sparkles className="h-5 w-5 mr-2 text-duolingo-green" />
+                    Workout Journal
+                  </CardTitle>
+                  {writeUpContent.length > 0 && (
+                    <button
+                      onClick={() => setShowWriteUpSection(!showWriteUpSection)}
+                      className="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700"
+                    >
+                      <Edit3 className="h-4 w-4" />
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                        {writeUpContent.length}
+                      </span>
+                    </button>
+                  )}
+                </div>
                 <p className="text-sm text-gray-600">
-                  Write continuously - auto-saves and AI processes your thoughts in real-time
+                  Write your thoughts freely - AI organizes everything when you're ready
                 </p>
               </CardHeader>
               
               <CardContent className="space-y-4">
-                {/* Status Indicators */}
-                <div className="space-y-2">
-                  {/* Save Status */}
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center space-x-2">
-                      {saveStatus === 'saving' && isDirty ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="flex space-x-1">
-                            <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                            <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                            <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                          </div>
-                        </div>
-                      ) : saveStatus === 'saved' ? (
-                        <div className="flex items-center space-x-1 text-green-600">
-                          <Check className="h-3 w-3" />
-                          <span className="font-medium">Saved!</span>
-                        </div>
-                      ) : null}
-                    </div>
-                    <AnimatePresence>
-                      {showSaveAnimation && (
-                        <motion.div
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
-                          className="flex items-center space-x-1 text-green-600"
-                        >
-                          <Check className="h-4 w-4" />
-                          <span className="font-medium">Saved!</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
-                  {/* Parse Status with Progress */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-2 h-2 rounded-full ${
-                          parseStatus === 'parsing' ? 'bg-blue-500 animate-pulse' :
-                          parseStatus === 'parsed' ? 'bg-green-500' : 'bg-gray-300'
-                        }`} />
-                        <span className="text-gray-600">
-                          {parseStatus === 'parsing' ? 'AI Processing...' :
-                           parseStatus === 'parsed' ? 'AI Analysis Complete' : 'Ready for AI analysis'}
-                        </span>
-                      </div>
-                      <AnimatePresence>
-                        {showParseAnimation && (
-                          <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            className="flex items-center space-x-1 text-blue-600"
-                          >
-                            <Activity className="h-4 w-4" />
-                            <span className="font-medium">Parsed!</span>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                    
-                    {/* Linear Progress Bar */}
-                    {parseStatus === 'parsing' && (
-                      <div className="w-full bg-gray-200 rounded-full h-1">
-                        <div 
-                          className="bg-blue-500 h-1 rounded-full transition-all duration-200"
-                          style={{ width: `${parseProgress}%` }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Write-up Preview (shows above input when parsing) */}
-                {writeUpContent.length > 0 && (
+                {/* Expandable Write-up Section */}
+                {showWriteUpSection && writeUpContent.length > 0 && (
                   <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-amber-50 border border-amber-200 rounded-lg p-3"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="bg-amber-50 border border-amber-200 rounded-lg p-4"
                   >
-                    <div className="flex items-center text-xs text-amber-700 mb-2">
-                      <Edit3 className="h-3 w-3 mr-1" />
-                      Stream of consciousness thoughts
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center text-sm text-amber-700">
+                        <Edit3 className="h-4 w-4 mr-2" />
+                        Stream of consciousness thoughts
+                      </div>
+                      <Button
+                        onClick={handleSendWriteUp}
+                        size="sm"
+                        disabled={parseStatus === 'parsing'}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        {parseStatus === 'parsing' ? (
+                          <>
+                            <div className="animate-spin h-3 w-3 border border-white border-t-transparent rounded-full mr-2" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="h-3 w-3 mr-2" />
+                            Send to AI
+                          </>
+                        )}
+                      </Button>
                     </div>
-                    <div className="space-y-1 max-h-20 overflow-y-auto">
-                      {writeUpContent.slice(-3).map((content, index) => (
-                        <p key={index} className="text-xs text-amber-800 italic">"{content}"</p>
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {writeUpContent.map((content, index) => (
+                        <p key={index} className="text-sm text-amber-800 bg-white/50 p-2 rounded border-l-2 border-amber-300">
+                          "{content}"
+                        </p>
                       ))}
                     </div>
                   </motion.div>
                 )}
 
-                {/* Journal Input */}
+                {/* Journal Input - Full Width */}
                 <Textarea
-                  placeholder="Start writing... 'Did bench press today, felt strong at 185lbs for 3 sets of 8. Really pushing myself hard this week. Tomorrow I need to remember to...' - AI will separate exercises from thoughts automatically"
+                  placeholder="Start writing... 'Did bench press today, felt strong at 185lbs for 3 sets of 8. Really pushing myself hard this week. Tomorrow I need to remember to...'"
                   value={journalText}
                   onChange={(e) => handleJournalChange(e.target.value)}
-                  rows={8}
+                  rows={6}
                   disabled={!isEditing || Boolean(workout?.isCompleted)}
-                  className="resize-none"
+                  className="resize-none w-full"
                 />
 
-                {/* End Workout Button */}
-                {isEditing && !workout?.isCompleted && (
-                  <div className="pt-2">
-                    <Button
-                      onClick={handleEndWorkout}
-                      variant="outline"
-                      size="sm"
-                      className="border-red-200 text-red-700 hover:bg-red-50"
-                    >
-                      <StopCircle className="h-4 w-4 mr-2" />
-                      End Workout
-                    </Button>
+                {/* Status Indicators - Simplified */}
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center space-x-3">
+                    {saveStatus === 'saving' && isDirty && (
+                      <div className="flex items-center space-x-2 text-gray-500">
+                        <div className="flex space-x-1">
+                          <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        </div>
+                        <span>Saving...</span>
+                      </div>
+                    )}
+                    {saveStatus === 'saved' && (
+                      <div className="flex items-center space-x-1 text-green-600">
+                        <Check className="h-3 w-3" />
+                        <span>Saved</span>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </CardContent>
             </Card>
           </section>
