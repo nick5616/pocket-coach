@@ -1,9 +1,10 @@
 import { 
-  users, goals, workouts, exercises, programs, achievements, muscleGroups, exerciseMuscleMapping,
+  users, goals, workouts, exercises, sets, programs, achievements, muscleGroups, exerciseMuscleMapping,
   type User, type InsertUser,
   type Goal, type InsertGoal,
   type Workout, type InsertWorkout,
   type Exercise, type InsertExercise,
+  type Set, type InsertSet,
   type Program, type InsertProgram,
   type Achievement, type InsertAchievement,
   type MuscleGroup, type InsertMuscleGroup,
@@ -35,6 +36,13 @@ export interface IStorage {
   createExercise(exercise: InsertExercise): Promise<Exercise>;
   updateExercise(id: number, updates: Partial<Exercise>): Promise<Exercise | undefined>;
   deleteExercise(id: number): Promise<boolean>;
+
+  // Sets
+  getExerciseSets(exerciseId: number): Promise<Set[]>;
+  createSet(set: InsertSet): Promise<Set>;
+  updateSet(id: number, updates: Partial<Set>): Promise<Set | undefined>;
+  deleteSet(id: number): Promise<boolean>;
+  getWorkoutSets(workoutId: number): Promise<(Set & { exerciseName: string })[]>;
 
   // Programs
   getUserPrograms(userId: number): Promise<Program[]>;
@@ -68,6 +76,7 @@ export class MemStorage implements IStorage {
   private goals: Map<number, Goal>;
   private workouts: Map<number, Workout>;
   private exercises: Map<number, Exercise>;
+  private sets: Map<number, Set>;
   private programs: Map<number, Program>;
   private achievements: Map<number, Achievement>;
   private muscleGroups: Map<number, MuscleGroup>;
@@ -79,6 +88,7 @@ export class MemStorage implements IStorage {
     this.goals = new Map();
     this.workouts = new Map();
     this.exercises = new Map();
+    this.sets = new Map();
     this.programs = new Map();
     this.achievements = new Map();
     this.muscleGroups = new Map();
