@@ -171,7 +171,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteGoal(id: number): Promise<boolean> {
     const result = await db.delete(goals).where(eq(goals.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   // Workouts
@@ -256,66 +256,43 @@ export class DatabaseStorage implements IStorage {
 
   // Achievements
   async getUserAchievements(userId: number): Promise<Achievement[]> {
-    return Array.from(this.achievements.values())
-      .filter(achievement => achievement.userId === userId)
-      .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+    return await db.select().from(achievements)
+      .where(eq(achievements.userId, userId))
+      .orderBy(desc(achievements.createdAt));
   }
 
   async createAchievement(insertAchievement: InsertAchievement): Promise<Achievement> {
-    const id = this.currentId++;
-    const achievement: Achievement = {
-      ...insertAchievement,
-      id,
-      description: insertAchievement.description || null,
-      data: insertAchievement.data || null,
-      isViewed: false,
-      createdAt: new Date()
-    };
-    this.achievements.set(id, achievement);
+    const [achievement] = await db.insert(achievements).values(insertAchievement).returning();
     return achievement;
   }
 
   async markAchievementViewed(id: number): Promise<void> {
-    const achievement = this.achievements.get(id);
-    if (achievement) {
-      achievement.isViewed = true;
-      this.achievements.set(id, achievement);
-    }
+    await db.update(achievements).set({ isViewed: true }).where(eq(achievements.id, id));
   }
 
   // Muscle Groups
   async getAllMuscleGroups(): Promise<MuscleGroup[]> {
-    return Array.from(this.muscleGroups.values());
+    return await db.select().from(muscleGroups);
   }
 
   async getMuscleGroup(id: number): Promise<MuscleGroup | undefined> {
-    return this.muscleGroups.get(id);
+    const [muscleGroup] = await db.select().from(muscleGroups).where(eq(muscleGroups.id, id));
+    return muscleGroup || undefined;
   }
 
   async createMuscleGroup(insertMuscleGroup: InsertMuscleGroup): Promise<MuscleGroup> {
-    const id = this.currentId++;
-    const muscleGroup: MuscleGroup = {
-      ...insertMuscleGroup,
-      id
-    };
-    this.muscleGroups.set(id, muscleGroup);
+    const [muscleGroup] = await db.insert(muscleGroups).values(insertMuscleGroup).returning();
     return muscleGroup;
   }
 
   // Exercise Muscle Mapping
   async getExerciseMuscleMapping(exerciseName: string): Promise<ExerciseMuscleMapping[]> {
-    return Array.from(this.exerciseMuscleMapping.values())
-      .filter(mapping => mapping.exerciseName.toLowerCase().includes(exerciseName.toLowerCase()));
+    return await db.select().from(exerciseMuscleMapping)
+      .where(sql`LOWER(${exerciseMuscleMapping.exerciseName}) LIKE LOWER(${'%' + exerciseName + '%'})`);
   }
 
   async createExerciseMuscleMapping(insertMapping: InsertExerciseMuscleMapping): Promise<ExerciseMuscleMapping> {
-    const id = this.currentId++;
-    const mapping: ExerciseMuscleMapping = {
-      ...insertMapping,
-      id,
-      primaryMuscle: insertMapping.primaryMuscle ?? true
-    };
-    this.exerciseMuscleMapping.set(id, mapping);
+    const [mapping] = await db.insert(exerciseMuscleMapping).values(insertMapping).returning();
     return mapping;
   }
 
@@ -372,4 +349,4 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
