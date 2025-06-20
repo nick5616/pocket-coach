@@ -112,6 +112,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- June 20, 2025: **COMPLETED** - Program-to-Workout Integration
+  - Implemented proper program activation flow with automatic deactivation of other programs
+  - Added API endpoint to get today's workout from active program (`/api/programs/:id/today`)
+  - Modified workout creation to pre-load exercises from active program schedules
+  - Enhanced workout journal UI to show program context and planned exercises
+  - Fixed "Start Workout" button to integrate with active programs and load structured workouts
+  - Programs now provide RPE guidance, sets/reps targets, and exercise progression
 - June 20, 2025: **COMPLETED** - PostgreSQL Database Integration
   - Migrated from in-memory storage (MemStorage) to PostgreSQL database (DatabaseStorage)
   - Created comprehensive database schema with proper relationships using Drizzle ORM
