@@ -433,7 +433,7 @@ export default function WorkoutJournal() {
     
     try {
       const response = await apiRequest("POST", `/api/workouts/${workoutId}/journal`, {
-        text: fullText
+        journalText: fullText
       });
       
       clearInterval(progressInterval);
@@ -556,8 +556,9 @@ export default function WorkoutJournal() {
   }
 
   return (
-    <>
-      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-8 z-40">
+    <div className="flex flex-col h-screen">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 px-4 py-2 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Link href={workoutId ? "/workouts" : "/"}>
@@ -565,35 +566,35 @@ export default function WorkoutJournal() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <h1 className="text-lg font-bold text-gray-900">
-              {workoutId ? (isEditing ? "Edit Workout" : "Workout Details") : "New Workout"}
-            </h1>
+            <div>
+              <h1 className="text-base font-semibold text-gray-900">
+                {workoutId ? (workout?.name || 'Workout') : 'New Workout'}
+              </h1>
+              <p className="text-xs text-gray-500">
+                {new Date().toLocaleDateString('en-US', { 
+                  weekday: 'short', 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}
+              </p>
+            </div>
           </div>
           <div className="flex items-center space-x-2">
-            {workoutId && !workout?.isCompleted && (
-              <Button
-                onClick={() => setIsEditing(!isEditing)}
-                variant="ghost"
-                size="icon"
-                className="text-gray-500"
-              >
-                <Edit3 className="h-4 w-4" />
-              </Button>
-            )}
             {workout?.isCompleted && (
-              <Badge className="bg-success-green text-white">
+              <Badge className="bg-green-500 text-white text-xs">
                 <CheckCircle className="h-3 w-3 mr-1" />
-                Completed
+                Done
               </Badge>
             )}
           </div>
         </div>
       </header>
 
-      <main className="pb-20">
-        {/* Workout Form */}
-        <section className="px-4 py-6">
-          <Form {...form}>
+      {/* New Workout Form */}
+      {!workoutId && (
+        <main className="flex-1 overflow-y-auto pb-4">
+          <section className="px-4 py-6">
+            <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {!workoutId && (
                 <div className="text-center py-2 mb-4">
@@ -695,142 +696,123 @@ export default function WorkoutJournal() {
           </section>
         )}
 
-        {/* Stream-of-Consciousness Journal */}
+        {/* iMessage-Style Journal Interface */}
         {workoutId && (
-          <section className="mb-6">
-            <Card className="mx-4">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center text-lg">
+          <section className="flex-1 flex flex-col h-full">
+            {/* Chat Header */}
+            <div className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
                   <Sparkles className="h-5 w-5 mr-2 text-duolingo-green" />
-                  Workout Journal
-                </CardTitle>
-                <p className="text-sm text-gray-600">
-                  Write your thoughts freely - AI organizes everything when you're ready
-                </p>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-
-
-                {/* Real-time Batch Display - Always Visible Above Input */}
+                  <h2 className="font-semibold text-gray-900">Workout Journal</h2>
+                </div>
                 {writeUpContent.length > 0 && (
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center text-sm text-amber-700">
-                        <Edit3 className="h-4 w-4 mr-2" />
-                        Thoughts ready ({writeUpContent.length})
-                      </div>
-                      <Button
-                        onClick={handleSendWriteUp}
-                        size="sm"
-                        disabled={parseStatus === 'parsing' || writeUpContent.length === 0}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        {parseStatus === 'parsing' ? (
-                          <>
-                            <div className="animate-spin h-3 w-3 border border-white border-t-transparent rounded-full mr-2" />
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="h-3 w-3 mr-2" />
-                            Send to AI
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    <div className="space-y-1 max-h-24 overflow-y-auto">
-                      {writeUpContent.map((content, index) => (
-                        <div key={index} className="text-xs text-amber-800 bg-white/60 px-2 py-1 rounded border-l-2 border-amber-300">
-                          "{content.length > 60 ? content.substring(0, 60) + '...' : content}"
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <Button
+                    onClick={handleSendWriteUp}
+                    size="sm"
+                    disabled={parseStatus === 'parsing'}
+                    className="bg-duolingo-green hover:bg-green-600 text-white"
+                  >
+                    {parseStatus === 'parsing' ? (
+                      <>
+                        <div className="animate-spin h-3 w-3 border border-white border-t-transparent rounded-full mr-2" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-3 w-3 mr-2" />
+                        Generate Exercises ({writeUpContent.length})
+                      </>
+                    )}
+                  </Button>
                 )}
+              </div>
+            </div>
 
-                {/* Current Text Being Typed - Always Show When There's Content */}
-                {(journalText.trim() || batchProgress > 0 || lastBatchedThought) && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center text-sm text-blue-700">
-                        <Edit className="h-4 w-4 mr-2" />
-                        {journalText.trim() ? 'Current thought' : 
-                         batchProgress > 0 ? 'Batching thought...' : 'Latest thought'}
-                      </div>
-                      <div className="text-xs text-blue-600">
-                        {batchProgress > 0 ? `Batching in ${Math.ceil((100 - batchProgress) / 20)}s` : 
-                         journalText.trim() ? 'Keep writing...' : 'Start new thought'}
-                      </div>
-                    </div>
-                    <div className="text-xs text-blue-800 bg-white/60 px-2 py-1 rounded border-l-2 border-blue-300">
-                      {(() => {
-                        const displayText = journalText.trim() || lastBatchedThought || 'Start writing your thoughts...';
-                        return `"${displayText.length > 80 ? displayText.substring(0, 80) + '...' : displayText}"`;
-                      })()}
-                    </div>
-                  </div>
-                )}
-
-                {/* Journal Input - Borderless Full Width */}
-                <Textarea
-                  placeholder="Start writing... 'Did bench press today, felt strong at 185lbs for 3 sets of 8. Really pushing myself hard this week. Tomorrow I need to remember to...'"
-                  value={journalText}
-                  onChange={(e) => handleJournalChange(e.target.value)}
-                  rows={4}
-                  disabled={!isEditing || Boolean(workout?.isCompleted)}
-                  className="resize-none w-full border-0 outline-none focus:ring-0 focus:border-0 shadow-none px-0 bg-transparent"
-                />
-
-                {/* Linear Progress Bar for Batching - Underneath Input */}
-                {batchProgress > 0 && (
-                  <div className="w-full bg-gray-200 rounded-full h-1">
-                    <div 
-                      className="bg-blue-500 h-1 rounded-full transition-all duration-200 ease-out"
-                      style={{ width: `${batchProgress}%` }}
-                    />
-                  </div>
-                )}
-
-                {/* Status Indicators and Manual Controls */}
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center space-x-3">
-                    {saveStatus === 'saving' && (
-                      <div className="flex items-center space-x-2 text-gray-500">
-                        <div className="flex space-x-1">
-                          <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                          <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                          <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                        </div>
-                      </div>
-                    )}
-                    {saveStatus === 'saved' && (
-                      <div className="flex items-center space-x-1 text-green-600">
-                        <Check className="h-3 w-3" />
-                        <span>Saved!</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {writeUpContent.length > 0 && (
-                      <div className="text-xs text-gray-500">
-                        {writeUpContent.length} thought{writeUpContent.length !== 1 ? 's' : ''} ready
-                      </div>
-                    )}
-                    {journalText.trim() && (
-                      <Button
-                        onClick={() => debouncedBatch()}
-                        size="sm"
-                        variant="outline"
-                        className="h-6 text-xs px-2"
-                      >
-                        Batch Now
-                      </Button>
-                    )}
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+              {/* Your sent messages */}
+              {writeUpContent.map((message, index) => (
+                <div key={index} className="flex justify-end">
+                  <div className="max-w-xs lg:max-w-md bg-duolingo-green text-white rounded-2xl rounded-br-md px-4 py-2">
+                    <p className="text-sm">{message}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              ))}
+              
+              {/* Processing message */}
+              {parseStatus === 'parsing' && (
+                <div className="flex justify-start">
+                  <div className="max-w-xs lg:max-w-md bg-white border rounded-2xl rounded-bl-md px-4 py-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      </div>
+                      <span className="text-sm text-gray-600">AI is analyzing your workout...</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
+                      <div 
+                        className="bg-duolingo-green h-1 rounded-full transition-all duration-200"
+                        style={{ width: `${parseProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Current typing indicator */}
+              {journalText.trim() && (
+                <div className="flex justify-end">
+                  <div className="max-w-xs lg:max-w-md bg-blue-100 border border-blue-200 text-blue-800 rounded-2xl rounded-br-md px-4 py-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-medium">Writing...</span>
+                      {saveStatus === 'saved' && (
+                        <Check className="h-3 w-3 text-green-600" />
+                      )}
+                    </div>
+                    <p className="text-sm">{journalText.length > 80 ? journalText.substring(0, 80) + '...' : journalText}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Input Area */}
+            <div className="bg-white border-t border-gray-200 px-4 py-3">
+              <div className="flex items-end space-x-3">
+                <div className="flex-1">
+                  <Textarea
+                    placeholder="Type your workout thoughts... Press Enter to send"
+                    value={journalText}
+                    onChange={(e) => handleJournalChange(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (journalText.trim()) {
+                          debouncedBatch();
+                        }
+                      }
+                    }}
+                    rows={1}
+                    disabled={!isEditing || Boolean(workout?.isCompleted)}
+                    className="resize-none w-full border border-gray-300 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-duolingo-green focus:border-transparent max-h-32"
+                  />
+                </div>
+                <Button
+                  onClick={() => {
+                    if (journalText.trim()) {
+                      debouncedBatch();
+                    }
+                  }}
+                  disabled={!journalText.trim()}
+                  size="sm"
+                  className="bg-duolingo-green hover:bg-green-600 text-white rounded-full w-10 h-10 p-0 shrink-0"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </section>
         )}
 
@@ -1222,7 +1204,7 @@ export default function WorkoutJournal() {
         />
       )}
 
-      <BottomNavigation />
-    </>
+      {!workoutId && <BottomNavigation />}
+    </div>
   );
 }
