@@ -81,6 +81,7 @@ export default function WorkoutJournal() {
   const [showWriteUpSection, setShowWriteUpSection] = useState(false);
   const [batchProgress, setBatchProgress] = useState(0);
   const [nextBatchIn, setNextBatchIn] = useState(5000);
+  const [lastBatchedThought, setLastBatchedThought] = useState('');
   
   // Debounce refs
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -305,6 +306,9 @@ export default function WorkoutJournal() {
   // Batch thoughts after 5 seconds (no AI processing)
   const debouncedBatch = useCallback(() => {
     if (!journalText.trim()) return;
+    
+    // Store the last thought for persistent display
+    setLastBatchedThought(journalText.trim());
     
     // Add current text to writeup content (batch it)
     const textToBatch = journalText.trim();
@@ -740,20 +744,25 @@ export default function WorkoutJournal() {
                   </div>
                 )}
 
-                {/* Current Text Being Typed - Show if Input Has Content */}
-                {journalText.trim() && (
+                {/* Current Text Being Typed - Always Show When There's Content */}
+                {(journalText.trim() || batchProgress > 0 || lastBatchedThought) && (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center text-sm text-blue-700">
                         <Edit className="h-4 w-4 mr-2" />
-                        Current thought
+                        {journalText.trim() ? 'Current thought' : 
+                         batchProgress > 0 ? 'Batching thought...' : 'Latest thought'}
                       </div>
                       <div className="text-xs text-blue-600">
-                        {batchProgress > 0 ? `Batching in ${Math.ceil((100 - batchProgress) / 20)}s` : 'Keep writing...'}
+                        {batchProgress > 0 ? `Batching in ${Math.ceil((100 - batchProgress) / 20)}s` : 
+                         journalText.trim() ? 'Keep writing...' : 'Start new thought'}
                       </div>
                     </div>
                     <div className="text-xs text-blue-800 bg-white/60 px-2 py-1 rounded border-l-2 border-blue-300">
-                      "{journalText.length > 80 ? journalText.substring(0, 80) + '...' : journalText}"
+                      {(() => {
+                        const displayText = journalText.trim() || lastBatchedThought || 'Start writing your thoughts...';
+                        return `"${displayText.length > 80 ? displayText.substring(0, 80) + '...' : displayText}"`;
+                      })()}
                     </div>
                   </div>
                 )}
