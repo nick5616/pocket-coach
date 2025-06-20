@@ -170,7 +170,7 @@ export default function Home() {
               >
                 <div className="flex items-center justify-center space-x-3">
                   <Play className="h-6 w-6" />
-                  <span className="text-lg font-semibold">Resume "{ongoingWorkout.name}"</span>
+                  <span className="text-lg font-semibold max-w-[350px] truncate">Resume "{ongoingWorkout.name}"</span>
                 </div>
               </Button>
             </Link>

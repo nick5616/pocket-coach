@@ -108,6 +108,7 @@ Preferred communication style: Simple, everyday language.
 - UI improvements: Show current date on workout creation screen
 - Workout naming: AI-generated workout names based on exercises
 - Data storage preference: Hybrid approach with offline capabilities
+- Resume workout button: Truncate workout name with ellipsis at 350px width
 
 ## Recent Changes
 
