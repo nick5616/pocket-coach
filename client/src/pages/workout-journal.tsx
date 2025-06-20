@@ -1133,6 +1133,9 @@ export default function WorkoutJournal() {
       {/* Completion Modal */}
       <Dialog open={showCompletion} onOpenChange={setShowCompletion}>
         <DialogContent className="max-w-sm mx-4 rounded-2xl p-0 overflow-hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Workout Complete</DialogTitle>
+          </DialogHeader>
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
