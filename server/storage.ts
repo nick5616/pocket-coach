@@ -9,6 +9,8 @@ import {
   type MuscleGroup, type InsertMuscleGroup,
   type ExerciseMuscleMapping, type InsertExerciseMuscleMapping
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, and, sql } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -65,40 +67,17 @@ export interface IStorage {
   }>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private goals: Map<number, Goal>;
-  private workouts: Map<number, Workout>;
-  private exercises: Map<number, Exercise>;
-  private programs: Map<number, Program>;
-  private achievements: Map<number, Achievement>;
-  private muscleGroups: Map<number, MuscleGroup>;
-  private exerciseMuscleMapping: Map<number, ExerciseMuscleMapping>;
-  private currentId: number;
-
+export class DatabaseStorage implements IStorage {
   constructor() {
-    this.users = new Map();
-    this.goals = new Map();
-    this.workouts = new Map();
-    this.exercises = new Map();
-    this.programs = new Map();
-    this.achievements = new Map();
-    this.muscleGroups = new Map();
-    this.exerciseMuscleMapping = new Map();
-    this.currentId = 1;
-
-    // Create demo user
-    this.createUser({
-      username: "alex",
-      password: "password123",
-      email: "alex@example.com"
-    });
-
-    // Initialize muscle groups
+    // Initialize muscle groups on startup
     this.initializeMuscleGroups();
   }
 
   private async initializeMuscleGroups() {
+    // Check if muscle groups are already initialized
+    const existingGroups = await db.select().from(muscleGroups).limit(1);
+    if (existingGroups.length > 0) return;
+
     const muscleGroupsData = [
       { name: "chest", region: "upper", displayName: "Chest", svgId: "chest" },
       { name: "back", region: "upper", displayName: "Back", svgId: "back" },
@@ -115,235 +94,164 @@ export class MemStorage implements IStorage {
       { name: "calves", region: "lower", displayName: "Calves", svgId: "calves" },
     ];
 
-    for (const data of muscleGroupsData) {
-      await this.createMuscleGroup(data);
-    }
+    const insertedGroups = await db.insert(muscleGroups).values(muscleGroupsData).returning();
 
     // Initialize common exercise-muscle mappings
     const exerciseMappings = [
       // Chest exercises
-      { exerciseName: "bench press", muscleGroupId: 1, primaryMuscle: true },
-      { exerciseName: "push ups", muscleGroupId: 1, primaryMuscle: true },
-      { exerciseName: "dumbbell press", muscleGroupId: 1, primaryMuscle: true },
-      { exerciseName: "incline press", muscleGroupId: 1, primaryMuscle: true },
-      { exerciseName: "chest fly", muscleGroupId: 1, primaryMuscle: true },
+      { exerciseName: "bench press", muscleGroupId: insertedGroups[0].id, primaryMuscle: true },
+      { exerciseName: "push ups", muscleGroupId: insertedGroups[0].id, primaryMuscle: true },
+      { exerciseName: "dumbbell press", muscleGroupId: insertedGroups[0].id, primaryMuscle: true },
+      { exerciseName: "incline press", muscleGroupId: insertedGroups[0].id, primaryMuscle: true },
+      { exerciseName: "chest fly", muscleGroupId: insertedGroups[0].id, primaryMuscle: true },
       
       // Back exercises
-      { exerciseName: "pull ups", muscleGroupId: 2, primaryMuscle: true },
-      { exerciseName: "rows", muscleGroupId: 2, primaryMuscle: true },
-      { exerciseName: "lat pulldown", muscleGroupId: 2, primaryMuscle: true },
-      { exerciseName: "deadlift", muscleGroupId: 2, primaryMuscle: true },
+      { exerciseName: "pull ups", muscleGroupId: insertedGroups[1].id, primaryMuscle: true },
+      { exerciseName: "rows", muscleGroupId: insertedGroups[1].id, primaryMuscle: true },
+      { exerciseName: "lat pulldown", muscleGroupId: insertedGroups[1].id, primaryMuscle: true },
+      { exerciseName: "deadlift", muscleGroupId: insertedGroups[1].id, primaryMuscle: true },
       
       // Shoulder exercises
-      { exerciseName: "shoulder press", muscleGroupId: 3, primaryMuscle: true },
-      { exerciseName: "lateral raises", muscleGroupId: 3, primaryMuscle: true },
-      { exerciseName: "front raises", muscleGroupId: 3, primaryMuscle: true },
+      { exerciseName: "shoulder press", muscleGroupId: insertedGroups[2].id, primaryMuscle: true },
+      { exerciseName: "lateral raises", muscleGroupId: insertedGroups[2].id, primaryMuscle: true },
+      { exerciseName: "front raises", muscleGroupId: insertedGroups[2].id, primaryMuscle: true },
       
       // Leg exercises
-      { exerciseName: "squats", muscleGroupId: 10, primaryMuscle: true },
-      { exerciseName: "lunges", muscleGroupId: 10, primaryMuscle: true },
-      { exerciseName: "leg press", muscleGroupId: 10, primaryMuscle: true },
-      { exerciseName: "leg curls", muscleGroupId: 11, primaryMuscle: true },
-      { exerciseName: "calf raises", muscleGroupId: 13, primaryMuscle: true },
+      { exerciseName: "squats", muscleGroupId: insertedGroups[9].id, primaryMuscle: true },
+      { exerciseName: "lunges", muscleGroupId: insertedGroups[9].id, primaryMuscle: true },
+      { exerciseName: "leg press", muscleGroupId: insertedGroups[9].id, primaryMuscle: true },
+      { exerciseName: "leg curls", muscleGroupId: insertedGroups[10].id, primaryMuscle: true },
+      { exerciseName: "calf raises", muscleGroupId: insertedGroups[12].id, primaryMuscle: true },
     ];
 
-    for (const mapping of exerciseMappings) {
-      await this.createExerciseMuscleMapping(mapping);
-    }
+    await db.insert(exerciseMuscleMapping).values(exerciseMappings);
+
+    // Create demo user
+    await this.createUser({
+      username: "alex",
+      password: "password123",
+      email: "alex@example.com"
+    });
   }
 
   // Users
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user: User = {
-      ...insertUser,
-      id,
-      email: insertUser.email || null,
-      currentStreak: 0,
-      createdAt: new Date()
-    };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async updateUserStreak(userId: number, streak: number): Promise<void> {
-    const user = this.users.get(userId);
-    if (user) {
-      user.currentStreak = streak;
-      this.users.set(userId, user);
-    }
+    await db.update(users).set({ currentStreak: streak }).where(eq(users.id, userId));
   }
 
   // Goals
   async getUserGoals(userId: number): Promise<Goal[]> {
-    return Array.from(this.goals.values()).filter(goal => goal.userId === userId);
+    return await db.select().from(goals).where(eq(goals.userId, userId));
   }
 
   async createGoal(insertGoal: InsertGoal): Promise<Goal> {
-    const id = this.currentId++;
-    const goal: Goal = {
-      ...insertGoal,
-      id,
-      description: insertGoal.description || null,
-      targetValue: insertGoal.targetValue || null,
-      unit: insertGoal.unit || null,
-      muscleGroup: insertGoal.muscleGroup || null,
-      status: insertGoal.status || "active",
-      targetDate: insertGoal.targetDate || null,
-      currentValue: 0,
-      createdAt: new Date()
-    };
-    this.goals.set(id, goal);
+    const [goal] = await db.insert(goals).values(insertGoal).returning();
     return goal;
   }
 
   async updateGoal(id: number, updates: Partial<Goal>): Promise<Goal | undefined> {
-    const goal = this.goals.get(id);
-    if (goal) {
-      const updated = { ...goal, ...updates };
-      this.goals.set(id, updated);
-      return updated;
-    }
-    return undefined;
+    const [goal] = await db.update(goals).set(updates).where(eq(goals.id, id)).returning();
+    return goal || undefined;
   }
 
   async deleteGoal(id: number): Promise<boolean> {
-    return this.goals.delete(id);
+    const result = await db.delete(goals).where(eq(goals.id, id));
+    return result.rowCount > 0;
   }
 
   // Workouts
   async getUserWorkouts(userId: number, limit?: number): Promise<Workout[]> {
-    const userWorkouts = Array.from(this.workouts.values())
-      .filter(workout => workout.userId === userId)
-      .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+    const query = db.select().from(workouts)
+      .where(eq(workouts.userId, userId))
+      .orderBy(desc(workouts.createdAt));
     
-    return limit ? userWorkouts.slice(0, limit) : userWorkouts;
+    if (limit) {
+      return await query.limit(limit);
+    }
+    return await query;
   }
 
   async getWorkout(id: number): Promise<Workout | undefined> {
-    return this.workouts.get(id);
+    const [workout] = await db.select().from(workouts).where(eq(workouts.id, id));
+    return workout || undefined;
   }
 
   async createWorkout(insertWorkout: InsertWorkout): Promise<Workout> {
-    const id = this.currentId++;
-    const workout: Workout = {
-      ...insertWorkout,
-      id,
-      notes: insertWorkout.notes || null,
-      duration: insertWorkout.duration || null,
-      calories: insertWorkout.calories || null,
-      totalVolume: 0,
-      aiAnalysis: null,
-      isCompleted: false,
-      completedAt: null,
-      createdAt: new Date()
-    };
-    this.workouts.set(id, workout);
+    const [workout] = await db.insert(workouts).values(insertWorkout).returning();
     return workout;
   }
 
   async updateWorkout(id: number, updates: Partial<Workout>): Promise<Workout | undefined> {
-    const workout = this.workouts.get(id);
-    if (workout) {
-      const updated = { ...workout, ...updates };
-      this.workouts.set(id, updated);
-      return updated;
-    }
-    return undefined;
+    const [workout] = await db.update(workouts).set(updates).where(eq(workouts.id, id)).returning();
+    return workout || undefined;
   }
 
   async completeWorkout(id: number, analysis: any): Promise<Workout | undefined> {
-    const workout = this.workouts.get(id);
-    if (workout) {
-      const updated = {
-        ...workout,
+    const [workout] = await db.update(workouts)
+      .set({
         isCompleted: true,
         completedAt: new Date(),
         aiAnalysis: analysis
-      };
-      this.workouts.set(id, updated);
-      return updated;
-    }
-    return undefined;
+      })
+      .where(eq(workouts.id, id))
+      .returning();
+    return workout || undefined;
   }
 
   // Exercises
   async getWorkoutExercises(workoutId: number): Promise<Exercise[]> {
-    return Array.from(this.exercises.values()).filter(exercise => exercise.workoutId === workoutId);
+    return await db.select().from(exercises).where(eq(exercises.workoutId, workoutId));
   }
 
   async createExercise(insertExercise: InsertExercise): Promise<Exercise> {
-    const id = this.currentId++;
-    const exercise: Exercise = {
-      ...insertExercise,
-      id,
-      notes: insertExercise.notes || null,
-      sets: insertExercise.sets || null,
-      reps: insertExercise.reps || null,
-      weight: insertExercise.weight || null,
-      rpe: insertExercise.rpe || null,
-      restTime: insertExercise.restTime || null,
-      muscleGroups: insertExercise.muscleGroups || null,
-      createdAt: new Date()
-    };
-    this.exercises.set(id, exercise);
+    const [exercise] = await db.insert(exercises).values(insertExercise).returning();
     return exercise;
   }
 
   async updateExercise(id: number, updates: Partial<Exercise>): Promise<Exercise | undefined> {
-    const exercise = this.exercises.get(id);
-    if (exercise) {
-      const updated = { ...exercise, ...updates };
-      this.exercises.set(id, updated);
-      return updated;
-    }
-    return undefined;
+    const [exercise] = await db.update(exercises).set(updates).where(eq(exercises.id, id)).returning();
+    return exercise || undefined;
   }
 
   async deleteExercise(id: number): Promise<boolean> {
-    return this.exercises.delete(id);
+    const result = await db.delete(exercises).where(eq(exercises.id, id));
+    return (result.rowCount || 0) > 0;
   }
 
   // Programs
   async getUserPrograms(userId: number): Promise<Program[]> {
-    return Array.from(this.programs.values()).filter(program => program.userId === userId);
+    return await db.select().from(programs).where(eq(programs.userId, userId));
   }
 
   async getActiveProgram(userId: number): Promise<Program | undefined> {
-    return Array.from(this.programs.values()).find(program => program.userId === userId && program.isActive);
+    const [program] = await db.select().from(programs)
+      .where(and(eq(programs.userId, userId), eq(programs.isActive, true)));
+    return program || undefined;
   }
 
   async createProgram(insertProgram: InsertProgram): Promise<Program> {
-    const id = this.currentId++;
-    const program: Program = {
-      ...insertProgram,
-      id,
-      description: insertProgram.description || null,
-      isActive: insertProgram.isActive || false,
-      schedule: insertProgram.schedule || null,
-      aiGenerated: insertProgram.aiGenerated || false,
-      createdAt: new Date()
-    };
-    this.programs.set(id, program);
+    const [program] = await db.insert(programs).values(insertProgram).returning();
     return program;
   }
 
   async updateProgram(id: number, updates: Partial<Program>): Promise<Program | undefined> {
-    const program = this.programs.get(id);
-    if (program) {
-      const updated = { ...program, ...updates };
-      this.programs.set(id, updated);
-      return updated;
-    }
-    return undefined;
+    const [program] = await db.update(programs).set(updates).where(eq(programs.id, id)).returning();
+    return program || undefined;
   }
 
   // Achievements

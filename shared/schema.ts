@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, timestamp, real, jsonb } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -90,6 +91,61 @@ export const achievements = pgTable("achievements", {
   isViewed: boolean("is_viewed").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  goals: many(goals),
+  workouts: many(workouts),
+  programs: many(programs),
+  achievements: many(achievements),
+}));
+
+export const goalsRelations = relations(goals, ({ one }) => ({
+  user: one(users, {
+    fields: [goals.userId],
+    references: [users.id],
+  }),
+}));
+
+export const workoutsRelations = relations(workouts, ({ one, many }) => ({
+  user: one(users, {
+    fields: [workouts.userId],
+    references: [users.id],
+  }),
+  exercises: many(exercises),
+}));
+
+export const exercisesRelations = relations(exercises, ({ one }) => ({
+  workout: one(workouts, {
+    fields: [exercises.workoutId],
+    references: [workouts.id],
+  }),
+}));
+
+export const programsRelations = relations(programs, ({ one }) => ({
+  user: one(users, {
+    fields: [programs.userId],
+    references: [users.id],
+  }),
+}));
+
+export const exerciseMuscleMappingRelations = relations(exerciseMuscleMapping, ({ one }) => ({
+  muscleGroup: one(muscleGroups, {
+    fields: [exerciseMuscleMapping.muscleGroupId],
+    references: [muscleGroups.id],
+  }),
+}));
+
+export const muscleGroupsRelations = relations(muscleGroups, ({ many }) => ({
+  exerciseMappings: many(exerciseMuscleMapping),
+}));
+
+export const achievementsRelations = relations(achievements, ({ one }) => ({
+  user: one(users, {
+    fields: [achievements.userId],
+    references: [users.id],
+  }),
+}));
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
