@@ -693,63 +693,28 @@ export default function WorkoutJournal() {
           <section className="mb-6">
             <Card className="mx-4">
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center text-lg">
-                    <Sparkles className="h-5 w-5 mr-2 text-duolingo-green" />
-                    Workout Journal
-                  </CardTitle>
-                  <div className="flex items-center space-x-2">
-                    {writeUpContent.length > 0 && (
-                      <button
-                        onClick={() => setShowWriteUpSection(!showWriteUpSection)}
-                        className="flex items-center space-x-1 text-sm text-amber-600 hover:text-amber-700"
-                      >
-                        <Edit3 className="h-4 w-4" />
-                        <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-xs font-medium">
-                          {writeUpContent.length}
-                        </span>
-                      </button>
-                    )}
-                    {writeUpContent.length > 0 && (
-                      <button
-                        onClick={() => setShowWriteUpSection(!showWriteUpSection)}
-                        className={`p-1 rounded ${showWriteUpSection ? 'bg-amber-200' : 'bg-amber-100'} text-amber-700 hover:bg-amber-200`}
-                      >
-                        <svg 
-                          className={`h-4 w-4 transition-transform ${showWriteUpSection ? 'rotate-180' : ''}`} 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                </div>
+                <CardTitle className="flex items-center text-lg">
+                  <Sparkles className="h-5 w-5 mr-2 text-duolingo-green" />
+                  Workout Journal
+                </CardTitle>
                 <p className="text-sm text-gray-600">
                   Write your thoughts freely - AI organizes everything when you're ready
                 </p>
               </CardHeader>
               
               <CardContent className="space-y-4">
-                {/* Expandable Write-up Section */}
-                {showWriteUpSection && writeUpContent.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="bg-amber-50 border border-amber-200 rounded-lg p-4"
-                  >
-                    <div className="flex items-center justify-between mb-3">
+                {/* Real-time Batch Display - Always Visible Above Input */}
+                {writeUpContent.length > 0 && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center text-sm text-amber-700">
                         <Edit3 className="h-4 w-4 mr-2" />
-                        Stream of consciousness thoughts
+                        Thoughts ready ({writeUpContent.length})
                       </div>
                       <Button
                         onClick={handleSendWriteUp}
                         size="sm"
-                        disabled={parseStatus === 'parsing'}
+                        disabled={parseStatus === 'parsing' || writeUpContent.length === 0}
                         className="bg-blue-600 hover:bg-blue-700 text-white"
                       >
                         {parseStatus === 'parsing' ? (
@@ -765,14 +730,32 @@ export default function WorkoutJournal() {
                         )}
                       </Button>
                     </div>
-                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                    <div className="space-y-1 max-h-24 overflow-y-auto">
                       {writeUpContent.map((content, index) => (
-                        <p key={index} className="text-sm text-amber-800 bg-white/50 p-2 rounded border-l-2 border-amber-300">
-                          "{content}"
-                        </p>
+                        <div key={index} className="text-xs text-amber-800 bg-white/60 px-2 py-1 rounded border-l-2 border-amber-300">
+                          "{content.length > 60 ? content.substring(0, 60) + '...' : content}"
+                        </div>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
+                )}
+
+                {/* Current Text Being Typed - Show if Input Has Content */}
+                {journalText.trim() && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center text-sm text-blue-700">
+                        <Edit className="h-4 w-4 mr-2" />
+                        Current thought
+                      </div>
+                      <div className="text-xs text-blue-600">
+                        {batchProgress > 0 ? `Batching in ${Math.ceil((100 - batchProgress) / 20)}s` : 'Keep writing...'}
+                      </div>
+                    </div>
+                    <div className="text-xs text-blue-800 bg-white/60 px-2 py-1 rounded border-l-2 border-blue-300">
+                      "{journalText.length > 80 ? journalText.substring(0, 80) + '...' : journalText}"
+                    </div>
+                  </div>
                 )}
 
                 {/* Journal Input - Borderless Full Width */}
@@ -780,16 +763,16 @@ export default function WorkoutJournal() {
                   placeholder="Start writing... 'Did bench press today, felt strong at 185lbs for 3 sets of 8. Really pushing myself hard this week. Tomorrow I need to remember to...'"
                   value={journalText}
                   onChange={(e) => handleJournalChange(e.target.value)}
-                  rows={6}
+                  rows={4}
                   disabled={!isEditing || Boolean(workout?.isCompleted)}
                   className="resize-none w-full border-0 outline-none focus:ring-0 focus:border-0 shadow-none px-0 bg-transparent"
                 />
 
                 {/* Linear Progress Bar for Batching - Underneath Input */}
                 {batchProgress > 0 && (
-                  <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
+                  <div className="w-full bg-gray-200 rounded-full h-1">
                     <div 
-                      className="bg-amber-500 h-1 rounded-full transition-all duration-200 ease-out"
+                      className="bg-blue-500 h-1 rounded-full transition-all duration-200 ease-out"
                       style={{ width: `${batchProgress}%` }}
                     />
                   </div>
@@ -814,6 +797,11 @@ export default function WorkoutJournal() {
                       </div>
                     )}
                   </div>
+                  {writeUpContent.length > 0 && (
+                    <div className="text-xs text-gray-500">
+                      {writeUpContent.length} thought{writeUpContent.length !== 1 ? 's' : ''} ready
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
