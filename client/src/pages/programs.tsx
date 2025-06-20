@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -208,13 +209,15 @@ export default function Programs() {
                   <Calendar className="h-4 w-4 mr-1" />
                   <span>Week 2 of 8</span>
                 </div>
-                <Button 
-                  size="sm" 
-                  className="bg-white/20 hover:bg-white/30 text-white border-0"
-                >
-                  <Play className="h-4 w-4 mr-1" />
-                  Start Today
-                </Button>
+                <Link href="/workout-journal">
+                  <Button 
+                    size="sm" 
+                    className="bg-white/20 hover:bg-white/30 text-white border-0"
+                  >
+                    <Play className="h-4 w-4 mr-1" />
+                    Start Today
+                  </Button>
+                </Link>
               </div>
             </div>
           </section>
@@ -485,9 +488,9 @@ export default function Programs() {
                                   checked={field.value?.includes(equipment.id)}
                                   onCheckedChange={(checked) => {
                                     return checked
-                                      ? field.onChange([...field.value, equipment.id])
+                                      ? field.onChange([...(field.value || []), equipment.id])
                                       : field.onChange(
-                                          field.value?.filter((value) => value !== equipment.id)
+                                          field.value?.filter((value: string) => value !== equipment.id)
                                         );
                                   }}
                                 />

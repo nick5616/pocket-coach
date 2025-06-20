@@ -372,6 +372,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/programs/:id", async (req, res) => {
+    try {
+      const programId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      // If activating a program, deactivate all other programs for this user first
+      if (updates.isActive === true) {
+        const program = await storage.updateProgram(programId, { isActive: false });
+        if (program) {
+          // Get all user programs and deactivate them
+          const userPrograms = await storage.getUserPrograms(program.userId);
+          for (const userProgram of userPrograms) {
+            if (userProgram.id !== programId) {
+              await storage.updateProgram(userProgram.id, { isActive: false });
+            }
+          }
+        }
+      }
+      
+      const program = await storage.updateProgram(programId, updates);
+      if (!program) {
+        return res.status(404).json({ message: "Program not found" });
+      }
+      
+      res.json(program);
+    } catch (error) {
+      console.error("Program update error:", error);
+      res.status(500).json({ message: "Failed to update program" });
+    }
+  });
+
   // Achievement routes
   app.get("/api/achievements", async (req, res) => {
     try {
