@@ -332,22 +332,17 @@ export default function WorkoutJournal() {
   const regroupWriteUpContent = (parsedData: any) => {
     if (!journalText.trim()) return;
     
-    const lines = journalText.split('\n').filter(line => line.trim());
-    const nonExerciseLines: string[] = [];
+    // For now, add all content to writeup for AI processing
+    // Split by sentences or meaningful chunks
+    const content = journalText.trim();
+    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 10);
     
-    lines.forEach(line => {
-      const trimmedLine = line.trim().toLowerCase();
-      const hasExerciseKeywords = /\b(set|rep|lb|kg|bench|press|squat|curl|row|pull|push|lift|weight)\b/.test(trimmedLine);
-      const hasNumbers = /\d+/.test(trimmedLine);
-      
-      if (!hasExerciseKeywords || !hasNumbers) {
-        nonExerciseLines.push(line.trim());
-      }
-    });
-    
-    // Add to existing writeup content
-    if (nonExerciseLines.length > 0) {
-      setWriteUpContent(prev => [...prev, ...nonExerciseLines]);
+    if (sentences.length > 0) {
+      // Add each sentence as a separate thought
+      setWriteUpContent(prev => [...prev, ...sentences.map(s => s.trim())]);
+    } else {
+      // If no clear sentences, add the whole content as one thought
+      setWriteUpContent(prev => [...prev, content]);
     }
   };
 
@@ -361,9 +356,14 @@ export default function WorkoutJournal() {
       setSaveStatus('saving');
     }
     
-    // Clear existing timeouts
+    // Clear existing save timeout but preserve batch timeout if it's close to completion
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    if (parseTimeoutRef.current) clearTimeout(parseTimeoutRef.current);
+    
+    // Only clear batch timeout if batch progress is less than 80% (allow batching to complete)
+    if (parseTimeoutRef.current && batchProgress < 80) {
+      clearTimeout(parseTimeoutRef.current);
+      setBatchProgress(0);
+    }
     
     // Auto-save after 500ms of no typing
     if (value.trim().length > 0) {
@@ -375,27 +375,30 @@ export default function WorkoutJournal() {
         }, 100);
       }, 500);
       
-      // Start batching countdown with linear progress
-      setBatchProgress(0);
-      const startTime = Date.now();
-      const batchInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const progress = (elapsed / 5000) * 100;
-        setBatchProgress(Math.min(progress, 100));
+      // Start batching countdown only if not already in progress
+      if (batchProgress === 0 && !parseTimeoutRef.current) {
+        const startTime = Date.now();
+        const batchInterval = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          const progress = (elapsed / 5000) * 100;
+          setBatchProgress(Math.min(progress, 100));
+          
+          if (progress >= 100) {
+            clearInterval(batchInterval);
+          }
+        }, 50);
         
-        if (progress >= 100) {
+        // Batch after 5 seconds (clear input, add to writeup)
+        parseTimeoutRef.current = setTimeout(() => {
           clearInterval(batchInterval);
-        }
-      }, 50);
-      
-      // Batch after 5 seconds (clear input, add to writeup)
-      parseTimeoutRef.current = setTimeout(() => {
-        clearInterval(batchInterval);
-        debouncedBatch();
-      }, 5000);
+          debouncedBatch();
+        }, 5000);
+      }
     } else {
       setSaveStatus('idle');
-      setBatchProgress(0);
+      if (batchProgress < 80) {
+        setBatchProgress(0);
+      }
     }
   };
 
@@ -707,6 +710,8 @@ export default function WorkoutJournal() {
               </CardHeader>
               
               <CardContent className="space-y-4">
+
+
                 {/* Real-time Batch Display - Always Visible Above Input */}
                 {writeUpContent.length > 0 && (
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
@@ -787,7 +792,7 @@ export default function WorkoutJournal() {
                   </div>
                 )}
 
-                {/* Status Indicators - Fixed Timing */}
+                {/* Status Indicators and Manual Controls */}
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center space-x-3">
                     {saveStatus === 'saving' && (
@@ -806,11 +811,23 @@ export default function WorkoutJournal() {
                       </div>
                     )}
                   </div>
-                  {writeUpContent.length > 0 && (
-                    <div className="text-xs text-gray-500">
-                      {writeUpContent.length} thought{writeUpContent.length !== 1 ? 's' : ''} ready
-                    </div>
-                  )}
+                  <div className="flex items-center space-x-2">
+                    {writeUpContent.length > 0 && (
+                      <div className="text-xs text-gray-500">
+                        {writeUpContent.length} thought{writeUpContent.length !== 1 ? 's' : ''} ready
+                      </div>
+                    )}
+                    {journalText.trim() && (
+                      <Button
+                        onClick={() => debouncedBatch()}
+                        size="sm"
+                        variant="outline"
+                        className="h-6 text-xs px-2"
+                      >
+                        Batch Now
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
