@@ -79,12 +79,12 @@ export default function WorkoutJournal() {
   });
 
   // Queries
-  const { data: workout, isLoading: workoutLoading } = useQuery({
+  const { data: workout, isLoading: workoutLoading } = useQuery<Workout>({
     queryKey: ['/api/workouts', workoutId],
     enabled: !!workoutId
   });
 
-  const { data: exercises = [], isLoading: exercisesLoading } = useQuery({
+  const { data: exercises = [], isLoading: exercisesLoading } = useQuery<Exercise[]>({
     queryKey: ['/api/workouts', workoutId, 'exercises'],
     enabled: !!workoutId
   });
@@ -95,9 +95,9 @@ export default function WorkoutJournal() {
       const response = await apiRequest('POST', `/api/workouts`, data);
       return response.json();
     },
-    onSuccess: (workout) => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/workouts'] });
-      navigate(`/workout-journal/${workout.id}`);
+      navigate(`/workout-journal/${data.id}`);
       toast({
         title: "Workout started!",
         description: "Ready to log your exercises"
@@ -107,10 +107,7 @@ export default function WorkoutJournal() {
 
   const updateExerciseMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<Exercise> }) => {
-      const response = await apiRequest(`/api/exercises/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data)
-      });
+      const response = await apiRequest('PATCH', `/api/exercises/${id}`, data);
       return response.json();
     },
     onSuccess: () => {
@@ -125,9 +122,7 @@ export default function WorkoutJournal() {
 
   const deleteExerciseMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest(`/api/exercises/${id}`, {
-        method: 'DELETE'
-      });
+      await apiRequest('DELETE', `/api/exercises/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/workouts', workoutId, 'exercises'] });
@@ -140,10 +135,7 @@ export default function WorkoutJournal() {
 
   const parseJournalMutation = useMutation({
     mutationFn: async (journalText: string) => {
-      const response = await apiRequest(`/api/workouts/${workoutId}/parse-journal`, {
-        method: 'POST',
-        body: JSON.stringify({ journalText })
-      });
+      const response = await apiRequest('POST', `/api/workouts/${workoutId}/parse-journal`, { journalText });
       return response.json();
     },
     onSuccess: () => {
@@ -170,9 +162,7 @@ export default function WorkoutJournal() {
 
   const completeWorkoutMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest(`/api/workouts/${workoutId}/complete`, {
-        method: 'POST'
-      });
+      const response = await apiRequest('POST', `/api/workouts/${workoutId}/complete`);
       return response.json();
     },
     onSuccess: (data) => {
@@ -243,7 +233,7 @@ export default function WorkoutJournal() {
     setEditingExercise(exercise);
     editForm.reset({
       name: exercise.name,
-      sets: exercise.sets || [],
+      sets: exercise.sets || 0,
       notes: exercise.notes || ""
     });
   };
@@ -414,7 +404,7 @@ export default function WorkoutJournal() {
             )}
 
             {/* Exercise cards */}
-            {exercises.map((exercise, index) => (
+            {exercises.map((exercise: any, index: number) => (
               <div key={exercise.id || index} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold text-gray-900">{exercise.name}</h3>
