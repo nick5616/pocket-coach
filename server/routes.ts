@@ -403,6 +403,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/programs/:id/today", async (req, res) => {
+    try {
+      const programId = parseInt(req.params.id);
+      const program = await storage.getActiveProgram(1); // Mock user ID
+      
+      if (!program || program.id !== programId) {
+        return res.status(404).json({ message: "Program not found or not active" });
+      }
+
+      // Calculate which day of the program we're on
+      const startDate = new Date(program.createdAt!);
+      const today = new Date();
+      const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      const schedule = program.schedule as { days?: any[] };
+      if (!schedule || !schedule.days || !Array.isArray(schedule.days)) {
+        return res.status(400).json({ message: "Program has no schedule" });
+      }
+
+      // Get current workout day (cycle through program days)
+      const programDays = schedule.days;
+      const currentDayIndex = daysDiff % programDays.length;
+      const todaysWorkout = programDays[currentDayIndex];
+
+      res.json({
+        programName: program.name,
+        dayNumber: currentDayIndex + 1,
+        totalDays: programDays.length,
+        workout: todaysWorkout
+      });
+    } catch (error) {
+      console.error("Program today workout error:", error);
+      res.status(500).json({ message: "Failed to get today's workout" });
+    }
+  });
+
   // Achievement routes
   app.get("/api/achievements", async (req, res) => {
     try {

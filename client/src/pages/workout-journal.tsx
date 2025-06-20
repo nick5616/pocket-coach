@@ -89,18 +89,53 @@ export default function WorkoutJournal() {
     enabled: !!workoutId
   });
 
+  const { data: activeProgram } = useQuery({
+    queryKey: ['/api/programs/active', { userId: 1 }],
+    queryFn: () => fetch('/api/programs/active?userId=1').then(res => res.json()),
+    enabled: !workoutId
+  });
+
+  const { data: todaysWorkout } = useQuery({
+    queryKey: ['/api/programs', activeProgram?.id, 'today'],
+    queryFn: () => fetch(`/api/programs/${activeProgram.id}/today`).then(res => res.json()),
+    enabled: !!activeProgram && !workoutId
+  });
+
   // Mutations
   const createWorkoutMutation = useMutation({
     mutationFn: async (data: z.infer<typeof workoutFormSchema>) => {
-      const response = await apiRequest('POST', `/api/workouts`, data);
-      return response.json();
+      // Create workout with program-based name if available
+      const workoutData = {
+        ...data,
+        name: todaysWorkout ? `${todaysWorkout.programName} - ${todaysWorkout.workout.name}` : data.name,
+        userId: 1
+      };
+      
+      const response = await apiRequest('POST', `/api/workouts`, workoutData);
+      const workout = await response.json();
+
+      // If we have a program workout, pre-load exercises
+      if (todaysWorkout && todaysWorkout.workout.exercises) {
+        for (const programExercise of todaysWorkout.workout.exercises) {
+          await apiRequest('POST', `/api/exercises`, {
+            workoutId: workout.id,
+            name: programExercise.name,
+            sets: parseInt(programExercise.sets.split('-')[0]) || 3,
+            reps: parseInt(programExercise.reps.split('-')[0]) || 8,
+            restTime: programExercise.restTime || 60,
+            notes: programExercise.notes || `Target: ${programExercise.sets} sets × ${programExercise.reps} reps`
+          });
+        }
+      }
+
+      return workout;
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/workouts'] });
       navigate(`/workout-journal/${data.id}`);
       toast({
         title: "Workout started!",
-        description: "Ready to log your exercises"
+        description: todaysWorkout ? "Program exercises loaded - ready to train!" : "Ready to log your exercises"
       });
     }
   });
@@ -313,6 +348,27 @@ export default function WorkoutJournal() {
       {/* New Workout Form */}
       {!workoutId && (
         <main className="flex-1 overflow-y-auto pb-4">
+          {/* Program Workout Info */}
+          {todaysWorkout && (
+            <section className="bg-gradient-to-r from-duolingo-green to-green-600 text-white px-4 py-6">
+              <h2 className="text-xl font-bold mb-2">Today's Program Workout</h2>
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-lg">{todaysWorkout.workout.name}</h3>
+                  <Badge className="bg-white/20 text-white">
+                    Day {todaysWorkout.dayNumber} of {todaysWorkout.totalDays}
+                  </Badge>
+                </div>
+                <p className="text-green-100 text-sm mb-3">
+                  {todaysWorkout.workout.exercises?.length || 0} exercises planned from {todaysWorkout.programName}
+                </p>
+                <div className="text-xs text-green-100">
+                  Exercises will be pre-loaded when you start your workout
+                </div>
+              </div>
+            </section>
+          )}
+
           <section className="px-4 py-6">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -328,23 +384,25 @@ export default function WorkoutJournal() {
                   </div>
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Workout Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., Push Day - Chest & Shoulders"
-                          {...field}
-                          disabled={!isEditing}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {!todaysWorkout && (
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Workout Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Push Day - Chest & Shoulders"
+                            {...field}
+                            disabled={!isEditing}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 <FormField
                   control={form.control}
@@ -377,10 +435,10 @@ export default function WorkoutJournal() {
                   {createWorkoutMutation.isPending ? (
                     <>
                       <div className="animate-spin h-4 w-4 border border-white border-t-transparent rounded-full mr-2" />
-                      Creating...
+                      {todaysWorkout ? "Loading Program Exercises..." : "Creating..."}
                     </>
                   ) : (
-                    "Start Workout"
+                    todaysWorkout ? `Start ${todaysWorkout.workout.name}` : "Start Workout"
                   )}
                 </Button>
               </form>
