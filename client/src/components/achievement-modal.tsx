@@ -84,7 +84,7 @@ export default function AchievementModal({
               className="bg-white text-duolingo-green hover:bg-gray-50 font-semibold w-full"
               size="lg"
             >
-              Awesome! 🎉
+              Continue
             </Button>
           </motion.div>
         </motion.div>

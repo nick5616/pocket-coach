@@ -112,6 +112,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- June 21, 2025: **COMPLETED** - Enhanced Exercise Display and Achievement System Fixes
+  - Fixed resume workout navigation bug by correcting URL parameter extraction from workoutId to id
+  - Enhanced exercise display with comprehensive stats grid showing sets, reps, weight, and RPE
+  - Added workout volume calculation with gem icon in header for total work measurement
+  - Improved exercise cards with muscle group badges and detailed volume calculations per exercise
+  - Fixed achievement system redundant text issue - changed from duplicate "Workout Complete!" to clean "Great Work!" title
+  - Fixed achievement API error by correcting column name from 'viewed' to 'isViewed' in database operations
+  - Cleaned up achievement modal button text from redundant "Awesome!" to actionable "Continue"
 - June 21, 2025: **COMPLETED** - Program Flow Logic Implementation
   - Fixed resume workout functionality to properly handle existing workouts vs program-based workouts
   - Added /api/programs/active/today endpoint for fetching scheduled program workouts

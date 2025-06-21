@@ -216,8 +216,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.createAchievement({
           userId: workout.userId,
           type: "workout_complete",
-          title: "Workout Complete! 🎉",
-          description: `You've completed ${workout.name}. Keep up the great work!`,
+          title: "Great Work!",
+          description: `You've completed ${finalName}. Keep up the momentum!`,
           data: { workoutId: workoutId, analysis: analysis }
         });
       }
