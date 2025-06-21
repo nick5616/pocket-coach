@@ -14,7 +14,8 @@ import {
   Gem,
   Dumbbell,
   Hash,
-  Weight
+  Weight,
+  MoreVertical
 } from "lucide-react";
 import { Link, useParams, useLocation } from "wouter";
 
@@ -55,6 +56,7 @@ export default function WorkoutJournal() {
   const [aiGenerateName, setAiGenerateName] = useState(false);
   const [editExerciseName, setEditExerciseName] = useState("");
   const [editExerciseNotes, setEditExerciseNotes] = useState("");
+  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
 
   // Refs
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -338,9 +340,140 @@ export default function WorkoutJournal() {
         ) : (
           // Workout Journal
           <div className="space-y-6">
-            {/* Exercise List */}
+            {/* Programmed Exercises */}
+            {todaysWorkout?.workout?.exercises && (
+              <section className="px-4 py-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Programmed Exercises</h2>
+                <div className="space-y-3">
+                  {todaysWorkout.workout.exercises.map((programmedEx: any, index: number) => (
+                    <div key={index} className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                      <div className="flex items-start justify-between mb-3">
+                        <div 
+                          className="flex-1 cursor-pointer"
+                          onClick={() => {
+                            const exerciseText = `${programmedEx.name} - ${programmedEx.sets} sets × ${programmedEx.reps} reps @ RPE: `;
+                            setCurrentInput(exerciseText);
+                            inputRef.current?.focus();
+                          }}
+                        >
+                          <h3 className="font-semibold text-blue-900">{programmedEx.name}</h3>
+                          <div className="grid grid-cols-3 gap-2 mt-2 text-sm text-blue-700">
+                            <span>{programmedEx.sets} sets</span>
+                            <span>{programmedEx.reps} reps</span>
+                            <span>RPE {programmedEx.rpe}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="relative">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-blue-600 hover:text-blue-800"
+                            onClick={() => setOpenDropdown(openDropdown === index ? null : index)}
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                          
+                          {/* Action Menu */}
+                          {openDropdown === index && (
+                            <div className="absolute right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-48">
+                              <button 
+                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 border-b"
+                                onClick={() => {
+                                  const exerciseText = `${programmedEx.name} - ${programmedEx.sets} sets × ${programmedEx.reps} reps @ RPE ${programmedEx.rpe} - Completed as planned`;
+                                  setCurrentInput(exerciseText);
+                                  inputRef.current?.focus();
+                                  setOpenDropdown(null);
+                                }}
+                              >
+                                ✅ I did this exactly
+                              </button>
+                              <button 
+                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 border-b"
+                                onClick={() => {
+                                  const exerciseText = `${programmedEx.name} - ${programmedEx.sets} sets × ${programmedEx.reps} reps @ RPE: - Modified: `;
+                                  setCurrentInput(exerciseText);
+                                  inputRef.current?.focus();
+                                  setOpenDropdown(null);
+                                }}
+                              >
+                                📝 I did this, but...
+                              </button>
+                              <button 
+                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 border-b"
+                                onClick={() => {
+                                  const exerciseText = `Swapped ${programmedEx.name} for: `;
+                                  setCurrentInput(exerciseText);
+                                  inputRef.current?.focus();
+                                  setOpenDropdown(null);
+                                }}
+                              >
+                                🔄 Swap exercise
+                              </button>
+                              <button 
+                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                                onClick={() => {
+                                  const exerciseText = `Skipped ${programmedEx.name} - Reason: `;
+                                  setCurrentInput(exerciseText);
+                                  inputRef.current?.focus();
+                                  setOpenDropdown(null);
+                                }}
+                              >
+                                ⏭️ Skip
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Workout Input */}
+            <section className="px-4">
+              <div className="bg-white rounded-lg border border-gray-200">
+                <Textarea
+                  ref={inputRef}
+                  value={currentInput}
+                  onChange={(e) => setCurrentInput(e.target.value)}
+                  placeholder="How's your workout going? Log exercises, sets, reps, or just your thoughts..."
+                  className="border-0 resize-none min-h-[120px]"
+                />
+                <div className="border-t border-gray-200 p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">
+                      {saveStatus === 'typing' && "Typing..."}
+                      {saveStatus === 'saved' && "✓ Saved!"}
+                    </div>
+                    <Button
+                      onClick={handleSendThoughts}
+                      disabled={!currentInput.trim() || isSending}
+                      size="sm"
+                    >
+                      <Send className="h-4 w-4 mr-2" />
+                      Send to AI
+                    </Button>
+                  </div>
+                  {isSending && (
+                    <div className="mt-2">
+                      <div className="bg-gray-200 rounded-full h-1">
+                        <div 
+                          className="bg-blue-500 h-1 rounded-full transition-all duration-300"
+                          style={{ width: `${sendProgress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Completed Exercises */}
             <section className="px-4 py-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Exercises</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Completed Exercises</h2>
               <div className="space-y-4">
                 {exercises.map((exercise: Exercise) => (
                   <div key={exercise.id} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
