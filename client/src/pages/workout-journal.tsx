@@ -74,18 +74,26 @@ export default function WorkoutJournal() {
 
   // Mutations
   const createWorkoutMutation = useMutation({
-    mutationFn: (data: { userId: number; name: string; aiGenerateName: boolean }) =>
-      apiRequest("/api/workouts", {
+    mutationFn: async (data: { userId: number; name: string; aiGenerateName: boolean }) => {
+      const response = await fetch("/api/workouts", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
-      })
+      });
+      if (!response.ok) throw new Error('Failed to create workout');
+      return response.json();
+    }
   });
 
   const completeWorkoutMutation = useMutation({
-    mutationFn: () =>
-      apiRequest(`/api/workouts/${workoutId}/complete`, {
-        method: "POST"
-      }),
+    mutationFn: async () => {
+      const response = await fetch(`/api/workouts/${workoutId}/complete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      if (!response.ok) throw new Error('Failed to complete workout');
+      return response.json();
+    },
     onSuccess: (data) => {
       if (data.achievements?.length > 0) {
         setCurrentAchievement(data.achievements[0]);
@@ -97,11 +105,15 @@ export default function WorkoutJournal() {
   });
 
   const updateExerciseMutation = useMutation({
-    mutationFn: (data: { id: number; name: string; notes: string }) =>
-      apiRequest(`/api/exercises/${data.id}`, {
+    mutationFn: async (data: { id: number; name: string; notes: string }) => {
+      const response = await fetch(`/api/exercises/${data.id}`, {
         method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: data.name, notes: data.notes })
-      }),
+      });
+      if (!response.ok) throw new Error('Failed to update exercise');
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/workouts", workoutId, "exercises"] });
       setEditingExercise(null);
@@ -110,8 +122,13 @@ export default function WorkoutJournal() {
   });
 
   const deleteExerciseMutation = useMutation({
-    mutationFn: (id: number) =>
-      apiRequest(`/api/exercises/${id}`, { method: "DELETE" }),
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/exercises/${id}`, {
+        method: "DELETE"
+      });
+      if (!response.ok) throw new Error('Failed to delete exercise');
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/workouts", workoutId, "exercises"] });
       toast({ title: "Exercise deleted successfully" });
@@ -124,7 +141,7 @@ export default function WorkoutJournal() {
     try {
       const workoutData = {
         userId: 1,
-        name: workoutName,
+        name: workoutName || "Unnamed Workout",
         aiGenerateName: aiGenerateName
       };
       
@@ -259,7 +276,7 @@ export default function WorkoutJournal() {
                 />
                 <div>
                   <label htmlFor="aiGenerateName" className="text-sm font-medium text-gray-700">
-                    Generate workout name with AI
+                    Have AI name it later
                   </label>
                   <div className="text-sm text-gray-500">
                     AI will create a name based on your exercises
@@ -270,7 +287,7 @@ export default function WorkoutJournal() {
               <Button 
                 type="submit" 
                 className="w-full"
-                disabled={createWorkoutMutation.isPending}
+                disabled={createWorkoutMutation.isPending || (!workoutName && !aiGenerateName)}
               >
                 {createWorkoutMutation.isPending ? "Creating..." : "Start Workout"}
               </Button>
