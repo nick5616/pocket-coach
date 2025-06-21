@@ -341,14 +341,20 @@ export default function WorkoutJournal() {
             {/* Exercise List */}
             <section className="px-4 py-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Exercises</h2>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {exercises.map((exercise: Exercise) => (
-                  <div key={exercise.id} className="bg-white rounded-lg p-4 border border-gray-200">
-                    <div className="flex items-center justify-between">
+                  <div key={exercise.id} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">{exercise.name}</h3>
-                        {exercise.notes && (
-                          <p className="text-sm text-gray-600 mt-1">{exercise.notes}</p>
+                        <h3 className="font-semibold text-gray-900 text-lg">{exercise.name}</h3>
+                        {exercise.muscleGroups && exercise.muscleGroups.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {exercise.muscleGroups.map((muscle, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {muscle}
+                              </Badge>
+                            ))}
+                          </div>
                         )}
                       </div>
                       <div className="flex items-center space-x-2">
@@ -368,6 +374,63 @@ export default function WorkoutJournal() {
                         </Button>
                       </div>
                     </div>
+
+                    {/* Exercise Stats Grid */}
+                    <div className="grid grid-cols-4 gap-3 p-3 bg-gray-50 rounded-lg mb-3">
+                      <div className="text-center">
+                        <div className="flex items-center justify-center mb-1">
+                          <Hash className="h-4 w-4 text-blue-500" />
+                        </div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {exercise.sets || "--"}
+                        </div>
+                        <div className="text-xs text-gray-600">Sets</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="flex items-center justify-center mb-1">
+                          <Dumbbell className="h-4 w-4 text-green-500" />
+                        </div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {exercise.reps || "--"}
+                        </div>
+                        <div className="text-xs text-gray-600">Reps</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="flex items-center justify-center mb-1">
+                          <Weight className="h-4 w-4 text-orange-500" />
+                        </div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {exercise.weight ? `${exercise.weight}` : "--"}
+                        </div>
+                        <div className="text-xs text-gray-600">lbs</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="flex items-center justify-center mb-1">
+                          <Target className="h-4 w-4 text-purple-500" />
+                        </div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {exercise.rpe || "--"}
+                        </div>
+                        <div className="text-xs text-gray-600">RPE</div>
+                      </div>
+                    </div>
+
+                    {/* Volume Calculation */}
+                    {exercise.weight && exercise.sets && (
+                      <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                        <span>Volume:</span>
+                        <span className="font-medium">
+                          {exercise.weight * exercise.sets * (exercise.reps || 10)} lbs
+                        </span>
+                      </div>
+                    )}
+
+                    {exercise.notes && (
+                      <div className="mt-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                        <div className="text-xs text-blue-800 font-medium mb-1">Notes:</div>
+                        <p className="text-sm text-blue-900">{exercise.notes}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
