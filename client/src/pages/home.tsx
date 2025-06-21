@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
 import WorkoutCard from "@/components/workout-card";
@@ -22,6 +18,8 @@ import {
 } from "lucide-react";
 import type { WorkoutStats, AIRecommendation } from "@/lib/types";
 import type { User, Workout, Goal, Achievement } from "@shared/schema";
+import styles from "./home.module.css";
+import componentStyles from "../styles/components.module.css";
 
 export default function Home() {
   const [showAchievement, setShowAchievement] = useState(false);

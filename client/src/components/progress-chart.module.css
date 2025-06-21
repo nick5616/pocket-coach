@@ -1,0 +1,47 @@
+.chartContainer {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .chartContainer {
+    background-color: #1e293b;
+    border-color: #334155;
+  }
+}
+
+.chartTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chartTitle {
+    color: #f8fafc;
+  }
+}
+
+.chartWrapper {
+  height: 12rem;
+  width: 100%;
+}
+
+.noDataMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 12rem;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .noDataMessage {
+    color: #94a3b8;
+  }
+}
