@@ -28,7 +28,7 @@ import { apiRequest } from "@/lib/queryClient";
 
 export default function WorkoutJournal() {
   const { workoutId } = useParams<{ workoutId?: string }>();
-  const [, navigate] = useLocation();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -100,7 +100,7 @@ export default function WorkoutJournal() {
         setShowAchievement(true);
       }
       queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
-      navigate("/");
+      setLocation("/");
     }
   });
 
@@ -146,7 +146,7 @@ export default function WorkoutJournal() {
       };
       
       const result = await createWorkoutMutation.mutateAsync(workoutData);
-      navigate(`/workout-journal/${result.id}`);
+      setLocation(`/workout-journal/${result.id}`);
     } catch (error) {
       console.error("Failed to create workout:", error);
     }
