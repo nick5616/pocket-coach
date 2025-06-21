@@ -27,7 +27,7 @@ import { type Workout, type Exercise } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 
 export default function WorkoutJournal() {
-  const { workoutId } = useParams<{ workoutId?: string }>();
+  const { id: workoutId } = useParams<{ id?: string }>();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
