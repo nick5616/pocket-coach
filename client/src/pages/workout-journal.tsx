@@ -67,9 +67,16 @@ export default function WorkoutJournal() {
     enabled: !!workoutId
   });
 
+  const { data: activeProgram } = useQuery({
+    queryKey: ["/api/programs/active", { userId: 1 }],
+    queryFn: () => fetch("/api/programs/active?userId=1").then(res => res.json()),
+    enabled: !workoutId
+  });
+
   const { data: todaysWorkout } = useQuery({
     queryKey: ["/api/programs/active/today"],
-    enabled: !workoutId
+    queryFn: () => fetch("/api/programs/active/today?userId=1").then(res => res.json()),
+    enabled: !workoutId && !!activeProgram
   });
 
   // Mutations
