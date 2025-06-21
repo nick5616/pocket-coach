@@ -1,8 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/Card";
+import { Button } from "@/components/Button";
+import { Badge } from "@/components/Badge";
 import { CheckCircle, Clock, Weight, Flame } from "lucide-react";
 import type { Workout } from "@shared/schema";
+import styles from "./workout-card.module.css";
 
 interface WorkoutCardProps {
   workout: Workout;
