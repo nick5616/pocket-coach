@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Button";
 import { Trophy, Star, Zap, Target } from "lucide-react";
 import { motion } from "framer-motion";
 

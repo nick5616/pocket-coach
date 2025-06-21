@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
+import { Badge } from "@/components/Badge";
+import { Input } from "@/components/Input";
 import BottomNavigation from "@/components/bottom-navigation";
 import WorkoutCard from "@/components/workout-card";
 import { Search, Filter, Plus, Calendar, Clock } from "lucide-react";
@@ -104,13 +103,29 @@ export default function Workouts() {
               />
             </div>
             
-            <Tabs value={selectedFilter} onValueChange={setSelectedFilter}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="all">All ({workouts.length})</TabsTrigger>
-                <TabsTrigger value="completed">Done ({completedWorkouts.length})</TabsTrigger>
-                <TabsTrigger value="in-progress">Active ({inProgressWorkouts.length})</TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              <Button 
+                variant={selectedFilter === "all" ? "primary" : "outline"}
+                onClick={() => setSelectedFilter("all")}
+                size="sm"
+              >
+                All ({workouts.length})
+              </Button>
+              <Button 
+                variant={selectedFilter === "completed" ? "primary" : "outline"}
+                onClick={() => setSelectedFilter("completed")}
+                size="sm"
+              >
+                Done ({completedWorkouts.length})
+              </Button>
+              <Button 
+                variant={selectedFilter === "in-progress" ? "primary" : "outline"}
+                onClick={() => setSelectedFilter("in-progress")}
+                size="sm"
+              >
+                Active ({inProgressWorkouts.length})
+              </Button>
+            </div>
           </div>
         </section>
 
