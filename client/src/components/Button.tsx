@@ -16,7 +16,8 @@ export function Button({
     primary: styles.buttonPrimary,
     secondary: styles.buttonSecondary,
     destructive: styles.buttonDestructive,
-    ghost: styles.buttonGhost
+    ghost: styles.buttonGhost,
+    outline: styles.buttonOutline
   };
 
   const sizeClasses = {

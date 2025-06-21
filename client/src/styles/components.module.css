@@ -94,6 +94,29 @@
   }
 }
 
+.buttonOutline {
+  background-color: transparent;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.buttonOutline:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+@media (prefers-color-scheme: dark) {
+  .buttonOutline {
+    color: #cbd5e1;
+    border-color: #475569;
+  }
+  
+  .buttonOutline:hover {
+    background-color: #1e293b;
+    border-color: #64748b;
+  }
+}
+
 .buttonSm {
   height: 2rem;
   padding: 0.25rem 0.75rem;
