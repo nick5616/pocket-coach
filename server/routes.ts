@@ -8,7 +8,7 @@ import {
   insertGoalSchema,
   insertProgramSchema 
 } from "@shared/schema";
-import { analyzeWorkout, parseWorkoutJournal, generatePersonalizedProgram } from "./services/openai";
+import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePersonalizedProgram } from "./services/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
