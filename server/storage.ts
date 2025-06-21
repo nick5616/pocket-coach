@@ -291,7 +291,7 @@ export class DatabaseStorage implements IStorage {
 
   async markAchievementViewed(id: number): Promise<void> {
     await this.ensureInitialized();
-    await db.update(achievements).set({ viewed: true }).where(eq(achievements.id, id));
+    await db.update(achievements).set({ isViewed: true }).where(eq(achievements.id, id));
   }
 
   // Muscle Groups
