@@ -74,8 +74,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/workouts", async (req, res) => {
     try {
-      const validatedData = insertWorkoutSchema.parse(req.body);
-      const workout = await storage.createWorkout(validatedData);
+      const { aiGenerateName, ...workoutData } = req.body;
+      const validatedData = insertWorkoutSchema.parse(workoutData);
+      const workout = await storage.createWorkout({
+        ...validatedData,
+        aiGenerateName: aiGenerateName || false
+      });
       res.json(workout);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -88,18 +92,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/workouts/:id/journal", async (req, res) => {
     try {
       const workoutId = parseInt(req.params.id);
-      const { journalText } = req.body;
+      const { content } = req.body;
       
-      if (!journalText) {
-        return res.status(400).json({ message: "Journal text is required" });
+      if (!content) {
+        return res.status(400).json({ message: "Journal content is required" });
       }
 
       // Parse the journal using AI
-      const parsedData = await parseWorkoutJournal(journalText);
+      const parsedData = await parseWorkoutJournal(content);
       
       // Update workout with parsed data
       const workout = await storage.updateWorkout(workoutId, {
-        notes: journalText,
+        notes: content,
         duration: parsedData.duration
       });
 
@@ -171,8 +175,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return sum + ((ex.sets || 0) * (ex.reps || 0) * (ex.weight || 0));
       }, 0);
 
-      // Complete the workout
+      // Generate AI name if requested
+      let finalName = workout.name;
+      if (workout.aiGenerateName && exercises.length > 0) {
+        try {
+          const aiName = await generateWorkoutName(exercises.map(ex => ({
+            name: ex.name,
+            sets: ex.sets || undefined,
+            reps: ex.reps || undefined,
+            weight: ex.weight || undefined
+          })));
+          finalName = aiName;
+        } catch (error) {
+          console.error("AI name generation failed:", error);
+          // Keep original name if AI fails
+        }
+      }
+
+      // Complete the workout with AI name
       const completedWorkout = await storage.completeWorkout(workoutId, analysis);
+      
+      // Update the workout name if AI generated one
+      if (finalName !== workout.name) {
+        await storage.updateWorkout(workoutId, { name: finalName });
+      }
       
       if (completedWorkout) {
         await storage.updateWorkout(workoutId, {

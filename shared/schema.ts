@@ -36,6 +36,7 @@ export const workouts = pgTable("workouts", {
   totalVolume: real("total_volume"), // total weight lifted
   calories: integer("calories"),
   aiAnalysis: jsonb("ai_analysis"), // AI-generated insights and recommendations
+  aiGenerateName: boolean("ai_generate_name").default(false),
   isCompleted: boolean("is_completed").default(false),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),

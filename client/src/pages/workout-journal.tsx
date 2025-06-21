@@ -191,8 +191,9 @@ export default function WorkoutJournal() {
         setSendProgress(prev => Math.min(prev + 10, 90));
       }, 100);
 
-      await apiRequest(`/api/workouts/${workoutId}/journal`, {
+      await fetch(`/api/workouts/${workoutId}/journal`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: currentInput })
       });
 
