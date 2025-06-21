@@ -10,7 +10,11 @@ import {
   Trophy,
   Target,
   Calendar,
-  Clock
+  Clock,
+  Gem,
+  Dumbbell,
+  Hash,
+  Weight
 } from "lucide-react";
 import { Link, useParams, useLocation } from "wouter";
 
@@ -69,6 +73,18 @@ export default function WorkoutJournal() {
     enabled: !!workoutId
   });
 
+  // Calculate total workout volume (Force × Distance approximation)
+  const calculateWorkoutVolume = (exercises: Exercise[]) => {
+    return exercises.reduce((total, exercise) => {
+      if (exercise.weight && exercise.sets) {
+        // Approximate volume as weight × sets × reps (using average 10 reps if not specified)
+        const reps = exercise.reps || 10;
+        return total + (exercise.weight * exercise.sets * reps);
+      }
+      return total;
+    }, 0);
+  };
+
   const { data: activeProgram } = useQuery({
     queryKey: ["/api/programs/active", { userId: 1 }],
     queryFn: () => fetch("/api/programs/active?userId=1").then(res => res.json()),
@@ -80,6 +96,8 @@ export default function WorkoutJournal() {
     queryFn: () => fetch("/api/programs/active/today?userId=1").then(res => res.json()),
     enabled: !workoutId && !!activeProgram
   });
+
+  const totalVolume = calculateWorkoutVolume(exercises as Exercise[]);
 
   // Mutations
   const createWorkoutMutation = useMutation({
@@ -237,15 +255,25 @@ export default function WorkoutJournal() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Link href="/">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            </Link>
-            <h1 className="text-lg font-semibold text-gray-900">
-              {workoutId ? (workout?.name || "Workout") : "New Workout"}
-            </h1>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center space-x-3">
+              <Link href="/">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              </Link>
+              <h1 className="text-lg font-semibold text-gray-900">
+                {workoutId ? (workout?.name || "Workout") : "New Workout"}
+              </h1>
+            </div>
+            {workoutId && totalVolume > 0 && (
+              <div className="flex items-center space-x-2 text-blue-600">
+                <Gem className="h-4 w-4" />
+                <span className="text-sm font-medium">
+                  {Math.round(totalVolume / 1000)}k kg
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </header>

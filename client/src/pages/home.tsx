@@ -44,7 +44,7 @@ export default function Home() {
   });
 
   // Find ongoing workout (not completed)
-  const ongoingWorkout = recentWorkouts.find((w) => !w.isCompleted);
+  const ongoingWorkout = recentWorkouts.find((w) => !w.isCompleted && !w.completedAt);
 
   const { data: goals = [] } = useQuery<Goal[]>({
     queryKey: ["/api/goals", { userId }],
