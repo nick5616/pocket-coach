@@ -364,6 +364,91 @@
   }
 }
 
+/* Dialog Components */
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.dialogContent {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-width: 32rem;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.dialogInner {
+  padding: 1.5rem;
+}
+
+.dialogHeader {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.dialogTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dialogContent {
+    background-color: #1f2937;
+  }
+  
+  .dialogHeader {
+    border-bottom-color: #374151;
+  }
+  
+  .dialogTitle {
+    color: #f9fafb;
+  }
+}
+
+/* Checkbox Component */
+.checkbox {
+  height: 1rem;
+  width: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+  color: #3b82f6;
+  cursor: pointer;
+}
+
+.checkbox:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  .checkbox {
+    border-color: #4b5563;
+    background-color: #1f2937;
+  }
+  
+  .checkbox:checked {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+  }
+}
+
 .textarea:focus {
   outline: none;
   border-color: #3b82f6;
