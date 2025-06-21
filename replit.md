@@ -112,6 +112,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- June 21, 2025: **COMPLETED** - Program Flow Logic Implementation
+  - Fixed resume workout functionality to properly handle existing workouts vs program-based workouts
+  - Added /api/programs/active/today endpoint for fetching scheduled program workouts
+  - Implemented proper program flow: (1) Resume existing workouts directly, (2) Start from active program if available, (3) Start ad-hoc workout
+  - Enhanced home page UI with dual action buttons for program and ad-hoc workout flows
+  - Workout journal now correctly differentiates between resuming existing workouts and starting new ones
 - June 21, 2025: **COMPLETED** - AI Workout Naming and Navigation Fix
   - Fixed critical navigation bug in workout creation flow using proper wouter setLocation
   - Completed AI workout naming backend integration with generateWorkoutName function

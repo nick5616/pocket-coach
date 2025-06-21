@@ -18,6 +18,7 @@ import {
   Lightbulb,
   Plus,
   ChartLine,
+  Calendar,
   Flame,
 } from "lucide-react";
 import type { WorkoutStats, AIRecommendation } from "@/lib/types";
@@ -240,19 +241,35 @@ export default function Home() {
               </Button>
             </Link>
           ) : (
-            <Link href="/workout-journal">
-              <Button
-                size="lg"
-                className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
-              >
-                <div className="flex items-center justify-center space-x-3">
-                  <Play className="h-6 w-6" />
-                  <span className="text-lg font-semibold">
-                    Start New Workout
-                  </span>
-                </div>
-              </Button>
-            </Link>
+            <div className="space-y-3">
+              <Link href="/workout-journal">
+                <Button
+                  size="lg"
+                  className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
+                >
+                  <div className="flex items-center justify-center space-x-3">
+                    <Play className="h-6 w-6" />
+                    <span className="text-lg font-semibold">
+                      Start New Workout
+                    </span>
+                  </div>
+                </Button>
+              </Link>
+              <Link href="/programs">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full h-12 border-2 border-gray-300 hover:border-gray-400 text-gray-700 rounded-xl transition-all duration-200"
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <Calendar className="h-5 w-5" />
+                    <span className="font-semibold">
+                      View Programs
+                    </span>
+                  </div>
+                </Button>
+              </Link>
+            </div>
           )}
 
           <div className="mt-3 text-center">
