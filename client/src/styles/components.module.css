@@ -221,6 +221,35 @@
   }
 }
 
+/* Workout Card AI Analysis */
+.aiAnalysisSection {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.aiAnalysisBadge {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.aiIcon {
+  margin-right: 0.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .aiAnalysisSection {
+    border-top-color: #374151;
+  }
+  
+  .aiAnalysisBadge {
+    background-color: #064e3b;
+    color: #a7f3d0;
+    border-color: #065f46;
+  }
+}
+
 /* Input Components */
 .input {
   display: flex;

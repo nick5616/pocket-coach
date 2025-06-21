@@ -88,9 +88,9 @@ export default function WorkoutCard({ workout, onViewDetails }: WorkoutCardProps
         </div>
 
         {workout.isCompleted && workout.aiAnalysis && (
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <Badge variant="secondary" className="bg-duolingo-green/10 text-duolingo-green">
-              <span className="mr-1">🤖</span>
+          <div className={styles.aiAnalysisSection}>
+            <Badge variant="secondary" className={styles.aiAnalysisBadge}>
+              <span className={styles.aiIcon}>🤖</span>
               AI Analysis Complete
             </Badge>
           </div>
