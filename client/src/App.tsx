@@ -7,9 +7,9 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Workouts from "@/pages/workouts";
 import WorkoutJournal from "@/pages/workout-journal";
-import Progress from "@/pages/progress";
-import Programs from "@/pages/programs";
-import Profile from "@/pages/profile";
+import Progress from "@/pages/progress-simple";
+import Programs from "@/pages/programs-simple";
+import Profile from "@/pages/profile-simple";
 import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
 function Router() {

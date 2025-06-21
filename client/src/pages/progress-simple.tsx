@@ -1,0 +1,258 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
+import { Badge } from "@/components/Badge";
+import { Button } from "@/components/Button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
+import BottomNavigation from "@/components/bottom-navigation";
+import BodyVisualization from "@/components/body-visualization";
+import { 
+  Target, 
+  TrendingUp, 
+  Calendar, 
+  Award,
+  Zap,
+  Flame,
+  Activity
+} from "lucide-react";
+import type { Goal, Workout, Achievement } from "@shared/schema";
+
+export default function Progress() {
+  const [selectedTab, setSelectedTab] = useState<"overview" | "goals" | "body" | "achievements">("overview");
+  const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
+  const userId = 1; // Demo user
+
+  const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
+    queryKey: ["/api/goals", { userId }],
+    queryFn: () => fetch(`/api/goals?userId=${userId}`).then(res => res.json()),
+  });
+
+  const { data: workouts = [], isLoading: workoutsLoading } = useQuery<Workout[]>({
+    queryKey: ["/api/workouts", { userId }],
+    queryFn: () => fetch(`/api/workouts?userId=${userId}`).then(res => res.json()),
+  });
+
+  const { data: achievements = [], isLoading: achievementsLoading } = useQuery<Achievement[]>({
+    queryKey: ["/api/achievements", { userId }],
+    queryFn: () => fetch(`/api/achievements?userId=${userId}`).then(res => res.json()),
+  });
+
+  const selectedGoal = goals.find(g => g.id === selectedGoalId);
+
+  if (goalsLoading || workoutsLoading || achievementsLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading progress...</div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <main className="pb-20 bg-gray-50 min-h-screen">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Progress</h1>
+              <p className="text-gray-600 mt-1">Track your fitness achievements</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Award className="w-6 h-6 text-yellow-500" />
+              <span className="text-lg font-semibold text-gray-900">{achievements.length}</span>
+            </div>
+          </div>
+        </header>
+
+        {/* Tab Navigation */}
+        <section className="px-4 py-4 bg-white border-b">
+          <div className="grid grid-cols-4 gap-2">
+            <Button 
+              variant={selectedTab === "overview" ? "primary" : "outline"}
+              onClick={() => setSelectedTab("overview")}
+              size="sm"
+            >
+              Overview
+            </Button>
+            <Button 
+              variant={selectedTab === "goals" ? "primary" : "outline"}
+              onClick={() => setSelectedTab("goals")}
+              size="sm"
+            >
+              Goals
+            </Button>
+            <Button 
+              variant={selectedTab === "body" ? "primary" : "outline"}
+              onClick={() => setSelectedTab("body")}
+              size="sm"
+            >
+              Body Map
+            </Button>
+            <Button 
+              variant={selectedTab === "achievements" ? "primary" : "outline"}
+              onClick={() => setSelectedTab("achievements")}
+              size="sm"
+            >
+              Awards
+            </Button>
+          </div>
+        </section>
+
+        {/* Tab Content */}
+        <section className="px-4 py-4">
+          {selectedTab === "overview" && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-blue-600">{workouts.length}</div>
+                    <div className="text-sm text-gray-600">Total Workouts</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-green-600">{goals.filter(g => g.status === 'completed').length}</div>
+                    <div className="text-sm text-gray-600">Goals Achieved</div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Activity</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {workouts.slice(0, 3).map((workout) => (
+                    <div key={workout.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
+                      <div>
+                        <div className="font-medium">{workout.name}</div>
+                        <div className="text-sm text-gray-600">
+                          {new Date(workout.createdAt!).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <Badge variant={workout.isCompleted ? "default" : "secondary"}>
+                        {workout.isCompleted ? "Completed" : "In Progress"}
+                      </Badge>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {selectedTab === "goals" && (
+            <div className="space-y-4">
+              {goals.map((goal) => (
+                <Card key={goal.id} className="cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => setSelectedGoalId(goal.id)}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-medium">{goal.title}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{goal.description}</p>
+                        <div className="flex items-center mt-2 space-x-4">
+                          <Badge variant={goal.status === 'completed' ? 'default' : 'secondary'}>
+                            {goal.category}
+                          </Badge>
+                          <span className="text-sm text-gray-500">
+                            {goal.currentValue || 0} / {goal.targetValue} {goal.unit}
+                          </span>
+                        </div>
+                      </div>
+                      <Target className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              {goals.length === 0 && (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <Target className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No goals set</h3>
+                    <p className="text-gray-600">Set your first fitness goal to start tracking progress</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
+          {selectedTab === "body" && (
+            <div className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Body Heat Map</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <BodyVisualization userId={userId} />
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {selectedTab === "achievements" && (
+            <div className="space-y-4">
+              {achievements.map((achievement) => (
+                <Card key={achievement.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <Award className="w-5 h-5 text-yellow-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium">{achievement.title}</h3>
+                        <p className="text-sm text-gray-600">{achievement.description}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {new Date(achievement.createdAt!).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Badge>{achievement.type}</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              {achievements.length === 0 && (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <Award className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No achievements yet</h3>
+                    <p className="text-gray-600">Complete workouts and goals to earn achievements</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+        </section>
+      </main>
+
+      {/* Goal Details Dialog */}
+      {selectedGoal && (
+        <Dialog open={!!selectedGoal} onOpenChange={() => setSelectedGoalId(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{selectedGoal.title}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-gray-600">{selectedGoal.description}</p>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>Progress:</span>
+                  <span>{selectedGoal.currentValue || 0} / {selectedGoal.targetValue} {selectedGoal.unit}</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full" 
+                    style={{ width: `${Math.min(((selectedGoal.currentValue || 0) / (selectedGoal.targetValue || 1)) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      <BottomNavigation />
+    </>
+  );
+}

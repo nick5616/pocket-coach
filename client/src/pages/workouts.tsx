@@ -12,10 +12,8 @@ import type { Workout } from "@shared/schema";
 
 export default function Workouts() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  
-  // Mock user data
-  const userId = 1;
+  const [selectedFilter, setSelectedFilter] = useState<"all" | "completed" | "in-progress">("all");
+  const userId = 1; // Demo user
 
   const { data: workouts = [], isLoading } = useQuery<Workout[]>({
     queryKey: ["/api/workouts", { userId }],
@@ -36,66 +34,64 @@ export default function Workouts() {
   const completedWorkouts = workouts.filter(w => w.isCompleted);
   const inProgressWorkouts = workouts.filter(w => !w.isCompleted);
 
-  const workoutStats = {
-    total: workouts.length,
-    completed: completedWorkouts.length,
-    totalTime: completedWorkouts.reduce((sum, w) => sum + (w.duration || 0), 0),
-    totalVolume: completedWorkouts.reduce((sum, w) => sum + (w.totalVolume || 0), 0),
-  };
-
   if (isLoading) {
     return (
-      <div className="pb-20">
-        <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-8 z-40">
-          <h1 className="text-lg font-bold text-gray-900">My Workouts</h1>
-        </header>
-        <div className="p-4 space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-gray-200 rounded-xl h-32 loading-shimmer"></div>
-          ))}
-        </div>
-        <BottomNavigation />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading workouts...</div>
       </div>
     );
   }
 
   return (
     <>
-      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-8 z-40">
-        <h1 className="text-lg font-bold text-gray-900">My Workouts</h1>
-      </header>
+      <main className="pb-20 bg-gray-50 min-h-screen">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Workouts</h1>
+              <p className="text-gray-600 mt-1">Track your fitness journey</p>
+            </div>
+            <Link href="/workout-journal">
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                New Workout
+              </Button>
+            </Link>
+          </div>
+        </header>
 
-      <main className="pb-20">
-        {/* Stats Overview */}
-        <section className="px-4 py-6" style={{
-          background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)',
-          color: 'white'
-        }}>
-          <h2 className="text-xl font-bold mb-4" style={{color: '#ffffff'}}>Workout Stats</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="rounded-xl p-3 text-center" style={{
-              backgroundColor: 'rgba(30, 64, 175, 0.7)',
-              border: '1px solid rgba(59, 130, 246, 0.4)'
-            }}>
-              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{workoutStats.completed}</div>
-              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Completed</div>
-            </div>
-            <div className="rounded-xl p-3 text-center" style={{
-              backgroundColor: 'rgba(30, 64, 175, 0.7)',
-              border: '1px solid rgba(59, 130, 246, 0.4)'
-            }}>
-              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{Math.round(workoutStats.totalTime / 60)}h</div>
-              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Total Time</div>
-            </div>
+        {/* Workout Stats */}
+        <section className="px-4 py-6 bg-white border-b">
+          <div className="grid grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">{workouts.length}</div>
+                <div className="text-sm text-gray-600">Total</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">{completedWorkouts.length}</div>
+                <div className="text-sm text-gray-600">Completed</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-orange-600">{inProgressWorkouts.length}</div>
+                <div className="text-sm text-gray-600">In Progress</div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
         {/* Search and Filters */}
-        <section className="px-4 py-4 -mt-4 relative z-10">
-          <div className="bg-white rounded-2xl p-4 shadow-lg">
-            <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <section className="px-4 py-4 bg-white border-b">
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
+                type="text"
                 placeholder="Search workouts..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -103,7 +99,7 @@ export default function Workouts() {
               />
             </div>
             
-            <div className="grid grid-cols-3 gap-2 mt-4">
+            <div className="grid grid-cols-3 gap-2">
               <Button 
                 variant={selectedFilter === "all" ? "primary" : "outline"}
                 onClick={() => setSelectedFilter("all")}
@@ -130,7 +126,7 @@ export default function Workouts() {
         </section>
 
         {/* Workouts List */}
-        <section className="px-4">
+        <section className="px-4 py-4">
           {filteredWorkouts.length > 0 ? (
             <div className="space-y-4">
               {filteredWorkouts.map((workout) => (
@@ -139,59 +135,33 @@ export default function Workouts() {
                   workout={workout}
                   onViewDetails={() => {
                     // Navigate to workout details
-                    window.location.href = `/workouts/${workout.id}`;
+                    window.location.href = `/workout-journal/${workout.id}`;
                   }}
                 />
               ))}
             </div>
-          ) : workouts.length === 0 ? (
-            <Card className="border-dashed border-2 border-gray-200">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Plus className="h-8 w-8 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No workouts yet</h3>
-                <p className="text-gray-500 mb-4">
-                  Start tracking your fitness journey by logging your first workout!
-                </p>
+          ) : (
+            <div className="text-center py-12">
+              <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No workouts found</h3>
+              <p className="text-gray-600 mb-6">
+                {searchTerm || selectedFilter !== "all" 
+                  ? "Try adjusting your search or filters"
+                  : "Start your fitness journey by creating your first workout"
+                }
+              </p>
+              {!searchTerm && selectedFilter === "all" && (
                 <Link href="/workout-journal">
-                  <Button className="bg-duolingo-green hover:bg-duolingo-green/90">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Start First Workout
+                  <Button>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create First Workout
                   </Button>
                 </Link>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Search className="h-8 w-8 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No workouts found</h3>
-                <p className="text-gray-500 mb-4">
-                  Try adjusting your search or filter criteria.
-                </p>
-                <Button variant="outline" onClick={() => { setSearchTerm(""); setSelectedFilter("all"); }}>
-                  Clear Filters
-                </Button>
-              </CardContent>
-            </Card>
+              )}
+            </div>
           )}
         </section>
       </main>
-
-      {/* Floating Action Button */}
-      <div className="fixed bottom-20 right-4 z-30">
-        <Link href="/workout-journal">
-          <Button 
-            size="icon" 
-            className="w-14 h-14 bg-duolingo-green hover:bg-duolingo-green/90 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
-          >
-            <Plus className="h-6 w-6" />
-          </Button>
-        </Link>
-      </div>
 
       <BottomNavigation />
     </>
