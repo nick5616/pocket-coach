@@ -1,37 +1,23 @@
-import { HTMLAttributes, forwardRef } from "react";
+import { HTMLAttributes } from "react";
 import styles from "../styles/components.module.css";
 
 interface BadgeProps extends HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "secondary" | "destructive" | "outline";
 }
 
-const Badge = forwardRef<HTMLDivElement, BadgeProps>(
-  ({ className = "", variant = "default", ...props }, ref) => {
-    const getVariantClass = () => {
-      switch (variant) {
-        case "default":
-          return styles.badgeDefault;
-        case "secondary":
-          return styles.badgeSecondary;
-        case "destructive":
-          return styles.badgeDestructive;
-        case "outline":
-          return styles.badgeOutline;
-        default:
-          return styles.badgeDefault;
-      }
-    };
+export function Badge({ className = "", variant = "default", ...props }: BadgeProps) {
+  const variantClasses = {
+    default: styles.badgeDefault,
+    secondary: styles.badgeSecondary,
+    destructive: styles.badgeDestructive,
+    outline: styles.badgeOutline
+  };
 
-    return (
-      <div
-        className={`${styles.badge} ${getVariantClass()} ${className}`}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
+  const classes = [
+    styles.badge,
+    variantClasses[variant],
+    className
+  ].filter(Boolean).join(" ");
 
-Badge.displayName = "Badge";
-
-export { Badge };
+  return <div className={classes} {...props} />;
+}

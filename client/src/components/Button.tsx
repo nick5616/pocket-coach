@@ -1,52 +1,37 @@
-import { ButtonHTMLAttributes, forwardRef } from "react";
+import { ButtonHTMLAttributes } from "react";
 import styles from "../styles/components.module.css";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "destructive" | "ghost";
   size?: "sm" | "default" | "lg" | "icon";
-  asChild?: boolean;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className = "", variant = "primary", size = "default", ...props }, ref) => {
-    const getVariantClass = () => {
-      switch (variant) {
-        case "primary":
-          return styles.buttonPrimary;
-        case "secondary":
-          return styles.buttonSecondary;
-        case "destructive":
-          return styles.buttonDestructive;
-        case "ghost":
-          return styles.buttonGhost;
-        default:
-          return styles.buttonPrimary;
-      }
-    };
+export function Button({ 
+  className = "", 
+  variant = "primary", 
+  size = "default", 
+  ...props 
+}: ButtonProps) {
+  const variantClasses = {
+    primary: styles.buttonPrimary,
+    secondary: styles.buttonSecondary,
+    destructive: styles.buttonDestructive,
+    ghost: styles.buttonGhost
+  };
 
-    const getSizeClass = () => {
-      switch (size) {
-        case "sm":
-          return styles.buttonSm;
-        case "lg":
-          return styles.buttonLg;
-        case "icon":
-          return styles.buttonSm;
-        default:
-          return "";
-      }
-    };
+  const sizeClasses = {
+    sm: styles.buttonSm,
+    default: "",
+    lg: styles.buttonLg,
+    icon: styles.buttonSm
+  };
 
-    return (
-      <button
-        className={`${styles.button} ${getVariantClass()} ${getSizeClass()} ${className}`}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
+  const classes = [
+    styles.button,
+    variantClasses[variant],
+    sizeClasses[size],
+    className
+  ].filter(Boolean).join(" ");
 
-Button.displayName = "Button";
-
-export { Button };
+  return <button className={classes} {...props} />;
+}
