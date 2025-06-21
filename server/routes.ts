@@ -528,9 +528,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/achievements/:id/viewed", async (req, res) => {
     try {
       const achievementId = parseInt(req.params.id);
+      if (isNaN(achievementId)) {
+        return res.status(400).json({ message: "Invalid achievement ID" });
+      }
       await storage.markAchievementViewed(achievementId);
       res.json({ success: true });
     } catch (error) {
+      console.error("Achievement viewing error:", error);
       res.status(500).json({ message: "Failed to mark achievement as viewed" });
     }
   });
