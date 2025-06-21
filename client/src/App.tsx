@@ -1,8 +1,7 @@
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
+// Toaster temporarily disabled until fully migrated
 import { useEffect } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -43,15 +42,12 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <div className="min-h-screen max-w-md mx-auto bg-white shadow-xl relative">
-          {/* PWA Status Bar */}
-          <div className="bg-duolingo-green h-8 w-full"></div>
-          
-          <Router />
-          <Toaster />
-        </div>
-      </TooltipProvider>
+      <div className="min-h-screen max-w-md mx-auto bg-white shadow-xl relative">
+        {/* PWA Status Bar */}
+        <div className="bg-duolingo-green h-8 w-full"></div>
+        
+        <Router />
+      </div>
     </QueryClientProvider>
   );
 }
