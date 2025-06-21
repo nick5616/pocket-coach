@@ -59,11 +59,13 @@ export default function WorkoutJournal() {
   // Queries
   const { data: workout } = useQuery({
     queryKey: ["/api/workouts", workoutId],
+    queryFn: () => fetch(`/api/workouts/${workoutId}`).then(res => res.json()),
     enabled: !!workoutId
   });
 
   const { data: exercises = [] } = useQuery({
     queryKey: ["/api/workouts", workoutId, "exercises"],
+    queryFn: () => fetch(`/api/exercises?workoutId=${workoutId}`).then(res => res.json()),
     enabled: !!workoutId
   });
 
@@ -89,6 +91,10 @@ export default function WorkoutJournal() {
       });
       if (!response.ok) throw new Error('Failed to create workout');
       return response.json();
+    },
+    onSuccess: (newWorkout) => {
+      // Navigate to the newly created workout
+      setLocation(`/workout-journal/${newWorkout.id}`);
     }
   });
 
