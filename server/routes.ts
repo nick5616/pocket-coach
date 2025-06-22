@@ -288,6 +288,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create exercise from programmed exercise (exact completion)
+  app.post("/api/exercises/from-program", async (req, res) => {
+    try {
+      const { workoutId, programmedExercise } = req.body;
+      
+      const exercise = await storage.createExercise({
+        workoutId,
+        name: programmedExercise.name,
+        sets: programmedExercise.sets,
+        reps: programmedExercise.reps,
+        weight: programmedExercise.weight || null,
+        rpe: programmedExercise.rpe || null,
+        restTime: programmedExercise.restTime || null,
+        notes: "Completed as programmed"
+      });
+
+      res.json(exercise);
+    } catch (error) {
+      console.error("Error creating exercise from program:", error);
+      res.status(500).json({ message: "Failed to create exercise" });
+    }
+  });
+
+  // Swap exercise for equivalent
+  app.post("/api/exercises/swap", async (req, res) => {
+    try {
+      const { originalExercise, reason } = req.body;
+      
+      const { swapExerciseForEquivalent } = await import('./services/exercise-swap');
+      const swappedExercise = await swapExerciseForEquivalent(originalExercise, reason);
+      
+      res.json({ swappedExercise });
+    } catch (error) {
+      console.error("Error swapping exercise:", error);
+      res.status(500).json({ message: "Failed to swap exercise" });
+    }
+  });
+
   // Goal routes
   app.get("/api/goals", async (req, res) => {
     try {
