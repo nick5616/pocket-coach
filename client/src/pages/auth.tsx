@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
@@ -32,6 +32,8 @@ export default function AuthPage() {
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate auth query to refetch user data
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Welcome back!",
         description: "You've been logged in successfully.",
@@ -61,6 +63,8 @@ export default function AuthPage() {
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate auth query to refetch user data
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Account created!",
         description: "Welcome to Pocket Coach.",
