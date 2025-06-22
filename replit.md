@@ -110,7 +110,7 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
-- June 22, 2025: **IN PROGRESS** - Enhanced Home Page Button States and Program-Specific Workout Pages
+- June 22, 2025: **COMPLETED** - Enhanced Home Page Button States and Program-Specific Workout Pages
   - Implemented context-aware home page buttons based on program status
   - Added "You do not appear to be in a program" state with numbered buttons for users without active programs
   - Created program-specific workout flow with coaching insights and pre-workout briefings
@@ -119,6 +119,8 @@ The application uses a comprehensive PostgreSQL schema with the following core e
   - Created ProgramWorkout component with difficulty ratings, focus areas, challenge previews, and encouragement
   - Users with active programs see "Begin: [workout name]" instead of generic workout naming
   - Enhanced button hierarchy: program workouts → freestyle workouts → view programs
+  - Fixed hardcoded progress insights - now generates dynamic AI recommendations based on user's actual workout history
+  - Today's stats now calculate real exercise counts, workout duration, and session data from user's workouts
 - June 22, 2025: **COMPLETED** - Full Viewport Height Optimization Across All Pages
   - Fixed viewport height issues across entire application for proper mobile display
   - Updated App.tsx main container to use h-screen with flexbox layout for full viewport utilization

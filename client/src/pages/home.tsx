@@ -79,15 +79,62 @@ export default function Home() {
       const workoutDate = new Date(w.createdAt!);
       return workoutDate.toDateString() === today.toDateString();
     }).length,
-    exercises: 0, // Would be calculated from today's workouts
-    timeMinutes: 0, // Would be calculated from today's workouts
+    exercises: recentWorkouts
+      .filter((w) => {
+        const today = new Date();
+        const workoutDate = new Date(w.createdAt!);
+        return workoutDate.toDateString() === today.toDateString();
+      })
+      .reduce((total, workout) => total + ((workout as any).exercises?.length || 0), 0),
+    timeMinutes: recentWorkouts
+      .filter((w) => {
+        const today = new Date();
+        const workoutDate = new Date(w.createdAt!);
+        return workoutDate.toDateString() === today.toDateString();
+      })
+      .reduce((total, workout) => {
+        if (workout.completedAt && workout.createdAt) {
+          const duration = new Date(workout.completedAt).getTime() - new Date(workout.createdAt).getTime();
+          return total + Math.round(duration / (1000 * 60));
+        }
+        return total;
+      }, 0),
   };
 
-  const aiRecommendation: AIRecommendation = {
-    message:
-      "Based on your last push session, let's focus on shoulders today. Your lateral raises showed great progress - time to challenge those delts!",
-    focusAreas: ["shoulders", "delts"],
-  };
+  // Generate AI recommendation based on recent workout data
+  const aiRecommendation: AIRecommendation = (() => {
+    if (!recentWorkouts.length) {
+      return {
+        message: "Ready to start your fitness journey? Let's begin with a balanced workout to establish your baseline.",
+        focusAreas: ["full body", "foundation"],
+      };
+    }
+
+    const lastWorkout = recentWorkouts[0];
+    const daysSinceLastWorkout = Math.floor((Date.now() - new Date(lastWorkout.createdAt!).getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (daysSinceLastWorkout === 0) {
+      return {
+        message: "Great work today! Consider some light stretching or mobility work to aid recovery.",
+        focusAreas: ["recovery", "mobility"],
+      };
+    } else if (daysSinceLastWorkout === 1) {
+      return {
+        message: "Perfect timing for your next session. Your body has had time to recover and adapt.",
+        focusAreas: ["progression", "strength"],
+      };
+    } else if (daysSinceLastWorkout <= 3) {
+      return {
+        message: "Time to get back in there! Your muscles are ready for the next challenge.",
+        focusAreas: ["consistency", "endurance"],
+      };
+    } else {
+      return {
+        message: "Welcome back! Let's ease into it with a moderate session to rebuild momentum.",
+        focusAreas: ["restart", "foundation"],
+      };
+    }
+  })();
 
   const greeting = () => {
     const hour = new Date().getHours();
