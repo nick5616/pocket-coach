@@ -39,18 +39,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.id;
       const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
       
-      const workouts = await storage.getUserWorkouts(userId, limit);
-      
-      // Add exercises to each workout
-      const workoutsWithExercises = await Promise.all(
-        workouts.map(async (workout) => {
-          const exercises = await storage.getWorkoutExercises(workout.id);
-          return { ...workout, exercises };
-        })
-      );
+      // Use optimized query that fetches workouts with exercises efficiently
+      const workoutsWithExercises = await storage.getUserWorkoutsWithExercises(userId, limit);
       
       res.json(workoutsWithExercises);
     } catch (error) {
+      console.error("Error fetching workouts:", error);
       res.status(500).json({ message: "Failed to fetch workouts" });
     }
   });
