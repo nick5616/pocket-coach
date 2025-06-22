@@ -124,6 +124,8 @@ The application uses a comprehensive PostgreSQL schema with the following core e
   - Replaced browser confirmation dialog with proper app-based confirmation modal for exercise deletion
   - Added DialogDescription component for accessibility compliance in delete confirmation modal
   - Delete confirmation modal features proper red styling and loading states for better user feedback
+  - Updated action button layout to 2x2 grid with darker secondary variant colors (#64748b light, #475569 dark)
+  - Removed hover effects from action buttons for consistent appearance across interactions
   - Enhanced Card Spacing and CSS Modules Migration in Workout Journal
   - Added consistent 1rem margin spacing between both programmed and completed exercise cards
   - Converted all exercise cards from mixed Tailwind/inline styles to clean CSS Modules architecture
