@@ -110,6 +110,13 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
+- June 22, 2025: **COMPLETED** - Enhanced Program Cards with Clean Layout and Emoji Badges
+  - Restructured program card layout with emoji badges for duration [🕕 4 weeks] and difficulty [🎯 Beginner]
+  - Moved duration and level badges to bottom row inline with activation button
+  - Changed "Start" button text to "Activate" with proper loading state ("Activating...")
+  - Relocated creation date below description within same paragraph for cleaner hierarchy
+  - Simplified metadata display removing complex grid layout while preserving focus areas and equipment when available
+  - Enhanced bottom row with badges on left and activate button on right for balanced visual composition
 - June 22, 2025: **COMPLETED** - Fixed Critical React Hooks Error in Workout Journal Component
   - Resolved "Rendered more hooks than during the previous render" error by moving all useMutation hooks before conditional returns
   - Ensured proper React Hooks order compliance throughout workout-journal.tsx component

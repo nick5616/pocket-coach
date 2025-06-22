@@ -251,52 +251,19 @@ export default function Programs() {
                         </div>
                         
                         {program.description && (
-                          <p className="text-sm text-gray-600 leading-relaxed">{program.description}</p>
-                        )}
-                      </div>
-                      
-                      <div className="ml-4 flex-shrink-0">
-                        {!program.isActive && (
-                          <Button 
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              activateProgramMutation.mutate(program.id);
-                            }}
-                            disabled={activateProgramMutation.isPending}
-                            size="sm"
-                          >
-                            <Play className="w-4 h-4 mr-2" />
-                            {activateProgramMutation.isPending ? "Starting..." : "Start"}
-                          </Button>
-                        )}
-                        {program.isActive && (
-                          <Link href="/workout-journal">
-                            <Button size="sm">
-                              <Dumbbell className="w-4 h-4 mr-2" />
-                              Workout
-                            </Button>
-                          </Link>
+                          <div className="text-sm text-gray-600 leading-relaxed">
+                            <p className="mb-1">{program.description}</p>
+                            <p className="text-xs text-gray-400">
+                              Created {new Date(program.createdAt!).toLocaleDateString()}
+                            </p>
+                          </div>
                         )}
                       </div>
                     </div>
 
-                    {/* Program metadata grid */}
-                    <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-100">
-                      <div className="space-y-2">
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Clock className="w-4 h-4 mr-2 text-blue-500" />
-                          <span className="font-medium">Duration:</span>
-                          <span className="ml-1">{program.durationWeeks || 4} weeks</span>
-                        </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Target className="w-4 h-4 mr-2 text-green-500" />
-                          <span className="font-medium">Level:</span>
-                          <span className="ml-1 capitalize">{program.difficulty || "Beginner"}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
+                    {/* Focus Areas and Equipment */}
+                    {((program.focusAreas && program.focusAreas.length > 0) || (program.equipment && program.equipment.length > 0)) && (
+                      <div className="space-y-3">
                         {program.focusAreas && program.focusAreas.length > 0 && (
                           <div className="flex items-start text-sm text-gray-600">
                             <Star className="w-4 h-4 mr-2 text-yellow-500 mt-0.5" />
@@ -329,17 +296,49 @@ export default function Programs() {
                           </div>
                         )}
                       </div>
-                    </div>
+                    )}
 
-                    {/* Creation date */}
-                    <div className="flex items-center justify-between pt-2 border-t border-gray-50 text-xs text-gray-400">
-                      <span>Created {new Date(program.createdAt!).toLocaleDateString()}</span>
-                      {program.isActive && (
-                        <span className="flex items-center">
-                          <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
-                          Currently Active
-                        </span>
-                      )}
+                    {/* Bottom row with badges and action button */}
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline" className="text-xs">
+                          🕕 {program.durationWeeks || 4} weeks
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          🎯 {program.difficulty || "Beginner"}
+                        </Badge>
+                        {program.isActive && (
+                          <Badge variant="default" className="text-xs">
+                            <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
+                            Active
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <div className="flex-shrink-0">
+                        {!program.isActive && (
+                          <Button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              activateProgramMutation.mutate(program.id);
+                            }}
+                            disabled={activateProgramMutation.isPending}
+                            size="sm"
+                          >
+                            <Play className="w-4 h-4 mr-2" />
+                            {activateProgramMutation.isPending ? "Activating..." : "Activate"}
+                          </Button>
+                        )}
+                        {program.isActive && (
+                          <Link href="/workout-journal">
+                            <Button size="sm">
+                              <Dumbbell className="w-4 h-4 mr-2" />
+                              Workout
+                            </Button>
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
