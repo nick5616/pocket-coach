@@ -258,7 +258,6 @@ export default function WorkoutJournal() {
       newSkippedExercises.add(index);
     }
     setSkippedExercises(newSkippedExercises);
-    setOpenDropdown(null);
   };
 
   const handleUpdateExercise = async (e: React.FormEvent) => {

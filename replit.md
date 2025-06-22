@@ -112,6 +112,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- June 22, 2025: **COMPLETED** - Optimized Programmed Exercises Layout and Space Utilization
+  - Redesigned exercise cards with compact inline layout using space-between distribution for stats
+  - Combined sets and reps into single line (e.g., "3 sets × 12 reps") to reduce vertical space
+  - Replaced 2x2 button grid with inline 4-button row using flex layout and flex-1 for equal spacing
+  - Reduced card padding from p-4 to p-3 for tighter spacing
+  - Shortened button text ("Modified" → "Edit") while maintaining clear action intent
+  - Removed unused dropdown menu system and cleaned up LSP errors
 - June 21, 2025: **COMPLETED** - Enhanced Active Workout Page with Programmed Exercises Section
   - Created structured workout page layout: workout name → programmed exercises → workout input → completed exercises
   - Added programmed exercises section with recommended exercises showing sets, reps, RPE in blue cards
