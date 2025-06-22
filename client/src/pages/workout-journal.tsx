@@ -387,17 +387,17 @@ export default function WorkoutJournal() {
                 />
               </div>
 
-              <div className="flex items-start space-x-3">
+              <div className={styles.checkboxGroup}>
                 <Checkbox
                   id="aiGenerateName"
                   checked={aiGenerateName}
                   onChange={(e) => setAiGenerateName(e.target.checked)}
                 />
                 <div>
-                  <label htmlFor="aiGenerateName" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="aiGenerateName" className={styles.checkboxLabel}>
                     Have AI name it later
                   </label>
-                  <div className="text-sm text-gray-500">
+                  <div className={styles.checkboxDescription}>
                     AI will create a name based on your exercises
                   </div>
                 </div>
@@ -405,7 +405,7 @@ export default function WorkoutJournal() {
 
               <Button 
                 type="submit" 
-                className="w-full"
+                style={{width: '100%'}}
                 disabled={createWorkoutMutation.isPending || (!workoutName && !aiGenerateName)}
               >
                 {createWorkoutMutation.isPending ? "Creating..." : "Start Workout"}

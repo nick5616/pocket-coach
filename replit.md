@@ -73,10 +73,10 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 - **Model**: GPT-4o for advanced reasoning capabilities
 
 ### UI Dependencies
-- **Radix UI**: Accessible component primitives
-- **Tailwind CSS**: Utility-first styling
+- **CSS Modules**: Component-scoped styling system
 - **Lucide React**: Icon library
 - **Recharts**: Data visualization for progress charts
+- **Custom Components**: Built with CSS Modules (no external UI libraries)
 
 ## Deployment Strategy
 
@@ -100,15 +100,13 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## User Preferences
 
-Preferred communication style: Simple, everyday language.
-
-## User Preferences
-
 - Communication style: Simple, everyday language
 - UI improvements: Show current date on workout creation screen
 - Workout naming: AI-generated workout names based on exercises
 - Data storage preference: Hybrid approach with offline capabilities
 - Resume workout button: Truncate workout name with ellipsis at 350px width
+- **Styling System**: CSS Modules only - NO Tailwind CSS or shadcn/ui components
+- **Architecture Decision**: Complete removal of Tailwind CSS in favor of component-scoped CSS Modules
 
 ## Recent Changes
 
