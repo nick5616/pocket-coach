@@ -39,6 +39,7 @@ export interface IStorage {
 
   // Programs
   getUserPrograms(userId: string): Promise<Program[]>;
+  getProgram(id: number): Promise<Program | undefined>;
   getActiveProgram(userId: string): Promise<Program | undefined>;
   createProgram(program: InsertProgram): Promise<Program>;
   updateProgram(id: number, updates: Partial<Program>): Promise<Program | undefined>;
@@ -249,6 +250,12 @@ export class DatabaseStorage implements IStorage {
   async getUserPrograms(userId: string): Promise<Program[]> {
     await this.ensureInitialized();
     return await db.select().from(programs).where(eq(programs.userId, userId)).orderBy(desc(programs.createdAt));
+  }
+
+  async getProgram(id: number): Promise<Program | undefined> {
+    await this.ensureInitialized();
+    const [program] = await db.select().from(programs).where(eq(programs.id, id));
+    return program || undefined;
   }
 
   async getActiveProgram(userId: string): Promise<Program | undefined> {

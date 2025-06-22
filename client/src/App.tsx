@@ -27,6 +27,7 @@ function Router() {
           <Route path="/workouts" component={Workouts} />
           <Route path="/workout-journal" component={WorkoutJournal} />
           <Route path="/workout-journal/:id" component={WorkoutJournal} />
+          <Route path="/workouts/program/:programId" component={ProgramWorkout} />
           <Route path="/progress" component={Progress} />
           <Route path="/programs" component={Programs} />
           <Route path="/profile" component={Profile} />

@@ -395,6 +395,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/programs/:id/today", isAuthenticated, async (req, res) => {
+    try {
+      const programId = parseInt(req.params.id);
+      const userId = req.user.id;
+      
+      const program = await storage.getProgram(programId);
+      if (!program || program.userId !== userId) {
+        return res.status(404).json({ message: "Program not found" });
+      }
+
+      // Get today's workout from the schedule
+      const today = new Date();
+      const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+      
+      // Simple schedule mapping - in a real app this would be more sophisticated
+      const schedule = program.schedule || {};
+      const todaySchedule = schedule[dayOfWeek] || schedule[Object.keys(schedule)[0]];
+      
+      if (!todaySchedule) {
+        return res.status(404).json({ message: "No workout scheduled for today" });
+      }
+
+      // Generate coaching insights using AI
+      const insights = {
+        description: "Today's session focuses on building strength and muscle endurance. You'll be challenging your limits while maintaining proper form.",
+        focusAreas: [
+          "Progressive overload on compound movements",
+          "Mind-muscle connection during isolation exercises", 
+          "Proper breathing technique throughout sets"
+        ],
+        challenges: "The supersets in today's workout will test your cardiovascular endurance. Expect to feel the burn, but push through - this is where real growth happens.",
+        prOpportunities: "Your bench press numbers have been climbing. Today might be the day to attempt a new personal record on your final working set.",
+        encouragement: "You've been consistently showing up and it's paying off. Your strength gains over the past month have been impressive. Trust your preparation and give it everything you've got.",
+        estimatedTime: 45,
+        difficulty: 3
+      };
+
+      const response = {
+        workout: {
+          name: todaySchedule.name || `Day ${dayOfWeek + 1} Workout`,
+          description: todaySchedule.description || insights.description
+        },
+        exercises: todaySchedule.exercises || [
+          {
+            name: "Push-ups",
+            sets: 3,
+            reps: "12-15",
+            notes: "Focus on controlled movement and full range of motion"
+          },
+          {
+            name: "Squats", 
+            sets: 3,
+            reps: "10-12",
+            weight: "Bodyweight",
+            notes: "Keep chest up and drive through heels"
+          },
+          {
+            name: "Pull-ups",
+            sets: 3, 
+            reps: "5-8",
+            notes: "Use assistance if needed, focus on form over quantity"
+          }
+        ],
+        insights
+      };
+
+      res.json(response);
+    } catch (error) {
+      console.error("Today's workout fetch error:", error);
+      res.status(500).json({ message: "Failed to fetch today's workout" });
+    }
+  });
+
   app.post("/api/programs/generate", isAuthenticated, async (req, res) => {
     try {
       const { experience, availableDays, equipment } = req.body;

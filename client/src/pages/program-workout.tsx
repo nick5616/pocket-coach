@@ -18,7 +18,7 @@ import {
   Trophy,
   Star,
 } from "lucide-react";
-import type { Program, Workout, Exercise } from "../../shared/schema";
+import type { Program, Workout, Exercise } from "../../../shared/schema";
 
 export default function ProgramWorkout() {
   const { programId } = useParams();
