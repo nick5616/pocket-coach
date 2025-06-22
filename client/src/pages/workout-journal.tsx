@@ -25,7 +25,7 @@ import { Badge } from "@/components/Badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
 import { Checkbox } from "@/components/Checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { useMuscleGroups } from "@/hooks/use-muscle-groups";
+import { ExerciseMuscleGroups } from "@/components/exercise-muscle-groups";
 import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
 import { type Workout, type Exercise } from "@shared/schema";
@@ -502,9 +502,9 @@ export default function WorkoutJournal() {
               ) : (
                 <div className="space-y-3">
                   {[
-                    { name: "Push-ups", sets: 3, reps: 12, rpe: 7, muscleGroups: ["Chest", "Triceps", "Shoulders"] },
-                    { name: "Squats", sets: 4, reps: 15, rpe: 6, muscleGroups: ["Quadriceps", "Glutes", "Core"] },
-                    { name: "Pull-ups", sets: 3, reps: 8, rpe: 8, muscleGroups: ["Lats", "Biceps", "Middle Traps"] }
+                    { name: "Push-ups", sets: 3, reps: 12, rpe: 7 },
+                    { name: "Squats", sets: 4, reps: 15, rpe: 6 },
+                    { name: "Pull-ups", sets: 3, reps: 8, rpe: 8 }
                   ].map((programmedEx, index) => {
                     const currentExercise = swappedExercises.get(index) || programmedEx;
                     const isSkipped = skippedExercises.has(index);
