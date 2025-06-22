@@ -110,6 +110,12 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
+- June 22, 2025: **COMPLETED** - Enhanced Loading Experience with PocketCoach Splash Screen and Skeleton Components
+  - Created engaging splash screen with PocketCoach branding, animated dumbbell logo, and gradient backgrounds
+  - Added smooth progress bar animation and floating fitness icons (Heart, Target, Zap) with sequential appearance
+  - Implemented comprehensive LoadingSkeleton component system with shimmer animations for cards, workouts, and programs
+  - Enhanced user experience with branded loading states that reflect the fitness app theme
+  - Dark mode support for all loading animations with proper color transitions
 - June 22, 2025: **COMPLETED** - Fixed Viewport Height Issue by Removing PWA Status Bar
   - Removed 2rem PWA status bar from App.tsx that prevented pages from extending to full viewport
   - Pages now properly utilize complete viewport height with no artificial spacing at top
