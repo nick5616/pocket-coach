@@ -614,8 +614,8 @@ export default function WorkoutJournal() {
               </div>
             </section>
             {/* Completed Exercises */}
-            <section className="px-4 py-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Completed Exercises</h2>
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>Completed Exercises</h2>
               <div className={styles.completedExercises}>
                 {exercises.map((exercise: Exercise) => (
                   <div key={exercise.id} className={styles.completedExerciseCard}>

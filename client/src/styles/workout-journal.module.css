@@ -272,7 +272,7 @@
 }
 
 .programmedExerciseCard {
-  background-color: #dbeafe;
+  background-color: #ffffff;
   border-radius: 0.5rem;
   padding: 0.75rem;
   border: 1px solid #93c5fd;
@@ -281,7 +281,7 @@
 
 @media (prefers-color-scheme: dark) {
   .programmedExerciseCard {
-    background-color: #1e40af;
+    background-color: #374151;
     border-color: #3b82f6;
   }
 }

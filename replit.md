@@ -110,15 +110,20 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
-- June 22, 2025: **COMPLETED** - Enhanced Card Spacing and CSS Modules Migration in Workout Journal
+- June 22, 2025: **COMPLETED** - Comprehensive Styling Consistency and Theme Support Enhancement
+  - Fixed section header size inconsistency - both "Programmed Exercises" and "Completed Exercises" now use same title styling
+  - Standardized horizontal spacing across page sections using consistent CSS Modules section padding (1.5rem 1rem)
+  - Removed blue background from programmed exercise cards to improve button visibility and styling consistency
+  - Added comprehensive light/dark mode support for all exercise cards with proper theme-dependent colors
+  - Programmed exercise cards: White/dark gray backgrounds with blue borders for visual distinction
+  - Completed exercise cards: White/dark gray backgrounds with neutral borders for finished state
+  - Enhanced Card Spacing and CSS Modules Migration in Workout Journal
   - Added consistent 1rem margin spacing between both programmed and completed exercise cards
   - Converted all exercise cards from mixed Tailwind/inline styles to clean CSS Modules architecture
   - Replaced space-y-6 and space-y-3 containers with dedicated CSS classes for uniform spacing
   - Applied programmedExerciseCard and completedExerciseCard classes with identical 1rem bottom margins
   - Converted exercise notes div component at line 698 from Tailwind CSS to CSS Modules architecture
   - Added exerciseNotesContainer, exerciseNotesLabel, exerciseNotesText CSS classes with proper theme support
-  - Light mode: Light blue background (#dbeafe) with dark blue text (#1e40af, #1e3a8a)
-  - Dark mode: Dark blue background (#1e40af) with light blue text (#dbeafe, #bfdbfe)
   - Converted div component at line 520 from Tailwind CSS to CSS Modules architecture
   - Added exerciseStatsContainer, exerciseStatsText, exerciseStatsTextSkipped CSS classes with proper light/dark mode support  
   - Applied theme-dependent colors: blue tones in light mode (#1d4ed8), lighter blue in dark mode (#93c5fd)
