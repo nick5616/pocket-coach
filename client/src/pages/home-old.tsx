@@ -50,20 +50,27 @@ export default function Home() {
     (w) => !w.isCompleted && !w.completedAt,
   );
 
-  const { data: goals = [] } = useQuery<Goal[]>({
+  const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
     queryKey: ["/api/goals"],
     enabled: isAuthenticated,
   });
 
-  const { data: achievements = [] } = useQuery<Achievement[]>({
+  const { data: achievements = [], isLoading: achievementsLoading } = useQuery<Achievement[]>({
     queryKey: ["/api/achievements"],
     enabled: isAuthenticated,
   });
 
-  const { data: activeProgram } = useQuery({
+  const { data: activeProgram, isLoading: activeProgramLoading } = useQuery({
     queryKey: ["/api/programs/active"],
     enabled: isAuthenticated,
   });
+
+  // Show loading screen if any essential data is still loading
+  const isLoading = userLoading || workoutsLoading || goalsLoading || achievementsLoading || activeProgramLoading;
+
+  if (isLoading) {
+    return <LoadingScreen message="Loading your dashboard..." />;
+  }
 
   // Check for new achievements
   useEffect(() => {

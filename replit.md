@@ -110,6 +110,14 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
+- June 22, 2025: **COMPLETED** - Comprehensive Loading Screen Implementation Across All API Calls
+  - Created unified LoadingScreen component with PocketCoach branding and shimmer animations
+  - Implemented loading state detection across all pages: home, programs, progress, profile-simple, workout-journal, program-workout, home-old
+  - Added isLoading state tracking for all useQuery hooks throughout the application
+  - Replaced inconsistent basic loading states with consistent LoadingScreen component
+  - Enhanced user experience with contextual loading messages ("Loading your profile...", "Loading workout...", etc.)
+  - All API calls now show branded loading screens during data fetching operations
+  - Maintains visual consistency with existing splash screen design and green theme
 - June 22, 2025: **COMPLETED** - Fixed AI Coach Recommendation Text Color Override
   - Updated home page CSS to ensure "AI Coach Recommendation" text is always white regardless of theme
   - Added `color: white !important;` to `.aiTitle` class for consistent contrast against purple gradient background
