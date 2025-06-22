@@ -462,66 +462,27 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Progress Insights */}
-        <section className="px-4 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Your Progress Insights
-          </h3>
-
-          <div className="space-y-3">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-start">
-                  <div className="w-10 h-10 bg-duolingo-green/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                    <ChartLine className="h-5 w-5 text-duolingo-green" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">
-                      Strength Gains Detected
-                    </h4>
-                    <p className="text-sm text-gray-700 mb-2">
-                      Your bench press has improved 8% over the last 3 weeks.
-                      You're ready for heavier weight!
-                    </p>
-                    <div className="flex items-center text-xs text-gray-600">
-                      <svg
-                        className="w-3 h-3 mr-1"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
-                      </svg>
-                      <span>Based on 9 workouts</span>
-                    </div>
-                  </div>
+        {/* Progress Insights - Show only when user has workout data */}
+        {recentWorkouts.length > 0 && (
+          <section className="px-4 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Your Progress Insights
+            </h3>
+            <Card className="border-dashed border-2 border-gray-200">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <ChartLine className="h-6 w-6 text-gray-400" />
                 </div>
+                <h4 className="font-medium text-gray-900 mb-1">
+                  Building Your Profile
+                </h4>
+                <p className="text-sm text-gray-500">
+                  Complete more workouts to unlock personalized insights and progress analysis.
+                </p>
               </CardContent>
             </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-start">
-                  <div className="w-10 h-10 bg-energetic-orange/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                    <Target className="h-5 w-5 text-energetic-orange" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">
-                      Focus Area Suggestion
-                    </h4>
-                    <p className="text-sm text-gray-700 mb-2">
-                      Your shoulder development is progressing well, but rear
-                      delts could use more attention for balanced growth.
-                    </p>
-                    <div className="flex items-center text-xs text-gray-600">
-                      <Lightbulb className="w-3 h-3 mr-1" />
-                      <span>AI Pattern Analysis</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Goals */}
         <section className="px-4 mb-6">
