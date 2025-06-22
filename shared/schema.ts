@@ -1,20 +1,34 @@
-import { pgTable, text, serial, integer, boolean, timestamp, real, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, real, jsonb, varchar, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Session storage table for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// Updated users table for Replit Auth
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  email: text("email"),
+  id: varchar("id").primaryKey().notNull(), // Replit user ID as string
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
   currentStreak: integer("current_streak").default(0),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const goals = pgTable("goals", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: varchar("user_id").notNull(),
   title: text("title").notNull(),
   description: text("description"),
   targetValue: real("target_value"),
@@ -29,7 +43,7 @@ export const goals = pgTable("goals", {
 
 export const workouts = pgTable("workouts", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: varchar("user_id").notNull(),
   name: text("name").notNull(),
   notes: text("notes"), // Free-form workout journal entry
   duration: integer("duration"), // in minutes
@@ -58,7 +72,7 @@ export const exercises = pgTable("exercises", {
 
 export const programs = pgTable("programs", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: varchar("user_id").notNull(),
   name: text("name").notNull(),
   description: text("description"),
   isActive: boolean("is_active").default(false),
@@ -84,7 +98,7 @@ export const exerciseMuscleMapping = pgTable("exercise_muscle_mapping", {
 
 export const achievements = pgTable("achievements", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: varchar("user_id").notNull(),
   type: text("type").notNull(), // "workout_complete", "streak", "goal_achieved", etc.
   title: text("title").notNull(),
   description: text("description"),
@@ -150,9 +164,15 @@ export const achievementsRelations = relations(achievements, ({ one }) => ({
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
   currentStreak: true,
   createdAt: true,
+  updatedAt: true,
+});
+
+export const upsertUserSchema = createInsertSchema(users).omit({
+  currentStreak: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const insertGoalSchema = createInsertSchema(goals).omit({
@@ -197,6 +217,7 @@ export const insertAchievementSchema = createInsertSchema(achievements).omit({
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpsertUser = z.infer<typeof upsertUserSchema>;
 
 export type Goal = typeof goals.$inferSelect;
 export type InsertGoal = z.infer<typeof insertGoalSchema>;

@@ -1,6 +1,6 @@
 import { 
   users, goals, workouts, exercises, programs, achievements, muscleGroups, exerciseMuscleMapping,
-  type User, type InsertUser,
+  type User, type InsertUser, type UpsertUser,
   type Goal, type InsertGoal,
   type Workout, type InsertWorkout,
   type Exercise, type InsertExercise,
@@ -13,11 +13,10 @@ import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
 
 export interface IStorage {
-  // Users
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  updateUserStreak(userId: number, streak: number): Promise<void>;
+  // Users - Updated for Replit Auth
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  updateUserStreak(userId: string, streak: number): Promise<void>;
 
   // Goals
   getUserGoals(userId: number): Promise<Goal[]>;
