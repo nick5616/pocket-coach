@@ -35,14 +35,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Workout routes
-  app.get("/api/workouts", async (req, res) => {
+  app.get("/api/workouts", isAuthenticated, async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
+      const userId = req.user.id;
       const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
-      
-      if (!userId) {
-        return res.status(400).json({ message: "userId is required" });
-      }
       
       const workouts = await storage.getUserWorkouts(userId, limit);
       res.json(workouts);
@@ -561,13 +557,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Achievement routes
-  app.get("/api/achievements", async (req, res) => {
+  app.get("/api/achievements", isAuthenticated, async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
-      if (!userId) {
-        return res.status(400).json({ message: "userId is required" });
-      }
-      
+      const userId = req.user.id;
       const achievements = await storage.getUserAchievements(userId);
       res.json(achievements);
     } catch (error) {

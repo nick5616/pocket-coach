@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import type { WorkoutStats, AIRecommendation } from "@/lib/types";
 import type { User, Workout, Goal, Achievement } from "@shared/schema";
+import { useAuth } from "@/hooks/use-auth";
 import styles from "./home.module.css";
 
 export default function Home() {
@@ -30,17 +31,17 @@ export default function Home() {
   const [currentAchievement, setCurrentAchievement] =
     useState<Achievement | null>(null);
 
-  // Mock user data - in real app this would come from auth context
-  const userId = 1;
+  const { user: authUser, isAuthenticated } = useAuth();
 
   const { data: user } = useQuery<User>({
-    queryKey: ["/api/user/1"],
+    queryKey: ["/api/user", authUser?.id],
+    queryFn: () => fetch(`/api/user/${authUser?.id}`).then((res) => res.json()),
+    enabled: !!authUser?.id,
   });
 
   const { data: recentWorkouts = [] } = useQuery<Workout[]>({
-    queryKey: ["/api/workouts", { userId, limit: 3 }],
-    queryFn: () =>
-      fetch(`/api/workouts?userId=${userId}&limit=3`).then((res) => res.json()),
+    queryKey: ["/api/workouts"],
+    enabled: isAuthenticated,
   });
 
   // Find ongoing workout (not completed)
