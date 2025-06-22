@@ -9,19 +9,22 @@ interface SplashScreenProps {
 export default function SplashScreen({ onComplete }: SplashScreenProps) {
   const [stage, setStage] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [showTapPrompt, setShowTapPrompt] = useState(false);
+  const [loadingComplete, setLoadingComplete] = useState(false);
 
   useEffect(() => {
     const timer1 = setTimeout(() => setStage(1), 300);
     const timer2 = setTimeout(() => setStage(2), 800);
     const timer3 = setTimeout(() => setStage(3), 1300);
     const timer4 = setTimeout(() => setStage(4), 1800);
-    const timer5 = setTimeout(() => onComplete(), 2500);
 
     // Progress bar animation
     const progressTimer = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(progressTimer);
+          setLoadingComplete(true);
+          setTimeout(() => setShowTapPrompt(true), 500);
           return 100;
         }
         return prev + 2;
@@ -33,13 +36,18 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       clearTimeout(timer2);
       clearTimeout(timer3);
       clearTimeout(timer4);
-      clearTimeout(timer5);
       clearInterval(progressTimer);
     };
-  }, [onComplete]);
+  }, []);
+
+  const handleTap = () => {
+    if (loadingComplete) {
+      onComplete();
+    }
+  };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onClick={handleTap}>
       <div className={styles.content}>
         {/* Logo Animation */}
         <div className={`${styles.logoContainer} ${stage >= 1 ? styles.logoVisible : ''}`}>
@@ -74,8 +82,17 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className={styles.progressText}>Loading your workout experience...</p>
+          <p className={styles.progressText}>
+            {loadingComplete ? '' : 'Loading your workout experience...'}
+          </p>
         </div>
+
+        {/* Tap Prompt */}
+        {showTapPrompt && (
+          <div className={`${styles.tapPrompt} ${styles.tapPromptVisible}`}>
+            <p>Tap anywhere to begin</p>
+          </div>
+        )}
       </div>
 
       {/* Background Animation */}
