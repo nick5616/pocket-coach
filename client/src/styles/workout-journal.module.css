@@ -60,16 +60,41 @@
 .exerciseGrid {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
+}
+
+.section {
+  padding: 1.5rem 1rem;
+}
+
+.exerciseHeader {
+  margin-bottom: 0.75rem;
+}
+
+.exerciseRpe {
+  font-weight: 500;
+}
+
+.muscleGroupsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.actionButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
 }
 
 .exerciseCard {
   border-radius: 0.5rem;
-  padding: 0.75rem;
+  padding: 1.25rem;
   border: 1px solid #d1d5db;
   transition: all 0.2s ease;
   background-color: #dbeafe;
   border-color: #93c5fd;
+  margin-bottom: 0.5rem;
 }
 
 .exerciseCardSkipped {
@@ -218,14 +243,18 @@
 
 .completedExercises {
   padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .completedExerciseCard {
   background-color: #ffffff;
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: 1.25rem;
   border: 1px solid #e5e7eb;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  margin-bottom: 0.5rem;
 }
 
 .completedExerciseHeader {
@@ -320,6 +349,14 @@
     color: #f9fafb;
   }
   
+  .volumeIndicator {
+    color: #60a5fa;
+  }
+  
+  .volumeText {
+    color: #f3f4f6;
+  }
+  
   .sectionTitle {
     color: #f9fafb;
   }
@@ -329,12 +366,25 @@
     border-color: #3b82f6;
   }
   
+  .exerciseCardSkipped {
+    background-color: #374151;
+    border-color: #4b5563;
+  }
+  
   .exerciseName {
     color: #dbeafe;
   }
   
+  .exerciseNameSkipped {
+    color: #9ca3af;
+  }
+  
   .exerciseStats {
     color: #93c5fd;
+  }
+  
+  .exerciseStatsSkipped {
+    color: #6b7280;
   }
   
   .completedExerciseCard {
@@ -353,5 +403,49 @@
   
   .inputFooter {
     border-top-color: #374151;
+  }
+  
+  .dateLabel {
+    color: #9ca3af;
+  }
+  
+  .dateValue {
+    color: #f9fafb;
+  }
+  
+  .formLabel {
+    color: #d1d5db;
+  }
+  
+  .checkboxLabel {
+    color: #d1d5db;
+  }
+  
+  .checkboxDescription {
+    color: #9ca3af;
+  }
+  
+  .statusText {
+    color: #9ca3af;
+  }
+  
+  .statText {
+    color: #d1d5db;
+  }
+  
+  .rpeText {
+    color: #d1d5db;
+  }
+  
+  .volumeText {
+    color: #34d399;
+  }
+  
+  .exerciseNotes {
+    color: #9ca3af;
+  }
+  
+  .demoText {
+    color: #9ca3af;
   }
 }

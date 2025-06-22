@@ -414,12 +414,12 @@ export default function WorkoutJournal() {
           </section>
         ) : (
           // Workout Journal
-          <div className="space-y-6">
+          <div>
             {/* Programmed Exercises */}
-            <section className="px-4 py-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Programmed Exercises</h2>
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>Programmed Exercises</h2>
               {(todaysWorkout?.workout?.exercises && todaysWorkout.workout.exercises.length > 0) ? (
-                <div className="space-y-6">
+                <div className={styles.exerciseGrid}>
                   {todaysWorkout.workout.exercises.map((programmedEx: any, index: number) => {
                     const currentExercise = swappedExercises.get(index) || programmedEx;
                     const isSkipped = skippedExercises.has(index);
@@ -427,26 +427,22 @@ export default function WorkoutJournal() {
                     return (
                       <div 
                         key={index} 
-                        className={`rounded-lg p-3 border transition-all duration-200 ${
-                          isSkipped 
-                            ? 'bg-gray-100 border-gray-300 opacity-60' 
-                            : 'bg-blue-50 border-blue-200'
-                        }`}
+                        className={isSkipped ? `${styles.exerciseCard} ${styles.exerciseCardSkipped}` : styles.exerciseCard}
                       >
-                        <div className="mb-3">
-                          <h3 className={`font-semibold text-base mb-1 ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
+                        <div className={styles.exerciseHeader}>
+                          <h3 className={isSkipped ? `${styles.exerciseName} ${styles.exerciseNameSkipped}` : styles.exerciseName}>
                             {currentExercise.name}
                           </h3>
-                          <div className="flex items-center justify-between text-sm mb-2">
-                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
+                          <div className={isSkipped ? `${styles.exerciseStats} ${styles.exerciseStatsSkipped}` : styles.exerciseStats}>
+                            <span>
                               {currentExercise.sets} sets × {currentExercise.reps} reps
                             </span>
-                            <span className={`font-medium ${isSkipped ? 'text-gray-400' : 'text-blue-700'}`}>
+                            <span className={styles.exerciseRpe}>
                               RPE {currentExercise.rpe}
                             </span>
                           </div>
                           {currentExercise.muscleGroups && currentExercise.muscleGroups.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
+                            <div className={styles.muscleGroupsContainer}>
                               {currentExercise.muscleGroups.map((muscle: string, idx: number) => (
                                 <Badge key={idx} variant="secondary" className="text-xs">
                                   {muscle}
