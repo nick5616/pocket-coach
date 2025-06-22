@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dumbbell, Heart, Target, Zap } from "lucide-react";
+import { Dumbbell, Heart, Target } from "lucide-react";
 import styles from "./splash-screen.module.css";
 
 interface SplashScreenProps {
@@ -59,14 +59,11 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           <div className={`${styles.floatingIcon} ${styles.icon2} ${stage >= 3 ? styles.iconVisible : ''}`}>
             <Target />
           </div>
-          <div className={`${styles.floatingIcon} ${styles.icon3} ${stage >= 4 ? styles.iconVisible : ''}`}>
-            <Zap />
-          </div>
         </div>
 
         {/* Tagline */}
         <p className={`${styles.tagline} ${stage >= 3 ? styles.taglineVisible : ''}`}>
-          Your AI-Powered Fitness Journey
+          Your Personal Fitness Journey
         </p>
 
         {/* Progress Bar */}

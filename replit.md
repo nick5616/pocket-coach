@@ -111,8 +111,10 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 ## Recent Changes
 
 - June 22, 2025: **COMPLETED** - Enhanced Loading Experience with PocketCoach Splash Screen and Skeleton Components
-  - Created engaging splash screen with PocketCoach branding, animated dumbbell logo, and gradient backgrounds
-  - Added smooth progress bar animation and floating fitness icons (Heart, Target, Zap) with sequential appearance
+  - Created engaging splash screen with PocketCoach branding, animated dumbbell logo, and green pulse gradient backgrounds
+  - Added smooth progress bar animation and floating fitness icons (Heart, Target) with sequential appearance
+  - Implemented green gradient pulse animation similar to home page card background for cohesive visual theme
+  - Removed AI-related taglines and lightning bolts, updated to "Your Personal Fitness Journey"
   - Implemented comprehensive LoadingSkeleton component system with shimmer animations for cards, workouts, and programs
   - Enhanced user experience with branded loading states that reflect the fitness app theme
   - Dark mode support for all loading animations with proper color transitions
