@@ -418,7 +418,7 @@ export default function WorkoutJournal() {
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Programmed Exercises</h2>
               {(todaysWorkout?.workout?.exercises && todaysWorkout.workout.exercises.length > 0) ? (
-                <div className={styles.exerciseGrid}>
+                <div className={styles.programmedExercises}>
                   {todaysWorkout.workout.exercises.map((programmedEx: any, index: number) => {
                     const currentExercise = swappedExercises.get(index) || programmedEx;
                     const isSkipped = skippedExercises.has(index);
@@ -426,7 +426,7 @@ export default function WorkoutJournal() {
                     return (
                       <div 
                         key={index} 
-                        className={isSkipped ? `${styles.exerciseCard} ${styles.exerciseCardSkipped}` : styles.exerciseCard}
+                        className={isSkipped ? `${styles.programmedExerciseCard} ${styles.exerciseCardSkipped}` : styles.programmedExerciseCard}
                       >
                         <div className={styles.exerciseHeader}>
                           <h3 className={isSkipped ? `${styles.exerciseName} ${styles.exerciseNameSkipped}` : styles.exerciseName}>
@@ -494,7 +494,7 @@ export default function WorkoutJournal() {
                   })}
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className={styles.programmedExercises}>
                   {[
                     { name: "Push-ups", sets: 3, reps: 12, rpe: 7 },
                     { name: "Squats", sets: 4, reps: 15, rpe: 6 },
@@ -506,11 +506,7 @@ export default function WorkoutJournal() {
                     return (
                       <div 
                         key={index} 
-                        className={`rounded-lg p-3 border transition-all duration-200 ${
-                          isSkipped 
-                            ? 'bg-gray-100 border-gray-300 opacity-60' 
-                            : 'bg-blue-50 border-blue-200'
-                        }`}
+                        className={isSkipped ? `${styles.programmedExerciseCard} ${styles.exerciseCardSkipped}` : styles.programmedExerciseCard}
                       >
                         <div className="mb-3">
                           <h3 className={`font-semibold text-base mb-1 ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
