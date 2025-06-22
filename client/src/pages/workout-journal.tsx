@@ -99,21 +99,21 @@ export default function WorkoutJournal() {
     }, 0);
   };
 
-  const { data: exercises = [] } = useQuery({
+  const { data: exercises = [], isLoading: exercisesLoading } = useQuery({
     queryKey: ["/api/workouts", workoutId, "exercises"],
     queryFn: () =>
       fetch(`/api/exercises?workoutId=${workoutId}`).then((res) => res.json()),
     enabled: !!workoutId,
   });
 
-  const { data: activeProgram } = useQuery({
+  const { data: activeProgram, isLoading: activeProgramLoading } = useQuery({
     queryKey: ["/api/programs/active", { userId: 1 }],
     queryFn: () =>
       fetch("/api/programs/active?userId=1").then((res) => res.json()),
     enabled: !workoutId,
   });
 
-  const { data: todaysWorkout } = useQuery({
+  const { data: todaysWorkout, isLoading: todaysWorkoutLoading } = useQuery({
     queryKey: ["/api/programs/active/today"],
     queryFn: () =>
       fetch("/api/programs/active/today?userId=1").then((res) => res.json()),
@@ -121,6 +121,13 @@ export default function WorkoutJournal() {
   });
 
   const totalVolume = calculateWorkoutVolume(exercises as Exercise[]);
+
+  // Show loading screen if any essential data is still loading
+  const isLoading = workoutLoading || exercisesLoading || activeProgramLoading || todaysWorkoutLoading;
+
+  if (isLoading) {
+    return <LoadingScreen message="Loading workout..." />;
+  }
 
   // Mutations
   const createWorkoutMutation = useMutation({

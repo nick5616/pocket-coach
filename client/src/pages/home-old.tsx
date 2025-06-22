@@ -8,6 +8,7 @@ import { Progress } from "@/components/Progress";
 import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
 import WorkoutCard from "@/components/workout-card";
+import LoadingScreen from "@/components/loading-screen";
 import {
   Bell,
   User as UserIcon,
@@ -33,13 +34,13 @@ export default function Home() {
 
   const { user: authUser, isAuthenticated } = useAuth();
 
-  const { data: user } = useQuery<User>({
+  const { data: user, isLoading: userLoading } = useQuery<User>({
     queryKey: ["/api/user", authUser?.id],
     queryFn: () => fetch(`/api/user/${authUser?.id}`).then((res) => res.json()),
     enabled: !!authUser?.id,
   });
 
-  const { data: recentWorkouts = [] } = useQuery<Workout[]>({
+  const { data: recentWorkouts = [], isLoading: workoutsLoading } = useQuery<Workout[]>({
     queryKey: ["/api/workouts"],
     enabled: isAuthenticated,
   });

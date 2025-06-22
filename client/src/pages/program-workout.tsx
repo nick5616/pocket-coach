@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { Badge } from "@/components/Badge";
 import { Progress } from "@/components/Progress";
 import { ExerciseMuscleGroups } from "@/components/exercise-muscle-groups";
+import LoadingScreen from "@/components/loading-screen";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -27,12 +28,12 @@ export default function ProgramWorkout() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: program } = useQuery<Program>({
+  const { data: program, isLoading: programLoading } = useQuery<Program>({
     queryKey: ["/api/programs", programId],
     enabled: !!programId,
   });
 
-  const { data: todaysWorkout } = useQuery({
+  const { data: todaysWorkout, isLoading: workoutLoading } = useQuery({
     queryKey: ["/api/programs", programId, "today"],
     enabled: !!programId,
   });
@@ -71,15 +72,15 @@ export default function ProgramWorkout() {
     });
   };
 
+  // Show loading screen if any essential data is still loading
+  const isLoading = programLoading || workoutLoading;
+
+  if (isLoading) {
+    return <LoadingScreen message="Loading workout details..." />;
+  }
+
   if (!program || !todaysWorkout) {
-    return (
-      <div className="h-full bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading workout details...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Preparing program workout..." />;
   }
 
   const workout = todaysWorkout.workout;
