@@ -505,10 +505,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/programs/:id/today", async (req, res) => {
+  app.get("/api/programs/:id/today", isAuthenticated, async (req, res) => {
     try {
       const programId = parseInt(req.params.id);
-      const program = await storage.getActiveProgram(1); // Mock user ID
+      const userId = req.user.id;
+      const program = await storage.getActiveProgram(userId);
       
       if (!program || program.id !== programId) {
         return res.status(404).json({ message: "Program not found or not active" });
