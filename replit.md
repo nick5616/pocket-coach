@@ -110,6 +110,11 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
+- June 22, 2025: **COMPLETED** - Fixed Theme-Dependent Text Colors in Workout Journal
+  - Converted div component at line 520 from Tailwind CSS to CSS Modules architecture
+  - Added exerciseStatsContainer, exerciseStatsText, exerciseStatsTextSkipped CSS classes with proper light/dark mode support  
+  - Applied theme-dependent colors: blue tones in light mode (#1d4ed8), lighter blue in dark mode (#93c5fd)
+  - Maintained consistent skipped state styling with gray colors across themes
 - June 22, 2025: **COMPLETED** - Complete Tailwind CSS Removal and Enhanced UI Spacing
   - Completely removed Tailwind CSS from project and converted to CSS Modules architecture
   - Enhanced exercise card spacing with 2rem gaps and increased padding (1.25rem)

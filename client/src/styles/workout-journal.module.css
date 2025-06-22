@@ -335,6 +335,32 @@
   margin-bottom: 1rem;
 }
 
+.exerciseStatsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.exerciseStatsText {
+  color: #1d4ed8;
+}
+
+.exerciseStatsTextSkipped {
+  color: #9ca3af;
+}
+
+.exerciseRpeText {
+  font-weight: 500;
+  color: #1d4ed8;
+}
+
+.exerciseRpeTextSkipped {
+  font-weight: 500;
+  color: #9ca3af;
+}
+
 @media (prefers-color-scheme: dark) {
   .container {
     background-color: #111827;
@@ -447,5 +473,21 @@
   
   .demoText {
     color: #9ca3af;
+  }
+  
+  .exerciseStatsText {
+    color: #93c5fd;
+  }
+
+  .exerciseStatsTextSkipped {
+    color: #6b7280;
+  }
+
+  .exerciseRpeText {
+    color: #93c5fd;
+  }
+
+  .exerciseRpeTextSkipped {
+    color: #6b7280;
   }
 }

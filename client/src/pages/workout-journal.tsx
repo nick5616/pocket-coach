@@ -517,11 +517,11 @@ export default function WorkoutJournal() {
                           <h3 className={`font-semibold text-base mb-1 ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
                             {currentExercise.name}
                           </h3>
-                          <div className="flex items-center justify-between text-sm mb-2">
-                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
+                          <div className={styles.exerciseStatsContainer}>
+                            <span className={isSkipped ? styles.exerciseStatsTextSkipped : styles.exerciseStatsText}>
                               {currentExercise.sets} sets × {currentExercise.reps} reps
                             </span>
-                            <span className={`font-medium ${isSkipped ? 'text-gray-400' : 'text-blue-700'}`}>
+                            <span className={isSkipped ? styles.exerciseRpeTextSkipped : styles.exerciseRpeText}>
                               RPE {currentExercise.rpe}
                             </span>
                           </div>
