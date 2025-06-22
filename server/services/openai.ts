@@ -5,6 +5,9 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || ""
 });
 
+// Export the OpenAI client instance for use in other services
+export { openai };
+
 export interface WorkoutAnalysis {
   nextWorkoutRecommendation: string;
   keyInsights: string[];
