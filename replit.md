@@ -111,9 +111,10 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 ## Recent Changes
 
 - June 22, 2025: **COMPLETED** - Enhanced Card Spacing and CSS Modules Migration in Workout Journal
-  - Added proper 2rem margin spacing between completed exercise cards for better visual separation
-  - Converted completed exercise cards from mixed Tailwind/inline styles to clean CSS Modules architecture
-  - Replaced space-y-6 container with dedicated completedExercises CSS class for consistent spacing
+  - Added consistent 1rem margin spacing between both programmed and completed exercise cards
+  - Converted all exercise cards from mixed Tailwind/inline styles to clean CSS Modules architecture
+  - Replaced space-y-6 and space-y-3 containers with dedicated CSS classes for uniform spacing
+  - Applied programmedExerciseCard and completedExerciseCard classes with identical 1rem bottom margins
   - Converted exercise notes div component at line 698 from Tailwind CSS to CSS Modules architecture
   - Added exerciseNotesContainer, exerciseNotesLabel, exerciseNotesText CSS classes with proper theme support
   - Light mode: Light blue background (#dbeafe) with dark blue text (#1e40af, #1e3a8a)
