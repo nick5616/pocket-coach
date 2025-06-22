@@ -66,12 +66,18 @@ export async function setupAuth(app: Express) {
     done(null, user.id);
   });
 
-  passport.deserializeUser(async (id: string, done) => {
+  passport.deserializeUser(async (id: any, done) => {
     try {
+      // Handle legacy session data conflicts by checking if id is a string
+      if (typeof id !== 'string') {
+        // Invalid session data, clear it
+        return done(null, false);
+      }
       const user = await storage.getUser(id);
       done(null, user);
     } catch (error) {
-      done(error);
+      // If database error, clear the session
+      done(null, false);
     }
   });
 
