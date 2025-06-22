@@ -22,7 +22,7 @@ import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
 import { Badge } from "@/components/Badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/Dialog";
 import { Checkbox } from "@/components/Checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { ExerciseMuscleGroups } from "@/components/exercise-muscle-groups";
