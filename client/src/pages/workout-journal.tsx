@@ -695,9 +695,9 @@ export default function WorkoutJournal() {
                     )}
 
                     {exercise.notes && (
-                      <div className="mt-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                        <div className="text-xs text-blue-800 font-medium mb-1">Notes:</div>
-                        <p className="text-sm text-blue-900">{exercise.notes}</p>
+                      <div className={styles.exerciseNotesContainer}>
+                        <div className={styles.exerciseNotesLabel}>Notes:</div>
+                        <p className={styles.exerciseNotesText}>{exercise.notes}</p>
                       </div>
                     )}
                   </div>

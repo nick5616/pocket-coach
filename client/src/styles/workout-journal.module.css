@@ -361,6 +361,26 @@
   color: #9ca3af;
 }
 
+.exerciseNotesContainer {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background-color: #dbeafe;
+  border-radius: 0.5rem;
+  border-left: 4px solid #60a5fa;
+}
+
+.exerciseNotesLabel {
+  font-size: 0.75rem;
+  color: #1e40af;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.exerciseNotesText {
+  font-size: 0.875rem;
+  color: #1e3a8a;
+}
+
 @media (prefers-color-scheme: dark) {
   .container {
     background-color: #111827;
@@ -489,5 +509,18 @@
 
   .exerciseRpeTextSkipped {
     color: #6b7280;
+  }
+  
+  .exerciseNotesContainer {
+    background-color: #1e40af;
+    border-left-color: #3b82f6;
+  }
+
+  .exerciseNotesLabel {
+    color: #dbeafe;
+  }
+
+  .exerciseNotesText {
+    color: #bfdbfe;
   }
 }
