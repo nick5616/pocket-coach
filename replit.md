@@ -110,6 +110,10 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
+- June 22, 2025: **COMPLETED** - Fixed AI Coach Recommendation Text Color Override
+  - Updated home page CSS to ensure "AI Coach Recommendation" text is always white regardless of theme
+  - Added `color: white !important;` to `.aiTitle` class for consistent contrast against purple gradient background
+  - Resolved user-reported issue where text color was affected by light/dark mode theme switching
 - June 22, 2025: **COMPLETED** - Production-Ready Email/Password Authentication System
   - Completely removed Replit Auth dependency and implemented standalone email/password authentication
   - Created secure user registration and login system using bcrypt password hashing

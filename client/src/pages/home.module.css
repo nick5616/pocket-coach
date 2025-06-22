@@ -298,6 +298,7 @@
 
 .aiTitle {
   font-weight: 600;
+  color: white !important;
 }
 
 .aiMessage {
