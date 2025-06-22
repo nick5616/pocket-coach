@@ -257,6 +257,14 @@
   margin-bottom: 1rem;
 }
 
+@media (prefers-color-scheme: dark) {
+  .completedExerciseCard {
+    background-color: #374151;
+    border-color: #4b5563;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  }
+}
+
 .programmedExercises {
   display: flex;
   flex-direction: column;
@@ -269,6 +277,13 @@
   padding: 0.75rem;
   border: 1px solid #93c5fd;
   margin-bottom: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .programmedExerciseCard {
+    background-color: #1e40af;
+    border-color: #3b82f6;
+  }
 }
 
 .completedExerciseHeader {
