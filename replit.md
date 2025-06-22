@@ -110,6 +110,10 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
+- June 22, 2025: **COMPLETED** - Fixed Viewport Height Issue by Removing PWA Status Bar
+  - Removed 2rem PWA status bar from App.tsx that prevented pages from extending to full viewport
+  - Pages now properly utilize complete viewport height with no artificial spacing at top
+  - Enhanced user experience with full-screen page layout for mobile-first design
 - June 22, 2025: **COMPLETED** - Complete Tailwind CSS Removal from Home Page
   - Converted entire home.tsx from Tailwind CSS to CSS Modules architecture
   - Created comprehensive home.module.css with proper light/dark mode theming

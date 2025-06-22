@@ -75,24 +75,9 @@ function App() {
         margin: '0 auto',
         backgroundColor: isDark ? '#111827' : '#ffffff',
         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column'
+        position: 'relative'
       }}>
-        {/* PWA Status Bar */}
-        <div style={{
-          backgroundColor: '#58CC02',
-          height: '2rem',
-          width: '100%',
-          flexShrink: 0
-        }}></div>
-        
-        <div style={{
-          flex: 1,
-          overflowY: 'auto'
-        }}>
-          <Router />
-        </div>
+        <Router />
       </div>
     </QueryClientProvider>
   );
