@@ -57,6 +57,16 @@ export default function Home() {
     enabled: isAuthenticated,
   });
 
+  const { data: activeProgram } = useQuery({
+    queryKey: ["/api/programs/active"],
+    enabled: isAuthenticated,
+  });
+
+  const { data: todaysWorkout } = useQuery({
+    queryKey: ["/api/programs/active/today"],
+    enabled: isAuthenticated && !!activeProgram && !ongoingWorkout,
+  });
+
   // Check for new achievements
   useEffect(() => {
     const unviewedAchievement = achievements.find(
@@ -239,17 +249,31 @@ export default function Home() {
                 </div>
               </Button>
             </Link>
-          ) : (
+          ) : activeProgram ? (
             <div className="space-y-3">
-              <Link href="/workout-journal">
+              <Link href={`/workouts/program/${activeProgram.id}`}>
                 <Button
                   size="lg"
                   className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
                 >
                   <div className="flex items-center justify-center space-x-3">
                     <Play className="h-6 w-6" />
-                    <span className="text-lg font-semibold">
-                      Start New Workout
+                    <span className="text-lg font-semibold max-w-[280px] truncate">
+                      1. Begin: {todaysWorkout?.workout?.name || activeProgram.name}
+                    </span>
+                  </div>
+                </Button>
+              </Link>
+              <Link href="/workout-journal">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full h-12 border-2 border-gray-300 hover:border-gray-400 text-gray-700 rounded-xl transition-all duration-200"
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <Calendar className="h-5 w-5" />
+                    <span className="font-semibold">
+                      2. Freestyle a workout
                     </span>
                   </div>
                 </Button>
@@ -261,27 +285,50 @@ export default function Home() {
                   className="w-full h-12 border-2 border-gray-300 hover:border-gray-400 text-gray-700 rounded-xl transition-all duration-200"
                 >
                   <div className="flex items-center justify-center space-x-2">
-                    <Calendar className="h-5 w-5" />
+                    <ChartLine className="h-5 w-5" />
                     <span className="font-semibold">
-                      View Programs
+                      3. View programs
                     </span>
                   </div>
                 </Button>
               </Link>
             </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="text-center text-gray-600 text-sm mb-4">
+                You do not appear to be in a program
+              </div>
+              <div className="space-y-3">
+                <Link href="/workout-journal">
+                  <Button
+                    size="lg"
+                    className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
+                  >
+                    <div className="flex items-center justify-center space-x-3">
+                      <Play className="h-6 w-6" />
+                      <span className="text-lg font-semibold">
+                        1. Freestyle a workout
+                      </span>
+                    </div>
+                  </Button>
+                </Link>
+                <Link href="/programs">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full h-12 border-2 border-gray-300 hover:border-gray-400 text-gray-700 rounded-xl transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center space-x-2">
+                      <Calendar className="h-5 w-5" />
+                      <span className="font-semibold">
+                        2. Find a program
+                      </span>
+                    </div>
+                  </Button>
+                </Link>
+              </div>
+            </div>
           )}
-
-          <div className="mt-3 text-center">
-            <Link href="/programs">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-gray-800"
-              >
-                View Training Programs
-              </Button>
-            </Link>
-          </div>
         </section>
 
         {/* AI Recommendation */}

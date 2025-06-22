@@ -8,6 +8,7 @@ import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import Workouts from "@/pages/workouts";
 import WorkoutJournal from "@/pages/workout-journal";
+import ProgramWorkout from "@/pages/program-workout";
 import Progress from "@/pages/progress-simple";
 import Programs from "@/pages/programs-simple";
 import Profile from "@/pages/profile-simple";

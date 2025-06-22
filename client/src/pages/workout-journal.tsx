@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ArrowLeft, 
-  CheckCircle, 
-  Edit, 
-  Trash2, 
+import {
+  ArrowLeft,
+  CheckCircle,
+  Edit,
+  Trash2,
   Send,
   Trophy,
   Target,
@@ -14,7 +14,7 @@ import {
   Gem,
   Dumbbell,
   Hash,
-  Weight
+  Weight,
 } from "lucide-react";
 import { Link, useParams, useLocation } from "wouter";
 
@@ -22,7 +22,13 @@ import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
 import { Badge } from "@/components/Badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/Dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/Dialog";
 import { Checkbox } from "@/components/Checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { ExerciseMuscleGroups } from "@/components/exercise-muscle-groups";
@@ -48,7 +54,9 @@ export default function WorkoutJournal() {
   // Journal states
   const [currentInput, setCurrentInput] = useState("");
   const [currentThought, setCurrentThought] = useState("");
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'typing' | 'saved'>('idle');
+  const [saveStatus, setSaveStatus] = useState<"idle" | "typing" | "saved">(
+    "idle",
+  );
   const [isSending, setIsSending] = useState(false);
   const [sendProgress, setSendProgress] = useState(0);
 
@@ -58,8 +66,12 @@ export default function WorkoutJournal() {
   const [editExerciseName, setEditExerciseName] = useState("");
   const [editExerciseNotes, setEditExerciseNotes] = useState("");
 
-  const [skippedExercises, setSkippedExercises] = useState<Set<number>>(new Set());
-  const [swappedExercises, setSwappedExercises] = useState<Map<number, any>>(new Map());
+  const [skippedExercises, setSkippedExercises] = useState<Set<number>>(
+    new Set(),
+  );
+  const [swappedExercises, setSwappedExercises] = useState<Map<number, any>>(
+    new Map(),
+  );
   const [deleteExerciseId, setDeleteExerciseId] = useState<number | null>(null);
 
   // Refs
@@ -69,8 +81,9 @@ export default function WorkoutJournal() {
   // Queries
   const { data: workout } = useQuery({
     queryKey: ["/api/workouts", workoutId],
-    queryFn: () => fetch(`/api/workouts/${workoutId}`).then(res => res.json()),
-    enabled: !!workoutId
+    queryFn: () =>
+      fetch(`/api/workouts/${workoutId}`).then((res) => res.json()),
+    enabled: !!workoutId,
   });
 
   // Calculate total workout volume (Force × Distance approximation)
@@ -79,7 +92,7 @@ export default function WorkoutJournal() {
       if (exercise.weight && exercise.sets) {
         // Approximate volume as weight × sets × reps (using average 10 reps if not specified)
         const reps = exercise.reps || 10;
-        return total + (exercise.weight * exercise.sets * reps);
+        return total + exercise.weight * exercise.sets * reps;
       }
       return total;
     }, 0);
@@ -87,48 +100,55 @@ export default function WorkoutJournal() {
 
   const { data: exercises = [] } = useQuery({
     queryKey: ["/api/workouts", workoutId, "exercises"],
-    queryFn: () => fetch(`/api/exercises?workoutId=${workoutId}`).then(res => res.json()),
-    enabled: !!workoutId
+    queryFn: () =>
+      fetch(`/api/exercises?workoutId=${workoutId}`).then((res) => res.json()),
+    enabled: !!workoutId,
   });
 
   const { data: activeProgram } = useQuery({
     queryKey: ["/api/programs/active", { userId: 1 }],
-    queryFn: () => fetch("/api/programs/active?userId=1").then(res => res.json()),
-    enabled: !workoutId
+    queryFn: () =>
+      fetch("/api/programs/active?userId=1").then((res) => res.json()),
+    enabled: !workoutId,
   });
 
   const { data: todaysWorkout } = useQuery({
     queryKey: ["/api/programs/active/today"],
-    queryFn: () => fetch("/api/programs/active/today?userId=1").then(res => res.json()),
-    enabled: !workoutId && !!activeProgram
+    queryFn: () =>
+      fetch("/api/programs/active/today?userId=1").then((res) => res.json()),
+    enabled: !workoutId && !!activeProgram,
   });
 
   const totalVolume = calculateWorkoutVolume(exercises as Exercise[]);
 
   // Mutations
   const createWorkoutMutation = useMutation({
-    mutationFn: async (data: { userId: number; name: string; aiGenerateName: boolean }) => {
+    mutationFn: async (data: {
+      userId: number;
+      name: string;
+      aiGenerateName: boolean;
+    }) => {
       const response = await fetch("/api/workouts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
-      if (!response.ok) throw new Error('Failed to create workout');
+      if (!response.ok) throw new Error("Failed to create workout");
       return response.json();
     },
     onSuccess: (newWorkout) => {
       // Navigate to the newly created workout
       setLocation(`/workout-journal/${newWorkout.id}`);
-    }
+    },
   });
 
   const completeWorkoutMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`/api/workouts/${workoutId}/complete`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
       });
-      if (!response.ok) throw new Error('Failed to complete workout');
+      if (!response.ok) throw new Error("Failed to complete workout");
       return response.json();
     },
     onSuccess: (data) => {
@@ -138,7 +158,7 @@ export default function WorkoutJournal() {
       }
       queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
       setLocation("/");
-    }
+    },
   });
 
   const updateExerciseMutation = useMutation({
@@ -146,46 +166,56 @@ export default function WorkoutJournal() {
       const response = await fetch(`/api/exercises/${data.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: data.name, notes: data.notes })
+        body: JSON.stringify({ name: data.name, notes: data.notes }),
       });
-      if (!response.ok) throw new Error('Failed to update exercise');
+      if (!response.ok) throw new Error("Failed to update exercise");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/workouts", workoutId, "exercises"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/workouts", workoutId, "exercises"],
+      });
       setEditingExercise(null);
       toast({ title: "Exercise updated successfully" });
-    }
+    },
   });
 
   const deleteExerciseMutation = useMutation({
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/exercises/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
-      if (!response.ok) throw new Error('Failed to delete exercise');
+      if (!response.ok) throw new Error("Failed to delete exercise");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/workouts", workoutId, "exercises"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/workouts", workoutId, "exercises"],
+      });
       toast({ title: "Exercise deleted successfully" });
-    }
+    },
   });
 
   const createExerciseFromProgramMutation = useMutation({
-    mutationFn: async (data: { workoutId: string; programmedExercise: any }) => {
+    mutationFn: async (data: {
+      workoutId: string;
+      programmedExercise: any;
+    }) => {
       const response = await fetch("/api/exercises/from-program", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
-      if (!response.ok) throw new Error('Failed to create exercise from program');
+      if (!response.ok)
+        throw new Error("Failed to create exercise from program");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/workouts", workoutId, "exercises"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/workouts", workoutId, "exercises"],
+      });
       toast({ title: "Exercise completed successfully" });
-    }
+    },
   });
 
   const swapExerciseMutation = useMutation({
@@ -193,14 +223,14 @@ export default function WorkoutJournal() {
       const response = await fetch("/api/exercises/swap", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
-      if (!response.ok) throw new Error('Failed to swap exercise');
+      if (!response.ok) throw new Error("Failed to swap exercise");
       return response.json();
     },
     onSuccess: (data, variables) => {
       toast({ title: "Exercise swapped successfully" });
-    }
+    },
   });
 
   // Handlers
@@ -210,9 +240,9 @@ export default function WorkoutJournal() {
       const workoutData = {
         userId: 1,
         name: workoutName || "Unnamed Workout",
-        aiGenerateName: aiGenerateName
+        aiGenerateName: aiGenerateName,
       };
-      
+
       const result = await createWorkoutMutation.mutateAsync(workoutData);
       setLocation(`/workout-journal/${result.id}`);
     } catch (error) {
@@ -224,7 +254,7 @@ export default function WorkoutJournal() {
     try {
       await createExerciseFromProgramMutation.mutateAsync({
         workoutId: workoutId!,
-        programmedExercise: programmedEx
+        programmedExercise: programmedEx,
       });
     } catch (error) {
       console.error("Failed to complete exercise:", error);
@@ -241,9 +271,9 @@ export default function WorkoutJournal() {
     try {
       const result = await swapExerciseMutation.mutateAsync({
         originalExercise: programmedEx,
-        reason: "User requested swap"
+        reason: "User requested swap",
       });
-      
+
       // Update the swapped exercises map
       const newSwappedExercises = new Map(swappedExercises);
       newSwappedExercises.set(index, result.swappedExercise);
@@ -266,12 +296,12 @@ export default function WorkoutJournal() {
   const handleUpdateExercise = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingExercise) return;
-    
+
     try {
       await updateExerciseMutation.mutateAsync({
         id: editingExercise.id,
         name: editExerciseName,
-        notes: editExerciseNotes
+        notes: editExerciseNotes,
       });
     } catch (error) {
       console.error("Failed to update exercise:", error);
@@ -294,31 +324,32 @@ export default function WorkoutJournal() {
   // Journal logic (simplified for this clean version)
   const handleSendThoughts = async () => {
     if (!currentInput.trim()) return;
-    
+
     setIsSending(true);
     setSendProgress(0);
-    
+
     try {
       const progressInterval = setInterval(() => {
-        setSendProgress(prev => Math.min(prev + 10, 90));
+        setSendProgress((prev) => Math.min(prev + 10, 90));
       }, 100);
 
       await fetch(`/api/workouts/${workoutId}/journal`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: currentInput })
+        body: JSON.stringify({ content: currentInput }),
       });
 
       clearInterval(progressInterval);
       setSendProgress(100);
-      
+
       setTimeout(() => {
         setCurrentInput("");
         setIsSending(false);
         setSendProgress(0);
-        queryClient.invalidateQueries({ queryKey: ["/api/workouts", workoutId, "exercises"] });
+        queryClient.invalidateQueries({
+          queryKey: ["/api/workouts", workoutId, "exercises"],
+        });
       }, 500);
-      
     } catch (error) {
       console.error("Failed to send thoughts:", error);
       setIsSending(false);
@@ -343,7 +374,7 @@ export default function WorkoutJournal() {
               </Button>
             </Link>
             <h1 className={styles.title}>
-              {workoutId ? (workout?.name || "Workout") : "New Workout"}
+              {workoutId ? workout?.name || "Workout" : "New Workout"}
             </h1>
           </div>
           {workoutId && totalVolume > 0 && (
@@ -360,16 +391,16 @@ export default function WorkoutJournal() {
       <main className={styles.main}>
         {!workoutId ? (
           // Create Workout Form
-          (<section className={styles.createWorkoutForm}>
+          <section className={styles.createWorkoutForm}>
             <form onSubmit={handleCreateWorkout}>
               <div className={styles.dateDisplay}>
                 <div className={styles.dateLabel}>Today's workout</div>
                 <div className={styles.dateValue}>
-                  {new Date().toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                  {new Date().toLocaleDateString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                   })}
                 </div>
               </div>
@@ -395,7 +426,10 @@ export default function WorkoutJournal() {
                   onChange={(e) => setAiGenerateName(e.target.checked)}
                 />
                 <div>
-                  <label htmlFor="aiGenerateName" className={styles.checkboxLabel}>
+                  <label
+                    htmlFor="aiGenerateName"
+                    className={styles.checkboxLabel}
+                  >
                     Have AI name it later
                   </label>
                   <div className={styles.checkboxDescription}>
@@ -404,161 +438,233 @@ export default function WorkoutJournal() {
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
-                style={{width: '100%'}}
-                disabled={createWorkoutMutation.isPending || (!workoutName && !aiGenerateName)}
+              <Button
+                type="submit"
+                style={{ width: "100%" }}
+                disabled={
+                  createWorkoutMutation.isPending ||
+                  (!workoutName && !aiGenerateName)
+                }
               >
-                {createWorkoutMutation.isPending ? "Creating..." : "Start Workout"}
+                {createWorkoutMutation.isPending
+                  ? "Creating..."
+                  : "Start Workout"}
               </Button>
             </form>
-          </section>)
+          </section>
         ) : (
           // Workout Journal
-          (<div>
+          <div>
             {/* Programmed Exercises */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Programmed Exercises</h2>
-              {(todaysWorkout?.workout?.exercises && todaysWorkout.workout.exercises.length > 0) ? (
+              {todaysWorkout?.workout?.exercises &&
+              todaysWorkout.workout.exercises.length > 0 ? (
                 <div className={styles.programmedExercises}>
-                  {todaysWorkout.workout.exercises.map((programmedEx: any, index: number) => {
-                    const currentExercise = swappedExercises.get(index) || programmedEx;
-                    const isSkipped = skippedExercises.has(index);
-                    
-                    return (
-                      <div 
-                        key={index} 
-                        className={isSkipped ? `${styles.programmedExerciseCard} ${styles.exerciseCardSkipped}` : styles.programmedExerciseCard}
-                      >
-                        <div className={styles.exerciseHeader}>
-                          <h3 className={isSkipped ? `${styles.exerciseName} ${styles.exerciseNameSkipped}` : styles.exerciseName}>
-                            {currentExercise.name}
-                          </h3>
-                          <div className={isSkipped ? `${styles.exerciseStats} ${styles.exerciseStatsSkipped}` : styles.exerciseStats}>
-                            <span>
-                              {currentExercise.sets} sets × {currentExercise.reps} reps
-                            </span>
-                            <span className={styles.exerciseRpe}>
-                              RPE {currentExercise.rpe}
-                            </span>
-                          </div>
-                          {currentExercise.muscleGroups && currentExercise.muscleGroups.length > 0 && (
-                            <div className={styles.muscleGroupsContainer}>
-                              {currentExercise.muscleGroups.map((muscle: string, idx: number) => (
-                                <Badge key={idx} variant="secondary" className="text-xs">
-                                  {muscle}
-                                </Badge>
-                              ))}
+                  {todaysWorkout.workout.exercises.map(
+                    (programmedEx: any, index: number) => {
+                      const currentExercise =
+                        swappedExercises.get(index) || programmedEx;
+                      const isSkipped = skippedExercises.has(index);
+
+                      return (
+                        <div
+                          key={index}
+                          className={
+                            isSkipped
+                              ? `${styles.programmedExerciseCard} ${styles.exerciseCardSkipped}`
+                              : styles.programmedExerciseCard
+                          }
+                        >
+                          <div className={styles.exerciseHeader}>
+                            <h3
+                              className={
+                                isSkipped
+                                  ? `${styles.exerciseName} ${styles.exerciseNameSkipped}`
+                                  : styles.exerciseName
+                              }
+                            >
+                              {currentExercise.name}
+                            </h3>
+                            <div
+                              className={
+                                isSkipped
+                                  ? `${styles.exerciseStats} ${styles.exerciseStatsSkipped}`
+                                  : styles.exerciseStats
+                              }
+                            >
+                              <span>
+                                {currentExercise.sets} sets ×{" "}
+                                {currentExercise.reps} reps
+                              </span>
+                              <span className={styles.exerciseRpe}>
+                                RPE {currentExercise.rpe}
+                              </span>
                             </div>
-                          )}
+                            {currentExercise.muscleGroups &&
+                              currentExercise.muscleGroups.length > 0 && (
+                                <div className={styles.muscleGroupsContainer}>
+                                  {currentExercise.muscleGroups.map(
+                                    (muscle: string, idx: number) => (
+                                      <Badge
+                                        key={idx}
+                                        variant="secondary"
+                                        className="text-xs"
+                                      >
+                                        {muscle}
+                                      </Badge>
+                                    ),
+                                  )}
+                                </div>
+                              )}
+                          </div>
+
+                          {/* 2x2 Action Buttons */}
+                          <div className="grid grid-cols-2 gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
+                              disabled={isSkipped}
+                              onClick={() =>
+                                handleExactCompletion(currentExercise, index)
+                              }
+                            >
+                              ✅ As Prescribed
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
+                              disabled={isSkipped}
+                              onClick={() =>
+                                handleModifiedCompletion(currentExercise, index)
+                              }
+                            >
+                              📝 With Changes
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
+                              disabled={isSkipped}
+                              onClick={() =>
+                                handleSwapExercise(currentExercise, index)
+                              }
+                            >
+                              🔄 Swap Exercise
+                            </Button>
+                            <Button
+                              variant={isSkipped ? "secondary" : "outline"}
+                              size="sm"
+                              className="text-xs"
+                              onClick={() => handleSkipExercise(index)}
+                            >
+                              {isSkipped ? "↩️ Unskip" : "⏭️ Skip Today"}
+                            </Button>
+                          </div>
                         </div>
-                        
-                        {/* 2x2 Action Buttons */}
-                        <div className="grid grid-cols-2 gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={isSkipped}
-                            onClick={() => handleExactCompletion(currentExercise, index)}
-                          >
-                            ✅ As Prescribed
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={isSkipped}
-                            onClick={() => handleModifiedCompletion(currentExercise, index)}
-                          >
-                            📝 With Changes
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={isSkipped}
-                            onClick={() => handleSwapExercise(currentExercise, index)}
-                          >
-                            🔄 Swap Exercise
-                          </Button>
-                          <Button
-                            variant={isSkipped ? "secondary" : "outline"}
-                            size="sm"
-                            className="text-xs"
-                            onClick={() => handleSkipExercise(index)}
-                          >
-                            {isSkipped ? '↩️ Unskip' : '⏭️ Skip Today'}
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    },
+                  )}
                 </div>
               ) : (
                 <div className={styles.programmedExercises}>
                   {[
                     { name: "Push-ups", sets: 3, reps: 12, rpe: 7 },
                     { name: "Squats", sets: 4, reps: 15, rpe: 6 },
-                    { name: "Pull-ups", sets: 3, reps: 8, rpe: 8 }
+                    { name: "Pull-ups", sets: 3, reps: 8, rpe: 8 },
                   ].map((programmedEx, index) => {
-                    const currentExercise = swappedExercises.get(index) || programmedEx;
+                    const currentExercise =
+                      swappedExercises.get(index) || programmedEx;
                     const isSkipped = skippedExercises.has(index);
-                    
+
                     return (
-                      <div 
-                        key={index} 
-                        className={isSkipped ? `${styles.programmedExerciseCard} ${styles.exerciseCardSkipped}` : styles.programmedExerciseCard}
+                      <div
+                        key={index}
+                        className={
+                          isSkipped
+                            ? `${styles.programmedExerciseCard} ${styles.exerciseCardSkipped}`
+                            : styles.programmedExerciseCard
+                        }
                       >
                         <div className="mb-3">
-                          <h3 className={`font-semibold text-base mb-1 ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
+                          <h3
+                            className={`font-semibold text-base mb-1 ${isSkipped ? "text-gray-500" : "text-blue-900"}`}
+                          >
                             {currentExercise.name}
                           </h3>
                           <div className={styles.exerciseStatsContainer}>
-                            <span className={isSkipped ? styles.exerciseStatsTextSkipped : styles.exerciseStatsText}>
-                              {currentExercise.sets} sets × {currentExercise.reps} reps
+                            <span
+                              className={
+                                isSkipped
+                                  ? styles.exerciseStatsTextSkipped
+                                  : styles.exerciseStatsText
+                              }
+                            >
+                              {currentExercise.sets} sets ×{" "}
+                              {currentExercise.reps} reps
                             </span>
-                            <span className={isSkipped ? styles.exerciseRpeTextSkipped : styles.exerciseRpeText}>
+                            <span
+                              className={
+                                isSkipped
+                                  ? styles.exerciseRpeTextSkipped
+                                  : styles.exerciseRpeText
+                              }
+                            >
                               RPE {currentExercise.rpe}
                             </span>
                           </div>
-                          {currentExercise.muscleGroups && currentExercise.muscleGroups.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                              {currentExercise.muscleGroups.map((muscle: string, idx: number) => (
-                                <Badge key={idx} variant="secondary" className="text-xs">
-                                  {muscle}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
+                          {currentExercise.muscleGroups &&
+                            currentExercise.muscleGroups.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {currentExercise.muscleGroups.map(
+                                  (muscle: string, idx: number) => (
+                                    <Badge
+                                      key={idx}
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
+                                      {muscle}
+                                    </Badge>
+                                  ),
+                                )}
+                              </div>
+                            )}
                         </div>
-                        
+
                         {/* 2x2 Action Buttons */}
                         <div className={styles.actionButtons}>
                           <Button
                             variant="secondary"
                             size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
                             disabled={isSkipped}
-                            onClick={() => handleExactCompletion(currentExercise, index)}
+                            onClick={() =>
+                              handleExactCompletion(currentExercise, index)
+                            }
                           >
                             ✅ As Prescribed
                           </Button>
                           <Button
                             variant="secondary"
                             size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
                             disabled={isSkipped}
-                            onClick={() => handleModifiedCompletion(currentExercise, index)}
+                            onClick={() =>
+                              handleModifiedCompletion(currentExercise, index)
+                            }
                           >
                             📝 With Changes
                           </Button>
                           <Button
                             variant="secondary"
                             size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
                             disabled={isSkipped}
-                            onClick={() => handleSwapExercise(currentExercise, index)}
+                            onClick={() =>
+                              handleSwapExercise(currentExercise, index)
+                            }
                           >
                             🔄 Swap Exercise
                           </Button>
@@ -568,7 +674,7 @@ export default function WorkoutJournal() {
                             className="text-xs"
                             onClick={() => handleSkipExercise(index)}
                           >
-                            {isSkipped ? '↩️ Unskip' : '⏭️ Skip Today'}
+                            {isSkipped ? "↩️ Unskip" : "⏭️ Skip Today"}
                           </Button>
                         </div>
                       </div>
@@ -590,8 +696,8 @@ export default function WorkoutJournal() {
                 <div className="border-t border-gray-200 p-3">
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-500">
-                      {saveStatus === 'typing' && "Typing..."}
-                      {saveStatus === 'saved' && "✓ Saved!"}
+                      {saveStatus === "typing" && "Typing..."}
+                      {saveStatus === "saved" && "✓ Saved!"}
                     </div>
                     <Button
                       onClick={handleSendThoughts}
@@ -605,7 +711,7 @@ export default function WorkoutJournal() {
                   {isSending && (
                     <div className="mt-2">
                       <div className="bg-gray-200 rounded-full h-1">
-                        <div 
+                        <div
                           className="bg-blue-500 h-1 rounded-full transition-all duration-300"
                           style={{ width: `${sendProgress}%` }}
                         />
@@ -620,10 +726,15 @@ export default function WorkoutJournal() {
               <h2 className={styles.sectionTitle}>Completed Exercises</h2>
               <div className="_completedExercises_eqdug_250 pl-[0px] pr-[0px] pt-[0px] pb-[0px]">
                 {exercises.map((exercise: Exercise) => (
-                  <div key={exercise.id} className={styles.completedExerciseCard}>
+                  <div
+                    key={exercise.id}
+                    className={styles.completedExerciseCard}
+                  >
                     <div className={styles.completedExerciseHeader}>
                       <div className={styles.completedExerciseInfo}>
-                        <h3 className={styles.completedExerciseTitle}>{exercise.name}</h3>
+                        <h3 className={styles.completedExerciseTitle}>
+                          {exercise.name}
+                        </h3>
                       </div>
                       <div className={styles.completedExerciseActions}>
                         <Button
@@ -644,15 +755,20 @@ export default function WorkoutJournal() {
                     </div>
 
                     {/* Muscle Groups outside the header */}
-                    {exercise.muscleGroups && exercise.muscleGroups.length > 0 && (
-                      <div className={styles.completedMuscleGroups}>
-                        {exercise.muscleGroups.map((muscle, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {muscle}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
+                    {exercise.muscleGroups &&
+                      exercise.muscleGroups.length > 0 && (
+                        <div className={styles.completedMuscleGroups}>
+                          {exercise.muscleGroups.map((muscle, index) => (
+                            <Badge
+                              key={index}
+                              variant="secondary"
+                              className="text-xs"
+                            >
+                              {muscle}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
 
                     {/* Compact Exercise Stats */}
                     <div className={styles.completedExerciseStats}>
@@ -674,7 +790,11 @@ export default function WorkoutJournal() {
                         )}
                         {exercise.weight && exercise.sets && (
                           <span className={styles.completedVolumeText}>
-                            Vol: {exercise.weight * exercise.sets * (exercise.reps || 10)} lbs
+                            Vol:{" "}
+                            {exercise.weight *
+                              exercise.sets *
+                              (exercise.reps || 10)}{" "}
+                            lbs
                           </span>
                         )}
                       </div>
@@ -683,49 +803,13 @@ export default function WorkoutJournal() {
                     {exercise.notes && (
                       <div className={styles.exerciseNotesContainer}>
                         <div className={styles.exerciseNotesLabel}>Notes:</div>
-                        <p className={styles.exerciseNotesText}>{exercise.notes}</p>
+                        <p className={styles.exerciseNotesText}>
+                          {exercise.notes}
+                        </p>
                       </div>
                     )}
                   </div>
                 ))}
-              </div>
-            </section>
-            {/* Journal Input */}
-            <section className="px-4">
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <Textarea
-                  ref={inputRef}
-                  value={currentInput}
-                  onChange={(e) => setCurrentInput(e.target.value)}
-                  placeholder="How's your workout going? Log exercises, sets, reps, or just your thoughts..."
-                  className="border-0 resize-none min-h-[120px]"
-                />
-                <div className="border-t border-gray-200 p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-500">
-                      {saveStatus === 'typing' && "Typing..."}
-                      {saveStatus === 'saved' && "✓ Saved!"}
-                    </div>
-                    <Button
-                      onClick={handleSendThoughts}
-                      disabled={!currentInput.trim() || isSending}
-                      size="sm"
-                    >
-                      <Send className="h-4 w-4 mr-2" />
-                      Send to AI
-                    </Button>
-                  </div>
-                  {isSending && (
-                    <div className="mt-2">
-                      <div className="bg-gray-200 rounded-full h-1">
-                        <div 
-                          className="bg-blue-500 h-1 rounded-full transition-all duration-300"
-                          style={{ width: `${sendProgress}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
               </div>
             </section>
             {/* Complete Workout Button */}
@@ -738,7 +822,7 @@ export default function WorkoutJournal() {
                 Complete Workout
               </Button>
             </section>
-          </div>)
+          </div>
         )}
       </main>
       {/* Complete Workout Dialog */}
@@ -747,21 +831,27 @@ export default function WorkoutJournal() {
           <DialogHeader>
             <DialogTitle>Complete Workout</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <p className="text-gray-600">
-              Are you ready to finish this workout? AI will analyze your session and provide insights.
+              Are you ready to finish this workout? AI will analyze your session
+              and provide insights.
             </p>
-            
+
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center space-x-3 mb-2">
                 <Target className="h-5 w-5 text-green-500" />
-                <span className="font-medium">{exercises.length} exercises logged</span>
+                <span className="font-medium">
+                  {exercises.length} exercises logged
+                </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Clock className="h-5 w-5 text-blue-500" />
                 <span className="text-sm text-gray-600">
-                  Started {workout?.createdAt ? new Date(workout.createdAt).toLocaleTimeString() : 'today'}
+                  Started{" "}
+                  {workout?.createdAt
+                    ? new Date(workout.createdAt).toLocaleTimeString()
+                    : "today"}
                 </span>
               </div>
             </div>
@@ -793,16 +883,22 @@ export default function WorkoutJournal() {
         </DialogContent>
       </Dialog>
       {/* Exercise Edit Dialog */}
-      <Dialog open={!!editingExercise} onOpenChange={() => setEditingExercise(null)}>
+      <Dialog
+        open={!!editingExercise}
+        onOpenChange={() => setEditingExercise(null)}
+      >
         <DialogContent className="w-[95vw] max-w-md">
           <DialogHeader>
             <DialogTitle>Edit Exercise</DialogTitle>
           </DialogHeader>
-          
+
           {editingExercise && (
             <form onSubmit={handleUpdateExercise} className="space-y-4">
               <div>
-                <label htmlFor="exerciseName" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="exerciseName"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Exercise Name
                 </label>
                 <Input
@@ -814,7 +910,10 @@ export default function WorkoutJournal() {
               </div>
 
               <div>
-                <label htmlFor="exerciseNotes" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="exerciseNotes"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Notes
                 </label>
                 <Textarea
@@ -854,17 +953,21 @@ export default function WorkoutJournal() {
             type: currentAchievement.type,
             title: currentAchievement.title,
             description: currentAchievement.description || "Great achievement!",
-            data: currentAchievement.data
+            data: currentAchievement.data,
           }}
         />
       )}
       {/* Delete Confirmation Modal */}
-      <Dialog open={!!deleteExerciseId} onOpenChange={() => setDeleteExerciseId(null)}>
+      <Dialog
+        open={!!deleteExerciseId}
+        onOpenChange={() => setDeleteExerciseId(null)}
+      >
         <DialogContent className="w-[95vw] max-w-md">
           <DialogHeader>
             <DialogTitle>Delete Exercise</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this exercise? This action cannot be undone.
+              Are you sure you want to delete this exercise? This action cannot
+              be undone.
             </DialogDescription>
           </DialogHeader>
           <div className="flex space-x-2 mt-4">
