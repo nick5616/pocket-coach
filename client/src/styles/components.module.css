@@ -44,13 +44,13 @@
 }
 
 .buttonSecondary {
-  background-color: #f8fafc;
-  color: #1e293b;
-  border: 1px solid #e2e8f0;
+  background-color: #64748b;
+  color: #ffffff;
+  border: 1px solid #64748b;
 }
 
 .buttonSecondary:hover {
-  background-color: #f1f5f9;
+  background-color: #64748b;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -221,6 +221,16 @@
 }
 
 @media (prefers-color-scheme: dark) {
+  .buttonSecondary {
+    background-color: #475569;
+    color: #ffffff;
+    border: 1px solid #475569;
+  }
+
+  .buttonSecondary:hover {
+    background-color: #475569;
+  }
+
   .badgeSecondary {
     background-color: #1e293b;
     color: #f8fafc;

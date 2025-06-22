@@ -534,9 +534,9 @@ export default function WorkoutJournal() {
                         </div>
                         
                         {/* 2x2 Action Buttons */}
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className={styles.actionButtons}>
                           <Button
-                            variant="outline"
+                            variant="secondary"
                             size="sm"
                             className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
@@ -545,7 +545,7 @@ export default function WorkoutJournal() {
                             ✅ As Prescribed
                           </Button>
                           <Button
-                            variant="outline"
+                            variant="secondary"
                             size="sm"
                             className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
@@ -554,7 +554,7 @@ export default function WorkoutJournal() {
                             📝 With Changes
                           </Button>
                           <Button
-                            variant="outline"
+                            variant="secondary"
                             size="sm"
                             className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
@@ -563,7 +563,7 @@ export default function WorkoutJournal() {
                             🔄 Swap Exercise
                           </Button>
                           <Button
-                            variant={isSkipped ? "secondary" : "outline"}
+                            variant="secondary"
                             size="sm"
                             className="text-xs"
                             onClick={() => handleSkipExercise(index)}
