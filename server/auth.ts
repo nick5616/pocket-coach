@@ -22,8 +22,9 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: 'auto', // Let express-session handle HTTPS detection automatically
       maxAge: sessionTtl,
+      sameSite: 'lax',
     },
   });
 }
@@ -83,6 +84,10 @@ export async function setupAuth(app: Express) {
 
   // Auth routes
   app.post('/api/login', passport.authenticate('local'), (req, res) => {
+    console.log("Login successful - user:", req.user);
+    console.log("Login successful - session ID:", req.sessionID);
+    console.log("Login successful - session:", req.session);
+    console.log("Login successful - isAuthenticated:", req.isAuthenticated());
     res.json({ user: req.user });
   });
 
@@ -145,7 +150,12 @@ export async function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = (req, res, next) => {
+  console.log("Auth check - isAuthenticated:", req.isAuthenticated());
+  console.log("Auth check - session:", req.session);
+  console.log("Auth check - user:", req.user);
+  
   if (!req.isAuthenticated()) {
+    console.log("Authentication failed - returning 401");
     return res.status(401).json({ message: "Unauthorized" });
   }
   next();
