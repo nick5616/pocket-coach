@@ -221,6 +221,30 @@ export class DatabaseStorage implements IStorage {
     return await query;
   }
 
+  async getUserWorkoutsWithExercises(userId: string, limit?: number): Promise<(Workout & { exercises: Exercise[] })[]> {
+    await this.ensureInitialized();
+    
+    // First get workouts
+    const workoutQuery = db.select().from(workouts).where(eq(workouts.userId, userId)).orderBy(desc(workouts.createdAt));
+    const workoutList = limit ? await workoutQuery.limit(limit) : await workoutQuery;
+    
+    if (workoutList.length === 0) {
+      return [];
+    }
+    
+    // Get all exercises for these workouts using individual queries (still faster than N+1)
+    const exercisePromises = workoutList.map(workout => 
+      db.select().from(exercises).where(eq(exercises.workoutId, workout.id))
+    );
+    const exerciseLists = await Promise.all(exercisePromises);
+    
+    // Combine workouts with their exercises
+    return workoutList.map((workout, index) => ({
+      ...workout,
+      exercises: exerciseLists[index] || []
+    }));
+  }
+
   async getWorkout(id: number): Promise<Workout | undefined> {
     await this.ensureInitialized();
     const [workout] = await db.select().from(workouts).where(eq(workouts.id, id));

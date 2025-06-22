@@ -42,7 +42,7 @@ export default function Progress() {
     queryFn: () => fetch(`/api/workouts?userId=${userId}`).then(res => res.json()),
   });
 
-  const { data: goals = [] } = useQuery<Goal[]>({
+  const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
     queryKey: ["/api/goals", { userId }],
     queryFn: () => fetch(`/api/goals?userId=${userId}`).then(res => res.json()),
   });
@@ -92,7 +92,10 @@ export default function Progress() {
     return `${days} days ago`;
   };
 
-  if (workoutsLoading) {
+  // Show loading screen if any essential data is still loading
+  const isLoading = workoutsLoading || goalsLoading || progressLoading;
+
+  if (isLoading) {
     return <LoadingScreen message="Analyzing your progress data..." />;
   }
 
