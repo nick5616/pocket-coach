@@ -9,35 +9,42 @@ import BottomNavigation from "@/components/bottom-navigation";
 import WorkoutCard from "@/components/workout-card";
 import { Search, Filter, Plus, Calendar, Clock } from "lucide-react";
 import type { Workout } from "@shared/schema";
+import LoadingScreen from "@/components/loading-screen";
 
 export default function Workouts() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState<"all" | "completed" | "in-progress">("all");
+  const [selectedFilter, setSelectedFilter] = useState<
+    "all" | "completed" | "in-progress"
+  >("all");
   const userId = 1; // Demo user
 
   const { data: workouts = [], isLoading } = useQuery<Workout[]>({
     queryKey: ["/api/workouts", { userId }],
-    queryFn: () => fetch(`/api/workouts?userId=${userId}`).then(res => res.json()),
+    queryFn: () =>
+      fetch(`/api/workouts?userId=${userId}`).then((res) => res.json()),
   });
 
-  const filteredWorkouts = workouts.filter(workout => {
-    const matchesSearch = workout.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (workout.notes && workout.notes.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesFilter = selectedFilter === "all" || 
-                         (selectedFilter === "completed" && workout.isCompleted) ||
-                         (selectedFilter === "in-progress" && !workout.isCompleted);
-    
+  const filteredWorkouts = workouts.filter((workout) => {
+    const matchesSearch =
+      workout.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (workout.notes &&
+        workout.notes.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchesFilter =
+      selectedFilter === "all" ||
+      (selectedFilter === "completed" && workout.isCompleted) ||
+      (selectedFilter === "in-progress" && !workout.isCompleted);
+
     return matchesSearch && matchesFilter;
   });
 
-  const completedWorkouts = workouts.filter(w => w.isCompleted);
-  const inProgressWorkouts = workouts.filter(w => !w.isCompleted);
+  const completedWorkouts = workouts.filter((w) => w.isCompleted);
+  const inProgressWorkouts = workouts.filter((w) => !w.isCompleted);
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading workouts...</div>
+        <LoadingScreen message="Loading your workouts..." />
       </div>
     );
   }
@@ -66,19 +73,25 @@ export default function Workouts() {
           <div className="grid grid-cols-3 gap-4">
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600">{workouts.length}</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {workouts.length}
+                </div>
                 <div className="text-sm text-gray-600">Total</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-600">{completedWorkouts.length}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {completedWorkouts.length}
+                </div>
                 <div className="text-sm text-gray-600">Completed</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-orange-600">{inProgressWorkouts.length}</div>
+                <div className="text-2xl font-bold text-orange-600">
+                  {inProgressWorkouts.length}
+                </div>
                 <div className="text-sm text-gray-600">In Progress</div>
               </CardContent>
             </Card>
@@ -98,24 +111,26 @@ export default function Workouts() {
                 className="pl-10"
               />
             </div>
-            
+
             <div className="grid grid-cols-3 gap-2">
-              <Button 
+              <Button
                 variant={selectedFilter === "all" ? "primary" : "outline"}
                 onClick={() => setSelectedFilter("all")}
                 size="sm"
               >
                 All ({workouts.length})
               </Button>
-              <Button 
+              <Button
                 variant={selectedFilter === "completed" ? "primary" : "outline"}
                 onClick={() => setSelectedFilter("completed")}
                 size="sm"
               >
                 Done ({completedWorkouts.length})
               </Button>
-              <Button 
-                variant={selectedFilter === "in-progress" ? "primary" : "outline"}
+              <Button
+                variant={
+                  selectedFilter === "in-progress" ? "primary" : "outline"
+                }
                 onClick={() => setSelectedFilter("in-progress")}
                 size="sm"
               >
@@ -143,12 +158,13 @@ export default function Workouts() {
           ) : (
             <div className="text-center py-12">
               <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No workouts found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No workouts found
+              </h3>
               <p className="text-gray-600 mb-6">
-                {searchTerm || selectedFilter !== "all" 
+                {searchTerm || selectedFilter !== "all"
                   ? "Try adjusting your search or filters"
-                  : "Start your fitness journey by creating your first workout"
-                }
+                  : "Start your fitness journey by creating your first workout"}
               </p>
               {!searchTerm && selectedFilter === "all" && (
                 <Link href="/workout-journal">
