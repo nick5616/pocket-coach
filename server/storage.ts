@@ -19,13 +19,13 @@ export interface IStorage {
   updateUserStreak(userId: string, streak: number): Promise<void>;
 
   // Goals
-  getUserGoals(userId: number): Promise<Goal[]>;
+  getUserGoals(userId: string): Promise<Goal[]>;
   createGoal(goal: InsertGoal): Promise<Goal>;
   updateGoal(id: number, updates: Partial<Goal>): Promise<Goal | undefined>;
   deleteGoal(id: number): Promise<boolean>;
 
   // Workouts
-  getUserWorkouts(userId: number, limit?: number): Promise<Workout[]>;
+  getUserWorkouts(userId: string, limit?: number): Promise<Workout[]>;
   getWorkout(id: number): Promise<Workout | undefined>;
   createWorkout(workout: InsertWorkout): Promise<Workout>;
   updateWorkout(id: number, updates: Partial<Workout>): Promise<Workout | undefined>;
@@ -38,13 +38,13 @@ export interface IStorage {
   deleteExercise(id: number): Promise<boolean>;
 
   // Programs
-  getUserPrograms(userId: number): Promise<Program[]>;
-  getActiveProgram(userId: number): Promise<Program | undefined>;
+  getUserPrograms(userId: string): Promise<Program[]>;
+  getActiveProgram(userId: string): Promise<Program | undefined>;
   createProgram(program: InsertProgram): Promise<Program>;
   updateProgram(id: number, updates: Partial<Program>): Promise<Program | undefined>;
 
   // Achievements
-  getUserAchievements(userId: number): Promise<Achievement[]>;
+  getUserAchievements(userId: string): Promise<Achievement[]>;
   createAchievement(achievement: InsertAchievement): Promise<Achievement>;
   markAchievementViewed(id: number): Promise<void>;
 
@@ -56,7 +56,7 @@ export interface IStorage {
   // Exercise Muscle Mapping
   getExerciseMuscleMapping(exerciseName: string): Promise<ExerciseMuscleMapping[]>;
   createExerciseMuscleMapping(mapping: InsertExerciseMuscleMapping): Promise<ExerciseMuscleMapping>;
-  getMuscleGroupProgress(userId: number, muscleGroupId: number): Promise<{
+  getMuscleGroupProgress(userId: string, muscleGroupId: number): Promise<{
     frequency: number;
     volume: number;
     lastWorked: Date | null;
@@ -142,32 +142,36 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Users
-  async getUser(id: number): Promise<User | undefined> {
+  // Users - Updated for Replit Auth
+  async getUser(id: string): Promise<User | undefined> {
     await this.ensureInitialized();
     const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    await this.ensureInitialized();
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    await this.ensureInitialized();
-    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
-  async updateUserStreak(userId: number, streak: number): Promise<void> {
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    await this.ensureInitialized();
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  async updateUserStreak(userId: string, streak: number): Promise<void> {
     await this.ensureInitialized();
     await db.update(users).set({ currentStreak: streak }).where(eq(users.id, userId));
   }
 
   // Goals
-  async getUserGoals(userId: number): Promise<Goal[]> {
+  async getUserGoals(userId: string): Promise<Goal[]> {
     await this.ensureInitialized();
     return await db.select().from(goals).where(eq(goals.userId, userId));
   }
@@ -191,7 +195,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Workouts
-  async getUserWorkouts(userId: number, limit?: number): Promise<Workout[]> {
+  async getUserWorkouts(userId: string, limit?: number): Promise<Workout[]> {
     await this.ensureInitialized();
     const query = db.select().from(workouts).where(eq(workouts.userId, userId)).orderBy(desc(workouts.createdAt));
     if (limit) {
@@ -252,12 +256,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Programs
-  async getUserPrograms(userId: number): Promise<Program[]> {
+  async getUserPrograms(userId: string): Promise<Program[]> {
     await this.ensureInitialized();
     return await db.select().from(programs).where(eq(programs.userId, userId)).orderBy(desc(programs.createdAt));
   }
 
-  async getActiveProgram(userId: number): Promise<Program | undefined> {
+  async getActiveProgram(userId: string): Promise<Program | undefined> {
     await this.ensureInitialized();
     const [program] = await db.select().from(programs)
       .where(and(eq(programs.userId, userId), eq(programs.isActive, true)));
