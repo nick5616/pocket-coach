@@ -270,8 +270,8 @@
 
 /* Tap Prompt */
 .tapPrompt {
-  position: absolute;
-  bottom: 1rem;
+  position: fixed;
+  bottom: 2vh;
   left: 50%;
   transform: translateX(-50%);
   opacity: 0;
