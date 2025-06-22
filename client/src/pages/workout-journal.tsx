@@ -15,7 +15,7 @@ import {
   Dumbbell,
   Hash,
   Weight,
-  MoreVertical
+
 } from "lucide-react";
 import { Link, useParams, useLocation } from "wouter";
 
@@ -56,7 +56,7 @@ export default function WorkoutJournal() {
   const [aiGenerateName, setAiGenerateName] = useState(false);
   const [editExerciseName, setEditExerciseName] = useState("");
   const [editExerciseNotes, setEditExerciseNotes] = useState("");
-  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+
   const [skippedExercises, setSkippedExercises] = useState<Set<number>>(new Set());
   const [swappedExercises, setSwappedExercises] = useState<Map<number, any>>(new Map());
 
@@ -425,89 +425,77 @@ export default function WorkoutJournal() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Programmed Exercises</h2>
               {(todaysWorkout?.workout?.exercises && todaysWorkout.workout.exercises.length > 0) ? (
                 <div className="space-y-3">
-                  {todaysWorkout.workout.exercises.map((programmedEx: any, index: number) => (
-                    <div key={index} className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                      <div className="flex items-start justify-between mb-3">
-                        <div 
-                          className="flex-1 cursor-pointer"
-                          onClick={() => {
-                            const exerciseText = `${programmedEx.name} - ${programmedEx.sets} sets × ${programmedEx.reps} reps @ RPE: `;
-                            setCurrentInput(exerciseText);
-                            inputRef.current?.focus();
-                          }}
-                        >
-                          <h3 className="font-semibold text-blue-900">{programmedEx.name}</h3>
-                          <div className="grid grid-cols-3 gap-2 mt-2 text-sm text-blue-700">
-                            <span>{programmedEx.sets} sets</span>
-                            <span>{programmedEx.reps} reps</span>
-                            <span>RPE {programmedEx.rpe}</span>
+                  {todaysWorkout.workout.exercises.map((programmedEx: any, index: number) => {
+                    const currentExercise = swappedExercises.get(index) || programmedEx;
+                    const isSkipped = skippedExercises.has(index);
+                    
+                    return (
+                      <div 
+                        key={index} 
+                        className={`rounded-lg p-4 border transition-all duration-200 ${
+                          isSkipped 
+                            ? 'bg-gray-100 border-gray-300 opacity-60' 
+                            : 'bg-blue-50 border-blue-200'
+                        }`}
+                      >
+                        <div className="mb-3">
+                          <h3 className={`font-semibold ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
+                            {currentExercise.name}
+                          </h3>
+                          <div className="grid grid-cols-3 gap-2 mt-2 text-sm">
+                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
+                              {currentExercise.sets} sets
+                            </span>
+                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
+                              {currentExercise.reps} reps
+                            </span>
+                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
+                              RPE {currentExercise.rpe}
+                            </span>
                           </div>
                         </div>
                         
-                        {/* Action Buttons */}
-                        <div className="relative">
+                        {/* Direct Action Buttons */}
+                        <div className="grid grid-cols-2 gap-2">
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
-                            className="text-blue-600 hover:text-blue-800"
-                            onClick={() => setOpenDropdown(openDropdown === index ? null : index)}
+                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={isSkipped}
+                            onClick={() => handleExactCompletion(currentExercise, index)}
                           >
-                            <MoreVertical className="h-4 w-4" />
+                            ✅ Exact
                           </Button>
-                          
-                          {/* Action Menu */}
-                          {openDropdown === index && (
-                            <div className="absolute right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-48">
-                              <button 
-                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 border-b"
-                                onClick={() => {
-                                  const exerciseText = `${programmedEx.name} - ${programmedEx.sets} sets × ${programmedEx.reps} reps @ RPE ${programmedEx.rpe} - Completed as planned`;
-                                  setCurrentInput(exerciseText);
-                                  inputRef.current?.focus();
-                                  setOpenDropdown(null);
-                                }}
-                              >
-                                ✅ I did this exactly
-                              </button>
-                              <button 
-                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 border-b"
-                                onClick={() => {
-                                  const exerciseText = `${programmedEx.name} - ${programmedEx.sets} sets × ${programmedEx.reps} reps @ RPE: - Modified: `;
-                                  setCurrentInput(exerciseText);
-                                  inputRef.current?.focus();
-                                  setOpenDropdown(null);
-                                }}
-                              >
-                                📝 I did this, but...
-                              </button>
-                              <button 
-                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 border-b"
-                                onClick={() => {
-                                  const exerciseText = `Swapped ${programmedEx.name} for: `;
-                                  setCurrentInput(exerciseText);
-                                  inputRef.current?.focus();
-                                  setOpenDropdown(null);
-                                }}
-                              >
-                                🔄 Swap exercise
-                              </button>
-                              <button 
-                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-                                onClick={() => {
-                                  const exerciseText = `Skipped ${programmedEx.name} - Reason: `;
-                                  setCurrentInput(exerciseText);
-                                  inputRef.current?.focus();
-                                  setOpenDropdown(null);
-                                }}
-                              >
-                                ⏭️ Skip
-                              </button>
-                            </div>
-                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={isSkipped}
+                            onClick={() => handleModifiedCompletion(currentExercise, index)}
+                          >
+                            📝 Modified
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={isSkipped}
+                            onClick={() => handleSwapExercise(currentExercise, index)}
+                          >
+                            🔄 Swap
+                          </Button>
+                          <Button
+                            variant={isSkipped ? "secondary" : "outline"}
+                            size="sm"
+                            className="text-xs"
+                            onClick={() => handleSkipExercise(index)}
+                          >
+                            {isSkipped ? '↩️ Unskip' : '⏭️ Skip'}
+                          </Button>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="space-y-3">
