@@ -434,6 +434,10 @@
   .dialogTitle {
     color: #f9fafb;
   }
+  
+  .dialogDescription {
+    color: #9ca3af;
+  }
 }
 
 /* Checkbox Component */

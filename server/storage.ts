@@ -215,7 +215,7 @@ export class DatabaseStorage implements IStorage {
   async completeWorkout(id: number, analysis: any): Promise<Workout | undefined> {
     await this.ensureInitialized();
     const [workout] = await db.update(workouts)
-      .set({ status: "completed", analysis, completedAt: new Date() })
+      .set({ aiAnalysis: analysis, isCompleted: true, completedAt: new Date() })
       .where(eq(workouts.id, id))
       .returning();
     return workout || undefined;

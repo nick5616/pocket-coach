@@ -1,8 +1,4 @@
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { openai } from "./openai";
 
 export interface ExerciseSwapRequest {
   name: string;
@@ -27,58 +23,37 @@ export async function swapExerciseForEquivalent(
   originalExercise: ExerciseSwapRequest,
   reason?: string
 ): Promise<SwappedExercise> {
-  if (!process.env.OPENAI_API_KEY) {
-    // Fallback exercise swap without AI
-    return {
-      name: `Modified ${originalExercise.name}`,
-      sets: originalExercise.sets,
-      reps: originalExercise.reps,
-      weight: originalExercise.weight,
-      rpe: originalExercise.rpe,
-      reason: reason || "Equipment not available",
-      muscleGroups: originalExercise.muscleGroups || [],
-    };
-  }
-
   try {
-    const prompt = `You are a fitness expert. I need to swap this exercise for an equivalent alternative:
+    const prompt = `You are a fitness expert helping to swap an exercise for an equivalent alternative.
 
-Original Exercise: ${originalExercise.name}
-Sets: ${originalExercise.sets}
-Reps: ${originalExercise.reps}
-${originalExercise.weight ? `Weight: ${originalExercise.weight}lbs` : ''}
-${originalExercise.rpe ? `RPE: ${originalExercise.rpe}` : ''}
-Target Muscle Groups: ${originalExercise.muscleGroups?.join(', ') || 'Unknown'}
+Original Exercise:
+- Name: ${originalExercise.name}
+- Sets: ${originalExercise.sets}
+- Reps: ${originalExercise.reps}
+- Weight: ${originalExercise.weight || 'bodyweight'}
+- RPE: ${originalExercise.rpe || 'not specified'}
+- Target Muscle Groups: ${originalExercise.muscleGroups?.join(', ') || 'not specified'}
 
-Reason for swap: ${reason || 'Need alternative exercise'}
+${reason ? `Reason for swap: ${reason}` : ''}
 
-Please suggest an equivalent exercise that targets the same muscle groups and provide:
-1. Exercise name
-2. Recommended sets/reps (adjust if needed for the new exercise)
-3. Brief reason for this swap
+Please suggest an equivalent exercise that targets the same muscle groups with similar difficulty and movement pattern. Maintain the same sets and reps unless there's a compelling reason to adjust them.
 
-Respond with JSON in this format:
+Respond with a JSON object containing:
 {
-  "name": "Exercise name",
+  "name": "alternative exercise name",
   "sets": number,
   "reps": number,
-  "reason": "Brief explanation",
-  "muscleGroups": ["muscle1", "muscle2"]
+  "weight": number_or_null,
+  "rpe": number_or_null,
+  "reason": "brief explanation for this swap",
+  "muscleGroups": ["array", "of", "muscle", "groups"]
 }`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "You are a knowledgeable fitness expert who helps users find equivalent exercises. Always respond with valid JSON."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.3,
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 500,
     });
 
     const response = completion.choices[0]?.message?.content;
@@ -86,29 +61,28 @@ Respond with JSON in this format:
       throw new Error("No response from AI");
     }
 
-    const swappedExercise = JSON.parse(response);
+    const swappedExercise = JSON.parse(response) as SwappedExercise;
     
-    return {
-      name: swappedExercise.name,
-      sets: swappedExercise.sets || originalExercise.sets,
-      reps: swappedExercise.reps || originalExercise.reps,
-      weight: originalExercise.weight, // Keep original weight as starting point
-      rpe: originalExercise.rpe,
-      reason: swappedExercise.reason || "AI suggested alternative",
-      muscleGroups: swappedExercise.muscleGroups || originalExercise.muscleGroups || [],
-    };
+    // Validate the response
+    if (!swappedExercise.name || !swappedExercise.muscleGroups) {
+      throw new Error("Invalid response format from AI");
+    }
+
+    return swappedExercise;
   } catch (error) {
     console.error("Error swapping exercise:", error);
     
-    // Fallback exercise swap
+    // Fallback to a simple swap based on muscle groups
+    const fallbackMuscleGroups = originalExercise.muscleGroups || ['full_body'];
+    
     return {
       name: `Alternative to ${originalExercise.name}`,
       sets: originalExercise.sets,
       reps: originalExercise.reps,
       weight: originalExercise.weight,
       rpe: originalExercise.rpe,
-      reason: reason || "Original exercise modified",
-      muscleGroups: originalExercise.muscleGroups || [],
+      reason: "AI service unavailable - manual selection recommended",
+      muscleGroups: fallbackMuscleGroups
     };
   }
 }
