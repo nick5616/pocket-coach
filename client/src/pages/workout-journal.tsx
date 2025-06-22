@@ -14,8 +14,7 @@ import {
   Gem,
   Dumbbell,
   Hash,
-  Weight,
-
+  Weight
 } from "lucide-react";
 import { Link, useParams, useLocation } from "wouter";
 
@@ -224,7 +223,6 @@ export default function WorkoutJournal() {
         workoutId: workoutId!,
         programmedExercise: programmedEx
       });
-      setOpenDropdown(null);
     } catch (error) {
       console.error("Failed to complete exercise:", error);
     }
@@ -234,7 +232,6 @@ export default function WorkoutJournal() {
     const exerciseText = `${programmedEx.name} - ${programmedEx.sets} sets × ${programmedEx.reps} reps @ RPE `;
     setCurrentInput(exerciseText);
     inputRef.current?.focus();
-    setOpenDropdown(null);
   };
 
   const handleSwapExercise = async (programmedEx: any, index: number) => {
@@ -248,7 +245,6 @@ export default function WorkoutJournal() {
       const newSwappedExercises = new Map(swappedExercises);
       newSwappedExercises.set(index, result.swappedExercise);
       setSwappedExercises(newSwappedExercises);
-      setOpenDropdown(null);
     } catch (error) {
       console.error("Failed to swap exercise:", error);
     }
@@ -432,35 +428,34 @@ export default function WorkoutJournal() {
                     return (
                       <div 
                         key={index} 
-                        className={`rounded-lg p-4 border transition-all duration-200 ${
+                        className={`rounded-lg p-3 border transition-all duration-200 ${
                           isSkipped 
                             ? 'bg-gray-100 border-gray-300 opacity-60' 
                             : 'bg-blue-50 border-blue-200'
                         }`}
                       >
-                        <div className="mb-3">
-                          <h3 className={`font-semibold ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
-                            {currentExercise.name}
-                          </h3>
-                          <div className="grid grid-cols-3 gap-2 mt-2 text-sm">
-                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
-                              {currentExercise.sets} sets
-                            </span>
-                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
-                              {currentExercise.reps} reps
-                            </span>
-                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
-                              RPE {currentExercise.rpe}
-                            </span>
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex-1">
+                            <h3 className={`font-semibold text-base mb-1 ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
+                              {currentExercise.name}
+                            </h3>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
+                                {currentExercise.sets} sets × {currentExercise.reps} reps
+                              </span>
+                              <span className={`font-medium ${isSkipped ? 'text-gray-400' : 'text-blue-700'}`}>
+                                RPE {currentExercise.rpe}
+                              </span>
+                            </div>
                           </div>
                         </div>
                         
-                        {/* Direct Action Buttons */}
-                        <div className="grid grid-cols-2 gap-2">
+                        {/* Inline Action Buttons */}
+                        <div className="flex gap-1">
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleExactCompletion(currentExercise, index)}
                           >
@@ -469,16 +464,16 @@ export default function WorkoutJournal() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleModifiedCompletion(currentExercise, index)}
                           >
-                            📝 Modified
+                            📝 Edit
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleSwapExercise(currentExercise, index)}
                           >
@@ -487,7 +482,7 @@ export default function WorkoutJournal() {
                           <Button
                             variant={isSkipped ? "secondary" : "outline"}
                             size="sm"
-                            className="text-xs"
+                            className="flex-1 text-xs py-1"
                             onClick={() => handleSkipExercise(index)}
                           >
                             {isSkipped ? '↩️ Unskip' : '⏭️ Skip'}
@@ -510,35 +505,34 @@ export default function WorkoutJournal() {
                     return (
                       <div 
                         key={index} 
-                        className={`rounded-lg p-4 border transition-all duration-200 ${
+                        className={`rounded-lg p-3 border transition-all duration-200 ${
                           isSkipped 
                             ? 'bg-gray-100 border-gray-300 opacity-60' 
                             : 'bg-blue-50 border-blue-200'
                         }`}
                       >
-                        <div className="mb-3">
-                          <h3 className={`font-semibold ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
-                            {currentExercise.name}
-                          </h3>
-                          <div className="grid grid-cols-3 gap-2 mt-2 text-sm">
-                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
-                              {currentExercise.sets} sets
-                            </span>
-                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
-                              {currentExercise.reps} reps
-                            </span>
-                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
-                              RPE {currentExercise.rpe}
-                            </span>
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex-1">
+                            <h3 className={`font-semibold text-base mb-1 ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
+                              {currentExercise.name}
+                            </h3>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
+                                {currentExercise.sets} sets × {currentExercise.reps} reps
+                              </span>
+                              <span className={`font-medium ${isSkipped ? 'text-gray-400' : 'text-blue-700'}`}>
+                                RPE {currentExercise.rpe}
+                              </span>
+                            </div>
                           </div>
                         </div>
                         
-                        {/* Direct Action Buttons */}
-                        <div className="grid grid-cols-2 gap-2">
+                        {/* Inline Action Buttons */}
+                        <div className="flex gap-1">
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleExactCompletion(currentExercise, index)}
                           >
@@ -547,16 +541,16 @@ export default function WorkoutJournal() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleModifiedCompletion(currentExercise, index)}
                           >
-                            📝 Modified
+                            📝 Edit
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleSwapExercise(currentExercise, index)}
                           >
@@ -565,7 +559,7 @@ export default function WorkoutJournal() {
                           <Button
                             variant={isSkipped ? "secondary" : "outline"}
                             size="sm"
-                            className="text-xs"
+                            className="flex-1 text-xs py-1"
                             onClick={() => handleSkipExercise(index)}
                           >
                             {isSkipped ? '↩️ Unskip' : '⏭️ Skip'}
