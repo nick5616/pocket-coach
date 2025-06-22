@@ -620,9 +620,9 @@ export default function WorkoutJournal() {
             {/* Completed Exercises */}
             <section className="px-4 py-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Completed Exercises</h2>
-              <div className="space-y-6">
+              <div className={styles.completedExercises}>
                 {exercises.map((exercise: Exercise) => (
-                  <div key={exercise.id} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm mt-[16px] mb-[16px]">
+                  <div key={exercise.id} className={styles.completedExerciseCard}>
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900 text-lg">{exercise.name}</h3>
