@@ -1,0 +1,183 @@
+.container {
+  width: 100%;
+}
+
+.item {
+  margin-bottom: 1rem;
+}
+
+.item:last-child {
+  margin-bottom: 0;
+}
+
+/* Base skeleton styles */
+.line,
+.circle,
+.button,
+.badge {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.25rem;
+}
+
+:global(.dark) .line,
+:global(.dark) .circle,
+:global(.dark) .button,
+:global(.dark) .badge {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+.button {
+  border-radius: 0.5rem;
+}
+
+.badge {
+  border-radius: 9999px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Card skeleton */
+.card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .card {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cardHeaderText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Workout card skeleton */
+.workoutCard {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .workoutCard {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.workoutHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.workoutStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.workoutButtons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+/* Program card skeleton */
+.programCard {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .programCard {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.programHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.programContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.programBadges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .card,
+  .workoutCard,
+  .programCard {
+    padding: 1rem;
+  }
+  
+  .workoutStats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .workoutButtons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .workoutButtons .button {
+    width: 100% !important;
+  }
+}

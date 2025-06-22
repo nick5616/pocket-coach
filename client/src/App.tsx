@@ -12,6 +12,7 @@ import ProgramWorkout from "@/pages/program-workout";
 import Progress from "@/pages/progress-simple";
 import Programs from "@/pages/programs-simple";
 import Profile from "@/pages/profile-simple";
+import SplashScreen from "@/components/splash-screen";
 import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
 function Router() {
@@ -40,6 +41,7 @@ function Router() {
 
 function App() {
   const [isDark, setIsDark] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     // Initialize PWA features
@@ -69,16 +71,20 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div style={{
-        height: '100vh',
-        maxWidth: '28rem',
-        margin: '0 auto',
-        backgroundColor: isDark ? '#111827' : '#ffffff',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        position: 'relative'
-      }}>
-        <Router />
-      </div>
+      {showSplash ? (
+        <SplashScreen onComplete={() => setShowSplash(false)} />
+      ) : (
+        <div style={{
+          height: '100vh',
+          maxWidth: '28rem',
+          margin: '0 auto',
+          backgroundColor: isDark ? '#111827' : '#ffffff',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          position: 'relative'
+        }}>
+          <Router />
+        </div>
+      )}
     </QueryClientProvider>
   );
 }
