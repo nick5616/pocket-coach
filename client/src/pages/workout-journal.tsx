@@ -60,6 +60,7 @@ export default function WorkoutJournal() {
 
   const [skippedExercises, setSkippedExercises] = useState<Set<number>>(new Set());
   const [swappedExercises, setSwappedExercises] = useState<Map<number, any>>(new Map());
+  const [deleteExerciseId, setDeleteExerciseId] = useState<number | null>(null);
 
   // Refs
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -283,9 +284,10 @@ export default function WorkoutJournal() {
     setEditExerciseNotes(exercise.notes || "");
   };
 
-  const handleDeleteExercise = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this exercise?")) {
-      await deleteExerciseMutation.mutateAsync(id);
+  const handleDeleteExercise = async () => {
+    if (deleteExerciseId) {
+      await deleteExerciseMutation.mutateAsync(deleteExerciseId);
+      setDeleteExerciseId(null);
     }
   };
 
@@ -622,15 +624,6 @@ export default function WorkoutJournal() {
                     <div className={styles.completedExerciseHeader}>
                       <div className={styles.completedExerciseInfo}>
                         <h3 className={styles.completedExerciseTitle}>{exercise.name}</h3>
-                        {exercise.muscleGroups && exercise.muscleGroups.length > 0 && (
-                          <div className={styles.completedMuscleGroups}>
-                            {exercise.muscleGroups.map((muscle, index) => (
-                              <Badge key={index} variant="secondary" className="text-xs">
-                                {muscle}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
                       </div>
                       <div className={styles.completedExerciseActions}>
                         <Button
@@ -643,12 +636,23 @@ export default function WorkoutJournal() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDeleteExercise(exercise.id)}
+                          onClick={() => setDeleteExerciseId(exercise.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
+
+                    {/* Muscle Groups outside the header */}
+                    {exercise.muscleGroups && exercise.muscleGroups.length > 0 && (
+                      <div className={styles.completedMuscleGroups}>
+                        {exercise.muscleGroups.map((muscle, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {muscle}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
 
                     {/* Compact Exercise Stats */}
                     <div className={styles.completedExerciseStats}>
@@ -854,6 +858,35 @@ export default function WorkoutJournal() {
           }}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={!!deleteExerciseId} onOpenChange={() => setDeleteExerciseId(null)}>
+        <DialogContent className="w-[95vw] max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Exercise</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this exercise? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex space-x-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteExerciseId(null)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteExercise}
+              disabled={deleteExerciseMutation.isPending}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+            >
+              {deleteExerciseMutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {!workoutId && <BottomNavigation />}
     </div>
   );
