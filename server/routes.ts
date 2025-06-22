@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { z } from "zod";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { 
   insertWorkoutSchema, 
   insertExerciseSchema, 
@@ -12,33 +13,25 @@ import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePerso
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
-  // Auth routes (simplified for demo)
-  app.post("/api/auth/login", async (req, res) => {
+  // Auth middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const { username, password } = req.body;
-      const user = await storage.getUserByUsername(username);
-      
-      if (!user || user.password !== password) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-      
-      res.json({ user: { id: user.id, username: user.username, email: user.email, currentStreak: user.currentStreak } });
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
     } catch (error) {
-      res.status(500).json({ message: "Login failed" });
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
     }
   });
 
-  // User routes
-  app.get("/api/user/:id", async (req, res) => {
-    try {
-      const user = await storage.getUser(parseInt(req.params.id));
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      res.json({ id: user.id, username: user.username, email: user.email, currentStreak: user.currentStreak });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
+  // Protected route example
+  app.get("/api/protected", isAuthenticated, async (req, res) => {
+    const userId = req.user?.claims?.sub;
+    res.json({ message: "This is a protected route", userId });
   });
 
   // Workout routes

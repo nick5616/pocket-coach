@@ -126,16 +126,6 @@ export class DatabaseStorage implements IStorage {
       ];
 
       await db.insert(exerciseMuscleMapping).values(exerciseMappings);
-
-      // Create demo user if it doesn't exist
-      const existingUser = await db.select().from(users).where(eq(users.username, "alex")).limit(1);
-      if (existingUser.length === 0) {
-        await db.insert(users).values({
-          username: "alex",
-          password: "password123",
-          email: "alex@example.com"
-        });
-      }
     } catch (error) {
       console.error("Failed to initialize muscle groups:", error);
       // Don't throw error to prevent app startup failure
@@ -281,7 +271,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Achievements
-  async getUserAchievements(userId: number): Promise<Achievement[]> {
+  async getUserAchievements(userId: string): Promise<Achievement[]> {
     await this.ensureInitialized();
     return await db.select().from(achievements).where(eq(achievements.userId, userId)).orderBy(desc(achievements.createdAt));
   }
@@ -327,7 +317,7 @@ export class DatabaseStorage implements IStorage {
     return mapping;
   }
 
-  async getMuscleGroupProgress(userId: number, muscleGroupId: number): Promise<{
+  async getMuscleGroupProgress(userId: string, muscleGroupId: number): Promise<{
     frequency: number;
     volume: number;
     lastWorked: Date | null;
