@@ -21,6 +21,17 @@ import {
 } from "lucide-react";
 import type { Program } from "@shared/schema";
 
+const equipmentOptions = [
+  { id: "dumbbells", label: "Dumbbells" },
+  { id: "barbell", label: "Barbell" },
+  { id: "bench", label: "Bench" },
+  { id: "pullup_bar", label: "Pull-up Bar" },
+  { id: "cables", label: "Cable Machine" },
+  { id: "machines", label: "Weight Machines" },
+  { id: "resistance_bands", label: "Resistance Bands" },
+  { id: "bodyweight", label: "Bodyweight Only" },
+];
+
 export default function Programs() {
   const [selectedTab, setSelectedTab] = useState<"all" | "active" | "completed">("all");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -29,7 +40,8 @@ export default function Programs() {
     description: "",
     difficulty: "beginner",
     durationWeeks: 4,
-    focusAreas: [] as string[]
+    focusAreas: [] as string[],
+    equipment: [] as string[]
   });
   const { toast } = useToast();
   const userId = 1; // Demo user
@@ -71,7 +83,8 @@ export default function Programs() {
         description: "",
         difficulty: "beginner",
         durationWeeks: 4,
-        focusAreas: []
+        focusAreas: [],
+        equipment: []
       });
     },
   });
@@ -92,6 +105,15 @@ export default function Programs() {
       focusAreas: prev.focusAreas.includes(area)
         ? prev.focusAreas.filter(a => a !== area)
         : [...prev.focusAreas, area]
+    }));
+  };
+
+  const toggleEquipment = (equipmentId: string) => {
+    setNewProgram(prev => ({
+      ...prev,
+      equipment: prev.equipment.includes(equipmentId)
+        ? prev.equipment.filter(e => e !== equipmentId)
+        : [...prev.equipment, equipmentId]
     }));
   };
 
@@ -325,6 +347,21 @@ export default function Programs() {
                       onChange={() => toggleFocusArea(area)}
                     />
                     <label className="text-sm text-gray-700">{area}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Available Equipment</label>
+              <div className="grid grid-cols-2 gap-2">
+                {equipmentOptions.map((equipment) => (
+                  <div key={equipment.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      checked={newProgram.equipment.includes(equipment.id)}
+                      onChange={() => toggleEquipment(equipment.id)}
+                    />
+                    <label className="text-sm text-gray-700">{equipment.label}</label>
                   </div>
                 ))}
               </div>
