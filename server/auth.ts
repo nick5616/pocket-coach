@@ -129,8 +129,8 @@ export async function setupAuth(app: Express) {
       if (err) {
         return res.status(500).json({ message: 'Logout failed' });
       }
-      // Redirect to the auth page after logout
-      res.redirect('/auth');
+      // Redirect to the root path after logout
+      res.redirect('/');
     });
   });
 
