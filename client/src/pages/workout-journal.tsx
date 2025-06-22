@@ -25,6 +25,7 @@ import { Badge } from "@/components/Badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
 import { Checkbox } from "@/components/Checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useMuscleGroups } from "@/hooks/use-muscle-groups";
 import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
 import { type Workout, type Exercise } from "@shared/schema";

@@ -293,6 +293,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { workoutId, programmedExercise } = req.body;
       
+      // Get muscle groups from database/AI
+      const { getExerciseMuscleGroups } = await import('./services/muscle-groups.js');
+      const muscleGroups = await getExerciseMuscleGroups(programmedExercise.name);
+      
       const exercise = await storage.createExercise({
         workoutId,
         name: programmedExercise.name,
@@ -302,13 +306,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         rpe: programmedExercise.rpe || null,
         restTime: programmedExercise.restTime || null,
         notes: "Completed as programmed",
-        muscleGroups: programmedExercise.muscleGroups || []
+        muscleGroups: muscleGroups
       });
 
       res.json(exercise);
     } catch (error) {
       console.error("Error creating exercise from program:", error);
       res.status(500).json({ message: "Failed to create exercise" });
+    }
+  });
+
+  // Get muscle groups for an exercise
+  app.get("/api/exercises/:exerciseName/muscle-groups", async (req, res) => {
+    try {
+      const { exerciseName } = req.params;
+      const { getExerciseMuscleGroups } = await import('./services/muscle-groups.js');
+      const muscleGroups = await getExerciseMuscleGroups(exerciseName);
+      
+      res.json({ muscleGroups });
+    } catch (error) {
+      console.error("Error getting muscle groups for exercise:", error);
+      res.status(500).json({ message: "Failed to get muscle groups" });
     }
   });
 
