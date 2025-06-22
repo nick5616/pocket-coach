@@ -242,7 +242,7 @@ export class DatabaseStorage implements IStorage {
   async deleteExercise(id: number): Promise<boolean> {
     await this.ensureInitialized();
     const result = await db.delete(exercises).where(eq(exercises.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   // Programs
@@ -365,9 +365,15 @@ export class DatabaseStorage implements IStorage {
       return total + (sets * reps * weight);
     }, 0);
 
-    const lastWorked = workoutsWithExercises
-      .sort((a, b) => new Date(b.workoutDate).getTime() - new Date(a.workoutDate).getTime())[0]
-      .workoutDate;
+    const lastWorked = workoutsWithExercises.length > 0
+      ? workoutsWithExercises
+          .sort((a, b) => {
+            const dateB = a.workoutDate ? new Date(a.workoutDate).getTime() : 0;
+            const dateA = b.workoutDate ? new Date(b.workoutDate).getTime() : 0;
+            return dateA - dateB;
+          })[0]
+          .workoutDate
+      : null;
 
     // Calculate intensity (0-1 scale based on frequency and volume)
     const maxFrequency = 30; // Max possible workouts in 30 days
