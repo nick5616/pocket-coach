@@ -14,10 +14,11 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// Updated users table for Replit Auth
+// Users table for email/password authentication
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(), // Replit user ID as string
-  email: varchar("email").unique(),
+  id: varchar("id").primaryKey().notNull(),
+  email: varchar("email").unique().notNull(),
+  passwordHash: varchar("password_hash"),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),

@@ -13,8 +13,10 @@ import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
 
 export interface IStorage {
-  // Users - Updated for Replit Auth
+  // Users - Email/Password Auth
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: { email: string; passwordHash: string; firstName?: string | null; lastName?: string | null; }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserStreak(userId: string, streak: number): Promise<void>;
 
@@ -137,6 +139,30 @@ export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
     await this.ensureInitialized();
     const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    await this.ensureInitialized();
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: { email: string; passwordHash: string; firstName?: string | null; lastName?: string | null; }): Promise<User> {
+    await this.ensureInitialized();
+    // Generate a unique ID using timestamp and random
+    const id = `user_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+    
+    const [user] = await db
+      .insert(users)
+      .values({
+        id,
+        email: userData.email,
+        passwordHash: userData.passwordHash,
+        firstName: userData.firstName || null,
+        lastName: userData.lastName || null,
+      })
+      .returning();
     return user;
   }
 
