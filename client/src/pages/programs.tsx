@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Link } from "wouter";
 import { Button } from "@/components/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { Badge } from "@/components/Badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
-import { Input } from "@/components/Input";
-import { Checkbox } from "@/components/Checkbox";
+import { Dialog } from "@/components/Dialog";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,19 +12,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { 
-  Calendar, 
-  Play, 
-  Settings, 
-  Plus,
   Sparkles,
-  Clock,
-  Dumbbell,
-  Users,
+  Play,
   Star,
-  ChevronRight,
+  Clock,
   Target
 } from "lucide-react";
-import type { Program, Goal } from "@shared/schema";
+import type { Program } from "@shared/schema";
 import styles from "./programs.module.css";
 
 const programGenerationSchema = z.object({
@@ -36,17 +27,29 @@ const programGenerationSchema = z.object({
   equipment: z.array(z.string()).min(1, "Select at least one equipment type"),
 });
 
+type ProgramFormData = z.infer<typeof programGenerationSchema>;
+
+const equipmentOptions = [
+  { id: "dumbbells", label: "Dumbbells" },
+  { id: "barbell", label: "Barbell" },
+  { id: "bench", label: "Bench" },
+  { id: "pullup_bar", label: "Pull-up Bar" },
+  { id: "cables", label: "Cable Machine" },
+  { id: "machines", label: "Weight Machines" },
+  { id: "resistance_bands", label: "Resistance Bands" },
+  { id: "bodyweight", label: "Bodyweight Only" },
+];
+
 export default function Programs() {
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
   
   if (!user) {
-    return <div>Loading...</div>;
+    return <div className={styles.container}>Loading...</div>;
   }
 
-  const form = useForm({
+  const form = useForm<ProgramFormData>({
     resolver: zodResolver(programGenerationSchema),
     defaultValues: {
       experience: "",
@@ -65,20 +68,15 @@ export default function Programs() {
     queryFn: () => fetch(`/api/programs/active`).then(res => res.json()),
   });
 
-  const { data: goals = [] } = useQuery<Goal[]>({
-    queryKey: ["/api/goals"],
-    queryFn: () => fetch(`/api/goals`).then(res => res.json()),
-  });
-
   const generateProgramMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof programGenerationSchema>) => {
+    mutationFn: async (data: ProgramFormData) => {
       const response = await apiRequest("POST", "/api/programs/generate", data);
       return response.json();
     },
-    onSuccess: (program) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
       setShowGenerateDialog(false);
-      setSelectedProgram(program);
+      form.reset();
       toast({
         title: "Program Generated!",
         description: "Your personalized workout program is ready.",
@@ -93,78 +91,18 @@ export default function Programs() {
     },
   });
 
-  const activateProgramMutation = useMutation({
-    mutationFn: async (programId: number) => {
-      const response = await apiRequest("PATCH", `/api/programs/${programId}`, {
-        isActive: true,
-      });
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/programs/active"] });
-      toast({
-        title: "Program Activated",
-        description: "This program is now your active workout plan.",
-      });
-    },
-  });
-
-  const onGenerateProgram = (data: z.infer<typeof programGenerationSchema>) => {
+  const onGenerateProgram = (data: ProgramFormData) => {
     generateProgramMutation.mutate(data);
   };
 
-  const equipmentOptions = [
-    { id: "dumbbells", label: "Dumbbells" },
-    { id: "barbell", label: "Barbell" },
-    { id: "bench", label: "Bench" },
-    { id: "pullup_bar", label: "Pull-up Bar" },
-    { id: "cables", label: "Cable Machine" },
-    { id: "machines", label: "Weight Machines" },
-    { id: "resistance_bands", label: "Resistance Bands" },
-    { id: "bodyweight", label: "Bodyweight Only" },
-  ];
-
-  const predefinedPrograms = [
-    {
-      id: "push_pull_legs",
-      name: "Push/Pull/Legs",
-      description: "Classic 3-day split focusing on movement patterns",
-      duration: "6-8 weeks",
-      difficulty: "Intermediate",
-      daysPerWeek: 3,
-      popular: true,
-    },
-    {
-      id: "upper_lower",
-      name: "Upper/Lower Split",
-      description: "4-day program alternating upper and lower body",
-      duration: "8-10 weeks",
-      difficulty: "Beginner",
-      daysPerWeek: 4,
-      popular: true,
-    },
-    {
-      id: "full_body",
-      name: "Full Body",
-      description: "3-day full body routine for maximum efficiency",
-      duration: "4-6 weeks",
-      difficulty: "Beginner",
-      daysPerWeek: 3,
-      popular: false,
-    },
-  ];
-
   if (isLoading) {
     return (
-      <div className="pb-20">
-        <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-8 z-40">
-          <h1 className="text-lg font-bold text-gray-900">Programs</h1>
-        </header>
-        <div className="p-4 space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-gray-200 rounded-xl h-32 loading-shimmer"></div>
-          ))}
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.headerTitle}>Programs</h1>
+        </div>
+        <div className={styles.main}>
+          <div>Loading programs...</div>
         </div>
         <BottomNavigation />
       </div>
@@ -172,245 +110,103 @@ export default function Programs() {
   }
 
   return (
-    <>
-      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-8 z-40">
-        <div className="flex items-center justify-between">
-          <h1 className="text-lg font-bold text-gray-900">Programs</h1>
-          <Button
-            onClick={() => setShowGenerateDialog(true)}
-            size="sm"
-            className="bg-duolingo-green hover:bg-duolingo-green/90"
-          >
-            <Sparkles className="h-4 w-4 mr-1" />
-            Generate
-          </Button>
-        </div>
-      </header>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.headerTitle}>Programs</h1>
+        <Button
+          onClick={() => setShowGenerateDialog(true)}
+          size="sm"
+          variant="primary"
+        >
+          <Sparkles style={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} />
+          Generate
+        </Button>
+      </div>
 
-      <main className="pb-20">
+      <div className={styles.main}>
         {/* Active Program */}
         {activeProgram && (
-          <section className="bg-gradient-to-r from-duolingo-green to-green-600 text-white px-4 py-6">
-            <h2 className="text-xl font-bold mb-2">Active Program</h2>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-lg">{activeProgram.name}</h3>
-                {activeProgram.aiGenerated && (
-                  <Badge className="bg-white/20 text-white">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    AI Generated
-                  </Badge>
-                )}
+          <Card style={{ marginBottom: '1.5rem', backgroundColor: '#eff6ff', borderColor: '#3b82f6' }}>
+            <CardHeader>
+              <CardTitle style={{ color: '#1e40af', display: 'flex', alignItems: 'center' }}>
+                <Star style={{ width: '1.25rem', height: '1.25rem', marginRight: '0.5rem' }} />
+                Active Program
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>
+                {activeProgram.name}
+              </h3>
+              <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
+                {activeProgram.description}
+              </p>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <Badge variant="outline">
+                  <Clock style={{ width: '0.75rem', height: '0.75rem', marginRight: '0.25rem' }} />
+                  {activeProgram.duration}
+                </Badge>
+                <Badge variant="outline">
+                  <Target style={{ width: '0.75rem', height: '0.75rem', marginRight: '0.25rem' }} />
+                  {activeProgram.difficulty}
+                </Badge>
               </div>
-              <p className="text-green-100 text-sm mb-3">{activeProgram.description}</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center text-sm text-green-100">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  <span>Week 2 of 8</span>
-                </div>
-                <Link href="/workout-journal">
-                  <Button 
-                    size="sm" 
-                    className="bg-white/20 hover:bg-white/30 text-white border-0"
-                  >
-                    <Play className="h-4 w-4 mr-1" />
-                    Start Today
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </section>
+            </CardContent>
+          </Card>
         )}
 
-        <Tabs defaultValue="browse" className="px-4 py-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="browse">Browse</TabsTrigger>
-            <TabsTrigger value="my-programs">My Programs ({programs.length})</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="browse" className="space-y-6 mt-6">
-            {/* AI Generate Section */}
-            <Card className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-0">
-              <CardContent className="p-4">
-                <div className="flex items-center mb-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-3">
-                    <Sparkles className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">AI Program Generator</h3>
-                    <p className="text-purple-100 text-sm">Personalized for your goals</p>
-                  </div>
-                </div>
-                <p className="text-purple-100 text-sm mb-4">
-                  Get a custom workout program tailored to your experience, goals, and available equipment.
+        {/* Programs List */}
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          {programs.length === 0 ? (
+            <Card>
+              <CardContent style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+                <Sparkles style={{ width: '3rem', height: '3rem', margin: '0 auto 1rem', color: '#9ca3af' }} />
+                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>
+                  No Programs Yet
+                </h3>
+                <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+                  Generate your first AI-powered workout program
                 </p>
                 <Button
                   onClick={() => setShowGenerateDialog(true)}
-                  className="bg-white/20 hover:bg-white/30 text-white border-0"
+                  variant="primary"
                 >
-                  Generate My Program
+                  <Sparkles style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
+                  Generate Program
                 </Button>
               </CardContent>
             </Card>
-
-            {/* Popular Programs */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Popular Programs</h3>
-              <div className="space-y-3">
-                {predefinedPrograms.map((program) => (
-                  <Card key={program.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center mb-2">
-                            <h4 className="font-semibold text-gray-900 mr-2">{program.name}</h4>
-                            {program.popular && (
-                              <Badge className="bg-energetic-orange/10 text-energetic-orange">
-                                <Star className="h-3 w-3 mr-1" />
-                                Popular
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-600 mb-2">{program.description}</p>
-                          <div className="flex items-center text-xs text-gray-500 space-x-4">
-                            <div className="flex items-center">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {program.duration}
-                            </div>
-                            <div className="flex items-center">
-                              <Dumbbell className="h-3 w-3 mr-1" />
-                              {program.difficulty}
-                            </div>
-                            <div className="flex items-center">
-                              <Calendar className="h-3 w-3 mr-1" />
-                              {program.daysPerWeek} days/week
-                            </div>
-                          </div>
-                        </div>
-                        <ChevronRight className="h-5 w-5 text-gray-400 ml-3" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            {/* Program Categories */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Browse by Goal</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 text-center">
-                    <div className="w-12 h-12 bg-duolingo-green/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <Target className="h-6 w-6 text-duolingo-green" />
-                    </div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Strength</h4>
-                    <p className="text-xs text-gray-500">Build maximum strength</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 text-center">
-                    <div className="w-12 h-12 bg-duolingo-blue/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <Dumbbell className="h-6 w-6 text-duolingo-blue" />
-                    </div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Muscle</h4>
-                    <p className="text-xs text-gray-500">Hypertrophy focused</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 text-center">
-                    <div className="w-12 h-12 bg-energetic-orange/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <Clock className="h-6 w-6 text-energetic-orange" />
-                    </div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Endurance</h4>
-                    <p className="text-xs text-gray-500">Improve conditioning</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 text-center">
-                    <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <Users className="h-6 w-6 text-purple-500" />
-                    </div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Beginner</h4>
-                    <p className="text-xs text-gray-500">Getting started</p>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="my-programs" className="space-y-4 mt-6">
-            {programs.length > 0 ? (
-              programs.map((program) => (
-                <Card key={program.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <div className="flex items-center mb-1">
-                          <h4 className="font-semibold text-gray-900 mr-2">{program.name}</h4>
-                          {program.aiGenerated && (
-                            <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                              <Sparkles className="h-3 w-3 mr-1" />
-                              AI
-                            </Badge>
-                          )}
-                          {program.isActive && (
-                            <Badge className="bg-success-green text-white ml-2">Active</Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-600">{program.description}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="text-xs text-gray-500">
-                        Created {new Date(program.createdAt!).toLocaleDateString()}
-                      </div>
-                      <div className="flex gap-2">
-                        {!program.isActive && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => activateProgramMutation.mutate(program.id)}
-                            disabled={activateProgramMutation.isPending}
-                          >
-                            Activate
-                          </Button>
-                        )}
-                        <Button size="sm" variant="ghost">
-                          <Settings className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <Card className="border-dashed border-2 border-gray-200">
-                <CardContent className="p-8 text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Calendar className="h-8 w-8 text-gray-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No programs yet</h3>
-                  <p className="text-gray-500 mb-4">
-                    Generate your first AI-powered workout program or choose from our templates.
+          ) : (
+            programs.map((program) => (
+              <Card key={program.id}>
+                <CardHeader>
+                  <CardTitle style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>{program.name}</span>
+                    {program.isActive && (
+                      <Badge variant="default">Active</Badge>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
+                    {program.description}
                   </p>
-                  <Button 
-                    onClick={() => setShowGenerateDialog(true)}
-                    className="bg-duolingo-green hover:bg-duolingo-green/90"
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Generate Program
-                  </Button>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                    <Badge variant="outline">{program.duration}</Badge>
+                    <Badge variant="outline">{program.difficulty}</Badge>
+                    <Badge variant="outline">{program.daysPerWeek} days/week</Badge>
+                  </div>
+                  {!program.isActive && (
+                    <Button size="sm" variant="outline">
+                      <Play style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.5rem' }} />
+                      Activate
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
-            )}
-          </TabsContent>
-        </Tabs>
-      </main>
+            ))
+          )}
+        </div>
+      </div>
 
       {/* Generate Program Dialog */}
       <Dialog open={showGenerateDialog} onOpenChange={setShowGenerateDialog}>
@@ -532,6 +328,6 @@ export default function Programs() {
       </Dialog>
 
       <BottomNavigation />
-    </>
+    </div>
   );
 }
