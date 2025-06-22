@@ -110,6 +110,18 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
+- June 22, 2025: **COMPLETED** - Fixed Critical React Hooks Error in Workout Journal Component
+  - Resolved "Rendered more hooks than during the previous render" error by moving all useMutation hooks before conditional returns
+  - Ensured proper React Hooks order compliance throughout workout-journal.tsx component
+  - All mutation hooks (createWorkout, completeWorkout, updateExercise, deleteExercise, createExerciseFromProgram, swapExercise) now properly declared at top level
+  - Loading screen check moved after all hooks to prevent Rules of Hooks violations
+  - Workout journal tab now loads without React errors and maintains all functionality
+- June 22, 2025: **COMPLETED** - Optimized API Performance and Fixed Progress Page Loading Issues
+  - Created efficient getUserWorkoutsWithExercises method that eliminates N+1 database query patterns
+  - Updated /api/workouts endpoint to use optimized query reducing database round trips
+  - Fixed progress page loading screen with proper state detection across all API calls (workouts, goals, achievements)
+  - API response times significantly improved, especially for empty data responses that were causing delays
+  - Progress page now shows branded LoadingScreen with "Analyzing your progress data..." message during API calls
 - June 22, 2025: **COMPLETED** - Comprehensive Loading Screen Implementation Across All API Calls
   - Created unified LoadingScreen component with PocketCoach branding and shimmer animations
   - Implemented loading state detection across all pages: home, programs, progress, profile-simple, workout-journal, program-workout, home-old

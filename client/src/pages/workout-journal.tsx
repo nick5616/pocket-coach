@@ -122,14 +122,7 @@ export default function WorkoutJournal() {
 
   const totalVolume = calculateWorkoutVolume(exercises as Exercise[]);
 
-  // Show loading screen if any essential data is still loading
-  const isLoading = workoutLoading || exercisesLoading || activeProgramLoading || todaysWorkoutLoading;
-
-  if (isLoading) {
-    return <LoadingScreen message="Loading workout..." />;
-  }
-
-  // Mutations
+  // Mutations - Must be declared before any conditional returns
   const createWorkoutMutation = useMutation({
     mutationFn: async (data: {
       userId: number;
@@ -240,6 +233,13 @@ export default function WorkoutJournal() {
       toast({ title: "Exercise swapped successfully" });
     },
   });
+
+  // Show loading screen if any essential data is still loading
+  const isLoading = workoutLoading || exercisesLoading || activeProgramLoading || todaysWorkoutLoading;
+
+  if (isLoading) {
+    return <LoadingScreen message="Loading workout..." />;
+  }
 
   // Handlers
   const handleCreateWorkout = async (e: React.FormEvent) => {
