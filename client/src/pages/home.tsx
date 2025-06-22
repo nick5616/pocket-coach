@@ -8,6 +8,7 @@ import { Progress } from "@/components/Progress";
 import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
 import WorkoutCard from "@/components/workout-card";
+import LoadingScreen from "@/components/loading-screen";
 import {
   Bell,
   User as UserIcon,
@@ -31,30 +32,37 @@ export default function Home() {
   const [achievementData, setAchievementData] = useState<any>(null);
   const { user: authUser } = useAuth();
 
-  const { data: user } = useQuery<User>({
+  const { data: user, isLoading: userLoading } = useQuery<User>({
     queryKey: [`/api/user/${authUser?.id}`],
     enabled: !!authUser?.id,
   });
 
-  const { data: workouts = [] } = useQuery<Workout[]>({
+  const { data: workouts = [], isLoading: workoutsLoading } = useQuery<Workout[]>({
     queryKey: ["/api/workouts"],
     enabled: !!authUser?.id,
   });
 
-  const { data: goals = [] } = useQuery<Goal[]>({
+  const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
     queryKey: ["/api/goals"],
     enabled: !!authUser?.id,
   });
 
-  const { data: achievements = [] } = useQuery<Achievement[]>({
+  const { data: achievements = [], isLoading: achievementsLoading } = useQuery<Achievement[]>({
     queryKey: ["/api/achievements"],
     enabled: !!authUser?.id,
   });
 
-  const { data: activeProgram } = useQuery({
+  const { data: activeProgram, isLoading: programLoading } = useQuery({
     queryKey: ["/api/programs/active"],
     enabled: !!authUser?.id,
   });
+
+  // Show loading screen if any essential data is still loading
+  const isLoading = userLoading || workoutsLoading || goalsLoading || achievementsLoading || programLoading;
+
+  if (isLoading) {
+    return <LoadingScreen message="Loading your fitness dashboard..." />;
+  }
 
   // Check for any ongoing (incomplete) workouts
   const ongoingWorkout = workouts.find((w) => !w.isCompleted);

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { Badge } from "@/components/Badge";
 import { Dialog } from "@/components/Dialog";
 import BottomNavigation from "@/components/bottom-navigation";
+import LoadingScreen from "@/components/loading-screen";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useForm } from "react-hook-form";
@@ -96,17 +97,7 @@ export default function Programs() {
   };
 
   if (isLoading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.headerTitle}>Programs</h1>
-        </div>
-        <div className={styles.main}>
-          <div>Loading programs...</div>
-        </div>
-        <BottomNavigation />
-      </div>
-    );
+    return <LoadingScreen message="Loading your workout programs..." />;
   }
 
   return (
