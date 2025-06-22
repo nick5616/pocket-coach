@@ -112,6 +112,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- June 21, 2025: **COMPLETED** - Enhanced Active Workout Page with Programmed Exercises Section
+  - Created structured workout page layout: workout name → programmed exercises → workout input → completed exercises
+  - Added programmed exercises section with recommended exercises showing sets, reps, RPE in blue cards
+  - Implemented clickable exercise cards that populate text input with exercise details (RPE left empty)
+  - Added action dropdown menu with 4 options per exercise: "I did this exactly", "I did this, but...", "Swap", "Skip"
+  - Each action button pre-fills text input with contextually appropriate text for guided workout logging
+  - Demo exercises (Push-ups, Squats, Pull-ups) display when no program exercises available
 - June 21, 2025: **COMPLETED** - Enhanced Exercise Display and Achievement System Fixes
   - Fixed resume workout navigation bug by correcting URL parameter extraction from workoutId to id
   - Enhanced exercise display with comprehensive stats grid showing sets, reps, weight, and RPE
