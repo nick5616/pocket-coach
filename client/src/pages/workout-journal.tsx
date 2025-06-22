@@ -420,7 +420,7 @@ export default function WorkoutJournal() {
             <section className="px-4 py-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Programmed Exercises</h2>
               {(todaysWorkout?.workout?.exercises && todaysWorkout.workout.exercises.length > 0) ? (
-                <div className="space-y-3">
+                <div className="space-y-6">
                   {todaysWorkout.workout.exercises.map((programmedEx: any, index: number) => {
                     const currentExercise = swappedExercises.get(index) || programmedEx;
                     const isSkipped = skippedExercises.has(index);
@@ -587,7 +587,7 @@ export default function WorkoutJournal() {
             </section>
 
             {/* Workout Input */}
-            <section className="px-4">
+            <section className="px-4 py-4">
               <div className="bg-white rounded-lg border border-gray-200">
                 <Textarea
                   ref={inputRef}
@@ -628,7 +628,7 @@ export default function WorkoutJournal() {
             {/* Completed Exercises */}
             <section className="px-4 py-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Completed Exercises</h2>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {exercises.map((exercise: Exercise) => (
                   <div key={exercise.id} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
                     <div className="flex items-start justify-between mb-3">
