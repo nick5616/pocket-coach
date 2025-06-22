@@ -618,7 +618,7 @@ export default function WorkoutJournal() {
             {/* Completed Exercises */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Completed Exercises</h2>
-              <div className={styles.completedExercises}>
+              <div className="_completedExercises_eqdug_250 pl-[0px] pr-[0px] pt-[0px] pb-[0px]">
                 {exercises.map((exercise: Exercise) => (
                   <div key={exercise.id} className={styles.completedExerciseCard}>
                     <div className={styles.completedExerciseHeader}>
@@ -858,7 +858,6 @@ export default function WorkoutJournal() {
           }}
         />
       )}
-
       {/* Delete Confirmation Modal */}
       <Dialog open={!!deleteExerciseId} onOpenChange={() => setDeleteExerciseId(null)}>
         <DialogContent className="w-[95vw] max-w-md">
@@ -886,7 +885,6 @@ export default function WorkoutJournal() {
           </div>
         </DialogContent>
       </Dialog>
-
       {!workoutId && <BottomNavigation />}
     </div>
   );
