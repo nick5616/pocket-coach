@@ -1,249 +1,590 @@
+/* Home Page Styles */
 .container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   max-width: 28rem;
   margin: 0 auto;
+  background-color: #f9fafb;
+}
+
+.darkMode .container {
+  background-color: #111827;
+}
+
+/* Header */
+.header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 1rem;
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.darkMode .header {
+  background-color: #1f2937;
+  border-bottom-color: #374151;
+}
+
+.headerTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.darkMode .headerTitle {
+  color: #f9fafb;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.achievementButton {
+  position: relative;
+}
+
+.achievementBadge {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  background-color: #ef4444;
+  color: white;
+  border-radius: 9999px;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Main Content */
+.main {
+  flex: 1;
+  overflow: auto;
   padding-bottom: 5rem;
 }
 
+/* Welcome Section */
 .welcomeSection {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: #ffffff;
-  padding: 2rem 1.5rem;
-  border-radius: 1rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  padding: 1.5rem 1rem;
+  background: linear-gradient(135deg, #65a30d 0%, #16a34a 100%);
+  color: white;
 }
 
-@media (prefers-color-scheme: dark) {
-  .welcomeSection {
-    background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
-  }
-}
-
-.welcomeTitle {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.welcomeSubtitle {
-  font-size: 1rem;
-  opacity: 0.9;
+.welcomeContent {
   margin-bottom: 1rem;
 }
 
-.statsGrid {
+.welcomeTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: #ffffff;
+}
+
+.welcomeSubtitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #ffffff;
+  opacity: 0.95;
+}
+
+.quickStats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 0.75rem;
 }
 
 .statCard {
-  background-color: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  padding: 1rem;
   border-radius: 0.75rem;
+  padding: 0.75rem;
   text-align: center;
+  background-color: rgba(21, 128, 61, 0.7);
+  border: 1px solid rgba(34, 197, 94, 0.4);
 }
 
 .statValue {
   font-size: 1.5rem;
   font-weight: 700;
-  margin-bottom: 0.25rem;
+  color: #ffffff;
 }
 
 .statLabel {
   font-size: 0.75rem;
-  opacity: 0.8;
+  font-weight: 500;
+  color: #ffffff;
+  opacity: 0.9;
 }
 
-.quickActionsSection {
+/* Action Buttons Section */
+.actionsSection {
+  padding: 1.5rem 1rem;
   margin-bottom: 1.5rem;
 }
 
-.sectionTitle {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: #1e293b;
-}
-
-@media (prefers-color-scheme: dark) {
-  .sectionTitle {
-    color: #f1f5f9;
-  }
-}
-
-.primaryButton {
+.resumeButton {
+  width: 100%;
+  height: 3.5rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  width: 100%;
-  background-color: #10b981;
-  color: #ffffff;
-  border: none;
-  border-radius: 0.75rem;
-  padding: 1rem 1.5rem;
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
   margin-bottom: 1rem;
 }
 
-.primaryButton:hover {
-  background-color: #059669;
+.resumeButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
-.primaryButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.resumeButton {
+.programButton {
+  width: 100%;
+  height: 3rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  background-color: #ffffff;
-  color: #1e293b;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  padding: 1rem;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.programButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.noProgram {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.noProgramTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.darkMode .noProgramTitle {
+  color: #d1d5db;
+}
+
+.noProgramSubtitle {
   font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
 }
 
-.resumeButton:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
+.darkMode .noProgramSubtitle {
+  color: #9ca3af;
 }
 
-@media (prefers-color-scheme: dark) {
-  .resumeButton {
-    background-color: #1e293b;
-    color: #f8fafc;
-    border-color: #334155;
-  }
-  
-  .resumeButton:hover {
-    background-color: #334155;
-    border-color: #475569;
-  }
-}
-
-.resumeContent {
+.actionButtons {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.75rem;
 }
 
-.resumeTitle {
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 350px;
-}
-
-.resumeSubtitle {
-  font-size: 0.75rem;
-  color: #64748b;
-}
-
-@media (prefers-color-scheme: dark) {
-  .resumeSubtitle {
-    color: #94a3b8;
-  }
-}
-
-.resumeIcon {
-  width: 1rem;
-  height: 1rem;
-  color: #64748b;
-}
-
-@media (prefers-color-scheme: dark) {
-  .resumeIcon {
-    color: #94a3b8;
-  }
-}
-
-.aiRecommendationCard {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+.primaryButton {
+  width: 100%;
+  height: 3rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
   border-radius: 0.75rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
 }
 
-@media (prefers-color-scheme: dark) {
-  .aiRecommendationCard {
-    background-color: #1e293b;
-    border-color: #334155;
-  }
+.primaryButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.secondaryButton {
+  width: 100%;
+  height: 3rem;
+  background-color: white;
+  color: #374151;
+  border: 2px solid #d1d5db;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.secondaryButton:hover {
+  border-color: #9ca3af;
+}
+
+.darkMode .secondaryButton {
+  background-color: #1f2937;
+  color: #d1d5db;
+  border-color: #374151;
+}
+
+.darkMode .secondaryButton:hover {
+  border-color: #4b5563;
+}
+
+/* AI Recommendation */
+.aiSection {
+  padding: 0 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.aiCard {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  border-radius: 1rem;
+  padding: 1rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.aiContent {
+  position: relative;
+  z-index: 10;
 }
 
 .aiHeader {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .aiIcon {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: #8b5cf6;
+  width: 2rem;
+  height: 2rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
 }
 
 .aiTitle {
-  font-size: 1rem;
   font-weight: 600;
-  color: #1e293b;
-}
-
-@media (prefers-color-scheme: dark) {
-  .aiTitle {
-    color: #f8fafc;
-  }
 }
 
 .aiMessage {
-  color: #475569;
+  color: rgba(196, 181, 253, 1);
+  font-size: 0.875rem;
   margin-bottom: 0.75rem;
-  line-height: 1.5;
 }
 
-@media (prefers-color-scheme: dark) {
-  .aiMessage {
-    color: #cbd5e1;
-  }
+.aiButton {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.focusAreas {
+.aiButton:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.aiDecoration1 {
+  position: absolute;
+  right: -1rem;
+  top: -1rem;
+  width: 5rem;
+  height: 5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.aiDecoration2 {
+  position: absolute;
+  right: -2rem;
+  bottom: -2rem;
+  width: 8rem;
+  height: 8rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+/* Section Headers */
+.sectionHeader {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
 }
 
-.focusArea {
-  background-color: #f1f5f9;
-  color: #1e293b;
-  padding: 0.25rem 0.75rem;
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.darkMode .sectionTitle {
+  color: #f9fafb;
+}
+
+.sectionButton {
+  color: #3b82f6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.sectionButton:hover {
+  color: rgba(59, 130, 246, 0.8);
+}
+
+.darkMode .sectionButton {
+  color: #60a5fa;
+}
+
+.darkMode .sectionButton:hover {
+  color: rgba(96, 165, 250, 0.8);
+}
+
+/* Content Sections */
+.contentSection {
+  padding: 0 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.contentList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Empty States */
+.emptyState {
+  border: 2px dashed #d1d5db;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.darkMode .emptyState {
+  border-color: #374151;
+}
+
+.emptyIcon {
+  width: 3rem;
+  height: 3rem;
+  background-color: #f3f4f6;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+}
+
+.darkMode .emptyIcon {
+  background-color: #374151;
+}
+
+.emptyTitle {
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.darkMode .emptyTitle {
+  color: #f9fafb;
+}
+
+.emptyDescription {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+}
+
+.darkMode .emptyDescription {
+  color: #9ca3af;
+}
+
+.emptyButton {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.emptyButton:hover {
+  background-color: rgba(16, 185, 129, 0.9);
+}
+
+/* Progress Insights */
+.progressSection {
+  padding: 0 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.progressCard {
+  border: 2px dashed #d1d5db;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.darkMode .progressCard {
+  border-color: #374151;
+}
+
+.progressIcon {
+  width: 3rem;
+  height: 3rem;
+  background-color: #f3f4f6;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+}
+
+.darkMode .progressIcon {
+  background-color: #374151;
+}
+
+.progressTitle {
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.darkMode .progressTitle {
+  color: #f9fafb;
+}
+
+.progressDescription {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.darkMode .progressDescription {
+  color: #9ca3af;
+}
+
+/* Goal Progress */
+.goalCard {
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.darkMode .goalCard {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.goalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.goalTitle {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.875rem;
+}
+
+.darkMode .goalTitle {
+  color: #f9fafb;
+}
+
+.goalBadge {
+  padding: 0.125rem 0.5rem;
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
 }
 
-@media (prefers-color-scheme: dark) {
-  .focusArea {
-    background-color: #334155;
-    color: #e2e8f0;
-  }
+.goalBadgeGreen {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #16a34a;
+}
+
+.darkMode .goalBadgeGreen {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.goalBadgeYellow {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.darkMode .goalBadgeYellow {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.goalBadgeRed {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.darkMode .goalBadgeRed {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.goalProgress {
+  margin-bottom: 0.5rem;
+}
+
+.goalStats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.darkMode .goalStats {
+  color: #9ca3af;
 }

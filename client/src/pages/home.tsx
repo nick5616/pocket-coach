@@ -28,57 +28,51 @@ import styles from "./home.module.css";
 
 export default function Home() {
   const [showAchievement, setShowAchievement] = useState(false);
-  const [currentAchievement, setCurrentAchievement] =
-    useState<Achievement | null>(null);
-
-  const { user: authUser, isAuthenticated } = useAuth();
+  const [achievementData, setAchievementData] = useState<any>(null);
+  const { user: authUser } = useAuth();
 
   const { data: user } = useQuery<User>({
-    queryKey: ["/api/user", authUser?.id],
-    queryFn: () => fetch(`/api/user/${authUser?.id}`).then((res) => res.json()),
+    queryKey: [`/api/user/${authUser?.id}`],
     enabled: !!authUser?.id,
   });
 
-  const { data: recentWorkouts = [] } = useQuery<Workout[]>({
+  const { data: workouts = [] } = useQuery<Workout[]>({
     queryKey: ["/api/workouts"],
-    enabled: isAuthenticated,
+    enabled: !!authUser?.id,
   });
-
-  // Find ongoing workout (not completed)
-  const ongoingWorkout = recentWorkouts.find((w) => !w.isCompleted && !w.completedAt);
 
   const { data: goals = [] } = useQuery<Goal[]>({
     queryKey: ["/api/goals"],
-    enabled: isAuthenticated,
+    enabled: !!authUser?.id,
   });
 
   const { data: achievements = [] } = useQuery<Achievement[]>({
     queryKey: ["/api/achievements"],
-    enabled: isAuthenticated,
+    enabled: !!authUser?.id,
   });
 
   const { data: activeProgram } = useQuery({
     queryKey: ["/api/programs/active"],
-    enabled: isAuthenticated,
+    enabled: !!authUser?.id,
   });
 
-  // Check for new achievements
-  useEffect(() => {
-    const unviewedAchievement = achievements.find(
-      (achievement) => !achievement.isViewed,
-    );
-    if (unviewedAchievement) {
-      setCurrentAchievement(unviewedAchievement);
-      setShowAchievement(true);
-    }
-  }, [achievements]);
+  // Check for any ongoing (incomplete) workouts
+  const ongoingWorkout = workouts.find((w) => !w.isCompleted);
 
+  // Get recent workouts for stats
+  const recentWorkouts = workouts
+    .filter((w) => w.isCompleted)
+    .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime())
+    .slice(0, 10);
+
+  // Calculate today's stats
   const todayStats: WorkoutStats = {
-    workouts: recentWorkouts.filter((w) => {
-      const today = new Date();
-      const workoutDate = new Date(w.createdAt!);
-      return workoutDate.toDateString() === today.toDateString();
-    }).length,
+    workouts: recentWorkouts
+      .filter((w) => {
+        const today = new Date();
+        const workoutDate = new Date(w.createdAt!);
+        return workoutDate.toDateString() === today.toDateString();
+      }).length,
     exercises: recentWorkouts
       .filter((w) => {
         const today = new Date();
@@ -92,46 +86,42 @@ export default function Home() {
         const workoutDate = new Date(w.createdAt!);
         return workoutDate.toDateString() === today.toDateString();
       })
-      .reduce((total, workout) => {
-        if (workout.completedAt && workout.createdAt) {
-          const duration = new Date(workout.completedAt).getTime() - new Date(workout.createdAt).getTime();
-          return total + Math.round(duration / (1000 * 60));
-        }
-        return total;
-      }, 0),
+      .reduce((total, workout) => total + (workout.duration || 0), 0),
   };
 
-  // Generate AI recommendation based on recent workout data
+  // Generate AI recommendation based on workout history
   const aiRecommendation: AIRecommendation = (() => {
-    if (!recentWorkouts.length) {
+    if (recentWorkouts.length === 0) {
       return {
-        message: "Ready to start your fitness journey? Let's begin with a balanced workout to establish your baseline.",
-        focusAreas: ["full body", "foundation"],
+        message: "Ready to start your fitness journey? Begin with foundational movements to build strength and confidence.",
+        focusAreas: ["Foundation Building", "Form Development"],
       };
     }
 
     const lastWorkout = recentWorkouts[0];
-    const daysSinceLastWorkout = Math.floor((Date.now() - new Date(lastWorkout.createdAt!).getTime()) / (1000 * 60 * 60 * 24));
-    
+    const daysSinceLastWorkout = Math.floor(
+      (Date.now() - new Date(lastWorkout.createdAt!).getTime()) / (1000 * 60 * 60 * 24)
+    );
+
     if (daysSinceLastWorkout === 0) {
       return {
-        message: "Great work today! Consider some light stretching or mobility work to aid recovery.",
-        focusAreas: ["recovery", "mobility"],
+        message: "Great work today! Consider light stretching or mobility work to aid recovery.",
+        focusAreas: ["Recovery", "Mobility"],
       };
-    } else if (daysSinceLastWorkout === 1) {
+    } else if (daysSinceLastWorkout <= 2) {
       return {
-        message: "Perfect timing for your next session. Your body has had time to recover and adapt.",
-        focusAreas: ["progression", "strength"],
+        message: "Perfect timing for your next session. Focus on progressive overload and challenging yourself.",
+        focusAreas: ["Progressive Overload", "Strength Building"],
       };
-    } else if (daysSinceLastWorkout <= 3) {
+    } else if (daysSinceLastWorkout <= 7) {
       return {
-        message: "Time to get back in there! Your muscles are ready for the next challenge.",
-        focusAreas: ["consistency", "endurance"],
+        message: "Time to get back in there! Start with a moderate intensity to rebuild momentum.",
+        focusAreas: ["Momentum Building", "Consistency"],
       };
     } else {
       return {
-        message: "Welcome back! Let's ease into it with a moderate session to rebuild momentum.",
-        focusAreas: ["restart", "foundation"],
+        message: "Welcome back! Start with lighter weights and focus on movement quality as you return to training.",
+        focusAreas: ["Movement Quality", "Gradual Return"],
       };
     }
   })();
@@ -146,227 +136,107 @@ export default function Home() {
   };
 
   return (
-    <div className="h-full bg-gray-50 flex flex-col">
+    <div className={styles.container}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-duolingo-green rounded-full flex items-center justify-center">
-              <svg
-                className="w-4 h-4 text-white"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43L22 13.43l-1.43-1.57z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">Pocket Coach</h1>
-              <p className="text-xs text-gray-600">
-                {user?.currentStreak || 0} day streak
-              </p>
-            </div>
+      <header className={styles.header}>
+        <h1 className={styles.headerTitle}>Pocket Coach</h1>
+        <div className={styles.headerActions}>
+          <div className={styles.achievementButton}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowAchievement(true)}
+            >
+              <Bell className="h-5 w-5" />
+              {achievements.filter((a) => !a.isViewed).length > 0 && (
+                <span className={styles.achievementBadge}>
+                  {achievements.filter((a) => !a.isViewed).length}
+                </span>
+              )}
+            </Button>
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <Bell className="h-5 w-5" />
-                {achievements.filter((a) => !a.isViewed).length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-energetic-orange text-white text-xs rounded-full flex items-center justify-center">
-                    {achievements.filter((a) => !a.isViewed).length}
-                  </span>
-                )}
-              </Button>
-            </div>
-            <Link href="/profile">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <UserIcon className="h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
+          <Link href="/profile">
+            <Button variant="ghost" size="icon">
+              <UserIcon className="h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto pb-20">
+      <main className={styles.main}>
         {/* Welcome Section */}
-        <section
-          className="px-4 py-6"
-          style={{
-            background: "linear-gradient(135deg, #65a30d 0%, #16a34a 100%)",
-            color: "white",
-          }}
-        >
-          <div className="mb-4">
-            <h2
-              className="text-xl font-bold mb-1"
-              style={{ color: "#ffffff", fontWeight: "bold" }}
-            >
-              {greeting()}
-            </h2>
-            <p
-              className="text-sm font-medium"
-              style={{ color: "#ffffff", opacity: 0.95 }}
-            >
+        <section className={styles.welcomeSection}>
+          <div className={styles.welcomeContent}>
+            <h2 className={styles.welcomeTitle}>{greeting()}</h2>
+            <p className={styles.welcomeSubtitle}>
               Ready to crush today's workout?
             </p>
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-3">
-            <div
-              className="rounded-xl p-3 text-center"
-              style={{
-                backgroundColor: "rgba(21, 128, 61, 0.7)",
-                border: "1px solid rgba(34, 197, 94, 0.4)",
-              }}
-            >
-              <div className="text-2xl font-bold" style={{ color: "#ffffff" }}>
-                {todayStats.workouts}
-              </div>
-              <div
-                className="text-xs font-medium"
-                style={{ color: "#ffffff", opacity: 0.9 }}
-              >
-                Workouts
-              </div>
+          <div className={styles.quickStats}>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>{todayStats.workouts}</div>
+              <div className={styles.statLabel}>Workouts</div>
             </div>
-            <div
-              className="rounded-xl p-3 text-center"
-              style={{
-                backgroundColor: "rgba(21, 128, 61, 0.7)",
-                border: "1px solid rgba(34, 197, 94, 0.4)",
-              }}
-            >
-              <div className="text-2xl font-bold" style={{ color: "#ffffff" }}>
-                {todayStats.exercises}
-              </div>
-              <div
-                className="text-xs font-medium"
-                style={{ color: "#ffffff", opacity: 0.9 }}
-              >
-                Exercises
-              </div>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>{todayStats.exercises}</div>
+              <div className={styles.statLabel}>Exercises</div>
             </div>
-            <div
-              className="rounded-xl p-3 text-center"
-              style={{
-                backgroundColor: "rgba(21, 128, 61, 0.7)",
-                border: "1px solid rgba(34, 197, 94, 0.4)",
-              }}
-            >
-              <div className="text-2xl font-bold" style={{ color: "#ffffff" }}>
-                {todayStats.timeMinutes}
-              </div>
-              <div
-                className="text-xs font-medium"
-                style={{ color: "#ffffff", opacity: 0.9 }}
-              >
-                Minutes
-              </div>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>{todayStats.timeMinutes}</div>
+              <div className={styles.statLabel}>Minutes</div>
             </div>
           </div>
         </section>
 
         {/* Primary Action */}
-        <section className="px-4 py-6 -mt-4 relative z-10">
+        <section className={styles.actionsSection}>
           {ongoingWorkout ? (
             <Link href={`/workout-journal/${ongoingWorkout.id}`}>
-              <Button
-                size="lg"
-                className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
-              >
-                <div className="flex items-center justify-center space-x-3">
-                  <Play className="h-6 w-6" />
-                  <span className="text-lg font-semibold max-w-[280px] truncate">
-                    Resume "{ongoingWorkout.name}"
-                  </span>
-                </div>
-              </Button>
+              <button className={styles.resumeButton}>
+                <Play className="h-6 w-6" />
+                <span>Resume "{ongoingWorkout.name}"</span>
+              </button>
             </Link>
           ) : activeProgram ? (
-            <div className="space-y-3">
-              <Link href={`/workouts/program/${activeProgram?.id}`}>
-                <Button
-                  size="lg"
-                  className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
-                >
-                  <div className="flex items-center justify-center space-x-3">
-                    <Play className="h-6 w-6" />
-                    <span className="text-lg font-semibold max-w-[280px] truncate">
-                      1. Begin: {activeProgram?.name || 'Today\'s Workout'}
-                    </span>
-                  </div>
-                </Button>
+            <div className={styles.actionButtons}>
+              <Link href={`/workouts/program/${(activeProgram as any)?.id}`}>
+                <button className={styles.programButton}>
+                  <Play className="h-6 w-6" />
+                  <span>Begin: {(activeProgram as any)?.name || "Today's Workout"}</span>
+                </button>
               </Link>
               <Link href="/workout-journal">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full h-12 border-2 border-gray-300 hover:border-gray-400 text-gray-700 rounded-xl transition-all duration-200"
-                >
-                  <div className="flex items-center justify-center space-x-2">
-                    <Calendar className="h-5 w-5" />
-                    <span className="font-semibold">
-                      2. Freestyle a workout
-                    </span>
-                  </div>
-                </Button>
+                <button className={styles.secondaryButton}>
+                  <Calendar className="h-5 w-5" />
+                  <span>Freestyle a workout</span>
+                </button>
               </Link>
               <Link href="/programs">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full h-12 border-2 border-gray-300 hover:border-gray-400 text-gray-700 rounded-xl transition-all duration-200"
-                >
-                  <div className="flex items-center justify-center space-x-2">
-                    <ChartLine className="h-5 w-5" />
-                    <span className="font-semibold">
-                      3. View programs
-                    </span>
-                  </div>
-                </Button>
+                <button className={styles.secondaryButton}>
+                  <ChartLine className="h-5 w-5" />
+                  <span>View programs</span>
+                </button>
               </Link>
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="text-center text-gray-600 text-sm mb-4">
+            <div className={styles.noProgram}>
+              <h3 className={styles.noProgramTitle}>
                 You do not appear to be in a program
-              </div>
-              <div className="space-y-3">
+              </h3>
+              <div className={styles.actionButtons}>
                 <Link href="/workout-journal">
-                  <Button
-                    size="lg"
-                    className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
-                  >
-                    <div className="flex items-center justify-center space-x-3">
-                      <Play className="h-6 w-6" />
-                      <span className="text-lg font-semibold">
-                        1. Freestyle a workout
-                      </span>
-                    </div>
-                  </Button>
+                  <button className={styles.primaryButton}>
+                    <Play className="h-6 w-6" />
+                    <span>1. Freestyle a workout</span>
+                  </button>
                 </Link>
                 <Link href="/programs">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full h-12 border-2 border-gray-300 hover:border-gray-400 text-gray-700 rounded-xl transition-all duration-200"
-                  >
-                    <div className="flex items-center justify-center space-x-2">
-                      <Calendar className="h-5 w-5" />
-                      <span className="font-semibold">
-                        2. Find a program
-                      </span>
-                    </div>
-                  </Button>
+                  <button className={styles.secondaryButton}>
+                    <Calendar className="h-5 w-5" />
+                    <span>2. Find a program</span>
+                  </button>
                 </Link>
               </div>
             </div>
@@ -374,87 +244,59 @@ export default function Home() {
         </section>
 
         {/* AI Recommendation */}
-        <section className="px-4 mb-6">
-          <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl p-4 text-white relative overflow-hidden">
-            <div className="relative z-10">
-              <div className="flex items-center mb-3">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3">
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+        <section className={styles.aiSection}>
+          <div className={styles.aiCard}>
+            <div className={styles.aiContent}>
+              <div className={styles.aiHeader}>
+                <div className={styles.aiIcon}>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                   </svg>
                 </div>
-                <h3 className="font-semibold">AI Coach Recommendation</h3>
+                <h3 className={styles.aiTitle}>AI Coach Recommendation</h3>
               </div>
-              <p className="text-purple-100 text-sm mb-3">
-                {aiRecommendation.message}
-              </p>
+              <p className={styles.aiMessage}>{aiRecommendation.message}</p>
               <Link href="/programs">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border-0"
-                >
-                  View Full Program
-                </Button>
+                <button className={styles.aiButton}>View Full Program</button>
               </Link>
             </div>
-            <div className="absolute -right-4 -top-4 w-20 h-20 bg-white/5 rounded-full"></div>
-            <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/5 rounded-full"></div>
+            <div className={styles.aiDecoration1}></div>
+            <div className={styles.aiDecoration2}></div>
           </div>
         </section>
 
         {/* Recent Workouts */}
-        <section className="px-4 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Recent Workouts
-            </h3>
+        <section className={styles.contentSection}>
+          <div className={styles.sectionHeader}>
+            <h3 className={styles.sectionTitle}>Recent Workouts</h3>
             <Link href="/workouts">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-duolingo-blue hover:text-duolingo-blue/80"
-              >
-                View All
-              </Button>
+              <button className={styles.sectionButton}>View All</button>
             </Link>
           </div>
 
-          <div className="space-y-3">
+          <div className={styles.contentList}>
             {recentWorkouts.length > 0 ? (
               recentWorkouts.map((workout) => (
                 <WorkoutCard
                   key={workout.id}
                   workout={workout}
                   onViewDetails={() => {
-                    // Navigate to workout details
                     window.location.href = `/workouts/${workout.id}`;
                   }}
                 />
               ))
             ) : (
-              <Card className="border-dashed border-2 border-gray-200">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Card className={styles.emptyState}>
+                <CardContent className={styles.emptyState}>
+                  <div className={styles.emptyIcon}>
                     <Plus className="h-6 w-6 text-gray-400" />
                   </div>
-                  <h4 className="font-medium text-gray-900 mb-1">
-                    No workouts yet
-                  </h4>
-                  <p className="text-sm text-gray-500 mb-3">
+                  <h4 className={styles.emptyTitle}>No workouts yet</h4>
+                  <p className={styles.emptyDescription}>
                     Start your first workout to see it here!
                   </p>
                   <Link href="/workout-journal">
-                    <Button
-                      size="sm"
-                      className="bg-duolingo-green hover:bg-duolingo-green/90"
-                    >
-                      Start First Workout
-                    </Button>
+                    <button className={styles.emptyButton}>Start First Workout</button>
                   </Link>
                 </CardContent>
               </Card>
@@ -464,19 +306,15 @@ export default function Home() {
 
         {/* Progress Insights - Show only when user has workout data */}
         {recentWorkouts.length > 0 && (
-          <section className="px-4 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Your Progress Insights
-            </h3>
-            <Card className="border-dashed border-2 border-gray-200">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+          <section className={styles.progressSection}>
+            <h3 className={styles.sectionTitle}>Your Progress Insights</h3>
+            <Card className={styles.progressCard}>
+              <CardContent className={styles.progressCard}>
+                <div className={styles.progressIcon}>
                   <ChartLine className="h-6 w-6 text-gray-400" />
                 </div>
-                <h4 className="font-medium text-gray-900 mb-1">
-                  Building Your Profile
-                </h4>
-                <p className="text-sm text-gray-500">
+                <h4 className={styles.progressTitle}>Building Your Profile</h4>
+                <p className={styles.progressDescription}>
                   Complete more workouts to unlock personalized insights and progress analysis.
                 </p>
               </CardContent>
@@ -485,21 +323,15 @@ export default function Home() {
         )}
 
         {/* Goals */}
-        <section className="px-4 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Your Goals</h3>
+        <section className={styles.contentSection}>
+          <div className={styles.sectionHeader}>
+            <h3 className={styles.sectionTitle}>Your Goals</h3>
             <Link href="/profile">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-duolingo-blue hover:text-duolingo-blue/80"
-              >
-                Edit
-              </Button>
+              <button className={styles.sectionButton}>Edit</button>
             </Link>
           </div>
 
-          <div className="space-y-3">
+          <div className={styles.contentList}>
             {goals.length > 0 ? (
               goals.slice(0, 2).map((goal) => {
                 const progress = goal.targetValue
@@ -507,68 +339,45 @@ export default function Home() {
                   : 0;
 
                 const getStatusColor = () => {
-                  if (progress >= 80)
-                    return "bg-success-green/10 text-success-green";
-                  if (progress >= 50)
-                    return "bg-warning-orange/10 text-warning-orange";
-                  return "bg-gray-100 text-gray-600";
+                  if (progress >= 80) return styles.goalBadgeGreen;
+                  if (progress >= 50) return styles.goalBadgeYellow;
+                  return styles.goalBadgeRed;
                 };
 
                 return (
-                  <Card key={goal.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 bg-duolingo-blue/10 rounded-lg flex items-center justify-center mr-3">
-                            <Target className="h-4 w-4 text-duolingo-blue" />
-                          </div>
-                          <h4 className="font-semibold text-gray-900">
-                            {goal.title}
-                          </h4>
-                        </div>
-                        <Badge className={getStatusColor()}>
-                          {progress >= 80
-                            ? "On Track"
-                            : progress >= 50
-                              ? "Needs Focus"
-                              : "Getting Started"}
-                        </Badge>
+                  <Card key={goal.id} className={styles.goalCard}>
+                    <CardContent className={styles.goalCard}>
+                      <div className={styles.goalHeader}>
+                        <h4 className={styles.goalTitle}>{goal.title}</h4>
+                        <span className={`${styles.goalBadge} ${getStatusColor()}`}>
+                          {progress.toFixed(0)}%
+                        </span>
                       </div>
-
-                      <div className="mb-3">
-                        <div className="flex items-center justify-between text-xs text-gray-700 mb-1">
-                          <span>Progress</span>
-                          <span>{Math.round(progress)}%</span>
-                        </div>
-                        <Progress value={progress} className="h-2" />
+                      <div className={styles.goalProgress}>
+                        <Progress value={progress} />
                       </div>
-
-                      <p className="text-sm text-gray-700">
-                        {goal.description}
-                      </p>
+                      <div className={styles.goalStats}>
+                        <span>
+                          {goal.currentValue || 0} / {goal.targetValue} {goal.unit}
+                        </span>
+                        <span>{goal.category}</span>
+                      </div>
                     </CardContent>
                   </Card>
                 );
               })
             ) : (
-              <Card className="border-dashed border-2 border-gray-200">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Card className={styles.emptyState}>
+                <CardContent className={styles.emptyState}>
+                  <div className={styles.emptyIcon}>
                     <Target className="h-6 w-6 text-gray-400" />
                   </div>
-                  <h4 className="font-medium text-gray-900 mb-1">
-                    No goals set
-                  </h4>
-                  <p className="text-sm text-gray-700 mb-3">
+                  <h4 className={styles.emptyTitle}>No goals set</h4>
+                  <p className={styles.emptyDescription}>
                     Set your first fitness goal to track progress!
                   </p>
                   <Link href="/profile">
-                    <Button
-                      size="sm"
-                      className="bg-duolingo-green hover:bg-duolingo-green/90"
-                    >
-                      Set Goals
-                    </Button>
+                    <button className={styles.emptyButton}>Create Goal</button>
                   </Link>
                 </CardContent>
               </Card>
@@ -577,38 +386,13 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-20 right-4 z-30">
-        <Link href="/workout-journal">
-          <Button
-            size="icon"
-            className="w-14 h-14 bg-duolingo-green hover:bg-duolingo-green/90 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
-          >
-            <Plus className="h-6 w-6" />
-          </Button>
-        </Link>
-      </div>
-
       <BottomNavigation />
-
-      {/* Achievement Modal */}
-      {currentAchievement && (
+      
+      {showAchievement && achievementData && (
         <AchievementModal
           isOpen={showAchievement}
-          onClose={() => {
-            setShowAchievement(false);
-            // Mark achievement as viewed
-            fetch(`/api/achievements/${currentAchievement.id}/viewed`, {
-              method: "PATCH",
-              credentials: "include",
-            });
-          }}
-          achievement={{
-            type: currentAchievement.type,
-            title: currentAchievement.title,
-            description: currentAchievement.description || "Great achievement!",
-            data: currentAchievement.data,
-          }}
+          onClose={() => setShowAchievement(false)}
+          achievement={achievementData}
         />
       )}
     </div>
