@@ -62,11 +62,6 @@ export default function Home() {
     enabled: isAuthenticated,
   });
 
-  const { data: todaysWorkout } = useQuery({
-    queryKey: ["/api/programs/active/today"],
-    enabled: isAuthenticated && !!activeProgram && !ongoingWorkout,
-  });
-
   // Check for new achievements
   useEffect(() => {
     const unviewedAchievement = achievements.find(
@@ -251,7 +246,7 @@ export default function Home() {
             </Link>
           ) : activeProgram ? (
             <div className="space-y-3">
-              <Link href={`/workouts/program/${activeProgram.id}`}>
+              <Link href={`/workouts/program/${activeProgram?.id}`}>
                 <Button
                   size="lg"
                   className="w-full h-16 bg-duolingo-blue hover:bg-duolingo-blue/90 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95"
@@ -259,7 +254,7 @@ export default function Home() {
                   <div className="flex items-center justify-center space-x-3">
                     <Play className="h-6 w-6" />
                     <span className="text-lg font-semibold max-w-[280px] truncate">
-                      1. Begin: {activeProgram.name}
+                      1. Begin: {activeProgram?.name || 'Today\'s Workout'}
                     </span>
                   </div>
                 </Button>
