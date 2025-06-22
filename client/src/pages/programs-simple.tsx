@@ -58,14 +58,31 @@ export default function Programs() {
   });
 
   const activateProgramMutation = useMutation({
-    mutationFn: (programId: number) =>
-      fetch(`/api/programs/${programId}/activate`, {
+    mutationFn: async (programId: number) => {
+      const response = await fetch(`/api/programs/${programId}/activate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
-      }).then(res => res.json()),
+        body: JSON.stringify({ isActive: true }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to activate program: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
     onSuccess: () => {
       toast({ title: "Program activated successfully" });
+      // Invalidate and refetch programs and active program queries
+      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/programs/active"] });
+    },
+    onError: (error: Error) => {
+      console.error("Program activation error:", error);
+      toast({ 
+        title: "Failed to activate program",
+        description: error.message 
+      });
     },
   });
 

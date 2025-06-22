@@ -449,6 +449,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/programs/:id/activate", isAuthenticated, async (req, res) => {
+    try {
+      const programId = parseInt(req.params.id);
+      const userId = req.user.id;
+      
+      // Deactivate all other programs for this user first
+      const userPrograms = await storage.getUserPrograms(userId);
+      for (const userProgram of userPrograms) {
+        if (userProgram.id !== programId) {
+          await storage.updateProgram(userProgram.id, { isActive: false });
+        }
+      }
+      
+      // Activate the selected program
+      const program = await storage.updateProgram(programId, { isActive: true });
+      if (!program) {
+        return res.status(404).json({ message: "Program not found" });
+      }
+      
+      res.json(program);
+    } catch (error) {
+      console.error("Program activation error:", error);
+      res.status(500).json({ message: "Failed to activate program" });
+    }
+  });
+
   app.get("/api/programs/:id/today", isAuthenticated, async (req, res) => {
     try {
       const programId = parseInt(req.params.id);
