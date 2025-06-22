@@ -8,7 +8,7 @@
   background-color: #f9fafb;
 }
 
-.darkMode .container {
+:global(.dark) .container {
   background-color: #111827;
 }
 
@@ -23,7 +23,7 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
-.darkMode .header {
+:global(.dark) .header {
   background-color: #1f2937;
   border-bottom-color: #374151;
 }
@@ -34,7 +34,7 @@
   color: #111827;
 }
 
-.darkMode .headerTitle {
+:global(.dark) .headerTitle {
   color: #f9fafb;
 }
 
@@ -187,7 +187,7 @@
   margin-bottom: 0.5rem;
 }
 
-.darkMode .noProgramTitle {
+:global(.dark) .noProgramTitle {
   color: #d1d5db;
 }
 
@@ -197,7 +197,7 @@
   margin-bottom: 1.5rem;
 }
 
-.darkMode .noProgramSubtitle {
+:global(.dark) .noProgramSubtitle {
   color: #9ca3af;
 }
 
@@ -249,13 +249,13 @@
   border-color: #9ca3af;
 }
 
-.darkMode .secondaryButton {
+:global(.dark) .secondaryButton {
   background-color: #1f2937;
   color: #d1d5db;
   border-color: #374151;
 }
 
-.darkMode .secondaryButton:hover {
+:global(.dark) .secondaryButton:hover {
   border-color: #4b5563;
 }
 
@@ -356,7 +356,7 @@
   color: #111827;
 }
 
-.darkMode .sectionTitle {
+:global(.dark) .sectionTitle {
   color: #f9fafb;
 }
 
@@ -373,11 +373,11 @@
   color: rgba(59, 130, 246, 0.8);
 }
 
-.darkMode .sectionButton {
+:global(.dark) .sectionButton {
   color: #60a5fa;
 }
 
-.darkMode .sectionButton:hover {
+:global(.dark) .sectionButton:hover {
   color: rgba(96, 165, 250, 0.8);
 }
 
@@ -401,7 +401,7 @@
   text-align: center;
 }
 
-.darkMode .emptyState {
+:global(.dark) .emptyState {
   border-color: #374151;
 }
 
@@ -416,7 +416,7 @@
   margin: 0 auto 0.75rem;
 }
 
-.darkMode .emptyIcon {
+:global(.dark) .emptyIcon {
   background-color: #374151;
 }
 
@@ -426,7 +426,7 @@
   margin-bottom: 0.25rem;
 }
 
-.darkMode .emptyTitle {
+:global(.dark) .emptyTitle {
   color: #f9fafb;
 }
 
@@ -436,7 +436,7 @@
   margin-bottom: 0.75rem;
 }
 
-.darkMode .emptyDescription {
+:global(.dark) .emptyDescription {
   color: #9ca3af;
 }
 
@@ -468,7 +468,7 @@
   text-align: center;
 }
 
-.darkMode .progressCard {
+:global(.dark) .progressCard {
   border-color: #374151;
 }
 
@@ -483,7 +483,7 @@
   margin: 0 auto 0.75rem;
 }
 
-.darkMode .progressIcon {
+:global(.dark) .progressIcon {
   background-color: #374151;
 }
 
@@ -493,7 +493,7 @@
   margin-bottom: 0.25rem;
 }
 
-.darkMode .progressTitle {
+:global(.dark) .progressTitle {
   color: #f9fafb;
 }
 
@@ -502,7 +502,7 @@
   color: #6b7280;
 }
 
-.darkMode .progressDescription {
+:global(.dark) .progressDescription {
   color: #9ca3af;
 }
 
@@ -514,7 +514,7 @@
   border: 1px solid #e5e7eb;
 }
 
-.darkMode .goalCard {
+:global(.dark) .goalCard {
   background-color: #1f2937;
   border-color: #374151;
 }
@@ -532,7 +532,7 @@
   font-size: 0.875rem;
 }
 
-.darkMode .goalTitle {
+:global(.dark) .goalTitle {
   color: #f9fafb;
 }
 
@@ -548,7 +548,7 @@
   color: #16a34a;
 }
 
-.darkMode .goalBadgeGreen {
+:global(.dark) .goalBadgeGreen {
   background-color: rgba(16, 185, 129, 0.2);
   color: #34d399;
 }
@@ -558,7 +558,7 @@
   color: #d97706;
 }
 
-.darkMode .goalBadgeYellow {
+:global(.dark) .goalBadgeYellow {
   background-color: rgba(245, 158, 11, 0.2);
   color: #fbbf24;
 }
@@ -568,7 +568,7 @@
   color: #dc2626;
 }
 
-.darkMode .goalBadgeRed {
+:global(.dark) .goalBadgeRed {
   background-color: rgba(239, 68, 68, 0.2);
   color: #f87171;
 }
@@ -585,6 +585,6 @@
   color: #6b7280;
 }
 
-.darkMode .goalStats {
+:global(.dark) .goalStats {
   color: #9ca3af;
 }
