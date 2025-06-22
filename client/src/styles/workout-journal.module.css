@@ -265,6 +265,95 @@
   }
 }
 
+.completedExerciseHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.completedExerciseInfo {
+  flex: 1;
+}
+
+.completedExerciseTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .completedExerciseTitle {
+    color: #f9fafb;
+  }
+}
+
+.completedMuscleGroups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.completedExerciseActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.completedExerciseStats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.completedStatsLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.completedStatsRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.completedStatsText {
+  color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  .completedStatsText {
+    color: #d1d5db;
+  }
+}
+
+.completedRpeText {
+  color: #374151;
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+  .completedRpeText {
+    color: #d1d5db;
+  }
+}
+
+.completedVolumeText {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .completedVolumeText {
+    color: #9ca3af;
+  }
+}
+
 .programmedExercises {
   display: flex;
   flex-direction: column;

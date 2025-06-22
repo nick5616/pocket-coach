@@ -619,11 +619,11 @@ export default function WorkoutJournal() {
               <div className={styles.completedExercises}>
                 {exercises.map((exercise: Exercise) => (
                   <div key={exercise.id} className={styles.completedExerciseCard}>
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 text-lg">{exercise.name}</h3>
+                    <div className={styles.completedExerciseHeader}>
+                      <div className={styles.completedExerciseInfo}>
+                        <h3 className={styles.completedExerciseTitle}>{exercise.name}</h3>
                         {exercise.muscleGroups && exercise.muscleGroups.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
+                          <div className={styles.completedMuscleGroups}>
                             {exercise.muscleGroups.map((muscle, index) => (
                               <Badge key={index} variant="secondary" className="text-xs">
                                 {muscle}
@@ -632,7 +632,7 @@ export default function WorkoutJournal() {
                           </div>
                         )}
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className={styles.completedExerciseActions}>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -651,41 +651,30 @@ export default function WorkoutJournal() {
                     </div>
 
                     {/* Compact Exercise Stats */}
-                    <div className="flex items-center justify-between text-sm mb-3">
-                      <div className="flex items-center gap-4">
-                        <span className="text-gray-700">
+                    <div className={styles.completedExerciseStats}>
+                      <div className={styles.completedStatsLeft}>
+                        <span className={styles.completedStatsText}>
                           {exercise.sets} sets × {exercise.reps} reps
                         </span>
                         {exercise.weight && (
-                          <span className="text-gray-700">
+                          <span className={styles.completedStatsText}>
                             {exercise.weight} lbs
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className={styles.completedStatsRight}>
                         {exercise.rpe && (
-                          <span className="text-gray-700 font-medium">
+                          <span className={styles.completedRpeText}>
                             RPE {exercise.rpe}
                           </span>
                         )}
                         {exercise.weight && exercise.sets && (
-                          <span className="text-gray-600 text-xs">
+                          <span className={styles.completedVolumeText}>
                             Vol: {exercise.weight * exercise.sets * (exercise.reps || 10)} lbs
                           </span>
                         )}
                       </div>
                     </div>
-
-                    {/* Muscle Groups */}
-                    {exercise.muscleGroups && exercise.muscleGroups.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {exercise.muscleGroups.map((muscle: string, idx: number) => (
-                          <Badge key={idx} variant="secondary" className="text-xs">
-                            {muscle}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
 
                     {exercise.notes && (
                       <div className={styles.exerciseNotesContainer}>
