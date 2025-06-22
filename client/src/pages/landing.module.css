@@ -1,0 +1,178 @@
+/* Landing Page Styles */
+.container {
+  height: 100%;
+  background: linear-gradient(135deg, rgb(239, 246, 255) 0%, rgb(224, 231, 255) 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.container.dark {
+  background: linear-gradient(135deg, rgb(17, 24, 39) 0%, rgb(31, 41, 55) 100%);
+}
+
+.content {
+  padding: 2rem 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.iconBackground {
+  background-color: rgb(37, 99, 235);
+  padding: 0.75rem;
+  border-radius: 50%;
+}
+
+.icon {
+  width: 2rem;
+  height: 2rem;
+  color: white;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  color: rgb(17, 24, 39);
+  margin-bottom: 1rem;
+}
+
+.container.dark .title {
+  color: white;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: rgb(75, 85, 99);
+  margin-bottom: 2rem;
+}
+
+.container.dark .subtitle {
+  color: rgb(209, 213, 219);
+}
+
+.button {
+  width: 100%;
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.featureCard {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.container.dark .featureCard {
+  background-color: rgb(31, 41, 55);
+}
+
+.featureHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.featureIconBackground {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin-right: 0.75rem;
+}
+
+.featureIconBackground.ai {
+  background-color: rgb(219, 234, 254);
+}
+
+.container.dark .featureIconBackground.ai {
+  background-color: rgb(30, 58, 138);
+}
+
+.featureIconBackground.goal {
+  background-color: rgb(220, 252, 231);
+}
+
+.container.dark .featureIconBackground.goal {
+  background-color: rgb(20, 83, 45);
+}
+
+.featureIconBackground.progress {
+  background-color: rgb(243, 232, 255);
+}
+
+.container.dark .featureIconBackground.progress {
+  background-color: rgb(88, 28, 135);
+}
+
+.featureIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.featureIcon.ai {
+  color: rgb(37, 99, 235);
+}
+
+.container.dark .featureIcon.ai {
+  color: rgb(96, 165, 250);
+}
+
+.featureIcon.goal {
+  color: rgb(34, 197, 94);
+}
+
+.container.dark .featureIcon.goal {
+  color: rgb(74, 222, 128);
+}
+
+.featureIcon.progress {
+  color: rgb(168, 85, 247);
+}
+
+.container.dark .featureIcon.progress {
+  color: rgb(196, 181, 253);
+}
+
+.featureTitle {
+  font-weight: 600;
+  color: rgb(17, 24, 39);
+}
+
+.container.dark .featureTitle {
+  color: white;
+}
+
+.featureDescription {
+  color: rgb(75, 85, 99);
+}
+
+.container.dark .featureDescription {
+  color: rgb(209, 213, 219);
+}
+
+.footer {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 0.875rem;
+  color: rgb(107, 114, 128);
+}
+
+.container.dark .footer {
+  color: rgb(156, 163, 175);
+}
