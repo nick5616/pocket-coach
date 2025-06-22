@@ -9,6 +9,7 @@ import { Progress } from "@/components/Progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   User, 
   Settings, 
@@ -17,7 +18,9 @@ import {
   Calendar,
   Edit,
   Save,
-  X
+  X,
+  LogOut,
+  Mail
 } from "lucide-react";
 import type { User as UserType, Goal, Achievement } from "@shared/schema";
 
@@ -33,26 +36,21 @@ export default function Profile() {
     unit: "reps"
   });
   const { toast } = useToast();
-  const userId = 1; // Demo user
-
-  const { data: user, isLoading: userLoading } = useQuery<UserType>({
-    queryKey: ["/api/user", userId],
-    queryFn: () => fetch(`/api/user/${userId}`).then(res => res.json()),
-  });
+  const { user, isLoading: userLoading } = useAuth();
 
   const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
-    queryKey: ["/api/goals", { userId }],
-    queryFn: () => fetch(`/api/goals?userId=${userId}`).then(res => res.json()),
+    queryKey: ["/api/goals"],
+    enabled: !!user,
   });
 
   const { data: achievements = [], isLoading: achievementsLoading } = useQuery<Achievement[]>({
-    queryKey: ["/api/achievements", { userId }],
-    queryFn: () => fetch(`/api/achievements?userId=${userId}`).then(res => res.json()),
+    queryKey: ["/api/achievements"],
+    enabled: !!user,
   });
 
   const updateUserMutation = useMutation({
     mutationFn: (updatedUser: Partial<UserType>) =>
-      fetch(`/api/user/${userId}`, {
+      fetch(`/api/user/${user?.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedUser),
@@ -69,7 +67,7 @@ export default function Profile() {
       fetch("/api/goals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...goal, userId }),
+        body: JSON.stringify({ ...goal, userId: user?.id }),
       }).then(res => res.json()),
     onSuccess: () => {
       toast({ title: "Goal created successfully" });
@@ -77,6 +75,10 @@ export default function Profile() {
       setNewGoal({ title: "", description: "", category: "strength", targetValue: 0, unit: "reps" });
     },
   });
+
+  const handleLogout = () => {
+    window.location.href = '/api/logout';
+  };
 
   if (userLoading || goalsLoading || achievementsLoading) {
     return (
@@ -107,12 +109,21 @@ export default function Profile() {
               <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
               <p className="text-gray-600 mt-1">Manage your fitness profile</p>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsEditingProfile(!isEditingProfile)}
-            >
-              {isEditingProfile ? <X className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsEditingProfile(!isEditingProfile)}
+              >
+                {isEditingProfile ? <X className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={handleLogout}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </header>
 
@@ -128,9 +139,14 @@ export default function Profile() {
                   {isEditingProfile ? (
                     <div className="space-y-2">
                       <Input
-                        placeholder="Username"
-                        value={editingUser.username || user?.username || ""}
-                        onChange={(e) => setEditingUser({...editingUser, username: e.target.value})}
+                        placeholder="First Name"
+                        value={editingUser.firstName || user?.firstName || ""}
+                        onChange={(e) => setEditingUser({...editingUser, firstName: e.target.value})}
+                      />
+                      <Input
+                        placeholder="Last Name"
+                        value={editingUser.lastName || user?.lastName || ""}
+                        onChange={(e) => setEditingUser({...editingUser, lastName: e.target.value})}
                       />
                       <Input
                         placeholder="Email"
@@ -141,11 +157,18 @@ export default function Profile() {
                     </div>
                   ) : (
                     <div>
-                      <h2 className="text-xl font-bold text-gray-900">{user?.username}</h2>
-                      <p className="text-gray-600">{user?.email}</p>
+                      <h2 className="text-xl font-bold text-gray-900">
+                        {user?.firstName && user?.lastName 
+                          ? `${user.firstName} ${user.lastName}` 
+                          : 'User'}
+                      </h2>
+                      <div className="flex items-center mt-1 text-gray-600">
+                        <Mail className="w-4 h-4 mr-2" />
+                        {user?.email}
+                      </div>
                       <div className="flex items-center mt-2">
                         <Badge variant="outline">
-                          🔥 {user?.currentStreak} day streak
+                          🔥 {user?.currentStreak || 0} day streak
                         </Badge>
                       </div>
                     </div>
