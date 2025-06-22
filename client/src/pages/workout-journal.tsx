@@ -71,12 +71,6 @@ export default function WorkoutJournal() {
     enabled: !!workoutId
   });
 
-  const { data: exercises = [] } = useQuery({
-    queryKey: ["/api/workouts", workoutId, "exercises"],
-    queryFn: () => fetch(`/api/exercises?workoutId=${workoutId}`).then(res => res.json()),
-    enabled: !!workoutId
-  });
-
   // Calculate total workout volume (Force × Distance approximation)
   const calculateWorkoutVolume = (exercises: Exercise[]) => {
     return exercises.reduce((total, exercise) => {
@@ -88,6 +82,12 @@ export default function WorkoutJournal() {
       return total;
     }, 0);
   };
+
+  const { data: exercises = [] } = useQuery({
+    queryKey: ["/api/workouts", workoutId, "exercises"],
+    queryFn: () => fetch(`/api/exercises?workoutId=${workoutId}`).then(res => res.json()),
+    enabled: !!workoutId
+  });
 
   const { data: activeProgram } = useQuery({
     queryKey: ["/api/programs/active", { userId: 1 }],

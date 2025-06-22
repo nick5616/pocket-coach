@@ -42,3 +42,11 @@ export function DialogTitle({ className = "", children, ...props }: HTMLAttribut
     </h2>
   );
 }
+
+export function DialogDescription({ className = "", children, ...props }: HTMLAttributes<HTMLParagraphElement>) {
+  return (
+    <p className={`${styles.dialogDescription} ${className}`} {...props}>
+      {children}
+    </p>
+  );
+}

@@ -188,15 +188,15 @@ export class DatabaseStorage implements IStorage {
   async deleteGoal(id: number): Promise<boolean> {
     await this.ensureInitialized();
     const result = await db.delete(goals).where(eq(goals.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   // Workouts
   async getUserWorkouts(userId: number, limit?: number): Promise<Workout[]> {
     await this.ensureInitialized();
-    let query = db.select().from(workouts).where(eq(workouts.userId, userId)).orderBy(desc(workouts.createdAt));
+    const query = db.select().from(workouts).where(eq(workouts.userId, userId)).orderBy(desc(workouts.createdAt));
     if (limit) {
-      query = query.limit(limit);
+      return await query.limit(limit);
     }
     return await query;
   }

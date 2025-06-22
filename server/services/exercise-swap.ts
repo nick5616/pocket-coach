@@ -1,6 +1,4 @@
-import OpenAI from "openai";
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import { openai } from "./openai";
 
 export interface ExerciseSwapRequest {
   name: string;
@@ -26,64 +24,69 @@ export async function swapExerciseForEquivalent(
   reason?: string
 ): Promise<SwappedExercise> {
   try {
-    const prompt = `You are a fitness expert. I need to swap "${originalExercise.name}" for an equivalent exercise.
+    const prompt = `You are a fitness expert. Please suggest an equivalent exercise to replace "${originalExercise.name}".
 
 Original exercise details:
 - Name: ${originalExercise.name}
 - Sets: ${originalExercise.sets}
 - Reps: ${originalExercise.reps}
-- Weight: ${originalExercise.weight || "bodyweight"}
-- RPE: ${originalExercise.rpe || "not specified"}
+- Weight: ${originalExercise.weight || 'bodyweight'}
+- RPE: ${originalExercise.rpe || 'not specified'}
+- Muscle groups: ${originalExercise.muscleGroups?.join(', ') || 'unknown'}
 
-${reason ? `Reason for swap: ${reason}` : ""}
+Reason for swap: ${reason || 'User requested alternative'}
 
-Find an equivalent exercise that:
-1. Targets the same primary muscle groups
-2. Has similar movement pattern and difficulty
-3. Can be performed with similar sets/reps scheme
-4. Is commonly available in gyms
-
-Respond with JSON in this exact format:
+Please respond with a JSON object containing:
 {
-  "name": "replacement exercise name",
+  "name": "alternative exercise name",
   "sets": ${originalExercise.sets},
   "reps": ${originalExercise.reps},
-  "weight": estimated_weight_or_null,
-  "rpe": estimated_rpe_or_null,
-  "reason": "brief explanation of why this is equivalent",
-  "muscleGroups": ["primary", "secondary", "muscle", "groups"]
+  "weight": ${originalExercise.weight || null},
+  "rpe": ${originalExercise.rpe || null},
+  "reason": "brief explanation for why this is a good substitute",
+  "muscleGroups": ["list", "of", "target", "muscle", "groups"]
 }`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      messages: [
-        {
-          role: "system",
-          content: "You are a fitness expert specializing in exercise equivalency and program design. Always respond with valid JSON."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" },
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
+      max_tokens: 500
     });
 
-    const result = JSON.parse(response.choices[0].message.content || "{}");
-    
-    return {
-      name: result.name,
-      sets: result.sets || originalExercise.sets,
-      reps: result.reps || originalExercise.reps,
-      weight: result.weight,
-      rpe: result.rpe,
-      reason: result.reason,
-      muscleGroups: result.muscleGroups || []
-    };
+    const response = completion.choices[0]?.message?.content;
+    if (!response) {
+      throw new Error("No response from OpenAI");
+    }
 
+    // Parse the JSON response
+    const swappedExercise = JSON.parse(response) as SwappedExercise;
+    
+    return swappedExercise;
   } catch (error) {
     console.error("Error swapping exercise:", error);
-    throw new Error("Failed to generate exercise swap");
+    
+    // Fallback to a basic swap based on muscle groups
+    const fallbackSwaps: Record<string, string> = {
+      "push-ups": "dumbbell press",
+      "squats": "leg press",
+      "pull-ups": "lat pulldown",
+      "deadlifts": "romanian deadlifts",
+      "bench press": "dumbbell press",
+      "overhead press": "dumbbell shoulder press"
+    };
+
+    const exerciseName = originalExercise.name.toLowerCase();
+    const fallbackName = fallbackSwaps[exerciseName] || "alternative exercise";
+
+    return {
+      name: fallbackName,
+      sets: originalExercise.sets,
+      reps: originalExercise.reps,
+      weight: originalExercise.weight,
+      rpe: originalExercise.rpe,
+      reason: "Equivalent exercise targeting similar muscle groups",
+      muscleGroups: originalExercise.muscleGroups || ["unknown"]
+    };
   }
 }
