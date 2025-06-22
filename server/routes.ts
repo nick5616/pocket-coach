@@ -431,6 +431,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/programs", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const validatedData = insertProgramSchema.parse({
+        ...req.body,
+        userId: userId
+      });
+      const program = await storage.createProgram(validatedData);
+      res.json(program);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid program data", errors: error.errors });
+      }
+      console.error("Program creation error:", error);
+      res.status(500).json({ message: "Failed to create program" });
+    }
+  });
+
   app.get("/api/programs/:id/today", isAuthenticated, async (req, res) => {
     try {
       const programId = parseInt(req.params.id);

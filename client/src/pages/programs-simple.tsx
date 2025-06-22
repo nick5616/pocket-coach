@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
@@ -44,6 +44,7 @@ export default function Programs() {
     equipment: [] as string[]
   });
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const userId = 1; // Demo user
 
   const { data: programs = [], isLoading } = useQuery<Program[]>({
@@ -69,12 +70,19 @@ export default function Programs() {
   });
 
   const createProgramMutation = useMutation({
-    mutationFn: (program: any) =>
-      fetch("/api/programs", {
+    mutationFn: async (program: any) => {
+      const response = await fetch("/api/programs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...program, userId }),
-      }).then(res => res.json()),
+        body: JSON.stringify(program),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to create program: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
     onSuccess: () => {
       toast({ title: "Program created successfully" });
       setIsCreateOpen(false);
@@ -85,6 +93,15 @@ export default function Programs() {
         durationWeeks: 4,
         focusAreas: [],
         equipment: []
+      });
+      // Invalidate and refetch programs list
+      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
+    },
+    onError: (error: Error) => {
+      console.error("Program creation error:", error);
+      toast({ 
+        title: "Failed to create program",
+        description: error.message 
       });
     },
   });
