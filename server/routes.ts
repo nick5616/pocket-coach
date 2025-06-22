@@ -335,13 +335,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Goal routes
-  app.get("/api/goals", async (req, res) => {
+  app.get("/api/goals", isAuthenticated, async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
-      if (!userId) {
-        return res.status(400).json({ message: "userId is required" });
-      }
-      
+      const userId = req.user.id;
       const goals = await storage.getUserGoals(userId);
       res.json(goals);
     } catch (error) {
@@ -379,13 +375,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Program routes
-  app.get("/api/programs", async (req, res) => {
+  app.get("/api/programs", isAuthenticated, async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
-      if (!userId) {
-        return res.status(400).json({ message: "userId is required" });
-      }
-      
+      const userId = req.user.id;
       const programs = await storage.getUserPrograms(userId);
       res.json(programs);
     } catch (error) {
@@ -393,13 +385,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/programs/active", async (req, res) => {
+  app.get("/api/programs/active", isAuthenticated, async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
-      if (!userId) {
-        return res.status(400).json({ message: "userId is required" });
-      }
-      
+      const userId = req.user.id;
       const program = await storage.getActiveProgram(userId);
       res.json(program);
     } catch (error) {
@@ -407,13 +395,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/programs/generate", async (req, res) => {
+  app.post("/api/programs/generate", isAuthenticated, async (req, res) => {
     try {
-      const { userId, experience, availableDays, equipment } = req.body;
-      
-      if (!userId) {
-        return res.status(400).json({ message: "userId is required" });
-      }
+      const { experience, availableDays, equipment } = req.body;
+      const userId = req.user.id;
 
       const userGoals = await storage.getUserGoals(userId);
       
@@ -475,9 +460,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/programs/active/today", async (req, res) => {
+  app.get("/api/programs/active/today", isAuthenticated, async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string) || 1;
+      const userId = req.user.id;
       const program = await storage.getActiveProgram(userId);
       
       if (!program) {

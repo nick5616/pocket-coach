@@ -48,15 +48,13 @@ export default function Home() {
   const ongoingWorkout = recentWorkouts.find((w) => !w.isCompleted && !w.completedAt);
 
   const { data: goals = [] } = useQuery<Goal[]>({
-    queryKey: ["/api/goals", { userId }],
-    queryFn: () =>
-      fetch(`/api/goals?userId=${userId}`).then((res) => res.json()),
+    queryKey: ["/api/goals"],
+    enabled: isAuthenticated,
   });
 
   const { data: achievements = [] } = useQuery<Achievement[]>({
-    queryKey: ["/api/achievements", { userId }],
-    queryFn: () =>
-      fetch(`/api/achievements?userId=${userId}`).then((res) => res.json()),
+    queryKey: ["/api/achievements"],
+    enabled: isAuthenticated,
   });
 
   // Check for new achievements
@@ -88,7 +86,7 @@ export default function Home() {
 
   const greeting = () => {
     const hour = new Date().getHours();
-    const name = user?.username || "User";
+    const name = user?.firstName || authUser?.firstName || "User";
 
     if (hour < 12) return `Good morning, ${name}!`;
     if (hour < 17) return `Good afternoon, ${name}!`;
