@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
+import AuthPage from "@/pages/auth";
 import Home from "@/pages/home";
 import Workouts from "@/pages/workouts";
 import WorkoutJournal from "@/pages/workout-journal";
@@ -21,7 +22,7 @@ function Router() {
   return (
     <Switch>
       {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
+        <Route path="/" component={AuthPage} />
       ) : (
         <>
           <Route path="/" component={Home} />
