@@ -79,6 +79,10 @@ export const programs = pgTable("programs", {
   isActive: boolean("is_active").default(false),
   schedule: jsonb("schedule"), // Weekly schedule structure
   aiGenerated: boolean("ai_generated").default(false),
+  durationWeeks: integer("duration_weeks").default(4),
+  difficulty: text("difficulty").default("beginner"), // "beginner", "intermediate", "advanced"
+  focusAreas: text("focus_areas").array(), // ["strength", "cardio", "flexibility"]
+  equipment: text("equipment").array(), // ["dumbbells", "barbell", "bodyweight"]
   createdAt: timestamp("created_at").defaultNow(),
 });
 

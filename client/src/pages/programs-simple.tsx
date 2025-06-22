@@ -218,58 +218,110 @@ export default function Programs() {
           <div className="space-y-4">
             {filteredPrograms.map((program) => (
               <Card key={program.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="font-medium text-gray-900">{program.name}</h3>
-                        {program.isActive && (
-                          <Badge variant="default">Active</Badge>
-                        )}
-                        {program.isCompleted && (
-                          <Badge variant="outline">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Completed
-                          </Badge>
+                <CardContent className="p-5">
+                  <div className="space-y-4">
+                    {/* Header with title and status */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h3 className="font-semibold text-gray-900 text-lg">{program.name}</h3>
+                          {program.isActive && (
+                            <Badge variant="default">Active</Badge>
+                          )}
+                          {program.aiGenerated && (
+                            <Badge variant="outline">AI Generated</Badge>
+                          )}
+                        </div>
+                        
+                        {program.description && (
+                          <p className="text-sm text-gray-600 leading-relaxed">{program.description}</p>
                         )}
                       </div>
                       
-                      <p className="text-sm text-gray-600 mb-3">{program.description}</p>
-                      
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          {program.durationWeeks} weeks
-                        </div>
-                        <div className="flex items-center">
-                          <Target className="w-4 h-4 mr-1" />
-                          {program.difficulty}
-                        </div>
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 mr-1" />
-                          {program.focusAreas?.join(", ") || "General"}
-                        </div>
+                      <div className="ml-4 flex-shrink-0">
+                        {!program.isActive && (
+                          <Button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              activateProgramMutation.mutate(program.id);
+                            }}
+                            disabled={activateProgramMutation.isPending}
+                            size="sm"
+                          >
+                            <Play className="w-4 h-4 mr-2" />
+                            {activateProgramMutation.isPending ? "Starting..." : "Start"}
+                          </Button>
+                        )}
+                        {program.isActive && (
+                          <Link href="/workout-journal">
+                            <Button size="sm">
+                              <Dumbbell className="w-4 h-4 mr-2" />
+                              Workout
+                            </Button>
+                          </Link>
+                        )}
                       </div>
                     </div>
-                    
-                    <div className="ml-4">
-                      {!program.isActive && !program.isCompleted && (
-                        <Button 
-                          onClick={() => activateProgramMutation.mutate(program.id)}
-                          disabled={activateProgramMutation.isPending}
-                          size="sm"
-                        >
-                          <Play className="w-4 h-4 mr-2" />
-                          Start
-                        </Button>
-                      )}
+
+                    {/* Program metadata grid */}
+                    <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-100">
+                      <div className="space-y-2">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Clock className="w-4 h-4 mr-2 text-blue-500" />
+                          <span className="font-medium">Duration:</span>
+                          <span className="ml-1">{program.durationWeeks || 4} weeks</span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Target className="w-4 h-4 mr-2 text-green-500" />
+                          <span className="font-medium">Level:</span>
+                          <span className="ml-1 capitalize">{program.difficulty || "Beginner"}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {program.focusAreas && program.focusAreas.length > 0 && (
+                          <div className="flex items-start text-sm text-gray-600">
+                            <Star className="w-4 h-4 mr-2 text-yellow-500 mt-0.5" />
+                            <div>
+                              <span className="font-medium">Focus:</span>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {program.focusAreas.map((area, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {area}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {program.equipment && program.equipment.length > 0 && (
+                          <div className="flex items-start text-sm text-gray-600">
+                            <Dumbbell className="w-4 h-4 mr-2 text-purple-500 mt-0.5" />
+                            <div>
+                              <span className="font-medium">Equipment:</span>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {program.equipment.map((item, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {item}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Creation date */}
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-50 text-xs text-gray-400">
+                      <span>Created {new Date(program.createdAt!).toLocaleDateString()}</span>
                       {program.isActive && (
-                        <Link href="/workout-journal">
-                          <Button size="sm">
-                            <Dumbbell className="w-4 h-4 mr-2" />
-                            Workout
-                          </Button>
-                        </Link>
+                        <span className="flex items-center">
+                          <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
+                          Currently Active
+                        </span>
                       )}
                     </div>
                   </div>
