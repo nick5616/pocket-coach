@@ -8,6 +8,7 @@ import { Badge } from "@/components/Badge";
 import { Progress } from "@/components/Progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
 import BottomNavigation from "@/components/bottom-navigation";
+import LoadingScreen from "@/components/loading-screen";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { 
@@ -47,6 +48,17 @@ export default function Profile() {
     queryKey: ["/api/achievements"],
     enabled: !!user,
   });
+
+  // Show loading screen if any essential data is still loading
+  const isLoading = userLoading || goalsLoading || achievementsLoading;
+
+  if (isLoading) {
+    return <LoadingScreen message="Loading your profile..." />;
+  }
+
+  if (!user) {
+    return <LoadingScreen message="Authenticating..." />;
+  }
 
   const updateUserMutation = useMutation({
     mutationFn: (updatedUser: Partial<UserType>) =>

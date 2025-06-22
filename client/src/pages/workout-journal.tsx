@@ -17,6 +17,7 @@ import {
   Weight,
 } from "lucide-react";
 import { Link, useParams, useLocation } from "wouter";
+import LoadingScreen from "@/components/loading-screen";
 
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
@@ -79,7 +80,7 @@ export default function WorkoutJournal() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Queries
-  const { data: workout } = useQuery({
+  const { data: workout, isLoading: workoutLoading } = useQuery({
     queryKey: ["/api/workouts", workoutId],
     queryFn: () =>
       fetch(`/api/workouts/${workoutId}`).then((res) => res.json()),

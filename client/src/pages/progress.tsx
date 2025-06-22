@@ -6,6 +6,7 @@ import { Button } from "@/components/Button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
 import BottomNavigation from "@/components/bottom-navigation";
 import BodyVisualization from "@/components/body-visualization";
+import LoadingScreen from "@/components/loading-screen";
 import { 
   Target, 
   Calendar, 
@@ -92,19 +93,7 @@ export default function Progress() {
   };
 
   if (workoutsLoading) {
-    return (
-      <div className="pb-20">
-        <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-8 z-40">
-          <h1 className="text-lg font-bold text-gray-900">Progress</h1>
-        </header>
-        <div className="p-4 space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-gray-200 rounded-xl h-32 loading-shimmer"></div>
-          ))}
-        </div>
-        <BottomNavigation />
-      </div>
-    );
+    return <LoadingScreen message="Analyzing your progress data..." />;
   }
 
   return (
