@@ -20,6 +20,7 @@ import {
   CheckCircle
 } from "lucide-react";
 import type { Program } from "@shared/schema";
+import styles from "./programs-simple.module.css";
 
 const equipmentOptions = [
   { id: "dumbbells", label: "Dumbbells" },
@@ -29,32 +30,84 @@ const equipmentOptions = [
   { id: "cables", label: "Cable Machine" },
   { id: "machines", label: "Weight Machines" },
   { id: "resistance_bands", label: "Resistance Bands" },
-  { id: "bodyweight", label: "Bodyweight Only" },
+  { id: "kettlebells", label: "Kettlebells" },
+  { id: "bodyweight", label: "Bodyweight Only" }
+];
+
+const tabs = [
+  { id: "all", label: "All" },
+  { id: "active", label: "Active" },
+  { id: "completed", label: "Completed" }
 ];
 
 export default function Programs() {
-  const [selectedTab, setSelectedTab] = useState<"all" | "active" | "completed">("all");
+  const [selectedTab, setSelectedTab] = useState("all");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newProgram, setNewProgram] = useState({
     name: "",
     description: "",
     difficulty: "beginner",
-    durationWeeks: 4,
+    durationWeeks: 8,
     focusAreas: [] as string[],
     equipment: [] as string[]
   });
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const userId = 1; // Demo user
 
-  const { data: programs = [], isLoading } = useQuery<Program[]>({
-    queryKey: ["/api/programs", { userId }],
-    queryFn: () => fetch(`/api/programs?userId=${userId}`).then(res => res.json()),
+  const { data: user } = useQuery({
+    queryKey: ["/api/auth/user"],
+    queryFn: () => fetch("/api/auth/user").then(res => res.json()),
   });
 
-  const { data: activeProgram } = useQuery<Program | null>({
+  const userId = user?.id;
+
+  const { data: programs = [], isLoading } = useQuery({
+    queryKey: ["/api/programs", { userId }],
+    queryFn: () => fetch(`/api/programs?userId=${userId}`).then(res => res.json()),
+    enabled: !!userId,
+  });
+
+  const { data: activeProgram } = useQuery({
     queryKey: ["/api/programs/active", { userId }],
     queryFn: () => fetch(`/api/programs/active?userId=${userId}`).then(res => res.json()),
+    enabled: !!userId,
+  });
+
+  const createProgramMutation = useMutation({
+    mutationFn: async (programData: typeof newProgram) => {
+      const response = await fetch("/api/programs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(programData),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to create program: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Program created successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
+      setIsCreateOpen(false);
+      setNewProgram({
+        name: "",
+        description: "",
+        difficulty: "beginner",
+        durationWeeks: 8,
+        focusAreas: [],
+        equipment: []
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Program creation error:", error);
+      toast({ 
+        title: "Failed to create program",
+        description: error.message 
+      });
+    },
   });
 
   const activateProgramMutation = useMutation({
@@ -86,50 +139,17 @@ export default function Programs() {
     },
   });
 
-  const createProgramMutation = useMutation({
-    mutationFn: async (program: any) => {
-      const response = await fetch("/api/programs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(program),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to create program: ${response.statusText}`);
-      }
-      
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({ title: "Program created successfully" });
-      setIsCreateOpen(false);
-      setNewProgram({
-        name: "",
-        description: "",
-        difficulty: "beginner",
-        durationWeeks: 4,
-        focusAreas: [],
-        equipment: []
-      });
-      // Invalidate and refetch programs list
-      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
-    },
-    onError: (error: Error) => {
-      console.error("Program creation error:", error);
-      toast({ 
-        title: "Failed to create program",
-        description: error.message 
-      });
-    },
-  });
-
-  const filteredPrograms = programs.filter(program => {
+  const filteredPrograms = programs.filter((program: Program) => {
     if (selectedTab === "active") return program.isActive;
     if (selectedTab === "completed") return program.isCompleted;
     return true;
   });
 
   const handleCreateProgram = () => {
+    if (!newProgram.name.trim()) {
+      toast({ title: "Program name is required" });
+      return;
+    }
     createProgramMutation.mutate(newProgram);
   };
 
@@ -153,21 +173,23 @@ export default function Programs() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading programs...</div>
+      <div className={styles.container}>
+        <div className={styles.emptyState}>
+          <div className={styles.subtitle}>Loading programs...</div>
+        </div>
       </div>
     );
   }
 
   return (
     <>
-      <main className="pb-20 bg-gray-50 min-h-screen">
+      <main className={styles.container}>
         {/* Header */}
-        <header className="bg-white shadow-sm border-b px-4 py-6">
-          <div className="flex items-center justify-between">
+        <header className={styles.header}>
+          <div className={styles.headerFlex}>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Programs</h1>
-              <p className="text-gray-600 mt-1">Structured workout plans</p>
+              <h1 className={styles.title}>Programs</h1>
+              <p className={styles.subtitle}>Structured workout plans</p>
             </div>
             <Button onClick={() => setIsCreateOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
@@ -178,34 +200,32 @@ export default function Programs() {
 
         {/* Active Program Banner */}
         {activeProgram && (
-          <section className="px-4 py-4 bg-blue-50 border-b">
-            <Card className="border-blue-200 bg-white">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Play className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-blue-900">Active Program</h3>
-                      <p className="text-sm text-blue-700">{activeProgram.name}</p>
-                    </div>
+          <section className={styles.activeBanner}>
+            <Card className={styles.activeCard}>
+              <CardContent className={styles.activeCardContent}>
+                <div className={styles.activeInfo}>
+                  <div className={styles.activeIcon}>
+                    <Play className="w-5 h-5" style={{color: '#2563eb'}} />
                   </div>
-                  <Link href="/workout-journal">
-                    <Button size="sm">
-                      <Dumbbell className="w-4 h-4 mr-2" />
-                      Start Workout
-                    </Button>
-                  </Link>
+                  <div>
+                    <h3 className={styles.activeTitle}>Active Program</h3>
+                    <p className={styles.activeName}>{activeProgram.name}</p>
+                  </div>
                 </div>
+                <Link href="/workout-journal">
+                  <Button size="sm">
+                    <Dumbbell className="w-4 h-4 mr-2" />
+                    Start Workout
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </section>
         )}
 
         {/* Tab Navigation */}
-        <section className="px-4 py-4 bg-white border-b">
-          <div className="grid grid-cols-3 gap-2">
+        <section className={styles.tabSection}>
+          <div className={styles.tabGrid}>
             <Button 
               variant={selectedTab === "all" ? "primary" : "outline"}
               onClick={() => setSelectedTab("all")}
@@ -218,30 +238,30 @@ export default function Programs() {
               onClick={() => setSelectedTab("active")}
               size="sm"
             >
-              Active ({programs.filter(p => p.isActive).length})
+              Active ({programs.filter((p: Program) => p.isActive).length})
             </Button>
             <Button 
               variant={selectedTab === "completed" ? "primary" : "outline"}
               onClick={() => setSelectedTab("completed")}
               size="sm"
             >
-              Done ({programs.filter(p => p.isCompleted).length})
+              Completed ({programs.filter((p: Program) => p.isCompleted).length})
             </Button>
           </div>
         </section>
 
         {/* Programs List */}
-        <section className="px-4 py-4">
-          <div className="space-y-4">
-            {filteredPrograms.map((program) => (
-              <Card key={program.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-5">
-                  <div className="space-y-4">
+        <section className={styles.section}>
+          <div className={styles.programsList}>
+            {filteredPrograms.map((program: Program) => (
+              <Card key={program.id}>
+                <CardContent className={styles.programCard}>
+                  <div className={styles.cardContent}>
                     {/* Header with title and status */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <h3 className="font-semibold text-gray-900 text-lg">{program.name}</h3>
+                    <div className={styles.cardHeader}>
+                      <div className={styles.headerContent}>
+                        <div className={styles.titleRow}>
+                          <h3 className={styles.programTitle}>{program.name}</h3>
                           {program.isActive && (
                             <Badge variant="default">Active</Badge>
                           )}
@@ -251,9 +271,9 @@ export default function Programs() {
                         </div>
                         
                         {program.description && (
-                          <div className="text-sm text-gray-600 leading-relaxed">
-                            <p className="mb-1">{program.description}</p>
-                            <p className="text-xs text-gray-400">
+                          <div className={styles.description}>
+                            <p className={styles.descriptionText}>{program.description}</p>
+                            <p className={styles.createdDate}>
                               Created {new Date(program.createdAt!).toLocaleDateString()}
                             </p>
                           </div>
@@ -263,13 +283,13 @@ export default function Programs() {
 
                     {/* Focus Areas and Equipment */}
                     {((program.focusAreas && program.focusAreas.length > 0) || (program.equipment && program.equipment.length > 0)) && (
-                      <div className="space-y-3">
+                      <div className={styles.metadataSection}>
                         {program.focusAreas && program.focusAreas.length > 0 && (
-                          <div className="flex items-start text-sm text-gray-600">
-                            <Star className="w-4 h-4 mr-2 text-yellow-500 mt-0.5" />
+                          <div className={styles.metadataRow}>
+                            <Star className={styles.metadataIcon} style={{color: '#eab308'}} />
                             <div>
-                              <span className="font-medium">Focus:</span>
-                              <div className="flex flex-wrap gap-1 mt-1">
+                              <span className={styles.metadataLabel}>Focus:</span>
+                              <div className={styles.metadataBadges}>
                                 {program.focusAreas.map((area, index) => (
                                   <Badge key={index} variant="outline" className="text-xs">
                                     {area}
@@ -281,11 +301,11 @@ export default function Programs() {
                         )}
                         
                         {program.equipment && program.equipment.length > 0 && (
-                          <div className="flex items-start text-sm text-gray-600">
-                            <Dumbbell className="w-4 h-4 mr-2 text-purple-500 mt-0.5" />
+                          <div className={styles.metadataRow}>
+                            <Dumbbell className={styles.metadataIcon} style={{color: '#a855f7'}} />
                             <div>
-                              <span className="font-medium">Equipment:</span>
-                              <div className="flex flex-wrap gap-1 mt-1">
+                              <span className={styles.metadataLabel}>Equipment:</span>
+                              <div className={styles.metadataBadges}>
                                 {program.equipment.map((item, index) => (
                                   <Badge key={index} variant="outline" className="text-xs">
                                     {item}
@@ -299,8 +319,8 @@ export default function Programs() {
                     )}
 
                     {/* Bottom row with badges and action button */}
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                      <div className="flex items-center space-x-2">
+                    <div className={styles.bottomRow}>
+                      <div className={styles.badgeGroup}>
                         <Badge variant="outline" className="text-xs">
                           🕕 {program.durationWeeks || 4} weeks
                         </Badge>
@@ -309,13 +329,13 @@ export default function Programs() {
                         </Badge>
                         {program.isActive && (
                           <Badge variant="default" className="text-xs">
-                            <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
+                            <div className={styles.pulseDot}></div>
                             Active
                           </Badge>
                         )}
                       </div>
                       
-                      <div className="flex-shrink-0">
+                      <div>
                         {!program.isActive && (
                           <Button 
                             onClick={(e) => {
@@ -347,12 +367,12 @@ export default function Programs() {
 
             {filteredPrograms.length === 0 && (
               <Card>
-                <CardContent className="p-8 text-center">
-                  <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <CardContent className={styles.emptyState}>
+                  <BookOpen className={styles.emptyIcon} />
+                  <h3 className={styles.emptyTitle}>
                     {selectedTab === "all" ? "No programs available" : `No ${selectedTab} programs`}
                   </h3>
-                  <p className="text-gray-600 mb-6">
+                  <p className={styles.emptyDescription}>
                     {selectedTab === "all" 
                       ? "Create your first workout program to get started"
                       : `You don't have any ${selectedTab} programs yet`
@@ -377,9 +397,9 @@ export default function Programs() {
           <DialogHeader>
             <DialogTitle>Create New Program</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Program Name</label>
+          <div className={styles.dialog}>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Program Name</label>
               <Input
                 placeholder="e.g., 12-Week Strength Builder"
                 value={newProgram.name}
@@ -387,8 +407,8 @@ export default function Programs() {
               />
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Description</label>
               <Input
                 placeholder="Brief description of the program"
                 value={newProgram.description}
@@ -396,11 +416,11 @@ export default function Programs() {
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+            <div className={styles.formGrid}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Difficulty</label>
                 <select 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className={styles.formSelect}
                   value={newProgram.difficulty}
                   onChange={(e) => setNewProgram({...newProgram, difficulty: e.target.value})}
                 >
@@ -410,8 +430,8 @@ export default function Programs() {
                 </select>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Duration (weeks)</label>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Duration (weeks)</label>
                 <Input
                   type="number"
                   min="1"
@@ -422,41 +442,41 @@ export default function Programs() {
               </div>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Focus Areas</label>
-              <div className="space-y-2">
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Focus Areas</label>
+              <div className={styles.checkboxGrid}>
                 {["Strength", "Cardio", "Flexibility", "Muscle Building", "Fat Loss"].map((area) => (
-                  <div key={area} className="flex items-center space-x-2">
+                  <div key={area} className={styles.checkboxRow}>
                     <Checkbox
                       checked={newProgram.focusAreas.includes(area)}
                       onChange={() => toggleFocusArea(area)}
                     />
-                    <label className="text-sm text-gray-700">{area}</label>
+                    <label className={styles.checkboxLabel}>{area}</label>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Available Equipment</label>
-              <div className="grid grid-cols-2 gap-2">
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Available Equipment</label>
+              <div className={styles.checkboxGrid}>
                 {equipmentOptions.map((equipment) => (
-                  <div key={equipment.id} className="flex items-center space-x-2">
+                  <div key={equipment.id} className={styles.checkboxRow}>
                     <Checkbox
                       checked={newProgram.equipment.includes(equipment.id)}
                       onChange={() => toggleEquipment(equipment.id)}
                     />
-                    <label className="text-sm text-gray-700">{equipment.label}</label>
+                    <label className={styles.checkboxLabel}>{equipment.label}</label>
                   </div>
                 ))}
               </div>
             </div>
             
-            <div className="flex space-x-3">
+            <div className={styles.buttonGroup}>
               <Button 
                 onClick={handleCreateProgram}
                 disabled={createProgramMutation.isPending || !newProgram.name}
-                className="flex-1"
+                className={styles.buttonFlex}
               >
                 Create Program
               </Button>
