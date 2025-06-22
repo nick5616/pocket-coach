@@ -30,6 +30,7 @@ import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
 import { type Workout, type Exercise } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import styles from "@/styles/workout-journal.module.css";
 
 export default function WorkoutJournal() {
   const { id: workoutId } = useParams<{ id?: string }>();
@@ -329,42 +330,40 @@ export default function WorkoutJournal() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={styles.container}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center space-x-3">
-              <Link href="/">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-              </Link>
-              <h1 className="text-lg font-semibold text-gray-900">
-                {workoutId ? (workout?.name || "Workout") : "New Workout"}
-              </h1>
-            </div>
-            {workoutId && totalVolume > 0 && (
-              <div className="flex items-center space-x-2 text-blue-600">
-                <Gem className="h-4 w-4" />
-                <span className="text-sm font-medium">
-                  {Math.round(totalVolume / 1000)}k kg
-                </span>
-              </div>
-            )}
+      <header className={styles.header}>
+        <div className={styles.headerContent}>
+          <div className={styles.headerLeft}>
+            <Link href="/">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <h1 className={styles.title}>
+              {workoutId ? (workout?.name || "Workout") : "New Workout"}
+            </h1>
           </div>
+          {workoutId && totalVolume > 0 && (
+            <div className={styles.volumeIndicator}>
+              <Gem className="h-4 w-4" />
+              <span className={styles.volumeText}>
+                {Math.round(totalVolume / 1000)}k kg
+              </span>
+            </div>
+          )}
         </div>
       </header>
 
       {/* Content */}
-      <main className="pb-20">
+      <main className={styles.main}>
         {!workoutId ? (
           // Create Workout Form
-          <section className="px-4 py-6">
-            <form onSubmit={handleCreateWorkout} className="space-y-4">
-              <div className="text-center py-2 mb-4">
-                <div className="text-sm text-gray-500">Today's workout</div>
-                <div className="text-lg font-semibold text-gray-900">
+          <section className={styles.createWorkoutForm}>
+            <form onSubmit={handleCreateWorkout}>
+              <div className={styles.dateDisplay}>
+                <div className={styles.dateLabel}>Today's workout</div>
+                <div className={styles.dateValue}>
                   {new Date().toLocaleDateString('en-US', { 
                     weekday: 'long', 
                     year: 'numeric', 
@@ -374,8 +373,8 @@ export default function WorkoutJournal() {
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="workoutName" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className={styles.formGroup}>
+                <label htmlFor="workoutName" className={styles.formLabel}>
                   Workout Name
                 </label>
                 <Input
