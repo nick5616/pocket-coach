@@ -301,7 +301,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         weight: programmedExercise.weight || null,
         rpe: programmedExercise.rpe || null,
         restTime: programmedExercise.restTime || null,
-        notes: "Completed as programmed"
+        notes: "Completed as programmed",
+        muscleGroups: programmedExercise.muscleGroups || []
       });
 
       res.json(exercise);

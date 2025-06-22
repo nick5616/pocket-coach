@@ -433,58 +433,65 @@ export default function WorkoutJournal() {
                             : 'bg-blue-50 border-blue-200'
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex-1">
-                            <h3 className={`font-semibold text-base mb-1 ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
-                              {currentExercise.name}
-                            </h3>
-                            <div className="flex items-center justify-between text-sm">
-                              <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
-                                {currentExercise.sets} sets × {currentExercise.reps} reps
-                              </span>
-                              <span className={`font-medium ${isSkipped ? 'text-gray-400' : 'text-blue-700'}`}>
-                                RPE {currentExercise.rpe}
-                              </span>
-                            </div>
+                        <div className="mb-3">
+                          <h3 className={`font-semibold text-base mb-1 ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
+                            {currentExercise.name}
+                          </h3>
+                          <div className="flex items-center justify-between text-sm mb-2">
+                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
+                              {currentExercise.sets} sets × {currentExercise.reps} reps
+                            </span>
+                            <span className={`font-medium ${isSkipped ? 'text-gray-400' : 'text-blue-700'}`}>
+                              RPE {currentExercise.rpe}
+                            </span>
                           </div>
+                          {currentExercise.muscleGroups && currentExercise.muscleGroups.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {currentExercise.muscleGroups.map((muscle: string, idx: number) => (
+                                <Badge key={idx} variant="secondary" className="text-xs">
+                                  {muscle}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         
-                        {/* Inline Action Buttons */}
-                        <div className="flex gap-1">
+                        {/* 2x2 Action Buttons */}
+                        <div className="grid grid-cols-2 gap-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleExactCompletion(currentExercise, index)}
                           >
-                            ✅ Exact
+                            ✅ As Prescribed
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleModifiedCompletion(currentExercise, index)}
                           >
-                            📝 Edit
+                            📝 With Changes
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleSwapExercise(currentExercise, index)}
                           >
-                            🔄 Swap
+                            🔄 Swap Exercise
                           </Button>
                           <Button
                             variant={isSkipped ? "secondary" : "outline"}
                             size="sm"
-                            className="flex-1 text-xs py-1"
+                            className="text-xs"
                             onClick={() => handleSkipExercise(index)}
                           >
-                            {isSkipped ? '↩️ Unskip' : '⏭️ Skip'}
+                            {isSkipped ? '↩️ Unskip' : '⏭️ Skip Today'}
                           </Button>
                         </div>
                       </div>
@@ -494,9 +501,9 @@ export default function WorkoutJournal() {
               ) : (
                 <div className="space-y-3">
                   {[
-                    { name: "Push-ups", sets: 3, reps: 12, rpe: 7 },
-                    { name: "Squats", sets: 4, reps: 15, rpe: 6 },
-                    { name: "Pull-ups", sets: 3, reps: 8, rpe: 8 }
+                    { name: "Push-ups", sets: 3, reps: 12, rpe: 7, muscleGroups: ["Chest", "Triceps", "Shoulders"] },
+                    { name: "Squats", sets: 4, reps: 15, rpe: 6, muscleGroups: ["Quadriceps", "Glutes", "Core"] },
+                    { name: "Pull-ups", sets: 3, reps: 8, rpe: 8, muscleGroups: ["Lats", "Biceps", "Middle Traps"] }
                   ].map((programmedEx, index) => {
                     const currentExercise = swappedExercises.get(index) || programmedEx;
                     const isSkipped = skippedExercises.has(index);
@@ -510,58 +517,65 @@ export default function WorkoutJournal() {
                             : 'bg-blue-50 border-blue-200'
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex-1">
-                            <h3 className={`font-semibold text-base mb-1 ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
-                              {currentExercise.name}
-                            </h3>
-                            <div className="flex items-center justify-between text-sm">
-                              <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
-                                {currentExercise.sets} sets × {currentExercise.reps} reps
-                              </span>
-                              <span className={`font-medium ${isSkipped ? 'text-gray-400' : 'text-blue-700'}`}>
-                                RPE {currentExercise.rpe}
-                              </span>
-                            </div>
+                        <div className="mb-3">
+                          <h3 className={`font-semibold text-base mb-1 ${isSkipped ? 'text-gray-500' : 'text-blue-900'}`}>
+                            {currentExercise.name}
+                          </h3>
+                          <div className="flex items-center justify-between text-sm mb-2">
+                            <span className={isSkipped ? 'text-gray-400' : 'text-blue-700'}>
+                              {currentExercise.sets} sets × {currentExercise.reps} reps
+                            </span>
+                            <span className={`font-medium ${isSkipped ? 'text-gray-400' : 'text-blue-700'}`}>
+                              RPE {currentExercise.rpe}
+                            </span>
                           </div>
+                          {currentExercise.muscleGroups && currentExercise.muscleGroups.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {currentExercise.muscleGroups.map((muscle: string, idx: number) => (
+                                <Badge key={idx} variant="secondary" className="text-xs">
+                                  {muscle}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         
-                        {/* Inline Action Buttons */}
-                        <div className="flex gap-1">
+                        {/* 2x2 Action Buttons */}
+                        <div className="grid grid-cols-2 gap-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleExactCompletion(currentExercise, index)}
                           >
-                            ✅ Exact
+                            ✅ As Prescribed
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleModifiedCompletion(currentExercise, index)}
                           >
-                            📝 Edit
+                            📝 With Changes
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`flex-1 text-xs py-1 ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`text-xs ${isSkipped ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSkipped}
                             onClick={() => handleSwapExercise(currentExercise, index)}
                           >
-                            🔄 Swap
+                            🔄 Swap Exercise
                           </Button>
                           <Button
                             variant={isSkipped ? "secondary" : "outline"}
                             size="sm"
-                            className="flex-1 text-xs py-1"
+                            className="text-xs"
                             onClick={() => handleSkipExercise(index)}
                           >
-                            {isSkipped ? '↩️ Unskip' : '⏭️ Skip'}
+                            {isSkipped ? '↩️ Unskip' : '⏭️ Skip Today'}
                           </Button>
                         </div>
                       </div>
@@ -647,53 +661,40 @@ export default function WorkoutJournal() {
                       </div>
                     </div>
 
-                    {/* Exercise Stats Grid */}
-                    <div className="grid grid-cols-4 gap-3 p-3 bg-gray-50 rounded-lg mb-3">
-                      <div className="text-center">
-                        <div className="flex items-center justify-center mb-1">
-                          <Hash className="h-4 w-4 text-blue-500" />
-                        </div>
-                        <div className="text-lg font-bold text-gray-900">
-                          {exercise.sets || "--"}
-                        </div>
-                        <div className="text-xs text-gray-600">Sets</div>
+                    {/* Compact Exercise Stats */}
+                    <div className="flex items-center justify-between text-sm mb-3">
+                      <div className="flex items-center gap-4">
+                        <span className="text-gray-700">
+                          {exercise.sets} sets × {exercise.reps} reps
+                        </span>
+                        {exercise.weight && (
+                          <span className="text-gray-700">
+                            {exercise.weight} lbs
+                          </span>
+                        )}
                       </div>
-                      <div className="text-center">
-                        <div className="flex items-center justify-center mb-1">
-                          <Dumbbell className="h-4 w-4 text-green-500" />
-                        </div>
-                        <div className="text-lg font-bold text-gray-900">
-                          {exercise.reps || "--"}
-                        </div>
-                        <div className="text-xs text-gray-600">Reps</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="flex items-center justify-center mb-1">
-                          <Weight className="h-4 w-4 text-orange-500" />
-                        </div>
-                        <div className="text-lg font-bold text-gray-900">
-                          {exercise.weight ? `${exercise.weight}` : "--"}
-                        </div>
-                        <div className="text-xs text-gray-600">lbs</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="flex items-center justify-center mb-1">
-                          <Target className="h-4 w-4 text-purple-500" />
-                        </div>
-                        <div className="text-lg font-bold text-gray-900">
-                          {exercise.rpe || "--"}
-                        </div>
-                        <div className="text-xs text-gray-600">RPE</div>
+                      <div className="flex items-center gap-3">
+                        {exercise.rpe && (
+                          <span className="text-gray-700 font-medium">
+                            RPE {exercise.rpe}
+                          </span>
+                        )}
+                        {exercise.weight && exercise.sets && (
+                          <span className="text-gray-600 text-xs">
+                            Vol: {exercise.weight * exercise.sets * (exercise.reps || 10)} lbs
+                          </span>
+                        )}
                       </div>
                     </div>
 
-                    {/* Volume Calculation */}
-                    {exercise.weight && exercise.sets && (
-                      <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-                        <span>Volume:</span>
-                        <span className="font-medium">
-                          {exercise.weight * exercise.sets * (exercise.reps || 10)} lbs
-                        </span>
+                    {/* Muscle Groups */}
+                    {exercise.muscleGroups && exercise.muscleGroups.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {exercise.muscleGroups.map((muscle: string, idx: number) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {muscle}
+                          </Badge>
+                        ))}
                       </div>
                     )}
 
