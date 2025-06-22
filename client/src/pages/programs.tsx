@@ -9,6 +9,7 @@ import { Input } from "@/components/Input";
 import { Checkbox } from "@/components/Checkbox";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -27,6 +28,7 @@ import {
   Target
 } from "lucide-react";
 import type { Program, Goal } from "@shared/schema";
+import styles from "./programs.module.css";
 
 const programGenerationSchema = z.object({
   experience: z.string().min(1, "Experience level is required"),
@@ -38,8 +40,11 @@ export default function Programs() {
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
   
-  const userId = 1; // Mock user ID
+  if (!user) {
+    return <div>Loading...</div>;
+  }
 
   const form = useForm({
     resolver: zodResolver(programGenerationSchema),
@@ -51,26 +56,23 @@ export default function Programs() {
   });
 
   const { data: programs = [], isLoading } = useQuery<Program[]>({
-    queryKey: ["/api/programs", { userId }],
-    queryFn: () => fetch(`/api/programs?userId=${userId}`).then(res => res.json()),
+    queryKey: ["/api/programs"],
+    queryFn: () => fetch(`/api/programs`).then(res => res.json()),
   });
 
   const { data: activeProgram } = useQuery<Program | null>({
-    queryKey: ["/api/programs/active", { userId }],
-    queryFn: () => fetch(`/api/programs/active?userId=${userId}`).then(res => res.json()),
+    queryKey: ["/api/programs/active"],
+    queryFn: () => fetch(`/api/programs/active`).then(res => res.json()),
   });
 
   const { data: goals = [] } = useQuery<Goal[]>({
-    queryKey: ["/api/goals", { userId }],
-    queryFn: () => fetch(`/api/goals?userId=${userId}`).then(res => res.json()),
+    queryKey: ["/api/goals"],
+    queryFn: () => fetch(`/api/goals`).then(res => res.json()),
   });
 
   const generateProgramMutation = useMutation({
     mutationFn: async (data: z.infer<typeof programGenerationSchema>) => {
-      const response = await apiRequest("POST", "/api/programs/generate", {
-        userId,
-        ...data,
-      });
+      const response = await apiRequest("POST", "/api/programs/generate", data);
       return response.json();
     },
     onSuccess: (program) => {
@@ -412,126 +414,121 @@ export default function Programs() {
 
       {/* Generate Program Dialog */}
       <Dialog open={showGenerateDialog} onOpenChange={setShowGenerateDialog}>
-        <DialogContent className="max-w-sm mx-4">
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <Sparkles className="h-5 w-5 mr-2 text-duolingo-green" />
+        <div className={styles.dialogContent}>
+          <div className={styles.dialogHeader}>
+            <h2 className={styles.dialogTitle}>
+              <Sparkles className={styles.dialogIcon} />
               Generate AI Program
-            </DialogTitle>
-          </DialogHeader>
+            </h2>
+          </div>
           
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onGenerateProgram)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="experience"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Experience Level</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your experience" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="beginner">Beginner (0-6 months)</SelectItem>
-                        <SelectItem value="intermediate">Intermediate (6 months - 2 years)</SelectItem>
-                        <SelectItem value="advanced">Advanced (2+ years)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <form onSubmit={form.handleSubmit(onGenerateProgram)} className={styles.form}>
+            {/* Experience Level */}
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Experience Level</label>
+              <select 
+                className={styles.select}
+                {...form.register("experience")}
+              >
+                <option value="">Select your experience</option>
+                <option value="beginner">Beginner (0-6 months)</option>
+                <option value="intermediate">Intermediate (6 months - 2 years)</option>
+                <option value="advanced">Advanced (2+ years)</option>
+              </select>
+              {form.formState.errors.experience && (
+                <div className={styles.errorMessage}>
+                  {form.formState.errors.experience.message}
+                </div>
+              )}
+            </div>
 
-              <FormField
-                control={form.control}
-                name="availableDays"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Days per week</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        max="7"
-                        placeholder="3"
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+            {/* Days per week */}
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Days per week</label>
+              <input
+                type="number"
+                min="1"
+                max="7"
+                placeholder="3"
+                className={styles.input}
+                {...form.register("availableDays", { 
+                  valueAsNumber: true,
+                  min: 1,
+                  max: 7
+                })}
+              />
+              {form.formState.errors.availableDays && (
+                <div className={styles.errorMessage}>
+                  {form.formState.errors.availableDays.message}
+                </div>
+              )}
+            </div>
+
+            {/* Equipment Selection */}
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Available Equipment</label>
+              <div className={styles.equipmentGrid}>
+                {equipmentOptions.map((equipment) => {
+                  const isSelected = form.watch("equipment")?.includes(equipment.id);
+                  return (
+                    <div
+                      key={equipment.id}
+                      className={`${styles.equipmentItem} ${
+                        isSelected ? styles.equipmentItemSelected : ""
+                      }`}
+                      onClick={() => {
+                        const currentEquipment = form.getValues("equipment") || [];
+                        const newEquipment = isSelected
+                          ? currentEquipment.filter((id: string) => id !== equipment.id)
+                          : [...currentEquipment, equipment.id];
+                        form.setValue("equipment", newEquipment);
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        className={styles.checkbox}
+                        checked={isSelected}
+                        onChange={() => {}} // Handled by parent div onClick
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="equipment"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Available Equipment</FormLabel>
-                    <div className="grid grid-cols-2 gap-2">
-                      {equipmentOptions.map((equipment) => (
-                        <FormField
-                          key={equipment.id}
-                          control={form.control}
-                          name="equipment"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(equipment.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...(field.value || []), equipment.id])
-                                      : field.onChange(
-                                          field.value?.filter((value: string) => value !== equipment.id)
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="text-sm font-normal">
-                                {equipment.label}
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                      ))}
+                      <label className={styles.equipmentLabel}>
+                        {equipment.label}
+                      </label>
                     </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex gap-2 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowGenerateDialog(false)}
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={generateProgramMutation.isPending}
-                  className="flex-1 bg-duolingo-green hover:bg-duolingo-green/90"
-                >
-                  {generateProgramMutation.isPending ? (
-                    <>
-                      <Sparkles className="h-4 w-4 mr-2 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    "Generate Program"
-                  )}
-                </Button>
+                  );
+                })}
               </div>
-            </form>
-          </Form>
-        </DialogContent>
+              {form.formState.errors.equipment && (
+                <div className={styles.errorMessage}>
+                  {form.formState.errors.equipment.message}
+                </div>
+              )}
+            </div>
+
+            <div className={styles.buttonGroup}>
+              <button
+                type="button"
+                className={`${styles.button} ${styles.buttonSecondary}`}
+                onClick={() => setShowGenerateDialog(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={generateProgramMutation.isPending}
+                className={`${styles.button} ${styles.buttonPrimary}`}
+              >
+                {generateProgramMutation.isPending ? (
+                  <>
+                    <Sparkles className={styles.loadingIcon} />
+                    Generating...
+                  </>
+                ) : (
+                  "Generate Program"
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </Dialog>
 
       <BottomNavigation />
