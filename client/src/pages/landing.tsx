@@ -3,8 +3,8 @@ import { Button } from "@/components/Button";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="max-w-lg mx-auto px-4 py-8">
+    <div className="h-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex flex-col">
+      <div className="max-w-lg mx-auto px-4 py-8 flex-1 flex flex-col justify-center">
         {/* Hero Section */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">

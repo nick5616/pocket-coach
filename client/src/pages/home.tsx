@@ -95,9 +95,9 @@ export default function Home() {
   };
 
   return (
-    <>
+    <div className="h-full bg-gray-50 flex flex-col">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-8 z-40">
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-duolingo-green rounded-full flex items-center justify-center">
@@ -144,7 +144,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="pb-20 min-h-screen">
+      <main className="flex-1 overflow-auto pb-20">
         {/* Welcome Section */}
         <section
           className="px-4 py-6"
@@ -562,6 +562,6 @@ export default function Home() {
           }}
         />
       )}
-    </>
+    </div>
   );
 }

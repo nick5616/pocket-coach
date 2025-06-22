@@ -51,11 +51,13 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen max-w-md mx-auto bg-white shadow-xl relative">
+      <div className="h-screen max-w-md mx-auto bg-white shadow-xl relative flex flex-col">
         {/* PWA Status Bar */}
-        <div className="bg-duolingo-green h-8 w-full"></div>
+        <div className="bg-duolingo-green h-8 w-full flex-shrink-0"></div>
         
-        <Router />
+        <div className="flex-1 overflow-auto">
+          <Router />
+        </div>
       </div>
     </QueryClientProvider>
   );
