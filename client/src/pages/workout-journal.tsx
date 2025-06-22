@@ -354,12 +354,11 @@ export default function WorkoutJournal() {
           )}
         </div>
       </header>
-
       {/* Content */}
       <main className={styles.main}>
         {!workoutId ? (
           // Create Workout Form
-          <section className={styles.createWorkoutForm}>
+          (<section className={styles.createWorkoutForm}>
             <form onSubmit={handleCreateWorkout}>
               <div className={styles.dateDisplay}>
                 <div className={styles.dateLabel}>Today's workout</div>
@@ -411,10 +410,10 @@ export default function WorkoutJournal() {
                 {createWorkoutMutation.isPending ? "Creating..." : "Start Workout"}
               </Button>
             </form>
-          </section>
+          </section>)
         ) : (
           // Workout Journal
-          <div>
+          (<div>
             {/* Programmed Exercises */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Programmed Exercises</h2>
@@ -580,7 +579,6 @@ export default function WorkoutJournal() {
                 </div>
               )}
             </section>
-
             {/* Workout Input */}
             <section className="px-4 py-4">
               <div className="bg-white rounded-lg border border-gray-200">
@@ -619,13 +617,12 @@ export default function WorkoutJournal() {
                 </div>
               </div>
             </section>
-
             {/* Completed Exercises */}
             <section className="px-4 py-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Completed Exercises</h2>
               <div className="space-y-6">
                 {exercises.map((exercise: Exercise) => (
-                  <div key={exercise.id} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                  <div key={exercise.id} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm mt-[16px] mb-[16px]">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900 text-lg">{exercise.name}</h3>
@@ -704,7 +701,6 @@ export default function WorkoutJournal() {
                 ))}
               </div>
             </section>
-
             {/* Journal Input */}
             <section className="px-4">
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -743,7 +739,6 @@ export default function WorkoutJournal() {
                 </div>
               </div>
             </section>
-
             {/* Complete Workout Button */}
             <section className="px-4 pb-6">
               <Button
@@ -754,10 +749,9 @@ export default function WorkoutJournal() {
                 Complete Workout
               </Button>
             </section>
-          </div>
+          </div>)
         )}
       </main>
-
       {/* Complete Workout Dialog */}
       <Dialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
         <DialogContent className="w-[95vw] max-w-md">
@@ -809,7 +803,6 @@ export default function WorkoutJournal() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Exercise Edit Dialog */}
       <Dialog open={!!editingExercise} onOpenChange={() => setEditingExercise(null)}>
         <DialogContent className="w-[95vw] max-w-md">
@@ -863,7 +856,6 @@ export default function WorkoutJournal() {
           )}
         </DialogContent>
       </Dialog>
-
       {/* Achievement Modal */}
       {currentAchievement && (
         <AchievementModal
@@ -877,7 +869,6 @@ export default function WorkoutJournal() {
           }}
         />
       )}
-
       {!workoutId && <BottomNavigation />}
     </div>
   );
