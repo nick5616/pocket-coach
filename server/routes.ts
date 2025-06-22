@@ -29,7 +29,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Protected route example
   app.get("/api/protected", isAuthenticated, async (req, res) => {
-    const userId = req.user?.claims?.sub;
+    const userId = req.user.id;
     res.json({ message: "This is a protected route", userId });
   });
 
@@ -353,6 +353,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Goals routes
+  app.get("/api/goals", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const goals = await storage.getUserGoals(userId);
+      res.json(goals);
+    } catch (error) {
+      console.error("Failed to fetch goals:", error);
+      res.status(500).json({ message: "Failed to fetch goals" });
+    }
+  });
+
   app.post("/api/goals", async (req, res) => {
     try {
       const validatedData = insertGoalSchema.parse(req.body);
@@ -379,6 +391,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(goal);
     } catch (error) {
       res.status(500).json({ message: "Failed to update goal" });
+    }
+  });
+
+  // Achievements routes
+  app.get("/api/achievements", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const achievements = await storage.getUserAchievements(userId);
+      res.json(achievements);
+    } catch (error) {
+      console.error("Failed to fetch achievements:", error);
+      res.status(500).json({ message: "Failed to fetch achievements" });
+    }
+  });
+
+  app.patch("/api/achievements/:id/viewed", async (req, res) => {
+    try {
+      const achievementId = parseInt(req.params.id);
+      await storage.markAchievementViewed(achievementId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to mark achievement as viewed" });
     }
   });
 
