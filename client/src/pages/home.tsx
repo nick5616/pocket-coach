@@ -62,24 +62,29 @@ export default function Home() {
   // Get recent workouts for stats
   const recentWorkouts = workouts
     .filter((w) => w.isCompleted)
-    .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime(),
+    )
     .slice(0, 10);
 
   // Calculate today's stats
   const todayStats: WorkoutStats = {
-    workouts: recentWorkouts
-      .filter((w) => {
-        const today = new Date();
-        const workoutDate = new Date(w.createdAt!);
-        return workoutDate.toDateString() === today.toDateString();
-      }).length,
+    workouts: recentWorkouts.filter((w) => {
+      const today = new Date();
+      const workoutDate = new Date(w.createdAt!);
+      return workoutDate.toDateString() === today.toDateString();
+    }).length,
     exercises: recentWorkouts
       .filter((w) => {
         const today = new Date();
         const workoutDate = new Date(w.createdAt!);
         return workoutDate.toDateString() === today.toDateString();
       })
-      .reduce((total, workout) => total + ((workout as any).exercises?.length || 0), 0),
+      .reduce(
+        (total, workout) => total + ((workout as any).exercises?.length || 0),
+        0,
+      ),
     timeMinutes: recentWorkouts
       .filter((w) => {
         const today = new Date();
@@ -93,34 +98,40 @@ export default function Home() {
   const aiRecommendation: AIRecommendation = (() => {
     if (recentWorkouts.length === 0) {
       return {
-        message: "Ready to start your fitness journey? Begin with foundational movements to build strength and confidence.",
+        message:
+          "Ready to start your fitness journey? Begin with foundational movements to build strength and confidence.",
         focusAreas: ["Foundation Building", "Form Development"],
       };
     }
 
     const lastWorkout = recentWorkouts[0];
     const daysSinceLastWorkout = Math.floor(
-      (Date.now() - new Date(lastWorkout.createdAt!).getTime()) / (1000 * 60 * 60 * 24)
+      (Date.now() - new Date(lastWorkout.createdAt!).getTime()) /
+        (1000 * 60 * 60 * 24),
     );
 
     if (daysSinceLastWorkout === 0) {
       return {
-        message: "Great work today! Consider light stretching or mobility work to aid recovery.",
+        message:
+          "Great work today! Consider light stretching or mobility work to aid recovery.",
         focusAreas: ["Recovery", "Mobility"],
       };
     } else if (daysSinceLastWorkout <= 2) {
       return {
-        message: "Perfect timing for your next session. Focus on progressive overload and challenging yourself.",
+        message:
+          "Perfect timing for your next session. Focus on progressive overload and challenging yourself.",
         focusAreas: ["Progressive Overload", "Strength Building"],
       };
     } else if (daysSinceLastWorkout <= 7) {
       return {
-        message: "Time to get back in there! Start with a moderate intensity to rebuild momentum.",
+        message:
+          "Time to get back in there! Start with a moderate intensity to rebuild momentum.",
         focusAreas: ["Momentum Building", "Consistency"],
       };
     } else {
       return {
-        message: "Welcome back! Start with lighter weights and focus on movement quality as you return to training.",
+        message:
+          "Welcome back! Start with lighter weights and focus on movement quality as you return to training.",
         focusAreas: ["Movement Quality", "Gradual Return"],
       };
     }
@@ -204,7 +215,9 @@ export default function Home() {
               <Link href={`/workouts/program/${(activeProgram as any)?.id}`}>
                 <button className={styles.programButton}>
                   <Play className="h-6 w-6" />
-                  <span>Begin: {(activeProgram as any)?.name || "Today's Workout"}</span>
+                  <span>
+                    Begin: {(activeProgram as any)?.name || "Today's Workout"}
+                  </span>
                 </button>
               </Link>
               <Link href="/workout-journal">
@@ -229,13 +242,13 @@ export default function Home() {
                 <Link href="/workout-journal">
                   <button className={styles.primaryButton}>
                     <Play className="h-6 w-6" />
-                    <span>1. Freestyle a workout</span>
+                    <span>Freestyle a workout</span>
                   </button>
                 </Link>
                 <Link href="/programs">
                   <button className={styles.secondaryButton}>
                     <Calendar className="h-5 w-5" />
-                    <span>2. Find a program</span>
+                    <span>Find a program</span>
                   </button>
                 </Link>
               </div>
@@ -249,7 +262,11 @@ export default function Home() {
             <div className={styles.aiContent}>
               <div className={styles.aiHeader}>
                 <div className={styles.aiIcon}>
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                   </svg>
                 </div>
@@ -296,7 +313,9 @@ export default function Home() {
                     Start your first workout to see it here!
                   </p>
                   <Link href="/workout-journal">
-                    <button className={styles.emptyButton}>Start First Workout</button>
+                    <button className={styles.emptyButton}>
+                      Start First Workout
+                    </button>
                   </Link>
                 </CardContent>
               </Card>
@@ -315,7 +334,8 @@ export default function Home() {
                 </div>
                 <h4 className={styles.progressTitle}>Building Your Profile</h4>
                 <p className={styles.progressDescription}>
-                  Complete more workouts to unlock personalized insights and progress analysis.
+                  Complete more workouts to unlock personalized insights and
+                  progress analysis.
                 </p>
               </CardContent>
             </Card>
@@ -349,7 +369,9 @@ export default function Home() {
                     <CardContent className={styles.goalCard}>
                       <div className={styles.goalHeader}>
                         <h4 className={styles.goalTitle}>{goal.title}</h4>
-                        <span className={`${styles.goalBadge} ${getStatusColor()}`}>
+                        <span
+                          className={`${styles.goalBadge} ${getStatusColor()}`}
+                        >
                           {progress.toFixed(0)}%
                         </span>
                       </div>
@@ -358,7 +380,8 @@ export default function Home() {
                       </div>
                       <div className={styles.goalStats}>
                         <span>
-                          {goal.currentValue || 0} / {goal.targetValue} {goal.unit}
+                          {goal.currentValue || 0} / {goal.targetValue}{" "}
+                          {goal.unit}
                         </span>
                         <span>{goal.category}</span>
                       </div>
@@ -387,7 +410,7 @@ export default function Home() {
       </main>
 
       <BottomNavigation />
-      
+
       {showAchievement && achievementData && (
         <AchievementModal
           isOpen={showAchievement}
