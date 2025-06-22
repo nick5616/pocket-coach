@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/Button";
@@ -43,6 +43,7 @@ const tabs = [
 export default function Programs() {
   const [selectedTab, setSelectedTab] = useState("all");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   const [newProgram, setNewProgram] = useState({
     name: "",
     description: "",
@@ -54,6 +55,22 @@ export default function Programs() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    return () => observer.disconnect();
+  }, []);
 
   const { data: user } = useQuery({
     queryKey: ["/api/auth/user"],
@@ -173,9 +190,9 @@ export default function Programs() {
 
   if (isLoading) {
     return (
-      <div className={styles.container}>
+      <div className={`${styles.container} ${isDark ? styles.dark : ''}`}>
         <div className={styles.emptyState}>
-          <div className={styles.subtitle}>Loading programs...</div>
+          <div className={`${styles.subtitle} ${isDark ? styles.dark : ''}`}>Loading programs...</div>
         </div>
       </div>
     );
@@ -183,13 +200,13 @@ export default function Programs() {
 
   return (
     <>
-      <main className={styles.container}>
+      <main className={`${styles.container} ${isDark ? styles.dark : ''}`}>
         {/* Header */}
-        <header className={styles.header}>
+        <header className={`${styles.header} ${isDark ? styles.dark : ''}`}>
           <div className={styles.headerFlex}>
             <div>
-              <h1 className={styles.title}>Programs</h1>
-              <p className={styles.subtitle}>Structured workout plans</p>
+              <h1 className={`${styles.title} ${isDark ? styles.dark : ''}`}>Programs</h1>
+              <p className={`${styles.subtitle} ${isDark ? styles.dark : ''}`}>Structured workout plans</p>
             </div>
             <Button onClick={() => setIsCreateOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
@@ -200,16 +217,16 @@ export default function Programs() {
 
         {/* Active Program Banner */}
         {activeProgram && (
-          <section className={styles.activeBanner}>
+          <section className={`${styles.activeBanner} ${isDark ? styles.dark : ''}`}>
             <Card className={styles.activeCard}>
               <CardContent className={styles.activeCardContent}>
                 <div className={styles.activeInfo}>
-                  <div className={styles.activeIcon}>
-                    <Play className="w-5 h-5" style={{color: '#2563eb'}} />
+                  <div className={`${styles.activeIcon} ${isDark ? styles.dark : ''}`}>
+                    <Play className="w-5 h-5" style={{color: isDark ? '#60a5fa' : '#2563eb'}} />
                   </div>
                   <div>
-                    <h3 className={styles.activeTitle}>Active Program</h3>
-                    <p className={styles.activeName}>{activeProgram.name}</p>
+                    <h3 className={`${styles.activeTitle} ${isDark ? styles.dark : ''}`}>Active Program</h3>
+                    <p className={`${styles.activeName} ${isDark ? styles.dark : ''}`}>{activeProgram.name}</p>
                   </div>
                 </div>
                 <Link href="/workout-journal">
@@ -224,7 +241,7 @@ export default function Programs() {
         )}
 
         {/* Tab Navigation */}
-        <section className={styles.tabSection}>
+        <section className={`${styles.tabSection} ${isDark ? styles.dark : ''}`}>
           <div className={styles.tabGrid}>
             <Button 
               variant={selectedTab === "all" ? "primary" : "outline"}
@@ -261,7 +278,7 @@ export default function Programs() {
                     <div className={styles.cardHeader}>
                       <div className={styles.headerContent}>
                         <div className={styles.titleRow}>
-                          <h3 className={styles.programTitle}>{program.name}</h3>
+                          <h3 className={`${styles.programTitle} ${isDark ? styles.dark : ''}`}>{program.name}</h3>
                           {program.isActive && (
                             <Badge variant="default">Active</Badge>
                           )}
@@ -271,9 +288,9 @@ export default function Programs() {
                         </div>
                         
                         {program.description && (
-                          <div className={styles.description}>
+                          <div className={`${styles.description} ${isDark ? styles.dark : ''}`}>
                             <p className={styles.descriptionText}>{program.description}</p>
-                            <p className={styles.createdDate}>
+                            <p className={`${styles.createdDate} ${isDark ? styles.dark : ''}`}>
                               Created {new Date(program.createdAt!).toLocaleDateString()}
                             </p>
                           </div>
@@ -285,7 +302,7 @@ export default function Programs() {
                     {((program.focusAreas && program.focusAreas.length > 0) || (program.equipment && program.equipment.length > 0)) && (
                       <div className={styles.metadataSection}>
                         {program.focusAreas && program.focusAreas.length > 0 && (
-                          <div className={styles.metadataRow}>
+                          <div className={`${styles.metadataRow} ${isDark ? styles.dark : ''}`}>
                             <Star className={styles.metadataIcon} style={{color: '#eab308'}} />
                             <div>
                               <span className={styles.metadataLabel}>Focus:</span>
@@ -301,7 +318,7 @@ export default function Programs() {
                         )}
                         
                         {program.equipment && program.equipment.length > 0 && (
-                          <div className={styles.metadataRow}>
+                          <div className={`${styles.metadataRow} ${isDark ? styles.dark : ''}`}>
                             <Dumbbell className={styles.metadataIcon} style={{color: '#a855f7'}} />
                             <div>
                               <span className={styles.metadataLabel}>Equipment:</span>
@@ -319,7 +336,7 @@ export default function Programs() {
                     )}
 
                     {/* Bottom row with badges and action button */}
-                    <div className={styles.bottomRow}>
+                    <div className={`${styles.bottomRow} ${isDark ? styles.dark : ''}`}>
                       <div className={styles.badgeGroup}>
                         <Badge variant="outline" className="text-xs">
                           🕕 {program.durationWeeks || 4} weeks
@@ -369,10 +386,10 @@ export default function Programs() {
               <Card>
                 <CardContent className={styles.emptyState}>
                   <BookOpen className={styles.emptyIcon} />
-                  <h3 className={styles.emptyTitle}>
+                  <h3 className={`${styles.emptyTitle} ${isDark ? styles.dark : ''}`}>
                     {selectedTab === "all" ? "No programs available" : `No ${selectedTab} programs`}
                   </h3>
-                  <p className={styles.emptyDescription}>
+                  <p className={`${styles.emptyDescription} ${isDark ? styles.dark : ''}`}>
                     {selectedTab === "all" 
                       ? "Create your first workout program to get started"
                       : `You don't have any ${selectedTab} programs yet`
@@ -399,7 +416,7 @@ export default function Programs() {
           </DialogHeader>
           <div className={styles.dialog}>
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Program Name</label>
+              <label className={`${styles.formLabel} ${isDark ? styles.dark : ''}`}>Program Name</label>
               <Input
                 placeholder="e.g., 12-Week Strength Builder"
                 value={newProgram.name}
@@ -408,7 +425,7 @@ export default function Programs() {
             </div>
             
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Description</label>
+              <label className={`${styles.formLabel} ${isDark ? styles.dark : ''}`}>Description</label>
               <Input
                 placeholder="Brief description of the program"
                 value={newProgram.description}
@@ -418,9 +435,9 @@ export default function Programs() {
             
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Difficulty</label>
+                <label className={`${styles.formLabel} ${isDark ? styles.dark : ''}`}>Difficulty</label>
                 <select 
-                  className={styles.formSelect}
+                  className={`${styles.formSelect} ${isDark ? styles.dark : ''}`}
                   value={newProgram.difficulty}
                   onChange={(e) => setNewProgram({...newProgram, difficulty: e.target.value})}
                 >
@@ -431,7 +448,7 @@ export default function Programs() {
               </div>
               
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Duration (weeks)</label>
+                <label className={`${styles.formLabel} ${isDark ? styles.dark : ''}`}>Duration (weeks)</label>
                 <Input
                   type="number"
                   min="1"
@@ -443,7 +460,7 @@ export default function Programs() {
             </div>
             
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Focus Areas</label>
+              <label className={`${styles.formLabel} ${isDark ? styles.dark : ''}`}>Focus Areas</label>
               <div className={styles.checkboxGrid}>
                 {["Strength", "Cardio", "Flexibility", "Muscle Building", "Fat Loss"].map((area) => (
                   <div key={area} className={styles.checkboxRow}>
@@ -451,14 +468,14 @@ export default function Programs() {
                       checked={newProgram.focusAreas.includes(area)}
                       onChange={() => toggleFocusArea(area)}
                     />
-                    <label className={styles.checkboxLabel}>{area}</label>
+                    <label className={`${styles.checkboxLabel} ${isDark ? styles.dark : ''}`}>{area}</label>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Available Equipment</label>
+              <label className={`${styles.formLabel} ${isDark ? styles.dark : ''}`}>Available Equipment</label>
               <div className={styles.checkboxGrid}>
                 {equipmentOptions.map((equipment) => (
                   <div key={equipment.id} className={styles.checkboxRow}>
@@ -466,7 +483,7 @@ export default function Programs() {
                       checked={newProgram.equipment.includes(equipment.id)}
                       onChange={() => toggleEquipment(equipment.id)}
                     />
-                    <label className={styles.checkboxLabel}>{equipment.label}</label>
+                    <label className={`${styles.checkboxLabel} ${isDark ? styles.dark : ''}`}>{equipment.label}</label>
                   </div>
                 ))}
               </div>
