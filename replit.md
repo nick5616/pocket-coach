@@ -110,16 +110,20 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
-- June 22, 2025: **COMPLETED** - Comprehensive Styling Consistency and Theme Support Enhancement
+- June 22, 2025: **COMPLETED** - Enhanced Styling Consistency, Theme Support, and User Experience Improvements
   - Fixed section header size inconsistency - both "Programmed Exercises" and "Completed Exercises" now use same title styling
   - Standardized horizontal spacing across page sections using consistent CSS Modules section padding (1.5rem 1rem)
-  - Removed blue background from programmed exercise cards to improve button visibility and styling consistency
+  - Added comprehensive blue border system for visual consistency across all components
+  - Programmed exercise cards: White/dark gray backgrounds with blue borders (#3b82f6 light, #60a5fa dark)
+  - Completed exercise cards: White/dark gray backgrounds with blue borders for visual distinction
+  - Muscle group badges: Enhanced with blue borders matching card styling system
   - Added comprehensive light/dark mode support for all exercise cards with proper theme-dependent colors
-  - Programmed exercise cards: White/dark gray backgrounds with blue borders for visual distinction
-  - Completed exercise cards: White/dark gray backgrounds with neutral borders for finished state
   - Converted completed exercise cards to dedicated CSS Modules components with proper theming
   - Applied consistent styling structure: header, stats, and actions sections with proper spacing
   - Enhanced text contrast and readability across both light and dark modes for all exercise card elements
+  - Replaced browser confirmation dialog with proper app-based confirmation modal for exercise deletion
+  - Added DialogDescription component for accessibility compliance in delete confirmation modal
+  - Delete confirmation modal features proper red styling and loading states for better user feedback
   - Enhanced Card Spacing and CSS Modules Migration in Workout Journal
   - Added consistent 1rem margin spacing between both programmed and completed exercise cards
   - Converted all exercise cards from mixed Tailwind/inline styles to clean CSS Modules architecture

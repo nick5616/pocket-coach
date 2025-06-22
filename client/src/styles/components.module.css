@@ -224,6 +224,7 @@
   .badgeSecondary {
     background-color: #1e293b;
     color: #f8fafc;
+    border: 1px solid #60a5fa;
   }
 }
 
