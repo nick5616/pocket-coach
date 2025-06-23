@@ -107,16 +107,16 @@ export default function WorkoutJournal() {
   });
 
   const { data: activeProgram, isLoading: activeProgramLoading } = useQuery({
-    queryKey: ["/api/programs/active", { userId: 1 }],
+    queryKey: ["/api/programs/active"],
     queryFn: () =>
-      fetch("/api/programs/active?userId=1").then((res) => res.json()),
+      fetch("/api/programs/active", { credentials: "include" }).then((res) => res.json()),
     enabled: !workoutId,
   });
 
   const { data: todaysWorkout, isLoading: todaysWorkoutLoading } = useQuery({
     queryKey: ["/api/programs/active/today"],
     queryFn: () =>
-      fetch("/api/programs/active/today?userId=1").then((res) => res.json()),
+      fetch("/api/programs/active/today", { credentials: "include" }).then((res) => res.json()),
     enabled: !workoutId && !!activeProgram,
   });
 
@@ -246,7 +246,6 @@ export default function WorkoutJournal() {
     e.preventDefault();
     try {
       const workoutData = {
-        userId: 1,
         name: workoutName || "Unnamed Workout",
         aiGenerateName: aiGenerateName,
       };

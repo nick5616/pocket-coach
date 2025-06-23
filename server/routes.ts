@@ -797,7 +797,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/muscle-groups/:id/progress", async (req, res) => {
     try {
       const muscleGroupId = parseInt(req.params.id);
-      const userId = parseInt(req.query.userId as string);
+      const userId = req.query.userId as string;
       
       if (!userId) {
         return res.status(400).json({ message: "userId is required" });
@@ -812,7 +812,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/progress/heat-map", async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
+      const userId = req.query.userId as string;
       
       if (!userId) {
         return res.status(400).json({ message: "userId is required" });
