@@ -421,11 +421,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Program routes
   app.get("/api/programs", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = (req.user as any)?.id;
       const programs = await storage.getUserPrograms(userId);
       res.json(programs);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch programs" });
+    }
+  });
+
+  app.get("/api/programs/:id", isAuthenticated, async (req, res) => {
+    try {
+      const programId = parseInt(req.params.id);
+      const userId = (req.user as any)?.id;
+      
+      if (isNaN(programId)) {
+        return res.status(400).json({ message: "Invalid program ID" });
+      }
+      
+      const program = await storage.getProgram(programId);
+      if (!program || program.userId !== userId) {
+        return res.status(404).json({ message: "Program not found" });
+      }
+      
+      res.json(program);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch program" });
     }
   });
 
@@ -486,10 +506,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/programs/:id/today", isAuthenticated, async (req, res) => {
     try {
       const programId = parseInt(req.params.id);
-      const userId = req.user!.id;
+      const userId = (req.user as any)?.id;
       
       if (isNaN(programId)) {
         return res.status(400).json({ message: "Invalid program ID" });
+      }
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
       }
       
       const program = await storage.getProgram(programId);
@@ -501,6 +525,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const today = new Date();
       const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
       
+      console.log(`Today is day ${dayOfWeek}, program schedule:`, program.schedule);
+      
       // Simple schedule mapping - in a real app this would be more sophisticated
       let schedule = program.schedule || {};
       
@@ -508,7 +534,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (typeof schedule === 'string') {
         try {
           schedule = JSON.parse(schedule);
+          console.log('Parsed schedule:', schedule);
         } catch (error) {
+          console.log('Failed to parse schedule:', error);
           schedule = {};
         }
       }
@@ -516,6 +544,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const todaySchedule = schedule && typeof schedule === 'object' 
         ? (schedule as any)[dayOfWeek] || (schedule as any)[Object.keys(schedule)[0]]
         : null;
+        
+      console.log('Today schedule:', todaySchedule);
       
       // If no schedule exists, provide a default workout structure
       if (!todaySchedule) {
