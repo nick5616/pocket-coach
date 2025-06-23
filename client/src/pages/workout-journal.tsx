@@ -577,11 +577,7 @@ export default function WorkoutJournal() {
                 </div>
               ) : (
                 <div className={styles.programmedExercises}>
-                  {[
-                    { name: "Push-ups", sets: 3, reps: 12, rpe: 7 },
-                    { name: "Squats", sets: 4, reps: 15, rpe: 6 },
-                    { name: "Pull-ups", sets: 3, reps: 8, rpe: 8 },
-                  ].map((programmedEx, index) => {
+                  {(todaysWorkout?.exercises || []).map((programmedEx, index) => {
                     const currentExercise =
                       swappedExercises.get(index) || programmedEx;
                     const isSkipped = skippedExercises.has(index);
