@@ -757,20 +757,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Invalid program schedule format" });
       }
 
-      // Handle both old format (schedule.days) and new format (schedule.weeks)
+      // Handle object format with numeric keys (0-6 for days of week)
       let todaysWorkout: any = null;
       
       if (schedule.days && Array.isArray(schedule.days)) {
-        // Old format: cycle through program days
+        // Array format: cycle through program days
         const programDays = schedule.days;
         const currentDayIndex = daysDiff % programDays.length;
         todaysWorkout = programDays[currentDayIndex];
       } else if (schedule.weeks && Array.isArray(schedule.weeks)) {
-        // New format: weeks with days
+        // Weeks format: weeks with days
         const weekNumber = Math.floor(daysDiff / 7) % schedule.weeks.length;
         const dayNumber = daysDiff % 7;
         const currentWeek = schedule.weeks[weekNumber];
         todaysWorkout = currentWeek?.days?.[dayNumber];
+      } else if (typeof schedule === 'object' && schedule !== null) {
+        // Object format with numeric keys (0-6)
+        const dayKeys = Object.keys(schedule).sort((a, b) => parseInt(a) - parseInt(b));
+        const currentDayIndex = daysDiff % dayKeys.length;
+        const dayKey = dayKeys[currentDayIndex];
+        todaysWorkout = schedule[dayKey];
+        console.log(`Today is day ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
       } else {
         return res.status(400).json({ message: "Invalid program schedule format" });
       }
@@ -805,15 +812,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const today = new Date();
       const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
       
-      const schedule = program.schedule as { days?: any[] };
-      if (!schedule || !schedule.days || !Array.isArray(schedule.days)) {
+      // Parse the schedule
+      let schedule: any = {};
+      try {
+        schedule = typeof program.schedule === 'string' ? JSON.parse(program.schedule) : program.schedule;
+      } catch (error) {
+        return res.status(500).json({ message: "Invalid program schedule format" });
+      }
+      
+      // Handle different schedule formats
+      let todaysWorkout: any = null;
+      let currentDayIndex: number = 0;
+      
+      if (schedule.days && Array.isArray(schedule.days)) {
+        // Array format: cycle through program days
+        const programDays = schedule.days;
+        currentDayIndex = daysDiff % programDays.length;
+        todaysWorkout = programDays[currentDayIndex];
+      } else if (typeof schedule === 'object' && schedule !== null) {
+        // Object format with numeric keys (0-6)
+        const dayKeys = Object.keys(schedule).sort((a, b) => parseInt(a) - parseInt(b));
+        if (dayKeys.length === 0) {
+          return res.status(400).json({ message: "Program has no schedule" });
+        }
+        currentDayIndex = daysDiff % dayKeys.length;
+        const dayKey = dayKeys[currentDayIndex];
+        todaysWorkout = schedule[dayKey];
+        console.log(`Program ${programId} - Today is day ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
+      } else {
         return res.status(400).json({ message: "Program has no schedule" });
       }
-
-      // Get current workout day (cycle through program days)
-      const programDays = schedule.days;
-      const currentDayIndex = daysDiff % programDays.length;
-      const todaysWorkout = programDays[currentDayIndex];
 
       // Get user's workout history for realistic coaching insights
       const userWorkouts = await storage.getUserWorkouts(userId, 10);
@@ -859,10 +887,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         difficulty: 3
       };
 
+      // Calculate total days for response
+      let totalDays = 7; // Default for object format
+      if (schedule.days && Array.isArray(schedule.days)) {
+        totalDays = schedule.days.length;
+      } else if (typeof schedule === 'object' && schedule !== null) {
+        totalDays = Object.keys(schedule).length;
+      }
+
       res.json({
         programName: program.name,
         dayNumber: currentDayIndex + 1,
-        totalDays: programDays.length,
+        totalDays: totalDays,
         workout: todaysWorkout,
         exercises: todaysWorkout.exercises || [],
         insights: insights
