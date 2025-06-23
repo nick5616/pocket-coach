@@ -243,8 +243,8 @@ export default function ProgramWorkout() {
                 <div className={styles.exerciseCardContent}>
                   <div className={styles.exerciseHeader}>
                     <h4 className={`${styles.exerciseName} ${isDark ? styles.dark : ''}`}>{exercise.name}</h4>
-                    <ExerciseMuscleGroups exerciseName={exercise.name} />
                   </div>
+                  <ExerciseMuscleGroups exerciseName={exercise.name} />
                   <div className={`${styles.exerciseStats} ${isDark ? styles.dark : ''}`}>
                     <span>{exercise.sets} sets</span>
                     <span>×</span>

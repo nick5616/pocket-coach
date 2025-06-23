@@ -1,5 +1,7 @@
+import { useState, useEffect } from "react";
 import { Badge } from "./Badge";
 import { useMuscleGroups } from "../hooks/use-muscle-groups";
+import styles from "./exercise-muscle-groups.module.css";
 
 interface ExerciseMuscleGroupsProps {
   exerciseName: string;
@@ -8,12 +10,30 @@ interface ExerciseMuscleGroupsProps {
 
 export function ExerciseMuscleGroups({ exerciseName, className = "" }: ExerciseMuscleGroupsProps) {
   const { data: muscleGroupsData, isLoading } = useMuscleGroups(exerciseName);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      setIsDark(isDarkMode);
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   if (isLoading) {
     return (
-      <div className={`flex gap-1 ${className}`}>
-        <div className="h-5 w-16 bg-gray-200 rounded animate-pulse"></div>
-        <div className="h-5 w-12 bg-gray-200 rounded animate-pulse"></div>
+      <div className={`${styles.loadingContainer} ${className}`}>
+        <div className={`${styles.loadingSkeleton} ${styles.loadingSkeletonWide} ${isDark ? styles.dark : ''}`}></div>
+        <div className={`${styles.loadingSkeleton} ${styles.loadingSkeletonNarrow} ${isDark ? styles.dark : ''}`}></div>
       </div>
     );
   }
@@ -23,9 +43,9 @@ export function ExerciseMuscleGroups({ exerciseName, className = "" }: ExerciseM
   }
 
   return (
-    <div className={`flex flex-wrap gap-1 ${className}`}>
+    <div className={`${styles.container} ${className}`}>
       {muscleGroupsData.muscleGroups.map((muscle: string, idx: number) => (
-        <Badge key={idx} variant="secondary" className="text-xs">
+        <Badge key={idx} variant="secondary">
           {muscle}
         </Badge>
       ))}

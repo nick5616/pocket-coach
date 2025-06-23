@@ -110,6 +110,14 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
+- June 23, 2025: **COMPLETED** - Complete CSS Modules Migration for Program Workout Page
+  - Converted entire program-workout page from Tailwind CSS to CSS Modules architecture
+  - Fixed viewport height background issue ensuring proper full-screen display
+  - Added comprehensive dark mode support with automatic theme detection via MutationObserver
+  - Created dedicated CSS module files with proper component-scoped styling
+  - Updated ExerciseMuscleGroups component to use CSS Modules and moved muscle group badges to separate line below exercise name
+  - Enhanced layout structure with improved spacing and visual hierarchy for exercise cards
+  - All components now properly adapt to light/dark themes with consistent styling
 - June 22, 2025: **COMPLETED** - Fixed Authentication Issues and Realistic Coaching Insights
   - Resolved Express route ordering issue where /api/programs/active was matching /api/programs/:id causing "Invalid program ID" errors
   - Fixed hardcoded userId=1 references throughout workout-journal.tsx to use authenticated user sessions

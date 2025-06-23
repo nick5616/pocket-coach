@@ -1,0 +1,43 @@
+/* Exercise Muscle Groups Component Styles */
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.loadingContainer {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.loadingSkeleton {
+  height: 1.25rem;
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.loadingSkeletonWide {
+  width: 4rem;
+}
+
+.loadingSkeletonNarrow {
+  width: 3rem;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Dark mode support */
+.loadingSkeleton.dark {
+  background-color: #374151;
+}
