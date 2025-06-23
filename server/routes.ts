@@ -579,39 +579,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ]
         };
         
+        // Get user's workout history to provide realistic coaching
+        const userWorkouts = await storage.getUserWorkouts(userId, 10);
+        const isNewUser = userWorkouts.length === 0;
+        
         const response = {
           workout: defaultWorkout,
           exercises: defaultWorkout.exercises,
           insights: {
-            description: "Today's session focuses on building strength and muscle endurance. You'll be challenging your limits while maintaining proper form.",
+            description: "Today's session focuses on building foundational strength and proper movement patterns.",
             focusAreas: [
-              "Progressive overload on compound movements",
-              "Mind-muscle connection during isolation exercises", 
-              "Proper breathing technique throughout sets"
+              "Proper form and technique fundamentals",
+              "Controlled breathing throughout movements", 
+              "Building mind-muscle connection"
             ],
-            challenges: "The supersets in today's workout will test your cardiovascular endurance. Expect to feel the burn, but push through - this is where real growth happens.",
-            encouragement: "You've been consistently showing up and it's paying off. Your strength gains over the past month have been impressive. Trust your preparation and give it everything you've got.",
+            challenges: isNewUser 
+              ? "As you're starting your fitness journey, focus on learning proper form. Listen to your body and don't rush through movements."
+              : "The supersets in today's workout will test your cardiovascular endurance. Expect to feel the burn, but push through - this is where real growth happens.",
+            encouragement: isNewUser
+              ? "Welcome to your fitness journey! Every expert was once a beginner. Focus on consistency over intensity, and celebrate small wins."
+              : "You've been consistently showing up and it's paying off. Your strength gains have been impressive. Trust your preparation and give it everything you've got.",
             estimatedTime: 45,
-            difficulty: 3
+            difficulty: isNewUser ? 2 : 3
           }
         };
         
         return res.json(response);
       }
 
-      // Generate coaching insights using AI
+      // Get user's workout history for realistic coaching insights
+      const userWorkouts = await storage.getUserWorkouts(userId, 10);
+      const isNewUser = userWorkouts.length === 0;
+      
+      // Generate coaching insights based on actual user data
       const insights = {
-        description: "Today's session focuses on building strength and muscle endurance. You'll be challenging your limits while maintaining proper form.",
+        description: todaySchedule.description || "Focus on proper form and controlled movements as you build strength.",
         focusAreas: [
-          "Progressive overload on compound movements",
-          "Mind-muscle connection during isolation exercises", 
-          "Proper breathing technique throughout sets"
+          "Proper form and technique fundamentals",
+          "Controlled breathing throughout movements", 
+          "Building mind-muscle connection"
         ],
-        challenges: "The supersets in today's workout will test your cardiovascular endurance. Expect to feel the burn, but push through - this is where real growth happens.",
-        prOpportunities: "Your bench press numbers have been climbing. Today might be the day to attempt a new personal record on your final working set.",
-        encouragement: "You've been consistently showing up and it's paying off. Your strength gains over the past month have been impressive. Trust your preparation and give it everything you've got.",
+        challenges: isNewUser 
+          ? "As you're starting your fitness journey, focus on learning proper form. Listen to your body and don't rush through movements."
+          : "The supersets in today's workout will test your cardiovascular endurance. Expect to feel the burn, but push through - this is where real growth happens.",
+        prOpportunities: isNewUser ? undefined : "Your bench press numbers have been climbing. Today might be the day to attempt a new personal record on your final working set.",
+        encouragement: isNewUser
+          ? "Every expert was once a beginner. Focus on consistency over intensity, and celebrate small wins. You're building habits that will transform your life."
+          : "You've been consistently showing up and it's paying off. Your strength gains over the past month have been impressive. Trust your preparation and give it everything you've got.",
         estimatedTime: 45,
-        difficulty: 3
+        difficulty: isNewUser ? 2 : 3
       };
 
       const response = {

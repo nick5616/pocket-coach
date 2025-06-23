@@ -110,16 +110,16 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
-- June 22, 2025: **COMPLETED** - Fixed Hardcoded User ID Issues and Program Data Structure
-  - Resolved "Invalid program ID" errors by fixing hardcoded userId=1 references throughout the application
-  - Updated server routes to handle string-based user IDs instead of parseInt for muscle groups and heat map endpoints
-  - Fixed workout-journal.tsx to use authenticated user sessions instead of hardcoded user IDs
-  - Updated API calls to use credentials: "include" for proper authentication
-  - Fixed AI program generation route to properly set aiGenerated: true and populate all required fields
-  - Updated program creation to include focusAreas, equipment, durationWeeks, and difficulty fields
-  - Fixed existing program in database with proper AI-generated structure and complete bodyweight workout schedule
-  - Resolved program workout page crashes by ensuring programs have valid schedule data with structured exercises
-  - Program cards now display complete metadata including focus areas, equipment, and difficulty badges
+- June 22, 2025: **COMPLETED** - Fixed Authentication Issues and Realistic Coaching Insights
+  - Resolved Express route ordering issue where /api/programs/active was matching /api/programs/:id causing "Invalid program ID" errors
+  - Fixed hardcoded userId=1 references throughout workout-journal.tsx to use authenticated user sessions
+  - Updated API calls to use credentials: "include" for proper authentication across all program endpoints
+  - Fixed muscle groups API hook to use correct fetch method instead of apiRequest causing runtime errors
+  - Updated active program (id: 7) with complete 7-day workout schedule containing structured exercises
+  - Implemented realistic coaching insights based on actual user workout history instead of fake progress data
+  - New users now receive beginner-focused encouragement and form guidance rather than false achievement claims
+  - Experienced users get personalized insights based on their actual workout patterns and progress
+  - Coaching content now dynamically adjusts difficulty ratings and focus areas based on user experience level
 - June 22, 2025: **COMPLETED** - Comprehensive Theme Support for Programs Page
   - Implemented complete dark mode compatibility across all program page components and content
   - Added dynamic theme detection using MutationObserver to track document class changes
