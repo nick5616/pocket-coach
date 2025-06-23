@@ -61,7 +61,13 @@ Respond with a JSON object containing:
       throw new Error("No response from AI");
     }
 
-    const swappedExercise = JSON.parse(response) as SwappedExercise;
+    // Clean the response to handle markdown-formatted JSON
+    let cleanResponse = response.trim();
+    if (cleanResponse.startsWith('```json')) {
+      cleanResponse = cleanResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    }
+    
+    const swappedExercise = JSON.parse(cleanResponse) as SwappedExercise;
     
     // Validate the response
     if (!swappedExercise.name || !swappedExercise.muscleGroups) {

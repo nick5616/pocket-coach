@@ -296,6 +296,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { getExerciseMuscleGroups } = await import('./services/muscle-groups.js');
       const muscleGroups = await getExerciseMuscleGroups(programmedExercise.name);
       
+      // Convert restTime string to seconds if it's a string
+      let restTimeSeconds = null;
+      if (programmedExercise.restTime) {
+        if (typeof programmedExercise.restTime === 'string') {
+          // Parse "30-60 seconds" or "2 minutes" etc to a number
+          const match = programmedExercise.restTime.match(/(\d+)/);
+          restTimeSeconds = match ? parseInt(match[1]) : null;
+        } else {
+          restTimeSeconds = programmedExercise.restTime;
+        }
+      }
+
       const exercise = await storage.createExercise({
         workoutId,
         name: programmedExercise.name,
@@ -303,7 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         reps: programmedExercise.reps,
         weight: programmedExercise.weight || null,
         rpe: programmedExercise.rpe || null,
-        restTime: programmedExercise.restTime || null,
+        restTime: restTimeSeconds,
         notes: "Completed as programmed",
         muscleGroups: muscleGroups
       });
