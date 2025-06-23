@@ -632,7 +632,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description: generatedProgram.description,
         schedule: generatedProgram.schedule,
         aiGenerated: true,
-        isActive: false
+        isActive: false,
+        focusAreas: generatedProgram.focusAreas || ["Strength", "Muscle Building"],
+        equipment: equipment || ["dumbbells", "barbell", "bench"],
+        durationWeeks: generatedProgram.durationWeeks || 8,
+        difficulty: generatedProgram.difficulty || "intermediate"
       });
 
       res.json(program);

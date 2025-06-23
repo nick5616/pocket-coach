@@ -110,6 +110,12 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
+- June 22, 2025: **COMPLETED** - Fixed Program Creation and Data Structure Issues
+  - Fixed AI program generation route to properly set aiGenerated: true and populate all required fields
+  - Updated program creation to include focusAreas, equipment, durationWeeks, and difficulty fields
+  - Fixed existing program in database with proper AI-generated structure and complete bodyweight workout schedule
+  - Resolved program workout page crashes by ensuring programs have valid schedule data with structured exercises
+  - Program cards now display complete metadata including focus areas, equipment, and difficulty badges
 - June 22, 2025: **COMPLETED** - Comprehensive Theme Support for Programs Page
   - Implemented complete dark mode compatibility across all program page components and content
   - Added dynamic theme detection using MutationObserver to track document class changes
