@@ -236,16 +236,16 @@ export default function ProgramWorkout() {
 
         {/* Exercise Preview */}
         <section className={styles.exercisesSection}>
-          <h3 className={styles.exercisesTitle}>Today's Exercises</h3>
+          <h3 className={`${styles.exercisesTitle} ${isDark ? styles.dark : ''}`}>Today's Exercises</h3>
           <div className={styles.exercisesList}>
             {exercises.map((exercise: any, index: number) => (
-              <div key={index} className={styles.exerciseCard}>
+              <div key={index} className={`${styles.exerciseCard} ${isDark ? styles.dark : ''}`}>
                 <div className={styles.exerciseCardContent}>
                   <div className={styles.exerciseHeader}>
-                    <h4 className={styles.exerciseName}>{exercise.name}</h4>
+                    <h4 className={`${styles.exerciseName} ${isDark ? styles.dark : ''}`}>{exercise.name}</h4>
                     <ExerciseMuscleGroups exerciseName={exercise.name} />
                   </div>
-                  <div className={styles.exerciseStats}>
+                  <div className={`${styles.exerciseStats} ${isDark ? styles.dark : ''}`}>
                     <span>{exercise.sets} sets</span>
                     <span>×</span>
                     <span>{exercise.reps} reps</span>
@@ -263,7 +263,7 @@ export default function ProgramWorkout() {
                     )}
                   </div>
                   {exercise.notes && (
-                    <p className={styles.exerciseNotes}>{exercise.notes}</p>
+                    <p className={`${styles.exerciseNotes} ${isDark ? styles.dark : ''}`}>{exercise.notes}</p>
                   )}
                 </div>
               </div>
@@ -273,7 +273,7 @@ export default function ProgramWorkout() {
       </div>
 
       {/* Start Workout Button */}
-      <div className={styles.startButton}>
+      <div className={`${styles.startButton} ${isDark ? styles.dark : ''}`}>
         <button
           onClick={handleStartWorkout}
           disabled={createWorkoutMutation.isPending}
