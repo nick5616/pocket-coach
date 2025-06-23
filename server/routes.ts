@@ -756,13 +756,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         return res.status(500).json({ message: "Invalid program schedule format" });
       }
+
+      // Handle both old format (schedule.days) and new format (schedule.weeks)
+      let todaysWorkout: any = null;
       
-      // Get the current week and day
-      const weekNumber = Math.floor(daysDiff / 7) % (schedule.weeks?.length || 1);
-      const dayNumber = daysDiff % 7;
-      
-      const currentWeek = schedule.weeks?.[weekNumber];
-      const todaysWorkout = currentWeek?.days?.[dayNumber];
+      if (schedule.days && Array.isArray(schedule.days)) {
+        // Old format: cycle through program days
+        const programDays = schedule.days;
+        const currentDayIndex = daysDiff % programDays.length;
+        todaysWorkout = programDays[currentDayIndex];
+      } else if (schedule.weeks && Array.isArray(schedule.weeks)) {
+        // New format: weeks with days
+        const weekNumber = Math.floor(daysDiff / 7) % schedule.weeks.length;
+        const dayNumber = daysDiff % 7;
+        const currentWeek = schedule.weeks[weekNumber];
+        todaysWorkout = currentWeek?.days?.[dayNumber];
+      } else {
+        return res.status(400).json({ message: "Invalid program schedule format" });
+      }
       
       if (!todaysWorkout || todaysWorkout.isRestDay) {
         return res.status(404).json({ message: "Today is a rest day or no workout scheduled" });
@@ -771,8 +782,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         program,
         workout: todaysWorkout,
-        weekNumber: weekNumber + 1,
-        dayNumber: dayNumber + 1
+        exercises: todaysWorkout.exercises || []
       });
     } catch (error) {
       console.error("Today's workout error:", error);
@@ -805,11 +815,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentDayIndex = daysDiff % programDays.length;
       const todaysWorkout = programDays[currentDayIndex];
 
+      // Get user's workout history for realistic coaching insights
+      const userWorkouts = await storage.getUserWorkouts(userId, 10);
+      const isNewUser = userWorkouts.length === 0;
+      
+      // Generate workout-specific insights based on today's exercises
+      const exerciseNames = todaysWorkout.exercises?.map((ex: any) => ex.name.toLowerCase()) || [];
+      const isLegDay = exerciseNames.some((name: string) => 
+        name.includes('squat') || name.includes('lunge') || name.includes('leg') || name.includes('calf')
+      );
+      const isUpperBody = exerciseNames.some((name: string) => 
+        name.includes('push') || name.includes('pull') || name.includes('press') || name.includes('chest')
+      );
+      
+      // Generate coaching insights based on actual workout content
+      const insights = {
+        description: todaysWorkout.description || "Focus on proper form and controlled movements as you build strength.",
+        focusAreas: isLegDay ? [
+          "Proper squat depth and knee tracking",
+          "Controlled movement tempo", 
+          "Core stability throughout exercises"
+        ] : isUpperBody ? [
+          "Shoulder blade retraction and stability",
+          "Controlled eccentric (lowering) phase",
+          "Breathing rhythm during exercises"
+        ] : [
+          "Proper form and technique fundamentals",
+          "Controlled breathing throughout movements", 
+          "Building mind-muscle connection"
+        ],
+        challenges: isNewUser 
+          ? "Focus on learning proper form with these foundational movements. Listen to your body and don't rush."
+          : isLegDay 
+            ? "Lower body workouts challenge your largest muscle groups. Expect fatigue but push through - this builds real functional strength."
+            : "Today's session will test your upper body endurance. Focus on quality over speed.",
+        prOpportunities: isNewUser ? undefined : isLegDay 
+          ? "Your squat form has been improving. Consider adding slightly more weight if you can maintain perfect technique."
+          : "You've been consistent with your training. Today might be a good day to challenge yourself with an extra set.",
+        encouragement: isNewUser
+          ? "Every expert was once a beginner. Focus on consistency over intensity, and celebrate small wins."
+          : "Your dedication is paying off. Each workout builds on the last - keep pushing forward.",
+        estimatedTime: 45,
+        difficulty: 3
+      };
+
       res.json({
         programName: program.name,
         dayNumber: currentDayIndex + 1,
         totalDays: programDays.length,
-        workout: todaysWorkout
+        workout: todaysWorkout,
+        exercises: todaysWorkout.exercises || [],
+        insights: insights
       });
     } catch (error) {
       console.error("Program today workout error:", error);
