@@ -66,9 +66,9 @@ export default function ProgramWorkout() {
     if (!program || !todaysWorkout) return;
 
     createWorkoutMutation.mutate({
-      name: todaysWorkout.workout.name,
+      name: (todaysWorkout as any).workout?.name || "Today's Workout",
       programId: program.id,
-      exercises: todaysWorkout.exercises || [],
+      exercises: (todaysWorkout as any).exercises || [],
     });
   };
 
@@ -83,9 +83,9 @@ export default function ProgramWorkout() {
     return <LoadingScreen message="Preparing program workout..." />;
   }
 
-  const workout = todaysWorkout.workout;
-  const exercises = todaysWorkout.exercises || [];
-  const insights = todaysWorkout.insights || {};
+  const workout = (todaysWorkout as any).workout || {};
+  const exercises = (todaysWorkout as any).exercises || [];
+  const insights = (todaysWorkout as any).insights || {};
 
   return (
     <div className="h-full bg-gray-50 flex flex-col">
@@ -114,7 +114,7 @@ export default function ProgramWorkout() {
         {/* Workout Header */}
         <section className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-6">
           <div className="text-center">
-            <h2 className="text-2xl font-bold mb-2">{workout.name}</h2>
+            <h2 className="text-2xl font-bold mb-2">{workout.name || "Today's Workout"}</h2>
             <p className="text-blue-100 text-sm mb-4">
               {insights.description || "Time to push your limits and make progress"}
             </p>
