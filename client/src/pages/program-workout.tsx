@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/Button";
@@ -28,6 +28,26 @@ export default function ProgramWorkout() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    // Check for dark mode
+    const checkDarkMode = () => {
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      setIsDark(isDarkMode);
+    };
+
+    checkDarkMode();
+
+    // Watch for theme changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const { data: program, isLoading: programLoading } = useQuery<Program>({
     queryKey: ["/api/programs", programId],
@@ -93,9 +113,9 @@ export default function ProgramWorkout() {
   const insights = (todaysWorkout as any).insights || {};
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${isDark ? styles.dark : ''}`}>
       {/* Header */}
-      <header className={styles.header}>
+      <header className={`${styles.header} ${isDark ? styles.dark : ''}`}>
         <div className={styles.headerContent}>
           <div className={styles.headerLeft}>
             <Button
@@ -106,8 +126,8 @@ export default function ProgramWorkout() {
               <ChevronLeft style={{ width: '1.25rem', height: '1.25rem' }} />
             </Button>
             <div>
-              <h1 className={styles.programTitle}>{program.name}</h1>
-              <p className={styles.sessionSubtitle}>Today's Session</p>
+              <h1 className={`${styles.programTitle} ${isDark ? styles.dark : ''}`}>{program.name}</h1>
+              <p className={`${styles.sessionSubtitle} ${isDark ? styles.dark : ''}`}>Today's Session</p>
             </div>
           </div>
         </div>
@@ -153,7 +173,7 @@ export default function ProgramWorkout() {
           <div className={styles.coachingCards}>
             {/* Focus Areas */}
             {insights.focusAreas && insights.focusAreas.length > 0 && (
-              <div className={styles.coachingCard}>
+              <div className={`${styles.coachingCard} ${isDark ? styles.dark : ''}`}>
                 <div className={styles.cardHeader}>
                   <h3 className={`${styles.cardTitle} ${styles.cardTitleFocus}`}>
                     <Target className={styles.cardIcon} />
@@ -165,7 +185,7 @@ export default function ProgramWorkout() {
                     {insights.focusAreas.map((area: string, index: number) => (
                       <div key={index} className={styles.focusItem}>
                         <div className={styles.focusBullet}></div>
-                        <span className={styles.focusText}>{area}</span>
+                        <span className={`${styles.focusText} ${isDark ? styles.dark : ''}`}>{area}</span>
                       </div>
                     ))}
                   </div>
@@ -175,57 +195,57 @@ export default function ProgramWorkout() {
 
             {/* Challenges & PR Opportunities */}
             {insights.challenges && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-orange-600">
-                    <Zap className="h-5 w-5 mr-2" />
+              <div className={`${styles.coachingCard} ${isDark ? styles.dark : ''}`}>
+                <div className={styles.cardHeader}>
+                  <h3 className={`${styles.cardTitle} ${styles.cardTitleChallenge}`}>
+                    <Zap className={styles.cardIcon} />
                     Expect Challenge
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 mb-3">{insights.challenges}</p>
+                  </h3>
+                </div>
+                <div className={styles.cardContent}>
+                  <p className={`${styles.challengeText} ${isDark ? styles.dark : ''}`}>{insights.challenges}</p>
                   {insights.prOpportunities && (
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                      <div className="flex items-center mb-2">
-                        <Trophy className="h-4 w-4 text-orange-600 mr-2" />
-                        <span className="font-semibold text-orange-800">PR Opportunity</span>
+                    <div className={styles.prOpportunity}>
+                      <div className={styles.prHeader}>
+                        <Trophy className={styles.prIcon} />
+                        <span className={styles.prTitle}>PR Opportunity</span>
                       </div>
-                      <p className="text-orange-700 text-sm">{insights.prOpportunities}</p>
+                      <p className={styles.prText}>{insights.prOpportunities}</p>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
 
             {/* Encouragement */}
             {insights.encouragement && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-green-600">
-                    <Heart className="h-5 w-5 mr-2" />
+              <div className={`${styles.coachingCard} ${isDark ? styles.dark : ''}`}>
+                <div className={styles.cardHeader}>
+                  <h3 className={`${styles.cardTitle} ${styles.cardTitleEncouragement}`}>
+                    <Heart className={styles.cardIcon} />
                     You've Got This
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700">{insights.encouragement}</p>
-                </CardContent>
-              </Card>
+                  </h3>
+                </div>
+                <div className={styles.cardContent}>
+                  <p className={`${styles.encouragementText} ${isDark ? styles.dark : ''}`}>{insights.encouragement}</p>
+                </div>
+              </div>
             )}
           </div>
         </section>
 
         {/* Exercise Preview */}
-        <section className="px-4 pb-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Today's Exercises</h3>
-          <div className="space-y-3">
+        <section className={styles.exercisesSection}>
+          <h3 className={styles.exercisesTitle}>Today's Exercises</h3>
+          <div className={styles.exercisesList}>
             {exercises.map((exercise: any, index: number) => (
-              <Card key={index} className="border-l-4 border-blue-500">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-semibold text-gray-900">{exercise.name}</h4>
+              <div key={index} className={styles.exerciseCard}>
+                <div className={styles.exerciseCardContent}>
+                  <div className={styles.exerciseHeader}>
+                    <h4 className={styles.exerciseName}>{exercise.name}</h4>
                     <ExerciseMuscleGroups exerciseName={exercise.name} />
                   </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                  <div className={styles.exerciseStats}>
                     <span>{exercise.sets} sets</span>
                     <span>×</span>
                     <span>{exercise.reps} reps</span>
@@ -243,30 +263,29 @@ export default function ProgramWorkout() {
                     )}
                   </div>
                   {exercise.notes && (
-                    <p className="text-sm text-gray-600 mt-2 italic">"{exercise.notes}"</p>
+                    <p className={styles.exerciseNotes}>{exercise.notes}</p>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </section>
       </div>
 
       {/* Start Workout Button */}
-      <div className="flex-shrink-0 p-4 bg-white border-t border-gray-200">
-        <Button
+      <div className={styles.startButton}>
+        <button
           onClick={handleStartWorkout}
           disabled={createWorkoutMutation.isPending}
-          size="lg"
-          className="w-full h-14 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-lg transition-all duration-200"
+          className={styles.startButtonInner}
         >
-          <div className="flex items-center justify-center space-x-3">
-            <Play className="h-6 w-6" />
-            <span className="text-lg font-semibold">
+          <div className={styles.startButtonContent}>
+            <Play className={styles.startIcon} />
+            <span className={styles.startButtonText}>
               {createWorkoutMutation.isPending ? "Starting..." : "Start Workout"}
             </span>
           </div>
-        </Button>
+        </button>
       </div>
     </div>
   );
