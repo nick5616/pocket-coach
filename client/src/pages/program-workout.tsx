@@ -20,6 +20,7 @@ import {
   Star,
 } from "lucide-react";
 import type { Program, Workout, Exercise } from "../../../shared/schema";
+import styles from "./program-workout.module.css";
 
 export default function ProgramWorkout() {
   const { programId } = useParams();
@@ -92,85 +93,84 @@ export default function ProgramWorkout() {
   const insights = (todaysWorkout as any).insights || {};
 
   return (
-    <div className="h-full bg-gray-50 flex flex-col">
+    <div className={styles.container}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+      <header className={styles.header}>
+        <div className={styles.headerContent}>
+          <div className={styles.headerLeft}>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setLocation("/")}
-              className="text-gray-600 hover:text-gray-800"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft style={{ width: '1.25rem', height: '1.25rem' }} />
             </Button>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">{program.name}</h1>
-              <p className="text-sm text-gray-600">Today's Session</p>
+              <h1 className={styles.programTitle}>{program.name}</h1>
+              <p className={styles.sessionSubtitle}>Today's Session</p>
             </div>
           </div>
         </div>
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto">
+      <div className={styles.content}>
         {/* Workout Header */}
-        <section className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-6">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-2">{workout.name || "Today's Workout"}</h2>
-            <p className="text-blue-100 text-sm mb-4">
+        <section className={styles.workoutHeader}>
+          <div className={styles.workoutHeaderContent}>
+            <h2 className={styles.workoutTitle}>{workout.name || "Today's Workout"}</h2>
+            <p className={styles.workoutDescription}>
               {insights.description || "Time to push your limits and make progress"}
             </p>
             
             {/* Difficulty & Stats */}
-            <div className="flex justify-center space-x-6 mb-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold">{exercises.length}</div>
-                <div className="text-xs text-blue-200">Exercises</div>
+            <div className={styles.statsContainer}>
+              <div className={styles.statItem}>
+                <div className={styles.statValue}>{exercises.length}</div>
+                <div className={styles.statLabel}>Exercises</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{insights.estimatedTime || "45"}</div>
-                <div className="text-xs text-blue-200">Minutes</div>
+              <div className={styles.statItem}>
+                <div className={styles.statValue}>{insights.estimatedTime || "45"}</div>
+                <div className={styles.statLabel}>Minutes</div>
               </div>
-              <div className="text-center">
-                <div className="flex justify-center mb-1">
+              <div className={styles.statItem}>
+                <div className={styles.difficultyStars}>
                   {[...Array(insights.difficulty || 3)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-current text-yellow-300" />
+                    <Star key={i} className={styles.starFilled} />
                   ))}
                   {[...Array(5 - (insights.difficulty || 3))].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 text-blue-300" />
+                    <Star key={i} className={styles.starEmpty} />
                   ))}
                 </div>
-                <div className="text-xs text-blue-200">Difficulty</div>
+                <div className={styles.statLabel}>Difficulty</div>
               </div>
             </div>
           </div>
         </section>
 
         {/* Coaching Insights */}
-        <section className="px-4 py-6">
-          <div className="space-y-4">
+        <section className={styles.coachingSection}>
+          <div className={styles.coachingCards}>
             {/* Focus Areas */}
             {insights.focusAreas && insights.focusAreas.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-blue-700">
-                    <Target className="h-5 w-5 mr-2" />
+              <div className={styles.coachingCard}>
+                <div className={styles.cardHeader}>
+                  <h3 className={`${styles.cardTitle} ${styles.cardTitleFocus}`}>
+                    <Target className={styles.cardIcon} />
                     Today's Focus
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
+                  </h3>
+                </div>
+                <div className={styles.cardContent}>
+                  <div className={styles.focusAreas}>
                     {insights.focusAreas.map((area: string, index: number) => (
-                      <div key={index} className="flex items-center">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                        <span className="text-gray-700">{area}</span>
+                      <div key={index} className={styles.focusItem}>
+                        <div className={styles.focusBullet}></div>
+                        <span className={styles.focusText}>{area}</span>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
 
             {/* Challenges & PR Opportunities */}

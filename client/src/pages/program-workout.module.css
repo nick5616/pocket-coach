@@ -1,0 +1,378 @@
+/* Program Workout Page Styles */
+
+.container {
+  min-height: 100%;
+  height: 100%;
+  background-color: #f9fafb;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  flex-shrink: 0;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.programTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.sessionSubtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.content {
+  flex: 1;
+  overflow: auto;
+}
+
+.workoutHeader {
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  color: white;
+  padding: 1.5rem 1rem;
+}
+
+.workoutHeaderContent {
+  text-align: center;
+}
+
+.workoutTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.workoutDescription {
+  color: #dbeafe;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.statsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.statItem {
+  text-align: center;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: #bfdbfe;
+}
+
+.difficultyStars {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.starFilled {
+  width: 1rem;
+  height: 1rem;
+  color: #fcd34d;
+  fill: currentColor;
+}
+
+.starEmpty {
+  width: 1rem;
+  height: 1rem;
+  color: #93c5fd;
+}
+
+.coachingSection {
+  padding: 1.5rem 1rem;
+}
+
+.coachingCards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.coachingCard {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.cardHeader {
+  padding: 1rem 1rem 0 1rem;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.cardTitleFocus {
+  color: #1d4ed8;
+}
+
+.cardTitleChallenge {
+  color: #ea580c;
+}
+
+.cardTitleEncouragement {
+  color: #059669;
+}
+
+.cardIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+}
+
+.cardContent {
+  padding: 0 1rem 1rem 1rem;
+}
+
+.focusAreas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.focusItem {
+  display: flex;
+  align-items: center;
+}
+
+.focusBullet {
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: #3b82f6;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+}
+
+.focusText {
+  color: #374151;
+}
+
+.challengeText {
+  color: #374151;
+  margin-bottom: 0.75rem;
+}
+
+.prOpportunity {
+  background-color: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.prHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.prIcon {
+  width: 1rem;
+  height: 1rem;
+  color: #ea580c;
+  margin-right: 0.5rem;
+}
+
+.prTitle {
+  font-weight: 600;
+  color: #9a3412;
+}
+
+.prText {
+  color: #c2410c;
+  font-size: 0.875rem;
+}
+
+.encouragementText {
+  color: #374151;
+}
+
+.exercisesSection {
+  padding: 0 1rem 1.5rem 1rem;
+}
+
+.exercisesTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.exercisesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.exerciseCard {
+  background-color: white;
+  border-radius: 0.5rem;
+  border-left: 4px solid #3b82f6;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.exerciseCardContent {
+  padding: 1rem;
+}
+
+.exerciseHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.exerciseName {
+  font-weight: 600;
+  color: #111827;
+}
+
+.exerciseStats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.exerciseNotes {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.exerciseNotes::before {
+  content: '"';
+}
+
+.exerciseNotes::after {
+  content: '"';
+}
+
+.startButton {
+  flex-shrink: 0;
+  padding: 1rem;
+  background-color: white;
+  border-top: 1px solid #e5e7eb;
+}
+
+.startButtonInner {
+  width: 100%;
+  height: 3.5rem;
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.startButtonInner:hover:not(:disabled) {
+  background: linear-gradient(to right, #1d4ed8, #1e40af);
+}
+
+.startButtonInner:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.startButtonContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.startIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.startButtonText {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+/* Dark mode support */
+.container.dark {
+  background-color: #111827;
+}
+
+.header.dark {
+  background-color: #1f2937;
+  border-bottom-color: #374151;
+}
+
+.programTitle.dark {
+  color: #f9fafb;
+}
+
+.sessionSubtitle.dark {
+  color: #9ca3af;
+}
+
+.coachingCard.dark {
+  background-color: #1f2937;
+}
+
+.focusText.dark,
+.challengeText.dark,
+.encouragementText.dark {
+  color: #e5e7eb;
+}
+
+.exerciseCard.dark {
+  background-color: #1f2937;
+}
+
+.exerciseName.dark {
+  color: #f9fafb;
+}
+
+.exerciseStats.dark,
+.exerciseNotes.dark {
+  color: #9ca3af;
+}
+
+.exercisesTitle.dark {
+  color: #f9fafb;
+}
+
+.startButton.dark {
+  background-color: #1f2937;
+  border-top-color: #374151;
+}
