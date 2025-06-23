@@ -443,6 +443,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // CRITICAL: Move specific /api/programs/active/today route before ANY parameterized routes
+  app.get("/api/programs/active/today", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      const program = await storage.getActiveProgram(userId);
+      
+      if (!program) {
+        return res.status(404).json({ message: "Program not found or not active" });
+      }
+
+      // Calculate which day of the program we're on based on completed workouts
+      const completedWorkouts = await storage.getUserWorkouts(userId);
+      const programWorkouts = completedWorkouts.filter(w => 
+        w.isCompleted && 
+        w.createdAt && 
+        new Date(w.createdAt) >= new Date(program.createdAt!)
+      );
+      const daysDiff = programWorkouts.length;
+      console.log(`[ACTIVE/TODAY DEBUG] Program progress: ${programWorkouts.length} completed workouts since program created`);
+      console.log(`[ACTIVE/TODAY DEBUG] Program created: ${program.createdAt}, Completed workouts:`, programWorkouts.map(w => ({id: w.id, completed: w.isCompleted, created: w.createdAt})));
+      
+      // Parse the schedule to get today's workout
+      let schedule: any = {};
+      try {
+        schedule = typeof program.schedule === 'string' ? JSON.parse(program.schedule) : program.schedule;
+      } catch (error) {
+        return res.status(500).json({ message: "Invalid program schedule format" });
+      }
+
+      // Handle object format with numeric keys (0-6 for days of week)
+      let todaysWorkout: any = null;
+      
+      if (schedule.days && Array.isArray(schedule.days)) {
+        // Array format: cycle through program days
+        const programDays = schedule.days;
+        const currentDayIndex = daysDiff % programDays.length;
+        todaysWorkout = programDays[currentDayIndex];
+      } else if (schedule.weeks && Array.isArray(schedule.weeks)) {
+        // Weeks format: weeks with days
+        const weekNumber = Math.floor(daysDiff / 7) % schedule.weeks.length;
+        const dayNumber = daysDiff % 7;
+        const currentWeek = schedule.weeks[weekNumber];
+        todaysWorkout = currentWeek?.days?.[dayNumber];
+      } else if (typeof schedule === 'object' && schedule !== null) {
+        // Object format with numeric keys (0-6)
+        const dayKeys = Object.keys(schedule).sort((a, b) => parseInt(a) - parseInt(b));
+        const currentDayIndex = daysDiff % dayKeys.length;
+        const dayKey = dayKeys[currentDayIndex];
+        todaysWorkout = schedule[dayKey];
+        console.log(`[ACTIVE/TODAY] Program workouts completed: ${programWorkouts.length}, daysDiff: ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
+        console.log(`[ACTIVE/TODAY] Workout exercises:`, todaysWorkout?.exercises?.length || 0, 'exercises found');
+      } else {
+        return res.status(400).json({ message: "Invalid program schedule format" });
+      }
+      
+      if (!todaysWorkout || todaysWorkout.isRestDay) {
+        return res.status(404).json({ message: "Today is a rest day or no workout scheduled" });
+      }
+      
+      const response = {
+        program,
+        workout: todaysWorkout,
+        exercises: todaysWorkout.exercises || []
+      };
+      console.log(`[ACTIVE/TODAY] Returning response with ${response.exercises.length} exercises`);
+      res.json(response);
+    } catch (error) {
+      console.error("Today's workout error:", error);
+      res.status(500).json({ message: "Failed to fetch today's workout" });
+    }
+  });
+
   app.get("/api/programs/:id", isAuthenticated, async (req, res) => {
     try {
       const programId = parseInt(req.params.id);
@@ -732,78 +804,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Program update error:", error);
       res.status(500).json({ message: "Failed to update program" });
-    }
-  });
-
-  // CRITICAL: Specific route must come before parameterized route to avoid Express route conflicts
-  app.get("/api/programs/active/today", isAuthenticated, async (req, res) => {
-    try {
-      const userId = req.user.id;
-      const program = await storage.getActiveProgram(userId);
-      
-      if (!program) {
-        return res.status(404).json({ message: "Program not found or not active" });
-      }
-
-      // Calculate which day of the program we're on based on completed workouts
-      const completedWorkouts = await storage.getUserWorkouts(userId);
-      const programWorkouts = completedWorkouts.filter(w => 
-        w.isCompleted && 
-        w.createdAt && 
-        new Date(w.createdAt) >= new Date(program.createdAt!)
-      );
-      const daysDiff = programWorkouts.length;
-      console.log(`[ACTIVE/TODAY DEBUG] Program progress: ${programWorkouts.length} completed workouts since program created`);
-      console.log(`[ACTIVE/TODAY DEBUG] Program created: ${program.createdAt}, Completed workouts:`, programWorkouts.map(w => ({id: w.id, completed: w.isCompleted, created: w.createdAt})));
-      
-      // Parse the schedule to get today's workout
-      let schedule: any = {};
-      try {
-        schedule = typeof program.schedule === 'string' ? JSON.parse(program.schedule) : program.schedule;
-      } catch (error) {
-        return res.status(500).json({ message: "Invalid program schedule format" });
-      }
-
-      // Handle object format with numeric keys (0-6 for days of week)
-      let todaysWorkout: any = null;
-      
-      if (schedule.days && Array.isArray(schedule.days)) {
-        // Array format: cycle through program days
-        const programDays = schedule.days;
-        const currentDayIndex = daysDiff % programDays.length;
-        todaysWorkout = programDays[currentDayIndex];
-      } else if (schedule.weeks && Array.isArray(schedule.weeks)) {
-        // Weeks format: weeks with days
-        const weekNumber = Math.floor(daysDiff / 7) % schedule.weeks.length;
-        const dayNumber = daysDiff % 7;
-        const currentWeek = schedule.weeks[weekNumber];
-        todaysWorkout = currentWeek?.days?.[dayNumber];
-      } else if (typeof schedule === 'object' && schedule !== null) {
-        // Object format with numeric keys (0-6)
-        const dayKeys = Object.keys(schedule).sort((a, b) => parseInt(a) - parseInt(b));
-        const currentDayIndex = daysDiff % dayKeys.length;
-        const dayKey = dayKeys[currentDayIndex];
-        todaysWorkout = schedule[dayKey];
-        console.log(`[ACTIVE/TODAY] Program workouts completed: ${programWorkouts.length}, daysDiff: ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
-        console.log(`[ACTIVE/TODAY] Workout exercises:`, todaysWorkout?.exercises?.length || 0, 'exercises found');
-      } else {
-        return res.status(400).json({ message: "Invalid program schedule format" });
-      }
-      
-      if (!todaysWorkout || todaysWorkout.isRestDay) {
-        return res.status(404).json({ message: "Today is a rest day or no workout scheduled" });
-      }
-      
-      const response = {
-        program,
-        workout: todaysWorkout,
-        exercises: todaysWorkout.exercises || []
-      };
-      console.log(`[ACTIVE/TODAY] Returning response with ${response.exercises.length} exercises`);
-      res.json(response);
-    } catch (error) {
-      console.error("Today's workout error:", error);
-      res.status(500).json({ message: "Failed to fetch today's workout" });
     }
   });
 
