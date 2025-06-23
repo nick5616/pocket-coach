@@ -744,10 +744,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Program not found or not active" });
       }
 
-      // Calculate which day of the program we're on
-      const startDate = new Date(program.createdAt!);
-      const today = new Date();
-      const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      // Calculate which day of the program we're on based on completed workouts
+      const completedWorkouts = await storage.getUserWorkouts(userId);
+      const programWorkouts = completedWorkouts.filter(w => 
+        w.isCompleted && 
+        w.createdAt && 
+        new Date(w.createdAt) >= new Date(program.createdAt!)
+      );
+      const daysDiff = programWorkouts.length;
       
       // Parse the schedule to get today's workout
       let schedule: any = {};
@@ -777,7 +781,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const currentDayIndex = daysDiff % dayKeys.length;
         const dayKey = dayKeys[currentDayIndex];
         todaysWorkout = schedule[dayKey];
-        console.log(`Today is day ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
+        console.log(`Program workouts completed: ${programWorkouts.length}, daysDiff: ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
       } else {
         return res.status(400).json({ message: "Invalid program schedule format" });
       }
@@ -807,10 +811,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Program not found or not active" });
       }
 
-      // Calculate which day of the program we're on
-      const startDate = new Date(program.createdAt!);
-      const today = new Date();
-      const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      // Calculate which day of the program we're on based on completed workouts
+      const completedWorkouts = await storage.getUserWorkouts(userId);
+      const programWorkouts = completedWorkouts.filter(w => 
+        w.isCompleted && 
+        w.createdAt && 
+        new Date(w.createdAt) >= new Date(program.createdAt!)
+      );
+      const daysDiff = programWorkouts.length;
       
       // Parse the schedule
       let schedule: any = {};
@@ -838,7 +846,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentDayIndex = daysDiff % dayKeys.length;
         const dayKey = dayKeys[currentDayIndex];
         todaysWorkout = schedule[dayKey];
-        console.log(`Program ${programId} - Today is day ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
+        console.log(`Program ${programId} - Completed workouts: ${programWorkouts.length}, daysDiff: ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
       } else {
         return res.status(400).json({ message: "Program has no schedule" });
       }
