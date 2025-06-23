@@ -30,11 +30,15 @@ export default function ProgramWorkout() {
 
   const { data: program, isLoading: programLoading } = useQuery<Program>({
     queryKey: ["/api/programs", programId],
+    queryFn: () =>
+      fetch(`/api/programs/${programId}`, { credentials: "include" }).then((res) => res.json()),
     enabled: !!programId,
   });
 
   const { data: todaysWorkout, isLoading: workoutLoading } = useQuery({
     queryKey: ["/api/programs", programId, "today"],
+    queryFn: () =>
+      fetch(`/api/programs/${programId}/today`, { credentials: "include" }).then((res) => res.json()),
     enabled: !!programId,
   });
 
