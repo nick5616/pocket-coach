@@ -752,6 +752,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         new Date(w.createdAt) >= new Date(program.createdAt!)
       );
       const daysDiff = programWorkouts.length;
+      console.log(`[ACTIVE/TODAY DEBUG] Program progress: ${programWorkouts.length} completed workouts since program created`);
+      console.log(`[ACTIVE/TODAY DEBUG] Program created: ${program.createdAt}, Completed workouts:`, programWorkouts.map(w => ({id: w.id, completed: w.isCompleted, created: w.createdAt})));
       
       // Parse the schedule to get today's workout
       let schedule: any = {};
@@ -781,7 +783,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const currentDayIndex = daysDiff % dayKeys.length;
         const dayKey = dayKeys[currentDayIndex];
         todaysWorkout = schedule[dayKey];
-        console.log(`Program workouts completed: ${programWorkouts.length}, daysDiff: ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
+        console.log(`[ACTIVE/TODAY] Program workouts completed: ${programWorkouts.length}, daysDiff: ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
+        console.log(`[ACTIVE/TODAY] Workout exercises:`, todaysWorkout?.exercises?.length || 0, 'exercises found');
       } else {
         return res.status(400).json({ message: "Invalid program schedule format" });
       }
@@ -790,11 +793,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Today is a rest day or no workout scheduled" });
       }
       
-      res.json({
+      const response = {
         program,
         workout: todaysWorkout,
         exercises: todaysWorkout.exercises || []
-      });
+      };
+      console.log(`[ACTIVE/TODAY] Returning response with ${response.exercises.length} exercises`);
+      res.json(response);
     } catch (error) {
       console.error("Today's workout error:", error);
       res.status(500).json({ message: "Failed to fetch today's workout" });
