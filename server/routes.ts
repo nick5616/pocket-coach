@@ -429,6 +429,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/programs/active", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      const program = await storage.getActiveProgram(userId);
+      res.json(program);
+    } catch (error) {
+      console.error("Failed to fetch active program:", error);
+      res.status(500).json({ message: "Failed to fetch active program" });
+    }
+  });
+
   app.get("/api/programs/:id", isAuthenticated, async (req, res) => {
     try {
       const programId = parseInt(req.params.id);
@@ -446,16 +460,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(program);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch program" });
-    }
-  });
-
-  app.get("/api/programs/active", isAuthenticated, async (req, res) => {
-    try {
-      const userId = req.user.id;
-      const program = await storage.getActiveProgram(userId);
-      res.json(program);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch active program" });
     }
   });
 
