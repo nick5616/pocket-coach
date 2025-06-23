@@ -478,7 +478,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/programs/:id/today", isAuthenticated, async (req, res) => {
     try {
       const programId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = req.user!.id;
+      
+      if (isNaN(programId)) {
+        return res.status(400).json({ message: "Invalid program ID" });
+      }
       
       const program = await storage.getProgram(programId);
       if (!program || program.userId !== userId) {
@@ -501,7 +505,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const todaySchedule = schedule[dayOfWeek] || schedule[Object.keys(schedule)[0]];
+      const todaySchedule = schedule && typeof schedule === 'object' 
+        ? (schedule as any)[dayOfWeek] || (schedule as any)[Object.keys(schedule)[0]]
+        : null;
       
       // If no schedule exists, provide a default workout structure
       if (!todaySchedule) {
