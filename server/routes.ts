@@ -735,6 +735,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // CRITICAL: Specific route must come before parameterized route to avoid Express route conflicts
   app.get("/api/programs/active/today", isAuthenticated, async (req, res) => {
     try {
       const userId = req.user.id;
