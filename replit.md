@@ -110,7 +110,11 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
-- June 22, 2025: **COMPLETED** - Fixed Program Creation and Data Structure Issues
+- June 22, 2025: **COMPLETED** - Fixed Hardcoded User ID Issues and Program Data Structure
+  - Resolved "Invalid program ID" errors by fixing hardcoded userId=1 references throughout the application
+  - Updated server routes to handle string-based user IDs instead of parseInt for muscle groups and heat map endpoints
+  - Fixed workout-journal.tsx to use authenticated user sessions instead of hardcoded user IDs
+  - Updated API calls to use credentials: "include" for proper authentication
   - Fixed AI program generation route to properly set aiGenerated: true and populate all required fields
   - Updated program creation to include focusAreas, equipment, durationWeeks, and difficulty fields
   - Fixed existing program in database with proper AI-generated structure and complete bodyweight workout schedule

@@ -125,13 +125,13 @@ export default function WorkoutJournal() {
   // Mutations - Must be declared before any conditional returns
   const createWorkoutMutation = useMutation({
     mutationFn: async (data: {
-      userId: number;
       name: string;
       aiGenerateName: boolean;
     }) => {
       const response = await fetch("/api/workouts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(data),
       });
       if (!response.ok) throw new Error("Failed to create workout");

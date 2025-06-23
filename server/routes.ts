@@ -63,10 +63,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/workouts", async (req, res) => {
+  app.post("/api/workouts", isAuthenticated, async (req, res) => {
     try {
       const { aiGenerateName, ...workoutData } = req.body;
-      const validatedData = insertWorkoutSchema.parse(workoutData);
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+      
+      const validatedData = insertWorkoutSchema.parse({
+        ...workoutData,
+        userId: userId
+      });
       const workout = await storage.createWorkout({
         ...validatedData,
         aiGenerateName: aiGenerateName || false
