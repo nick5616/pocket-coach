@@ -33,7 +33,7 @@ export default function ProgramWorkout() {
   useEffect(() => {
     // Check for dark mode
     const checkDarkMode = () => {
-      const isDarkMode = document.documentElement.classList.contains('dark');
+      const isDarkMode = document.documentElement.classList.contains("dark");
       setIsDark(isDarkMode);
     };
 
@@ -43,7 +43,7 @@ export default function ProgramWorkout() {
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ["class"],
     });
 
     return () => observer.disconnect();
@@ -52,14 +52,18 @@ export default function ProgramWorkout() {
   const { data: program, isLoading: programLoading } = useQuery<Program>({
     queryKey: ["/api/programs", programId],
     queryFn: () =>
-      fetch(`/api/programs/${programId}`, { credentials: "include" }).then((res) => res.json()),
+      fetch(`/api/programs/${programId}`, { credentials: "include" }).then(
+        (res) => res.json(),
+      ),
     enabled: !!programId,
   });
 
   const { data: todaysWorkout, isLoading: workoutLoading } = useQuery({
     queryKey: ["/api/programs", programId, "today"],
     queryFn: () =>
-      fetch(`/api/programs/${programId}/today`, { credentials: "include" }).then((res) => res.json()),
+      fetch(`/api/programs/${programId}/today`, {
+        credentials: "include",
+      }).then((res) => res.json()),
     enabled: !!programId,
   });
 
@@ -113,9 +117,9 @@ export default function ProgramWorkout() {
   const insights = (todaysWorkout as any).insights || {};
 
   return (
-    <div className={`${styles.container} ${isDark ? styles.dark : ''}`}>
+    <div className={`${styles.container} ${isDark ? styles.dark : ""}`}>
       {/* Header */}
-      <header className={`${styles.header} ${isDark ? styles.dark : ''}`}>
+      <header className={`${styles.header} ${isDark ? styles.dark : ""}`}>
         <div className={styles.headerContent}>
           <div className={styles.headerLeft}>
             <Button
@@ -123,11 +127,19 @@ export default function ProgramWorkout() {
               size="icon"
               onClick={() => setLocation("/")}
             >
-              <ChevronLeft style={{ width: '1.25rem', height: '1.25rem' }} />
+              <ChevronLeft style={{ width: "1.25rem", height: "1.25rem" }} />
             </Button>
             <div>
-              <h1 className={`${styles.programTitle} ${isDark ? styles.dark : ''}`}>{program.name}</h1>
-              <p className={`${styles.sessionSubtitle} ${isDark ? styles.dark : ''}`}>Today's Session</p>
+              <h1
+                className={`${styles.programTitle} ${isDark ? styles.dark : ""}`}
+              >
+                {program.name}
+              </h1>
+              <p
+                className={`${styles.sessionSubtitle} ${isDark ? styles.dark : ""}`}
+              >
+                Today's Session
+              </p>
             </div>
           </div>
         </div>
@@ -138,11 +150,14 @@ export default function ProgramWorkout() {
         {/* Workout Header */}
         <section className={styles.workoutHeader}>
           <div className={styles.workoutHeaderContent}>
-            <h2 className={styles.workoutTitle}>{workout.name || "Today's Workout"}</h2>
+            <h2 className={styles.workoutTitle}>
+              {workout.name || "Today's Workout"}
+            </h2>
             <p className={styles.workoutDescription}>
-              {insights.description || "Time to push your limits and make progress"}
+              {insights.description ||
+                "Time to push your limits and make progress"}
             </p>
-            
+
             {/* Difficulty & Stats */}
             <div className={styles.statsContainer}>
               <div className={styles.statItem}>
@@ -150,7 +165,9 @@ export default function ProgramWorkout() {
                 <div className={styles.statLabel}>Exercises</div>
               </div>
               <div className={styles.statItem}>
-                <div className={styles.statValue}>{insights.estimatedTime || "45"}</div>
+                <div className={styles.statValue}>
+                  {insights.estimatedTime || "45"}
+                </div>
                 <div className={styles.statLabel}>Minutes</div>
               </div>
               <div className={styles.statItem}>
@@ -173,9 +190,13 @@ export default function ProgramWorkout() {
           <div className={styles.coachingCards}>
             {/* Focus Areas */}
             {insights.focusAreas && insights.focusAreas.length > 0 && (
-              <div className={`${styles.coachingCard} ${isDark ? styles.dark : ''}`}>
+              <div
+                className={`${styles.coachingCard} ${isDark ? styles.dark : ""}`}
+              >
                 <div className={styles.cardHeader}>
-                  <h3 className={`${styles.cardTitle} ${styles.cardTitleFocus}`}>
+                  <h3
+                    className={`${styles.cardTitle} ${styles.cardTitleFocus}`}
+                  >
                     <Target className={styles.cardIcon} />
                     Today's Focus
                   </h3>
@@ -185,7 +206,11 @@ export default function ProgramWorkout() {
                     {insights.focusAreas.map((area: string, index: number) => (
                       <div key={index} className={styles.focusItem}>
                         <div className={styles.focusBullet}></div>
-                        <span className={`${styles.focusText} ${isDark ? styles.dark : ''}`}>{area}</span>
+                        <span
+                          className={`${styles.focusText} ${isDark ? styles.dark : ""}`}
+                        >
+                          {area}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -195,22 +220,32 @@ export default function ProgramWorkout() {
 
             {/* Challenges & PR Opportunities */}
             {insights.challenges && (
-              <div className={`${styles.coachingCard} ${isDark ? styles.dark : ''}`}>
+              <div
+                className={`${styles.coachingCard} ${isDark ? styles.dark : ""}`}
+              >
                 <div className={styles.cardHeader}>
-                  <h3 className={`${styles.cardTitle} ${styles.cardTitleChallenge}`}>
+                  <h3
+                    className={`${styles.cardTitle} ${styles.cardTitleChallenge}`}
+                  >
                     <Zap className={styles.cardIcon} />
                     Expect Challenge
                   </h3>
                 </div>
                 <div className={styles.cardContent}>
-                  <p className={`${styles.challengeText} ${isDark ? styles.dark : ''}`}>{insights.challenges}</p>
+                  <p
+                    className={`${styles.challengeText} ${isDark ? styles.dark : ""}`}
+                  >
+                    {insights.challenges}
+                  </p>
                   {insights.prOpportunities && (
                     <div className={styles.prOpportunity}>
                       <div className={styles.prHeader}>
                         <Trophy className={styles.prIcon} />
                         <span className={styles.prTitle}>PR Opportunity</span>
                       </div>
-                      <p className={styles.prText}>{insights.prOpportunities}</p>
+                      <p className={styles.prText}>
+                        {insights.prOpportunities}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -219,15 +254,23 @@ export default function ProgramWorkout() {
 
             {/* Encouragement */}
             {insights.encouragement && (
-              <div className={`${styles.coachingCard} ${isDark ? styles.dark : ''}`}>
+              <div
+                className={`${styles.coachingCard} ${isDark ? styles.dark : ""}`}
+              >
                 <div className={styles.cardHeader}>
-                  <h3 className={`${styles.cardTitle} ${styles.cardTitleEncouragement}`}>
+                  <h3
+                    className={`${styles.cardTitle} ${styles.cardTitleEncouragement}`}
+                  >
                     <Heart className={styles.cardIcon} />
                     You've Got This
                   </h3>
                 </div>
                 <div className={styles.cardContent}>
-                  <p className={`${styles.encouragementText} ${isDark ? styles.dark : ''}`}>{insights.encouragement}</p>
+                  <p
+                    className={`${styles.encouragementText} ${isDark ? styles.dark : ""}`}
+                  >
+                    {insights.encouragement}
+                  </p>
                 </div>
               </div>
             )}
@@ -236,16 +279,28 @@ export default function ProgramWorkout() {
 
         {/* Exercise Preview */}
         <section className={styles.exercisesSection}>
-          <h3 className={`${styles.exercisesTitle} ${isDark ? styles.dark : ''}`}>Today's Exercises</h3>
+          <h3
+            className={`${styles.exercisesTitle} ${isDark ? styles.dark : ""}`}
+          >
+            Today's Exercises
+          </h3>
           <div className={styles.exercisesList}>
             {exercises.map((exercise: any, index: number) => (
-              <div key={index} className={`${styles.exerciseCard} ${isDark ? styles.dark : ''}`}>
+              <div
+                key={index}
+                className={`${styles.exerciseCard} ${isDark ? styles.dark : ""}`}
+              >
                 <div className={styles.exerciseCardContent}>
                   <div className={styles.exerciseHeader}>
-                    <h4 className={`${styles.exerciseName} ${isDark ? styles.dark : ''}`}>{exercise.name}</h4>
+                    <h4
+                      className={`${styles.exerciseName} ${isDark ? styles.dark : ""}`}
+                    >
+                      {exercise.name}
+                    </h4>
                   </div>
-                  <ExerciseMuscleGroups exerciseName={exercise.name} />
-                  <div className={`${styles.exerciseStats} ${isDark ? styles.dark : ''}`}>
+                  <div
+                    className={`${styles.exerciseStats} ${isDark ? styles.dark : ""}`}
+                  >
                     <span>{exercise.sets} sets</span>
                     <span>×</span>
                     <span>{exercise.reps} reps</span>
@@ -263,8 +318,13 @@ export default function ProgramWorkout() {
                     )}
                   </div>
                   {exercise.notes && (
-                    <p className={`${styles.exerciseNotes} ${isDark ? styles.dark : ''}`}>{exercise.notes}</p>
+                    <p
+                      className={`${styles.exerciseNotes} ${isDark ? styles.dark : ""}`}
+                    >
+                      {exercise.notes}
+                    </p>
                   )}
+                  <ExerciseMuscleGroups exerciseName={exercise.name} />
                 </div>
               </div>
             ))}
@@ -273,7 +333,7 @@ export default function ProgramWorkout() {
       </div>
 
       {/* Start Workout Button */}
-      <div className={`${styles.startButton} ${isDark ? styles.dark : ''}`}>
+      <div className={`${styles.startButton} ${isDark ? styles.dark : ""}`}>
         <button
           onClick={handleStartWorkout}
           disabled={createWorkoutMutation.isPending}
@@ -282,7 +342,9 @@ export default function ProgramWorkout() {
           <div className={styles.startButtonContent}>
             <Play className={styles.startIcon} />
             <span className={styles.startButtonText}>
-              {createWorkoutMutation.isPending ? "Starting..." : "Start Workout"}
+              {createWorkoutMutation.isPending
+                ? "Starting..."
+                : "Start Workout"}
             </span>
           </div>
         </button>
