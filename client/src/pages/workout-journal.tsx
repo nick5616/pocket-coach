@@ -117,7 +117,7 @@ export default function WorkoutJournal() {
     queryKey: ["/api/programs/active/today"],
     queryFn: () =>
       fetch("/api/programs/active/today", { credentials: "include" }).then((res) => res.json()),
-    enabled: !workoutId && !!activeProgram,
+    enabled: !!activeProgram, // Always fetch when active program exists
   });
 
   const totalVolume = calculateWorkoutVolume(exercises as Exercise[]);
