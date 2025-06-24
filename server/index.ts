@@ -7,14 +7,24 @@ const app = express();
 // Add CORS and iframe headers for portfolio embedding
 app.use((req, res, next) => {
   // Allow embedding in iframes from any origin
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-  res.setHeader('Content-Security-Policy', "frame-ancestors 'self' *");
+  res.removeHeader('X-Frame-Options'); // Remove any conflicting headers
+  res.setHeader('Content-Security-Policy', "frame-ancestors *");
   
   // Enable CORS for cross-origin requests
-  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With');
+  
+  // Add SameSite=None directive for cross-site cookies in production
+  if (process.env.NODE_ENV === 'production') {
+    res.setHeader('Set-Cookie', 'SameSite=None; Secure');
+  }
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
