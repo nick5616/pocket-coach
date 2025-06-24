@@ -17,15 +17,34 @@ export default function DemoPage() {
   // Auto-login with demo account
   const demoLoginMutation = useMutation({
     mutationFn: async () => {
+      console.log('Starting demo login...');
       const response = await fetch('/api/auth/demo', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         credentials: 'include',
       });
+      
+      console.log('Demo login response status:', response.status);
+      const contentType = response.headers.get('content-type');
+      console.log('Response content type:', contentType);
+      
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Demo login failed with:', errorText);
         throw new Error('Demo login failed');
       }
-      return response.json();
+      
+      if (!contentType?.includes('application/json')) {
+        console.error('Expected JSON response but got:', contentType);
+        throw new Error('Invalid response format');
+      }
+      
+      const result = await response.json();
+      console.log('Demo login successful:', result);
+      return result;
     },
     onSuccess: () => {
       // Invalidate auth query to refetch user data
@@ -50,12 +69,12 @@ export default function DemoPage() {
       if (user && !error) {
         // Already logged in, redirect to home
         setLocation("/");
-      } else {
-        // Not logged in or 401 error, start demo login
+      } else if (!demoLoginMutation.isPending && !demoLoginMutation.isSuccess) {
+        // Not logged in or 401 error, start demo login (but only once)
         demoLoginMutation.mutate();
       }
     }
-  }, [user, isLoading, error]);
+  }, [user, isLoading, error, demoLoginMutation]);
 
   if (isLoading || demoLoginMutation.isPending) {
     return (

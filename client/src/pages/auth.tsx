@@ -20,10 +20,19 @@ export default function AuthPage() {
   });
   const { toast } = useToast();
 
-  // Detect if running in iframe
+  // Detect if running in iframe and auto-redirect to demo
   useEffect(() => {
-    setIsInIframe(window.self !== window.top);
-  }, []);
+    const inIframe = window.self !== window.top;
+    setIsInIframe(inIframe);
+    
+    // If in iframe, immediately redirect to demo mode after a brief delay
+    if (inIframe) {
+      console.log('Iframe detected, redirecting to demo mode');
+      setTimeout(() => {
+        setLocation("/demo");
+      }, 100);
+    }
+  }, [setLocation]);
 
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {

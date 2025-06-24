@@ -19,9 +19,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Demo mode for iframe embedding
   app.post('/api/auth/demo', async (req, res) => {
     try {
+      console.log('Demo login request received');
+      
       // Create or get demo user
       let demoUser = await storage.getUserByEmail('demo@pocketcoach.app');
       if (!demoUser) {
+        console.log('Creating new demo user');
         const bcrypt = await import('bcrypt');
         const passwordHash = await bcrypt.hash('demo123', 10);
         demoUser = await storage.createUser({
@@ -30,13 +33,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           firstName: 'Demo',
           lastName: 'User',
         });
+      } else {
+        console.log('Found existing demo user:', demoUser.id);
       }
 
       // Log them in automatically
       req.login(demoUser, (err) => {
         if (err) {
+          console.error('Demo login error:', err);
           return res.status(500).json({ message: 'Demo login failed' });
         }
+        console.log('Demo user logged in successfully');
         res.json({ user: demoUser, isDemo: true });
       });
     } catch (error) {
