@@ -21,10 +21,8 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With');
   
-  // Add SameSite=None directive for cross-site cookies in production
-  if (process.env.NODE_ENV === 'production') {
-    res.setHeader('Set-Cookie', 'SameSite=None; Secure');
-  }
+  // Handle SameSite=None directive for cross-site cookies in production
+  // Note: This will be handled by express-session configuration
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();

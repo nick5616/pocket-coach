@@ -9,6 +9,7 @@ import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
 import WorkoutCard from "@/components/workout-card";
 import LoadingScreen from "@/components/loading-screen";
+import DemoBanner from "@/components/demo-banner";
 import {
   Bell,
   User as UserIcon,
@@ -31,6 +32,9 @@ export default function Home() {
   const [showAchievement, setShowAchievement] = useState(false);
   const [achievementData, setAchievementData] = useState<any>(null);
   const { user: authUser } = useAuth();
+  
+  // Check if this is demo mode
+  const isDemoUser = authUser?.email === 'demo@pocketcoach.app';
 
   const { data: user, isLoading: userLoading } = useQuery<User>({
     queryKey: [`/api/user/${authUser?.id}`],
@@ -156,6 +160,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      {isDemoUser && <DemoBanner />}
       {/* Header */}
       <header className={styles.header}>
         <h1 className={styles.headerTitle}>Pocket Coach</h1>

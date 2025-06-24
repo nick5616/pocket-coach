@@ -39,6 +39,14 @@ Mobile-first fitness tracking PWA with AI-powered workout analysis, personalized
 
 ## Recent Architecture Changes
 
+### June 24, 2025 - Iframe Authentication & Demo Mode
+- Fixed iframe authentication issues for portfolio embedding
+- Added `/demo` route with auto-login for demonstration purposes
+- Implemented demo banner component for iframe users
+- Updated session cookies to support cross-origin embedding (sameSite: 'none' in production)
+- Enhanced CORS headers to allow iframe embedding from any domain
+- Added iframe detection with fallback to demo mode on login failure
+
 ### June 23, 2025 - CSS Modules Migration Complete
 - Removed ALL Tailwind CSS dependencies from entire project
 - All components now use CSS Modules with .module.css files
