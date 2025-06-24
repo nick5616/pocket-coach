@@ -22,9 +22,9 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: 'auto', // Let express-session handle HTTPS detection automatically
+      secure: process.env.NODE_ENV === 'production', // Enable secure cookies in production
       maxAge: sessionTtl,
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Allow cross-site cookies in production for iframe embedding
     },
   });
 }

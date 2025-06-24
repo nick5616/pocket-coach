@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -11,6 +11,7 @@ import styles from "./auth.module.css";
 export default function AuthPage() {
   const [, setLocation] = useLocation();
   const [isLogin, setIsLogin] = useState(true);
+  const [isInIframe, setIsInIframe] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -19,15 +20,22 @@ export default function AuthPage() {
   });
   const { toast } = useToast();
 
+  // Detect if running in iframe
+  useEffect(() => {
+    setIsInIframe(window.self !== window.top);
+  }, []);
+
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for cross-origin requests
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        throw new Error('Login failed');
+        const errorData = await response.json().catch(() => ({ message: 'Login failed' }));
+        throw new Error(errorData.message || 'Login failed');
       }
       return response.json();
     },
@@ -40,10 +48,13 @@ export default function AuthPage() {
       });
       setLocation("/");
     },
-    onError: () => {
+    onError: (error: Error) => {
+      console.error('Login error details:', error);
       toast({
         title: "Login failed",
-        description: "Please check your email and password.",
+        description: isInIframe 
+          ? "If embedded in portfolio, try opening in new tab for login."
+          : "Please check your email and password.",
         variant: "destructive",
       });
     },
@@ -54,10 +65,11 @@ export default function AuthPage() {
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for cross-origin requests
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({ message: 'Registration failed' }));
         throw new Error(error.message || 'Registration failed');
       }
       return response.json();
@@ -121,6 +133,11 @@ export default function AuthPage() {
             <CardTitle className={styles.title}>
               {isLogin ? "Welcome Back" : "Join Pocket Coach"}
             </CardTitle>
+            {isInIframe && (
+              <div className={styles.iframeWarning}>
+                <p>Running in portfolio view. If login fails, <a href={window.location.href} target="_blank" rel="noopener noreferrer">open in new tab</a>.</p>
+              </div>
+            )}
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className={styles.form}>
