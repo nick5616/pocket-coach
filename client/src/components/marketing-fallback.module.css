@@ -1,0 +1,167 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+}
+
+.hero {
+  margin-bottom: 3rem;
+}
+
+.icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: white;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 2rem 0;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+}
+
+.featureCard {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-4px);
+}
+
+.featureTitle {
+  font-size: 1.1rem;
+  margin: 0;
+  color: #1a202c;
+}
+
+.featureText {
+  color: #4a5568;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.cta {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 3rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ctaTitle {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  margin: 0 0 1rem 0;
+}
+
+.ctaDescription {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 2rem 0;
+  line-height: 1.6;
+}
+
+.ctaButton {
+  background: #48bb78;
+  color: white;
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+
+.ctaButton:hover {
+  background: #38a169;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(72, 187, 120, 0.4);
+}
+
+.disclaimer {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 1rem 0 0 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+  }
+  
+  .subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .features {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .cta {
+    padding: 2rem 1.5rem;
+  }
+  
+  .ctaTitle {
+    font-size: 1.5rem;
+  }
+  
+  .ctaDescription {
+    font-size: 1rem;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  }
+  
+  .featureCard {
+    background: rgba(45, 55, 72, 0.95);
+  }
+  
+  .featureTitle {
+    color: #f7fafc;
+  }
+  
+  .featureText {
+    color: #e2e8f0;
+  }
+}

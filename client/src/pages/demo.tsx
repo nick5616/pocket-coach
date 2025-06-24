@@ -1,0 +1,107 @@
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import DemoBanner from "@/components/demo-banner";
+import LoadingScreen from "@/components/loading-screen";
+
+export default function DemoPage() {
+  const [, setLocation] = useLocation();
+  const [isInIframe, setIsInIframe] = useState(false);
+
+  // Detect if running in iframe
+  useEffect(() => {
+    setIsInIframe(window.self !== window.top);
+  }, []);
+
+  // Auto-login with demo account
+  const demoLoginMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/auth/demo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Demo login failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate auth query to refetch user data
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      // Redirect to main app
+      setLocation("/");
+    },
+    onError: (error) => {
+      console.error('Demo login failed:', error);
+    },
+  });
+
+  // Check if already authenticated with error handling for 401
+  const { data: user, isLoading, error } = useQuery({
+    queryKey: ["/api/auth/user"],
+    enabled: true,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (user && !error) {
+        // Already logged in, redirect to home
+        setLocation("/");
+      } else {
+        // Not logged in or 401 error, start demo login
+        demoLoginMutation.mutate();
+      }
+    }
+  }, [user, isLoading, error]);
+
+  if (isLoading || demoLoginMutation.isPending) {
+    return (
+      <div>
+        <DemoBanner />
+        <LoadingScreen message="Setting up your demo experience..." />
+      </div>
+    );
+  }
+
+  if (demoLoginMutation.isError) {
+    return (
+      <div>
+        <DemoBanner />
+        <div style={{ 
+          padding: '2rem', 
+          textAlign: 'center',
+          maxWidth: '500px',
+          margin: '2rem auto'
+        }}>
+          <h2>Demo Unavailable</h2>
+          <p>The demo mode is currently unavailable. Please try opening the app in a new tab for the full experience.</p>
+          <button 
+            onClick={() => window.open(window.location.origin, '_blank')}
+            style={{
+              background: '#6366f1',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.5rem',
+              padding: '0.75rem 1.5rem',
+              fontSize: '1rem',
+              cursor: 'pointer',
+              marginTop: '1rem'
+            }}
+          >
+            Open Full App
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <DemoBanner />
+      <LoadingScreen message="Loading demo..." />
+    </div>
+  );
+}

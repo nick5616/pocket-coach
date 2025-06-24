@@ -16,6 +16,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
+  // Demo mode for iframe embedding
+  app.post('/api/auth/demo', async (req, res) => {
+    try {
+      // Create or get demo user
+      let demoUser = await storage.getUserByEmail('demo@pocketcoach.app');
+      if (!demoUser) {
+        const bcrypt = await import('bcrypt');
+        const passwordHash = await bcrypt.hash('demo123', 10);
+        demoUser = await storage.createUser({
+          email: 'demo@pocketcoach.app',
+          passwordHash,
+          firstName: 'Demo',
+          lastName: 'User',
+        });
+      }
+
+      // Log them in automatically
+      req.login(demoUser, (err) => {
+        if (err) {
+          return res.status(500).json({ message: 'Demo login failed' });
+        }
+        res.json({ user: demoUser, isDemo: true });
+      });
+    } catch (error) {
+      console.error('Demo login error:', error);
+      res.status(500).json({ message: 'Demo mode failed' });
+    }
+  });
+
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {

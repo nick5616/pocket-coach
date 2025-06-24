@@ -50,13 +50,16 @@ export default function AuthPage() {
     },
     onError: (error: Error) => {
       console.error('Login error details:', error);
-      toast({
-        title: "Login failed",
-        description: isInIframe 
-          ? "If embedded in portfolio, try opening in new tab for login."
-          : "Please check your email and password.",
-        variant: "destructive",
-      });
+      if (isInIframe) {
+        // Redirect to demo mode for iframe users
+        setLocation("/demo");
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Please check your email and password.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -135,7 +138,7 @@ export default function AuthPage() {
             </CardTitle>
             {isInIframe && (
               <div className={styles.iframeWarning}>
-                <p>Running in portfolio view. If login fails, <a href={window.location.href} target="_blank" rel="noopener noreferrer">open in new tab</a>.</p>
+                <p>Portfolio demo mode available. <a href="/demo">Try demo version</a> or <a href={window.location.href} target="_blank" rel="noopener noreferrer">open in new tab</a> for full access.</p>
               </div>
             )}
           </CardHeader>
