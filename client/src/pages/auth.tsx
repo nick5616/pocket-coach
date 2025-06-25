@@ -25,14 +25,12 @@ export default function AuthPage() {
     const inIframe = window.self !== window.top;
     setIsInIframe(inIframe);
     
-    // If in iframe, immediately redirect to demo mode after a brief delay
-    if (inIframe) {
+    // If in iframe, redirect to demo mode immediately
+    if (inIframe && location !== "/demo") {
       console.log('Iframe detected, redirecting to demo mode');
-      setTimeout(() => {
-        setLocation("/demo");
-      }, 100);
+      setLocation("/demo");
     }
-  }, [setLocation]);
+  }, [setLocation, location]);
 
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {

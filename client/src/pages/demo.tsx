@@ -46,11 +46,14 @@ export default function DemoPage() {
       console.log('Demo login successful:', result);
       return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Demo login successful:', data);
       // Invalidate auth query to refetch user data
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      // Redirect to main app
-      setLocation("/");
+      // Small delay to ensure state updates, then redirect
+      setTimeout(() => {
+        setLocation("/");
+      }, 100);
     },
     onError: (error) => {
       console.error('Demo login failed:', error);
@@ -68,13 +71,16 @@ export default function DemoPage() {
     if (!isLoading) {
       if (user && !error) {
         // Already logged in, redirect to home
+        console.log('Demo user authenticated, redirecting to home');
         setLocation("/");
-      } else if (!demoLoginMutation.isPending && !demoLoginMutation.isSuccess) {
-        // Not logged in or 401 error, start demo login (but only once)
+      } else if (!hasTriedLogin && !demoLoginMutation.isPending) {
+        // Not logged in and haven't tried demo login yet
+        console.log('Starting demo login process');
+        setHasTriedLogin(true);
         demoLoginMutation.mutate();
       }
     }
-  }, [user, isLoading, error, demoLoginMutation]);
+  }, [user, isLoading, error, hasTriedLogin, demoLoginMutation.isPending]);
 
   if (isLoading || demoLoginMutation.isPending) {
     return (
