@@ -3,7 +3,7 @@ import { Dumbbell, Heart, Target } from "lucide-react";
 import styles from "./splash-screen.module.css";
 
 interface SplashScreenProps {
-  onComplete: () => void;
+  onComplete?: () => void;
 }
 
 export default function SplashScreen({ onComplete }: SplashScreenProps) {
@@ -41,7 +41,8 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
   }, []);
 
   const handleTap = () => {
-    if (loadingComplete) {
+    if (loadingComplete && onComplete) {
+      console.log('Splash screen tap to start');
       onComplete();
     }
   };

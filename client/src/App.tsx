@@ -17,27 +17,36 @@ import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
 function Router() {
   const [location] = useLocation();
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading, error } = useQuery({
     queryKey: ['/api/auth/user'],
     enabled: true,
     retry: false,
     staleTime: 5000,
   });
 
+  console.log('Router state:', { location, user: !!user, isLoading, error });
+
   // Handle demo route specifically to prevent loops
   if (location === '/demo') {
+    console.log('Rendering Demo component');
     return <Demo />;
   }
 
   // Show loading screen while checking auth
   if (isLoading) {
-    return <SplashScreen />;
+    console.log('Rendering SplashScreen for loading');
+    return <SplashScreen onComplete={() => {
+      console.log('Auth loading splash complete - this should not happen');
+    }} />;
   }
 
   // Show auth if no user
   if (!user) {
+    console.log('No user, rendering Auth');
     return <Auth />;
   }
+
+  console.log('User authenticated, rendering main routes');
 
   // Authenticated routes
   return (
@@ -88,7 +97,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       {showSplash ? (
-        <SplashScreen onComplete={() => setShowSplash(false)} />
+        <SplashScreen onComplete={() => {
+          console.log('Main splash complete, showing app');
+          setShowSplash(false);
+        }} />
       ) : (
         <div style={{
           height: '100vh',
