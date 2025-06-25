@@ -23,8 +23,28 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   currentStreak: integer("current_streak").default(0),
+  // Subscription fields
+  stripeCustomerId: varchar("stripe_customer_id"),
+  stripeSubscriptionId: varchar("stripe_subscription_id"),
+  subscriptionStatus: varchar("subscription_status").default("inactive"), // "active", "inactive", "canceled", "past_due"
+  subscriptionType: varchar("subscription_type").default("free"), // "free", "beta", "premium"
+  freeAccessGranted: boolean("free_access_granted").default(false), // Admin can grant free premium access
+  freeAccessReason: text("free_access_reason"), // Why free access was granted
+  subscriptionEndsAt: timestamp("subscription_ends_at"),
+  trialEndsAt: timestamp("trial_ends_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Admin actions log for tracking who gets free access
+export const adminActions = pgTable("admin_actions", {
+  id: serial("id").primaryKey(),
+  adminUserId: varchar("admin_user_id").notNull(),
+  targetUserId: varchar("target_user_id").notNull(),
+  action: text("action").notNull(), // "grant_free_access", "revoke_access", etc.
+  reason: text("reason"),
+  metadata: jsonb("metadata"), // Additional action data
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const goals = pgTable("goals", {
@@ -167,6 +187,17 @@ export const achievementsRelations = relations(achievements, ({ one }) => ({
   }),
 }));
 
+export const adminActionsRelations = relations(adminActions, ({ one }) => ({
+  adminUser: one(users, {
+    fields: [adminActions.adminUserId],
+    references: [users.id],
+  }),
+  targetUser: one(users, {
+    fields: [adminActions.targetUserId],
+    references: [users.id],
+  }),
+}));
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   currentStreak: true,
@@ -219,6 +250,11 @@ export const insertAchievementSchema = createInsertSchema(achievements).omit({
   createdAt: true,
 });
 
+export const insertAdminActionSchema = createInsertSchema(adminActions).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -244,3 +280,6 @@ export type InsertExerciseMuscleMapping = z.infer<typeof insertExerciseMuscleMap
 
 export type Achievement = typeof achievements.$inferSelect;
 export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+
+export type AdminAction = typeof adminActions.$inferSelect;
+export type InsertAdminAction = z.infer<typeof insertAdminActionSchema>;

@@ -1,5 +1,5 @@
 import { 
-  users, goals, workouts, exercises, programs, achievements, muscleGroups, exerciseMuscleMapping,
+  users, goals, workouts, exercises, programs, achievements, muscleGroups, exerciseMuscleMapping, adminActions,
   type User, type InsertUser, type UpsertUser,
   type Goal, type InsertGoal,
   type Workout, type InsertWorkout,
@@ -7,7 +7,8 @@ import {
   type Program, type InsertProgram,
   type Achievement, type InsertAchievement,
   type MuscleGroup, type InsertMuscleGroup,
-  type ExerciseMuscleMapping, type InsertExerciseMuscleMapping
+  type ExerciseMuscleMapping, type InsertExerciseMuscleMapping,
+  type AdminAction, type InsertAdminAction
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
@@ -66,6 +67,27 @@ export interface IStorage {
     lastWorked: Date | null;
     intensity: number; // 0-1 scale for heat map
   }>;
+
+  // Subscription Management
+  updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId?: string): Promise<User>;
+  updateUserSubscription(userId: string, updates: {
+    subscriptionStatus?: string;
+    subscriptionType?: string;
+    subscriptionEndsAt?: Date;
+    trialEndsAt?: Date;
+  }): Promise<User>;
+  getUserSubscriptionStatus(userId: string): Promise<{
+    hasAccess: boolean;
+    subscriptionType: string;
+    subscriptionStatus: string;
+    reason: string;
+  }>;
+
+  // Admin Access Management
+  grantFreeAccess(adminUserId: string, targetUserId: string, reason: string): Promise<void>;
+  revokeFreeAccess(adminUserId: string, targetUserId: string, reason: string): Promise<void>;
+  getAdminActions(limit?: number): Promise<AdminAction[]>;
+  createAdminAction(action: InsertAdminAction): Promise<AdminAction>;
 }
 
 export class DatabaseStorage implements IStorage {
