@@ -47,7 +47,8 @@ Mobile-first fitness tracking PWA with AI-powered workout analysis, personalized
 - Updated session cookies to support cross-origin embedding (sameSite: 'none' in production)
 - Enhanced CORS headers to allow iframe embedding from any domain
 - Added iframe detection with fallback to demo mode on login failure
-- **Mobile Strategy**: Identified Capacitor as optimal path for native iOS/Android apps while preserving web compatibility
+- **Mobile Strategy**: Added Capacitor configuration for future native iOS/Android apps while preserving web compatibility
+- **Platform Detection**: Added utilities to detect web vs native app context
 
 ### June 23, 2025 - CSS Modules Migration Complete
 - Removed ALL Tailwind CSS dependencies from entire project
