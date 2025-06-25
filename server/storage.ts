@@ -468,6 +468,166 @@ export class DatabaseStorage implements IStorage {
       intensity
     };
   }
+
+  // Subscription Management
+  async updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId?: string): Promise<User> {
+    const updates: any = { stripeCustomerId };
+    if (stripeSubscriptionId) {
+      updates.stripeSubscriptionId = stripeSubscriptionId;
+    }
+    
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return user;
+  }
+
+  async updateUserSubscription(userId: string, updates: {
+    subscriptionStatus?: string;
+    subscriptionType?: string;
+    subscriptionEndsAt?: Date;
+    trialEndsAt?: Date;
+  }): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return user;
+  }
+
+  async getUserSubscriptionStatus(userId: string): Promise<{
+    hasAccess: boolean;
+    subscriptionType: string;
+    subscriptionStatus: string;
+    reason: string;
+  }> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      return {
+        hasAccess: false,
+        subscriptionType: 'free',
+        subscriptionStatus: 'inactive',
+        reason: 'User not found'
+      };
+    }
+
+    // Check if admin granted free access
+    if (user.freeAccessGranted) {
+      return {
+        hasAccess: true,
+        subscriptionType: 'premium',
+        subscriptionStatus: 'active',
+        reason: 'Admin granted free access'
+      };
+    }
+
+    // Check if subscription is active
+    if (user.subscriptionStatus === 'active' && user.subscriptionType !== 'free') {
+      // Check if subscription hasn't expired
+      if (!user.subscriptionEndsAt || new Date() < user.subscriptionEndsAt) {
+        return {
+          hasAccess: true,
+          subscriptionType: user.subscriptionType || 'free',
+          subscriptionStatus: user.subscriptionStatus || 'inactive',
+          reason: 'Active subscription'
+        };
+      }
+    }
+
+    // Check if trial is active
+    if (user.trialEndsAt && new Date() < user.trialEndsAt) {
+      return {
+        hasAccess: true,
+        subscriptionType: 'trial',
+        subscriptionStatus: 'active',
+        reason: 'Active trial'
+      };
+    }
+
+    return {
+      hasAccess: false,
+      subscriptionType: user.subscriptionType || 'free',
+      subscriptionStatus: user.subscriptionStatus || 'inactive',
+      reason: 'No active subscription or trial'
+    };
+  }
+
+  // Admin Access Management
+  async grantFreeAccess(adminUserId: string, targetUserId: string, reason: string): Promise<void> {
+    await db.transaction(async (tx) => {
+      // Update user to grant free access
+      await tx
+        .update(users)
+        .set({
+          freeAccessGranted: true,
+          freeAccessReason: reason,
+          subscriptionType: 'premium',
+          subscriptionStatus: 'active'
+        })
+        .where(eq(users.id, targetUserId));
+
+      // Log the admin action
+      await tx
+        .insert(adminActions)
+        .values({
+          adminUserId,
+          targetUserId,
+          action: 'grant_free_access',
+          reason,
+          metadata: { grantedAt: new Date() }
+        });
+    });
+  }
+
+  async revokeFreeAccess(adminUserId: string, targetUserId: string, reason: string): Promise<void> {
+    await db.transaction(async (tx) => {
+      // Update user to revoke free access
+      await tx
+        .update(users)
+        .set({
+          freeAccessGranted: false,
+          freeAccessReason: null,
+          subscriptionType: 'free',
+          subscriptionStatus: 'inactive'
+        })
+        .where(eq(users.id, targetUserId));
+
+      // Log the admin action
+      await tx
+        .insert(adminActions)
+        .values({
+          adminUserId,
+          targetUserId,
+          action: 'revoke_free_access',
+          reason,
+          metadata: { revokedAt: new Date() }
+        });
+    });
+  }
+
+  async getAdminActions(limit: number = 50): Promise<AdminAction[]> {
+    const actions = await db
+      .select()
+      .from(adminActions)
+      .orderBy(desc(adminActions.createdAt))
+      .limit(limit);
+    
+    return actions;
+  }
+
+  async createAdminAction(action: InsertAdminAction): Promise<AdminAction> {
+    const [newAction] = await db
+      .insert(adminActions)
+      .values(action)
+      .returning();
+    
+    return newAction;
+  }
 }
 
 export const storage = new DatabaseStorage();

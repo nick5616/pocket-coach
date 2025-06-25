@@ -10,6 +10,15 @@ import {
   insertProgramSchema 
 } from "@shared/schema";
 import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePersonalizedProgram } from "./services/openai";
+import Stripe from "stripe";
+
+// Initialize Stripe with conditional check for development
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2023-10-16",
+  });
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -67,6 +76,197 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/protected", isAuthenticated, async (req, res) => {
     const userId = req.user.id;
     res.json({ message: "This is a protected route", userId });
+  });
+
+  // Beta Subscription Routes
+  app.get('/api/subscription/status', isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: 'User not authenticated' });
+      }
+
+      const subscriptionStatus = await storage.getUserSubscriptionStatus(userId);
+      res.json(subscriptionStatus);
+    } catch (error) {
+      console.error('Error fetching subscription status:', error);
+      res.status(500).json({ message: 'Failed to fetch subscription status' });
+    }
+  });
+
+  app.post('/api/subscription/create-beta-subscription', isAuthenticated, async (req, res) => {
+    if (!stripe) {
+      return res.status(500).json({ message: 'Stripe not configured' });
+    }
+
+    try {
+      const userId = req.user?.id;
+      const userEmail = req.user?.email;
+      if (!userId || !userEmail) {
+        return res.status(401).json({ message: 'User not authenticated' });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Check if user already has a subscription
+      if (user.stripeCustomerId && user.stripeSubscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+        if (subscription.status === 'active') {
+          return res.json({
+            subscriptionId: subscription.id,
+            clientSecret: subscription.latest_invoice?.payment_intent?.client_secret
+          });
+        }
+      }
+
+      // Create Stripe customer if doesn't exist
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: userEmail,
+          name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || userEmail,
+          metadata: {
+            userId: userId
+          }
+        });
+        customerId = customer.id;
+        await storage.updateUserStripeInfo(userId, customerId);
+      }
+
+      // Create beta subscription ($2.99/month)
+      const subscription = await stripe.subscriptions.create({
+        customer: customerId,
+        items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Pocket Coach Beta Access',
+              description: 'Early access to all premium features at beta pricing'
+            },
+            unit_amount: 299, // $2.99 in cents
+            recurring: {
+              interval: 'month'
+            }
+          }
+        }],
+        payment_behavior: 'default_incomplete',
+        payment_settings: {
+          save_default_payment_method: 'on_subscription'
+        },
+        expand: ['latest_invoice.payment_intent'],
+        metadata: {
+          userId: userId,
+          subscriptionType: 'beta'
+        }
+      });
+
+      // Update user with subscription info
+      await storage.updateUserStripeInfo(userId, customerId, subscription.id);
+      await storage.updateUserSubscription(userId, {
+        subscriptionType: 'beta',
+        subscriptionStatus: 'incomplete'
+      });
+
+      res.json({
+        subscriptionId: subscription.id,
+        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret
+      });
+
+    } catch (error) {
+      console.error('Error creating beta subscription:', error);
+      res.status(500).json({ message: 'Failed to create subscription' });
+    }
+  });
+
+  // Stripe webhook for subscription updates
+  app.post('/api/webhooks/stripe', async (req, res) => {
+    if (!stripe) {
+      return res.status(500).json({ message: 'Stripe not configured' });
+    }
+
+    try {
+      const event = req.body;
+
+      switch (event.type) {
+        case 'customer.subscription.updated':
+        case 'customer.subscription.deleted':
+          const subscription = event.data.object;
+          const userId = subscription.metadata?.userId;
+          
+          if (userId) {
+            await storage.updateUserSubscription(userId, {
+              subscriptionStatus: subscription.status,
+              subscriptionType: subscription.status === 'active' ? 'beta' : 'free'
+            });
+          }
+          break;
+
+        case 'invoice.payment_succeeded':
+          const invoice = event.data.object;
+          if (invoice.subscription) {
+            const sub = await stripe.subscriptions.retrieve(invoice.subscription);
+            const userId = sub.metadata?.userId;
+            
+            if (userId) {
+              await storage.updateUserSubscription(userId, {
+                subscriptionStatus: 'active',
+                subscriptionType: 'beta'
+              });
+            }
+          }
+          break;
+
+        case 'invoice.payment_failed':
+          const failedInvoice = event.data.object;
+          if (failedInvoice.subscription) {
+            const sub = await stripe.subscriptions.retrieve(failedInvoice.subscription);
+            const userId = sub.metadata?.userId;
+            
+            if (userId) {
+              await storage.updateUserSubscription(userId, {
+                subscriptionStatus: 'past_due'
+              });
+            }
+          }
+          break;
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      console.error('Stripe webhook error:', error);
+      res.status(400).json({ message: 'Webhook error' });
+    }
+  });
+
+  // Admin routes for granting free access
+  app.post('/api/admin/grant-free-access', isAuthenticated, async (req, res) => {
+    try {
+      const adminUserId = req.user?.id;
+      if (!adminUserId) {
+        return res.status(401).json({ message: 'Admin not authenticated' });
+      }
+
+      // Simple admin check - you can enhance this with proper admin roles
+      const adminUser = await storage.getUser(adminUserId);
+      if (!adminUser || !adminUser.email?.includes('admin') && adminUser.email !== 'demo@pocketcoach.app') {
+        return res.status(403).json({ message: 'Admin access required' });
+      }
+
+      const { targetUserId, reason } = req.body;
+      if (!targetUserId || !reason) {
+        return res.status(400).json({ message: 'Target user ID and reason required' });
+      }
+
+      await storage.grantFreeAccess(adminUserId, targetUserId, reason);
+      res.json({ message: 'Free access granted successfully' });
+
+    } catch (error) {
+      console.error('Error granting free access:', error);
+      res.status(500).json({ message: 'Failed to grant free access' });
+    }
   });
 
   // Workout routes
