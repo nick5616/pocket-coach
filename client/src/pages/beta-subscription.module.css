@@ -1,0 +1,268 @@
+.container {
+  min-height: 100vh;
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem 0;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: var(--muted-foreground);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.pricing {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.pricingCard {
+  max-width: 400px;
+  width: 100%;
+  border: 2px solid var(--primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.pricingTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.badge {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.amount {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.period {
+  font-size: 1rem;
+  color: var(--muted-foreground);
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.features li {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+
+.features li::before {
+  content: '✓';
+  color: var(--primary);
+  font-weight: bold;
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+
+.paymentCard {
+  margin-bottom: 2rem;
+}
+
+.paymentForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.message {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.message.success {
+  background: var(--success-bg, #dcfce7);
+  color: var(--success-text, #166534);
+  border: 1px solid var(--success-border, #bbf7d0);
+}
+
+.message.error {
+  background: var(--destructive-bg, #fef2f2);
+  color: var(--destructive-text, #dc2626);
+  border: 1px solid var(--destructive-border, #fecaca);
+}
+
+/* Dark mode message colors */
+:global(.dark) .message.success {
+  background: var(--success-bg, #14532d);
+  color: var(--success-text, #bbf7d0);
+  border-color: var(--success-border, #166534);
+}
+
+:global(.dark) .message.error {
+  background: var(--destructive-bg, #7f1d1d);
+  color: var(--destructive-text, #fecaca);
+  border-color: var(--destructive-border, #dc2626);
+}
+
+.submitButton {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.accessCard {
+  text-align: center;
+  max-width: 400px;
+  margin: 2rem auto;
+}
+
+.errorCard {
+  text-align: center;
+  max-width: 400px;
+  margin: 2rem auto;
+  border-color: var(--destructive);
+}
+
+.testimonials {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.testimonials h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: var(--foreground);
+}
+
+.testimonialGrid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.testimonial {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.testimonial p {
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+.testimonial cite {
+  font-weight: 600;
+  color: var(--primary);
+  font-style: normal;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .amount {
+    font-size: 2.5rem;
+  }
+
+  .testimonialGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricingTitle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* Focus states for accessibility */
+.submitButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Animation for loading states */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.submitButton:disabled {
+  animation: pulse 2s infinite;
+}
