@@ -87,7 +87,7 @@ export default function DemoPage() {
     return (
       <div>
         <DemoBanner />
-        <LoadingScreen message="Setting up your demo experience..." />
+        <LoadingScreen message={loginComplete ? "Demo ready! Loading app..." : "Setting up your demo experience..."} />
       </div>
     );
   }

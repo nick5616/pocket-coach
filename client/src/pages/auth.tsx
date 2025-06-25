@@ -26,7 +26,7 @@ export default function AuthPage() {
     setIsInIframe(inIframe);
     
     // If in iframe, redirect to demo mode immediately
-    if (inIframe && location !== "/demo") {
+    if (inIframe) {
       console.log('Iframe detected, redirecting to demo mode');
       setLocation("/demo");
     }
