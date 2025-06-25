@@ -62,6 +62,7 @@ function Router() {
       <Route path="/programs" component={Programs} />
       <Route path="/profile" component={Profile} />
       <Route path="/beta-subscription" component={BetaSubscription} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );

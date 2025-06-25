@@ -40,6 +40,19 @@ Mobile-first fitness tracking PWA with AI-powered workout analysis, personalized
 
 ## Recent Architecture Changes
 
+### June 25, 2025 - Beta Subscription System Implementation
+- **Revenue Model**: Implemented $2.99/month beta subscription for early access
+- **Stripe Integration**: Full payment processing with Stripe API for subscriptions
+- **Database Schema**: Added subscription fields to users table (stripe_customer_id, subscription_status, etc.)
+- **Admin Controls**: Built admin panel for granting free access with tracking and audit logs
+- **Access Management**: Smart subscription status checking with multiple access paths:
+  - Paid beta subscriptions ($2.99/month)
+  - Admin-granted free access (trackable with reasons)
+  - Trial periods and grandfathered pricing
+- **Frontend Pages**: `/beta-subscription` for signup, `/admin` for access management
+- **Webhook Handling**: Stripe webhooks for real-time subscription status updates
+- **CSS Modules Styling**: Responsive design matching app's existing design system
+
 ### June 24, 2025 - Iframe Authentication & Demo Mode + Mobile App Planning
 - Fixed iframe authentication issues for portfolio embedding
 - Added `/demo` route with auto-login for demonstration purposes
