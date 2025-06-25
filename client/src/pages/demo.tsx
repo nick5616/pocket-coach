@@ -48,12 +48,13 @@ export default function DemoPage() {
     },
     onSuccess: (data) => {
       console.log('Demo login successful:', data);
+      setLoginComplete(true);
       // Invalidate auth query to refetch user data
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      // Small delay to ensure state updates, then redirect
+      // Redirect after successful login
       setTimeout(() => {
         setLocation("/");
-      }, 100);
+      }, 500);
     },
     onError: (error) => {
       console.error('Demo login failed:', error);
@@ -82,7 +83,7 @@ export default function DemoPage() {
     }
   }, [user, isLoading, error, hasTriedLogin, demoLoginMutation.isPending]);
 
-  if (isLoading || demoLoginMutation.isPending) {
+  if (isLoading || demoLoginMutation.isPending || loginComplete) {
     return (
       <div>
         <DemoBanner />

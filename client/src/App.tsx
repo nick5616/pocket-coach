@@ -1,12 +1,10 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
-import Landing from "@/pages/landing";
-import AuthPage from "@/pages/auth";
-import DemoPage from "@/pages/demo";
+import Auth from "@/pages/auth";
+import Demo from "@/pages/demo";
 import Home from "@/pages/home";
 import Workouts from "@/pages/workouts";
 import WorkoutJournal from "@/pages/workout-journal";
@@ -18,25 +16,40 @@ import SplashScreen from "@/components/splash-screen";
 import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const [location] = useLocation();
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['/api/auth/user'],
+    enabled: true,
+    retry: false,
+    staleTime: 5000,
+  });
 
+  // Handle demo route specifically to prevent loops
+  if (location === '/demo') {
+    return <Demo />;
+  }
+
+  // Show loading screen while checking auth
+  if (isLoading) {
+    return <SplashScreen />;
+  }
+
+  // Show auth if no user
+  if (!user) {
+    return <Auth />;
+  }
+
+  // Authenticated routes
   return (
     <Switch>
-      <Route path="/demo" component={DemoPage} />
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={AuthPage} />
-      ) : (
-        <>
-          <Route path="/" component={Home} />
-          <Route path="/workouts" component={Workouts} />
-          <Route path="/workout-journal" component={WorkoutJournal} />
-          <Route path="/workout-journal/:id" component={WorkoutJournal} />
-          <Route path="/workouts/program/:programId" component={ProgramWorkout} />
-          <Route path="/progress" component={Progress} />
-          <Route path="/programs" component={Programs} />
-          <Route path="/profile" component={Profile} />
-        </>
-      )}
+      <Route path="/" component={Home} />
+      <Route path="/workouts" component={Workouts} />
+      <Route path="/workout-journal" component={WorkoutJournal} />
+      <Route path="/workout-journal/:id" component={WorkoutJournal} />
+      <Route path="/workouts/program/:programId" component={ProgramWorkout} />
+      <Route path="/progress" component={Progress} />
+      <Route path="/programs" component={Programs} />
+      <Route path="/profile" component={Profile} />
       <Route component={NotFound} />
     </Switch>
   );
