@@ -23,6 +23,7 @@ Mobile-first fitness tracking PWA with AI-powered workout analysis, personalized
 - **Styling System**: CSS Modules ONLY - absolute prohibition on Tailwind CSS or shadcn/ui
 - **Theme Support**: ALL components must adapt to light/dark modes
 - **Mobile-First**: Optimized for small phone screens with minimal width waste
+- **Future Plans**: Considering native mobile app wrapper (iOS/Android) while maintaining web compatibility
 
 ## Current Issues - Active Development
 
@@ -39,13 +40,14 @@ Mobile-first fitness tracking PWA with AI-powered workout analysis, personalized
 
 ## Recent Architecture Changes
 
-### June 24, 2025 - Iframe Authentication & Demo Mode
+### June 24, 2025 - Iframe Authentication & Demo Mode + Mobile App Planning
 - Fixed iframe authentication issues for portfolio embedding
 - Added `/demo` route with auto-login for demonstration purposes
 - Implemented demo banner component for iframe users
 - Updated session cookies to support cross-origin embedding (sameSite: 'none' in production)
 - Enhanced CORS headers to allow iframe embedding from any domain
 - Added iframe detection with fallback to demo mode on login failure
+- **Mobile Strategy**: Identified Capacitor as optimal path for native iOS/Android apps while preserving web compatibility
 
 ### June 23, 2025 - CSS Modules Migration Complete
 - Removed ALL Tailwind CSS dependencies from entire project
