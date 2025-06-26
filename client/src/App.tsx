@@ -14,6 +14,7 @@ import Programs from "@/pages/programs-simple";
 import Profile from "@/pages/profile-simple";
 import BetaSubscription from "@/pages/beta-subscription";
 import Admin from "@/pages/admin";
+import MuscleTargeting from "@/pages/muscle-targeting";
 import SplashScreen from "@/components/splash-screen";
 import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
@@ -63,6 +64,7 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/beta-subscription" component={BetaSubscription} />
       <Route path="/admin" component={Admin} />
+      <Route path="/muscle-targeting" component={MuscleTargeting} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1247,6 +1247,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Muscle Preference API Routes
+  app.get("/api/muscles/detailed-map", async (req, res) => {
+    try {
+      const muscleMap = await storage.getDetailedMuscleMap();
+      res.json(muscleMap);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch detailed muscle map" });
+    }
+  });
+
+  app.get("/api/muscles/preferences", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.sendStatus(401);
+    }
+    
+    try {
+      const preferences = await storage.getUserMusclePreferences(req.user.id);
+      res.json(preferences);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch muscle preferences" });
+    }
+  });
+
+  app.put("/api/muscles/preferences/:muscleGroupId", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.sendStatus(401);
+    }
+    
+    try {
+      const muscleGroupId = parseInt(req.params.muscleGroupId);
+      const preference = await storage.updateMusclePreference(
+        req.user.id,
+        muscleGroupId,
+        req.body
+      );
+      res.json(preference);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update muscle preference" });
+    }
+  });
+
+  app.get("/api/muscles/by-parent/:parentGroup", async (req, res) => {
+    try {
+      const parentGroup = req.params.parentGroup;
+      const muscles = await storage.getMusclesByParentGroup(parentGroup);
+      res.json(muscles);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch muscles by parent group" });
+    }
+  });
+
+  // Program Type Detection
+  app.post("/api/programs/detect-type", async (req, res) => {
+    try {
+      const { schedule, targetMuscles } = req.body;
+      const detection = await storage.detectProgramType(schedule, targetMuscles);
+      res.json(detection);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to detect program type" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

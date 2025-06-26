@@ -640,6 +640,170 @@ export class DatabaseStorage implements IStorage {
     
     return newAction;
   }
+
+  // User Muscle Preferences Implementation
+  async getUserMusclePreferences(userId: string): Promise<UserMusclePreference[]> {
+    await this.ensureInitialized();
+    
+    const preferences = await db
+      .select()
+      .from(userMusclePreferences)
+      .where(eq(userMusclePreferences.userId, userId));
+    
+    return preferences;
+  }
+
+  async updateMusclePreference(userId: string, muscleGroupId: number, preference: Partial<InsertUserMusclePreference>): Promise<UserMusclePreference> {
+    await this.ensureInitialized();
+    
+    // Try to update existing preference
+    const [updated] = await db
+      .update(userMusclePreferences)
+      .set({ ...preference, lastUpdated: new Date() })
+      .where(and(
+        eq(userMusclePreferences.userId, userId),
+        eq(userMusclePreferences.muscleGroupId, muscleGroupId)
+      ))
+      .returning();
+
+    // If no existing preference, create new one
+    if (!updated) {
+      const [created] = await db
+        .insert(userMusclePreferences)
+        .values({
+          userId,
+          muscleGroupId,
+          ...preference
+        })
+        .returning();
+      
+      return created;
+    }
+
+    return updated;
+  }
+
+  async getMusclesByParentGroup(parentGroup: string): Promise<MuscleGroup[]> {
+    await this.ensureInitialized();
+    
+    const muscles = await db
+      .select()
+      .from(muscleGroups)
+      .where(eq(muscleGroups.parentGroup, parentGroup))
+      .orderBy(muscleGroups.displayName);
+    
+    return muscles;
+  }
+
+  async getDetailedMuscleMap(): Promise<{ [parentGroup: string]: MuscleGroup[] }> {
+    await this.ensureInitialized();
+    
+    const allMuscles = await db
+      .select()
+      .from(muscleGroups)
+      .orderBy(muscleGroups.parentGroup, muscleGroups.displayName);
+    
+    const muscleMap: { [parentGroup: string]: MuscleGroup[] } = {};
+    
+    for (const muscle of allMuscles) {
+      if (!muscle.parentGroup) continue;
+      
+      if (!muscleMap[muscle.parentGroup]) {
+        muscleMap[muscle.parentGroup] = [];
+      }
+      
+      muscleMap[muscle.parentGroup].push(muscle);
+    }
+    
+    return muscleMap;
+  }
+
+  async detectProgramType(schedule: any, targetMuscles?: string[]): Promise<{
+    programType: string;
+    splitType: string;
+    confidence: number;
+  }> {
+    if (!schedule || typeof schedule !== 'object') {
+      return {
+        programType: 'custom',
+        splitType: 'custom',
+        confidence: 0
+      };
+    }
+
+    const days = Object.keys(schedule);
+    const dayCount = days.length;
+    
+    // Analyze workout names and exercises to detect patterns
+    const workoutNames = days.map(day => schedule[day]?.name?.toLowerCase() || '');
+    const allExercises = days.flatMap(day => 
+      schedule[day]?.exercises?.map((ex: any) => ex.name?.toLowerCase()) || []
+    );
+
+    // PPL Detection
+    const pushTerms = ['push', 'chest', 'tricep', 'shoulder'];
+    const pullTerms = ['pull', 'back', 'bicep', 'lat'];
+    const legTerms = ['leg', 'squat', 'deadlift', 'quad', 'glute'];
+    
+    const hasPush = workoutNames.some(name => pushTerms.some(term => name.includes(term)));
+    const hasPull = workoutNames.some(name => pullTerms.some(term => name.includes(term)));
+    const hasLegs = workoutNames.some(name => legTerms.some(term => name.includes(term)));
+    
+    if (hasPush && hasPull && hasLegs && dayCount >= 3) {
+      return {
+        programType: 'ppl',
+        splitType: 'push_pull_legs',
+        confidence: 0.9
+      };
+    }
+
+    // Bro Split Detection
+    const bodyParts = ['chest', 'back', 'shoulder', 'arm', 'leg'];
+    const bodyPartDays = workoutNames.filter(name => 
+      bodyParts.some(part => name.includes(part))
+    ).length;
+    
+    if (bodyPartDays >= 4 && dayCount >= 5) {
+      return {
+        programType: 'bro_split',
+        splitType: 'chest_back_shoulders_arms_legs',
+        confidence: 0.85
+      };
+    }
+
+    // Upper/Lower Detection
+    const hasUpper = workoutNames.some(name => name.includes('upper'));
+    const hasLower = workoutNames.some(name => name.includes('lower'));
+    
+    if (hasUpper && hasLower) {
+      return {
+        programType: 'upper_lower',
+        splitType: 'upper_lower',
+        confidence: 0.8
+      };
+    }
+
+    // Full Body Detection
+    if (dayCount <= 3) {
+      const hasCompoundMovements = allExercises.some(ex => 
+        ex && (ex.includes('squat') || ex.includes('deadlift') || ex.includes('press'))
+      );
+      
+      if (hasCompoundMovements) {
+        return {
+          programType: 'full_body',
+          splitType: 'full_body',
+          confidence: 0.7
+        };
+      }
+    }
+
+    return {
+      programType: 'custom',
+      splitType: 'custom',
+      confidence: 0.3
+    };
+  }
 }
 
 export const storage = new DatabaseStorage();
