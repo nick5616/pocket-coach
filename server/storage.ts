@@ -1,5 +1,5 @@
 import { 
-  users, goals, workouts, exercises, programs, achievements, muscleGroups, exerciseMuscleMapping, adminActions,
+  users, goals, workouts, exercises, programs, achievements, muscleGroups, exerciseMuscleMapping, adminActions, userMusclePreferences,
   type User, type InsertUser, type UpsertUser,
   type Goal, type InsertGoal,
   type Workout, type InsertWorkout,
@@ -8,7 +8,8 @@ import {
   type Achievement, type InsertAchievement,
   type MuscleGroup, type InsertMuscleGroup,
   type ExerciseMuscleMapping, type InsertExerciseMuscleMapping,
-  type AdminAction, type InsertAdminAction
+  type AdminAction, type InsertAdminAction,
+  type UserMusclePreference, type InsertUserMusclePreference
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
@@ -66,6 +67,17 @@ export interface IStorage {
     volume: number;
     lastWorked: Date | null;
     intensity: number; // 0-1 scale for heat map
+  }>;
+
+  // User Muscle Preferences
+  getUserMusclePreferences(userId: string): Promise<UserMusclePreference[]>;
+  updateMusclePreference(userId: string, muscleGroupId: number, preference: Partial<InsertUserMusclePreference>): Promise<UserMusclePreference>;
+  getMusclesByParentGroup(parentGroup: string): Promise<MuscleGroup[]>;
+  getDetailedMuscleMap(): Promise<{ [parentGroup: string]: MuscleGroup[] }>;
+  detectProgramType(schedule: any, targetMuscles?: string[]): Promise<{
+    programType: string;
+    splitType: string;
+    confidence: number;
   }>;
 
   // Subscription Management
