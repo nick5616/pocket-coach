@@ -1309,6 +1309,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Advanced Muscle Targeting Routes
+  app.post("/api/programs/generate-targeted", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.sendStatus(401);
+    }
+
+    try {
+      const { generateTargetedProgram } = await import('./services/muscle-targeting');
+      const program = await generateTargetedProgram(req.body);
+      
+      // Save the generated program to database
+      const savedProgram = await storage.createProgram({
+        userId: req.user.id,
+        name: program.name,
+        description: program.description,
+        schedule: program.schedule,
+        aiGenerated: true,
+        programType: program.programType,
+        splitType: program.splitType,
+        targetMuscles: program.targetMuscles,
+        focusAreas: program.focusAreas,
+        durationWeeks: program.durationWeeks,
+        difficulty: program.difficulty
+      });
+
+      res.json(savedProgram);
+    } catch (error) {
+      console.error('Generate targeted program error:', error);
+      res.status(500).json({ message: "Failed to generate targeted program" });
+    }
+  });
+
+  app.post("/api/programs/detect-optimal-split", async (req, res) => {
+    try {
+      const { detectOptimalSplit } = await import('./services/muscle-targeting');
+      const { targetMuscles } = req.body;
+      const analysis = await detectOptimalSplit(targetMuscles);
+      res.json(analysis);
+    } catch (error) {
+      console.error('Detect optimal split error:', error);
+      res.status(500).json({ message: "Failed to detect optimal split" });
+    }
+  });
+
+  app.post("/api/muscles/analyze", async (req, res) => {
+    try {
+      const { analyzeTargetMuscles } = await import('./services/muscle-targeting');
+      const { targetMuscles } = req.body;
+      const analysis = await analyzeTargetMuscles(targetMuscles);
+      res.json(analysis);
+    } catch (error) {
+      console.error('Analyze muscles error:', error);
+      res.status(500).json({ message: "Failed to analyze target muscles" });
+    }
+  });
+
+  app.post("/api/muscles/exercise-recommendations", async (req, res) => {
+    try {
+      const { generateExerciseRecommendations } = await import('./services/muscle-targeting');
+      const { targetMuscle, muscleFunction } = req.body;
+      const recommendations = await generateExerciseRecommendations(targetMuscle, muscleFunction);
+      res.json(recommendations);
+    } catch (error) {
+      console.error('Exercise recommendations error:', error);
+      res.status(500).json({ message: "Failed to generate exercise recommendations" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

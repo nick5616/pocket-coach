@@ -33,10 +33,36 @@ Mobile-first fitness tracking PWA with AI-powered workout analysis, personalized
 - Fixed database error with restTime string conversion
 - Fixed exercise swap JSON parsing for AI responses
 
-### Known Problems Still Occurring
-1. **Wrong exercises displayed** - Getting burpees/planks instead of Monday's squats/lunges  
-2. **Day advancement not working** - Still showing Monday after multiple completed workouts
-3. **Programmed exercises not populating** - Despite API fixes, workout journal shows wrong exercises
+### Recent System Enhancements
+
+### June 26, 2025 - Granular Muscle Targeting System Implementation
+- **Comprehensive Muscle Database**: Rebuilt muscle system with 36 detailed muscle groups including:
+  - Shoulder subdivisions: anterior delt, medial delt, rear delt, supraspinatus, infraspinatus, teres minor, teres major
+  - Chest subdivisions: upper chest, middle chest, lower chest, pectoralis minor
+  - Back subdivisions: upper lats, lower lats, rhomboids, middle traps, lower traps, upper traps
+  - Granular targeting for arms, legs, and rotator cuff muscles
+- **AI-Powered Program Detection**: Smart detection of traditional workout programs (PPL, Bro Split, Upper/Lower, Full Body)
+- **Interactive Body Map**: CSS Modules-based body mapping component with three modes:
+  - Preferences: Set muscle priorities and growth targets
+  - Heat Map: Visualize muscle importance with color-coded intensity
+  - Program Builder: Select specific muscles for AI program generation
+- **Intelligent Program Generation**: OpenAI GPT-4o integration for:
+  - Analyzing muscle selection patterns
+  - Detecting optimal training splits
+  - Generating targeted exercise programs
+  - Recommending muscle-specific exercises
+- **User Muscle Preferences**: Database system for tracking:
+  - Priority levels (1-10) for each muscle
+  - Current satisfaction ratings
+  - Growth targets (shrink, maintain, grow, grow significantly)
+  - Weekly volume targets
+- **Enhanced Database Schema**: Added program type detection fields and muscle preference tracking
+- **New Frontend Route**: `/muscle-targeting` page showcasing comprehensive targeting capabilities
+
+## Previous Issues Resolution
+1. **Fixed routing conflicts** - `/api/programs/active/today` endpoint properly implemented
+2. **Resolved database schema** - Added granular muscle groups and preference tracking
+3. **Enhanced AI services** - Muscle-specific program generation and exercise recommendations
 
 ## Recent Architecture Changes
 
