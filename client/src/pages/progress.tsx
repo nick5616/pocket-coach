@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { Badge } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import BottomNavigation from "@/components/bottom-navigation";
 import BodyVisualization from "@/components/body-visualization";
 import LoadingScreen from "@/components/loading-screen";
@@ -146,7 +147,7 @@ export default function Progress() {
           </div>
         </section>
 
-        <Tabs defaultValue="body" className="px-4 py-6">
+        <Tabs defaultValue="body" className="px-4 py-6 pb-24">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="body">Body Map</TabsTrigger>
             <TabsTrigger value="goals">Goals</TabsTrigger>
