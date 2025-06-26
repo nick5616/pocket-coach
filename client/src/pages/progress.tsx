@@ -6,7 +6,7 @@ import { Button } from "@/components/Button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import BottomNavigation from "@/components/bottom-navigation";
-import BodyVisualization from "@/components/body-visualization";
+import EnhancedBodyMap from "@/components/enhanced-body-map";
 import LoadingScreen from "@/components/loading-screen";
 import { 
   Target, 
@@ -23,6 +23,7 @@ import {
   BarChart3
 } from "lucide-react";
 import type { Workout, Goal, MuscleGroup } from "@shared/schema";
+import { useAuth } from "@/hooks/use-auth";
 
 interface MuscleProgress {
   frequency: number;
@@ -36,16 +37,17 @@ export default function Progress() {
   const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | null>(null);
   const [showMuscleDetails, setShowMuscleDetails] = useState(false);
   
-  const userId = 1;
+  const { user: authUser } = useAuth();
+  const userId = authUser?.id || "user_demo";
 
   const { data: workouts = [], isLoading: workoutsLoading } = useQuery<Workout[]>({
-    queryKey: ["/api/workouts", { userId }],
-    queryFn: () => fetch(`/api/workouts?userId=${userId}`).then(res => res.json()),
+    queryKey: ["/api/workouts"],
+    enabled: !!userId,
   });
 
   const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
-    queryKey: ["/api/goals", { userId }],
-    queryFn: () => fetch(`/api/goals?userId=${userId}`).then(res => res.json()),
+    queryKey: ["/api/goals"],
+    enabled: !!userId,
   });
 
   const { data: muscleProgress, isLoading: progressLoading } = useQuery<MuscleProgress>({
@@ -175,10 +177,11 @@ export default function Progress() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <BodyVisualization
-                  userId={userId}
+                <EnhancedBodyMap
+                  userId={userId.toString()}
                   onMuscleSelect={handleMuscleSelect}
                   selectedMuscles={selectedMuscles}
+                  mode="heat"
                 />
                 
                 {selectedMuscles.length > 0 && (
