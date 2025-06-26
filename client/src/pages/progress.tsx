@@ -108,7 +108,7 @@ export default function Progress() {
         <h1 className="text-lg font-bold text-gray-900">Progress</h1>
       </header>
 
-      <main className="pb-20">
+      <main className="pb-32">
         {/* Stats Overview */}
         <section className="px-4 py-6" style={{
           background: 'linear-gradient(135deg, #65a30d 0%, #16a34a 100%)',

@@ -4,6 +4,8 @@
   max-width: 500px;
   margin: 0 auto;
   padding: 1rem;
+  padding-bottom: 3rem; /* Extra bottom padding to prevent navigation overlap */
+  margin-bottom: 2rem; /* Additional margin for safety */
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   border-radius: 16px;
   box-shadow: 
@@ -140,6 +142,14 @@
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
+  /* Enhanced muscle definition with stronger borders and shadows */
+  stroke-width: 2px !important;
+  stroke: #2563eb !important;
+  filter: 
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))
+    drop-shadow(0 1px 2px rgba(59, 130, 246, 0.3));
+  /* Add inner gradient for 3D effect */
+  fill: url(#muscleGradient) !important;
 }
 
 .muscle:hover {
