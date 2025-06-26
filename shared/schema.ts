@@ -103,15 +103,27 @@ export const programs = pgTable("programs", {
   difficulty: text("difficulty").default("beginner"), // "beginner", "intermediate", "advanced"
   focusAreas: text("focus_areas").array(), // ["strength", "cardio", "flexibility"]
   equipment: text("equipment").array(), // ["dumbbells", "barbell", "bodyweight"]
+  programType: text("program_type"), // "ppl", "bro_split", "upper_lower", "full_body", "custom"
+  splitType: text("split_type"), // "push_pull_legs", "chest_back_shoulders_arms_legs", "upper_lower"
+  targetMuscles: text("target_muscles").array(), // ["rear_delt", "medial_delt", "chest_upper"]
+  weeklyFrequency: integer("weekly_frequency").default(3), // Days per week
+  currentWeek: integer("current_week").default(1),
+  currentDay: integer("current_day").default(0), // Day of week (0-6)
+  autoProgression: boolean("auto_progression").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const muscleGroups = pgTable("muscle_groups", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(), // "chest", "back", "shoulders", etc.
+  name: text("name").notNull(), // "rear_delt", "medial_delt", "anterior_delt", etc.
+  parentGroup: text("parent_group"), // "shoulders", "chest", "back" - for grouping
   region: text("region").notNull(), // "upper", "lower", "core"
-  displayName: text("display_name").notNull(), // "Chest", "Back", "Shoulders"
+  displayName: text("display_name").notNull(), // "Rear Deltoid", "Medial Deltoid"
   svgId: text("svg_id").notNull(), // SVG element ID for mapping
+  svgPath: text("svg_path"), // SVG path data for detailed mapping
+  anatomicalName: text("anatomical_name"), // Scientific muscle name
+  primaryFunction: text("primary_function"), // "shoulder abduction", "shoulder flexion"
+  exerciseCount: integer("exercise_count").default(0), // Track how many exercises target this
 });
 
 export const exerciseMuscleMapping = pgTable("exercise_muscle_mapping", {
@@ -119,6 +131,19 @@ export const exerciseMuscleMapping = pgTable("exercise_muscle_mapping", {
   exerciseName: text("exercise_name").notNull(),
   muscleGroupId: integer("muscle_group_id").notNull().references(() => muscleGroups.id),
   primaryMuscle: boolean("primary_muscle").notNull().default(true),
+  activationLevel: integer("activation_level").default(80), // 0-100 how much this exercise targets the muscle
+});
+
+// User preferences for muscle targeting
+export const userMusclePreferences = pgTable("user_muscle_preferences", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  muscleGroupId: integer("muscle_group_id").notNull().references(() => muscleGroups.id),
+  priority: integer("priority").default(5), // 1-10, how important is building this muscle
+  currentSatisfaction: integer("current_satisfaction").default(5), // 1-10, how happy with current size
+  targetGrowth: text("target_growth").default("maintain"), // "shrink", "maintain", "grow", "grow_significantly"
+  weeklyVolumeTarget: integer("weekly_volume_target"), // Target weekly sets for this muscle
+  lastUpdated: timestamp("last_updated").defaultNow(),
 });
 
 export const achievements = pgTable("achievements", {
@@ -178,6 +203,18 @@ export const exerciseMuscleMappingRelations = relations(exerciseMuscleMapping, (
 
 export const muscleGroupsRelations = relations(muscleGroups, ({ many }) => ({
   exerciseMappings: many(exerciseMuscleMapping),
+  userPreferences: many(userMusclePreferences),
+}));
+
+export const userMusclePreferencesRelations = relations(userMusclePreferences, ({ one }) => ({
+  user: one(users, {
+    fields: [userMusclePreferences.userId],
+    references: [users.id],
+  }),
+  muscleGroup: one(muscleGroups, {
+    fields: [userMusclePreferences.muscleGroupId],
+    references: [muscleGroups.id],
+  }),
 }));
 
 export const achievementsRelations = relations(achievements, ({ one }) => ({
@@ -255,6 +292,11 @@ export const insertAdminActionSchema = createInsertSchema(adminActions).omit({
   createdAt: true,
 });
 
+export const insertUserMusclePreferenceSchema = createInsertSchema(userMusclePreferences).omit({
+  id: true,
+  lastUpdated: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -283,3 +325,6 @@ export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
 
 export type AdminAction = typeof adminActions.$inferSelect;
 export type InsertAdminAction = z.infer<typeof insertAdminActionSchema>;
+
+export type UserMusclePreference = typeof userMusclePreferences.$inferSelect;
+export type InsertUserMusclePreference = z.infer<typeof insertUserMusclePreferenceSchema>;
