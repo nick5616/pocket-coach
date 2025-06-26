@@ -1,7 +1,7 @@
+import React, { useEffect, useState } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import NotFound from "@/pages/not-found";
 import Auth from "@/pages/auth";
 import Demo from "@/pages/demo";
