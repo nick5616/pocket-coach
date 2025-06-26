@@ -344,12 +344,42 @@ export default function EnhancedBodyMap({
             filter="url(#shadowEffect)"
           />
 
-          {/* Muscle Definition Lines for 3D Effect */}
-          <g className={styles.definitionLines} stroke="#9ca3af" strokeWidth="0.5" fill="none">
-            <path d="M 200 165 Q 200 175 200 185" /> {/* Chest separation */}
-            <path d="M 185 230 L 185 260" /> {/* Ab definition */}
-            <path d="M 200 230 L 200 260" />
-            <path d="M 215 230 L 215 260" />
+          {/* Enhanced Muscle Definition Lines for 3D Sculptural Effect */}
+          <g className={styles.definitionLines} fill="none">
+            {/* Chest muscle separations - much more prominent */}
+            <path d="M 170 140 Q 200 135 230 140" stroke="#1e293b" strokeWidth="3" /> 
+            <path d="M 175 165 Q 200 160 225 165" stroke="#1e293b" strokeWidth="3" />
+            <path d="M 180 190 Q 200 185 220 190" stroke="#1e293b" strokeWidth="3" />
+            <path d="M 200 140 L 200 215" stroke="#374151" strokeWidth="2" /> {/* Central chest line */}
+            
+            {/* Shoulder deltoid separations */}
+            <path d="M 140 140 L 160 170" stroke="#374151" strokeWidth="2.5" />
+            <path d="M 240 140 L 260 170" stroke="#374151" strokeWidth="2.5" />
+            <path d="M 120 140 L 140 180" stroke="#374151" strokeWidth="2.5" />
+            <circle cx="150" cy="155" r="20" stroke="#1e293b" strokeWidth="2.5" fill="none" /> {/* Anterior delt outline */}
+            <circle cx="250" cy="155" r="20" stroke="#1e293b" strokeWidth="2.5" fill="none" /> {/* Rear delt outline */}
+            
+            {/* Enhanced 6-pack abdominal definition */}
+            <path d="M 185 230 L 185 290" stroke="#1e293b" strokeWidth="3" />
+            <path d="M 200 230 L 200 290" stroke="#1e293b" strokeWidth="3" />
+            <path d="M 215 230 L 215 290" stroke="#1e293b" strokeWidth="3" />
+            <path d="M 170 245 L 230 245" stroke="#1e293b" strokeWidth="2.5" />
+            <path d="M 175 260 L 225 260" stroke="#1e293b" strokeWidth="2.5" />
+            <path d="M 175 275 L 225 275" stroke="#1e293b" strokeWidth="2.5" />
+            
+            {/* Arm muscle separations - bicep/tricep definition */}
+            <ellipse cx="120" cy="210" rx="15" ry="40" stroke="#1e293b" strokeWidth="2.5" fill="none" />
+            <ellipse cx="280" cy="210" rx="15" ry="40" stroke="#1e293b" strokeWidth="2.5" fill="none" />
+            <path d="M 105 190 L 135 230" stroke="#374151" strokeWidth="2" />
+            <path d="M 265 190 L 295 230" stroke="#374151" strokeWidth="2" />
+            
+            {/* Leg muscle separations - quad definition */}
+            <path d="M 180 320 L 180 450" stroke="#1e293b" strokeWidth="3" />
+            <path d="M 220 320 L 220 450" stroke="#1e293b" strokeWidth="3" />
+            <path d="M 200 320 L 200 450" stroke="#1e293b" strokeWidth="2.5" />
+            <path d="M 165 360 L 235 360" stroke="#374151" strokeWidth="2" />
+            <path d="M 170 390 L 230 390" stroke="#374151" strokeWidth="2" />
+            <path d="M 175 420 L 225 420" stroke="#374151" strokeWidth="2" />
           </g>
         </svg>
 
