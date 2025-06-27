@@ -18,7 +18,7 @@ import MuscleTargeting from "@/pages/muscle-targeting";
 import SplashScreen from "@/components/splash-screen";
 import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
-function Router() {
+function AppRouter() {
   const [location] = useLocation();
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['/api/auth/user'],
@@ -116,7 +116,7 @@ function App() {
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           position: 'relative'
         }}>
-          <Router />
+          <AppRouter />
         </div>
       )}
     </QueryClientProvider>
