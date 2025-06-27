@@ -135,6 +135,7 @@
   font-size: 1.25rem;
   font-weight: 600;
   margin: 0 0 0.5rem 0;
+  color: var(--pb-text);
 }
 
 .splitMeta {
@@ -144,28 +145,30 @@
 }
 
 .daysPerWeek {
-  background: var(--accent);
-  color: var(--accent-foreground);
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.375rem;
+  background: var(--pb-accent);
+  color: var(--pb-accent-foreground);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .splitDescription {
-  color: var(--text-secondary);
-  margin: 0 0 1rem 0;
-  line-height: 1.5;
+  color: var(--pb-text-secondary);
+  margin: 0 0 1.25rem 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
 }
 
 .bestFor {
   font-size: 0.875rem;
-  margin-bottom: 0.75rem;
-  color: var(--text);
+  margin-bottom: 1rem;
+  color: var(--pb-text);
 }
 
 .bestFor strong {
-  color: var(--primary);
+  color: var(--pb-primary);
+  font-weight: 600;
 }
 
 .example {
@@ -173,11 +176,12 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: var(--text-secondary);
-  background: var(--muted);
-  padding: 0.75rem;
-  border-radius: 0.5rem;
+  color: var(--pb-text-secondary);
+  background: var(--pb-muted);
+  padding: 1rem;
+  border-radius: 0.75rem;
   margin-top: 1rem;
+  border-left: 3px solid var(--pb-primary);
 }
 
 /* Option Grids */
@@ -188,31 +192,36 @@
 
 .optionCard {
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+  border: 2px solid var(--pb-card-border);
+  background: var(--pb-card);
   padding: 1.5rem;
+  border-radius: 1rem;
 }
 
 .optionCard:hover {
-  border-color: var(--primary-light);
-  transform: translateY(-2px);
+  border-color: var(--pb-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px var(--pb-card-shadow);
 }
 
 .optionCard.selected {
-  border-color: var(--primary);
-  background: var(--primary-light);
+  border-color: var(--pb-primary);
+  background: var(--pb-primary-light);
+  box-shadow: 0 6px 20px rgba(88, 204, 2, 0.15);
 }
 
 .optionTitle {
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0 0 0.5rem 0;
+  color: var(--pb-text);
 }
 
 .optionDescription {
-  color: var(--text-secondary);
+  color: var(--pb-text-secondary);
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 /* Goals Grid */
@@ -224,25 +233,30 @@
 
 .goalCard {
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+  border: 2px solid var(--pb-card-border);
+  background: var(--pb-card);
   text-align: center;
   padding: 1.5rem 1rem;
+  border-radius: 1rem;
 }
 
 .goalCard:hover {
-  border-color: var(--primary-light);
-  transform: translateY(-2px);
+  border-color: var(--pb-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px var(--pb-card-shadow);
 }
 
 .goalCard.selected {
-  border-color: var(--primary);
-  background: var(--primary-light);
+  border-color: var(--pb-primary);
+  background: var(--pb-primary-light);
+  box-shadow: 0 6px 20px rgba(88, 204, 2, 0.15);
 }
 
 .goalText {
-  font-weight: 500;
+  font-weight: 600;
   display: block;
+  color: var(--pb-text);
 }
 
 /* Equipment Grid */
@@ -254,25 +268,30 @@
 
 .equipmentCard {
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+  border: 2px solid var(--pb-card-border);
+  background: var(--pb-card);
   text-align: center;
   padding: 1.5rem 1rem;
+  border-radius: 1rem;
 }
 
 .equipmentCard:hover {
-  border-color: var(--primary-light);
-  transform: translateY(-2px);
+  border-color: var(--pb-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px var(--pb-card-shadow);
 }
 
 .equipmentCard.selected {
-  border-color: var(--primary);
-  background: var(--primary-light);
+  border-color: var(--pb-primary);
+  background: var(--pb-primary-light);
+  box-shadow: 0 6px 20px rgba(88, 204, 2, 0.15);
 }
 
 .equipmentText {
-  font-weight: 500;
+  font-weight: 600;
   display: block;
+  color: var(--pb-text);
 }
 
 /* Footer */
@@ -281,23 +300,47 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1rem;
-  background: var(--background);
-  border-top: 1px solid var(--border);
-  z-index: 10;
+  padding: 1.5rem;
+  padding-bottom: 5rem; /* Account for bottom navigation */
+  background: var(--pb-card);
+  border-top: 2px solid var(--pb-border);
+  z-index: 50;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 -4px 16px var(--pb-card-shadow);
 }
 
 .nextButton,
 .createButton {
   width: 100%;
-  padding: 1rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 0.75rem;
+  padding: 1rem 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  background: var(--pb-primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(88, 204, 2, 0.3);
+}
+
+.nextButton:hover,
+.createButton:hover {
+  background: var(--pb-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(88, 204, 2, 0.4);
+}
+
+.nextButton:disabled,
+.createButton:disabled {
+  background: var(--pb-text-secondary);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .loadingIcon {
