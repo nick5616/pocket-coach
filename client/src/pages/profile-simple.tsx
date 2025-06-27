@@ -11,6 +11,7 @@ import BottomNavigation from "@/components/bottom-navigation";
 import LoadingScreen from "@/components/loading-screen";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { handleLogout as authLogout } from "@/lib/auth-utils";
 import { 
   User, 
   Settings, 
@@ -89,7 +90,7 @@ export default function Profile() {
   });
 
   const handleLogout = () => {
-    window.location.href = '/api/logout';
+    authLogout();
   };
 
   if (userLoading || goalsLoading || achievementsLoading) {
