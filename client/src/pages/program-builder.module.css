@@ -361,27 +361,57 @@
 /* Mobile Responsive */
 @media (max-width: 640px) {
   .content {
-    padding: 0.75rem;
+    padding: 1rem;
+    padding-bottom: 9rem; /* More space for mobile bottom nav */
   }
   
   .stepHeader {
     margin-bottom: 1.5rem;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .stepIcon {
+    width: 2rem;
+    height: 2rem;
   }
   
   .stepTitle {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+  }
+  
+  .stepDescription {
+    font-size: 1rem;
   }
   
   .goalGrid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
   
   .equipmentGrid {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
   
-  .splitCard {
+  .splitCard,
+  .optionCard,
+  .goalCard,
+  .equipmentCard {
     padding: 1rem;
+  }
+  
+  .footer {
+    padding: 1rem;
+    padding-bottom: 5.5rem;
+  }
+  
+  .header {
+    padding: 1rem;
+  }
+  
+  .headerTitle {
+    font-size: 1.125rem;
   }
 }
 
