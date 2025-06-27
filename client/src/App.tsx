@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, useLocation, Router } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import NotFound from "@/pages/not-found";
@@ -90,7 +90,9 @@ function App() {
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           position: 'relative'
         }}>
-          <AppRouter />
+          <Router>
+            <AppRouter />
+          </Router>
         </div>
       )}
     </QueryClientProvider>
