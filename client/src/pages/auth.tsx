@@ -9,7 +9,18 @@ import { useToast } from "@/hooks/use-toast";
 import styles from "./auth.module.css";
 
 export default function AuthPage() {
-  const [, setLocation] = useLocation();
+  // Safe hook usage with error boundary
+  let setLocation: ((path: string) => void) | null = null;
+  try {
+    const [, setLoc] = useLocation();
+    setLocation = setLoc;
+  } catch (error) {
+    console.warn("Router context not available:", error);
+    // Fallback navigation
+    setLocation = (path: string) => {
+      window.location.href = path;
+    };
+  }
   const [isLogin, setIsLogin] = useState(true);
   const [isInIframe, setIsInIframe] = useState(false);
   const [formData, setFormData] = useState({
@@ -53,13 +64,13 @@ export default function AuthPage() {
         title: "Welcome back!",
         description: "You've been logged in successfully.",
       });
-      setLocation("/");
+      setLocation && setLocation("/");
     },
     onError: (error: Error) => {
       console.error('Login error details:', error);
       if (isInIframe) {
         // Redirect to demo mode for iframe users
-        setLocation("/demo");
+        setLocation && setLocation("/demo");
       } else {
         toast({
           title: "Login failed",
@@ -91,7 +102,7 @@ export default function AuthPage() {
         title: "Account created!",
         description: "Welcome to Pocket Coach.",
       });
-      setLocation("/");
+      setLocation && setLocation("/");
     },
     onError: (error: Error) => {
       toast({
