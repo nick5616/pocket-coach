@@ -182,6 +182,17 @@
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid var(--pb-card-border);
+  border-top: 3px solid var(--pb-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 .step {
