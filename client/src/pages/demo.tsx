@@ -8,6 +8,8 @@ import LoadingScreen from "@/components/loading-screen";
 export default function DemoPage() {
   const [, setLocation] = useLocation();
   const [isInIframe, setIsInIframe] = useState(false);
+  const [hasTriedLogin, setHasTriedLogin] = useState(false);
+  const [loginComplete, setLoginComplete] = useState(false);
 
   // Detect if running in iframe
   useEffect(() => {
