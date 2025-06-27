@@ -130,8 +130,8 @@ export async function setupAuth(app: Express) {
       if (err) {
         return res.status(500).json({ message: 'Logout failed' });
       }
-      // Redirect to the root path after logout
-      res.redirect('/');
+      // Redirect to demo to avoid React context issues on main page
+      res.redirect('/demo');
     });
   });
 

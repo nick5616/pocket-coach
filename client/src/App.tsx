@@ -17,6 +17,7 @@ import Admin from "@/pages/admin";
 import MuscleTargeting from "@/pages/muscle-targeting";
 import ProgramBuilder from "@/pages/program-builder";
 import SplashScreen from "@/components/splash-screen";
+import ErrorBoundary from "@/components/error-boundary";
 import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
 function AppRouter() {
@@ -38,19 +39,67 @@ function AppRouter() {
       <Route path="/demo" component={Demo} />
       <Route path="/auth" component={Auth} />
       
-      {/* Protected routes - add auth check in components themselves */}
-      <Route path="/" component={Home} />
-      <Route path="/workouts" component={Workouts} />
-      <Route path="/workout-journal" component={WorkoutJournal} />
-      <Route path="/workout-journal/:id" component={WorkoutJournal} />
-      <Route path="/workouts/program/:programId" component={ProgramWorkout} />
-      <Route path="/progress" component={Progress} />
-      <Route path="/programs" component={Programs} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/beta-subscription" component={BetaSubscription} />
-      <Route path="/admin" component={Admin} />
-      <Route path="/muscle-targeting" component={MuscleTargeting} />
-      <Route path="/program-builder" component={ProgramBuilder} />
+      {/* Protected routes - wrap each in error boundary */}
+      <Route path="/" component={() => (
+        <ErrorBoundary>
+          <Home />
+        </ErrorBoundary>
+      )} />
+      <Route path="/workouts" component={() => (
+        <ErrorBoundary>
+          <Workouts />
+        </ErrorBoundary>
+      )} />
+      <Route path="/workout-journal" component={() => (
+        <ErrorBoundary>
+          <WorkoutJournal />
+        </ErrorBoundary>
+      )} />
+      <Route path="/workout-journal/:id" component={() => (
+        <ErrorBoundary>
+          <WorkoutJournal />
+        </ErrorBoundary>
+      )} />
+      <Route path="/workouts/program/:programId" component={() => (
+        <ErrorBoundary>
+          <ProgramWorkout />
+        </ErrorBoundary>
+      )} />
+      <Route path="/progress" component={() => (
+        <ErrorBoundary>
+          <Progress />
+        </ErrorBoundary>
+      )} />
+      <Route path="/programs" component={() => (
+        <ErrorBoundary>
+          <Programs />
+        </ErrorBoundary>
+      )} />
+      <Route path="/profile" component={() => (
+        <ErrorBoundary>
+          <Profile />
+        </ErrorBoundary>
+      )} />
+      <Route path="/beta-subscription" component={() => (
+        <ErrorBoundary>
+          <BetaSubscription />
+        </ErrorBoundary>
+      )} />
+      <Route path="/admin" component={() => (
+        <ErrorBoundary>
+          <Admin />
+        </ErrorBoundary>
+      )} />
+      <Route path="/muscle-targeting" component={() => (
+        <ErrorBoundary>
+          <MuscleTargeting />
+        </ErrorBoundary>
+      )} />
+      <Route path="/program-builder" component={() => (
+        <ErrorBoundary>
+          <ProgramBuilder />
+        </ErrorBoundary>
+      )} />
       
       {/* Fallback */}
       <Route component={NotFound} />
@@ -115,27 +164,31 @@ function App() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {showSplash ? (
-        <SplashScreen onComplete={() => {
-          console.log('Main splash complete, showing app');
-          setShowSplash(false);
-        }} />
-      ) : (
-        <div style={{
-          height: '100vh',
-          maxWidth: '28rem',
-          margin: '0 auto',
-          backgroundColor: isDark ? '#111827' : '#ffffff',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          position: 'relative'
-        }}>
-          <Router>
-            <AppRouter />
-          </Router>
-        </div>
-      )}
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        {showSplash ? (
+          <SplashScreen onComplete={() => {
+            console.log('Main splash complete, showing app');
+            setShowSplash(false);
+          }} />
+        ) : (
+          <div style={{
+            height: '100vh',
+            maxWidth: '28rem',
+            margin: '0 auto',
+            backgroundColor: isDark ? '#111827' : '#ffffff',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            position: 'relative'
+          }}>
+            <ErrorBoundary>
+              <Router>
+                <AppRouter />
+              </Router>
+            </ErrorBoundary>
+          </div>
+        )}
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
