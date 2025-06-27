@@ -1,3 +1,8 @@
+// Check for iframe and redirect BEFORE any imports or React code
+if (typeof window !== 'undefined' && window.self !== window.top) {
+  window.location.href = '/demo';
+}
+
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
