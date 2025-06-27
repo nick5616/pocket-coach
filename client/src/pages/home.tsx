@@ -29,6 +29,64 @@ import { useAuth } from "@/hooks/use-auth";
 import styles from "./home.module.css";
 
 export default function Home() {
+  // If React context is broken, return a simple fallback
+  if (typeof window !== 'undefined' && !window.React) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#ffffff',
+        color: '#000000',
+        padding: '2rem',
+        fontFamily: 'system-ui, sans-serif'
+      }}>
+        <div style={{
+          maxWidth: '400px',
+          margin: '2rem auto',
+          padding: '2rem',
+          border: '1px solid #e2e8f0',
+          borderRadius: '0.5rem',
+          backgroundColor: '#ffffff'
+        }}>
+          <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>Pocket Coach</h1>
+          <p style={{ textAlign: 'center', marginBottom: '2rem', color: '#666' }}>
+            Please reload the page or try demo mode.
+          </p>
+          <button
+            onClick={() => window.location.href = '/demo'}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              backgroundColor: '#58cc02',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.5rem',
+              fontSize: '1rem',
+              cursor: 'pointer',
+              marginBottom: '1rem'
+            }}
+          >
+            Continue with Demo
+          </button>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              backgroundColor: 'transparent',
+              color: '#000000',
+              border: '1px solid #e2e8f0',
+              borderRadius: '0.5rem',
+              fontSize: '1rem',
+              cursor: 'pointer'
+            }}
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const [, setLocation] = useLocation();
   const [showAchievement, setShowAchievement] = useState(false);
   const [achievementData, setAchievementData] = useState<any>(null);
