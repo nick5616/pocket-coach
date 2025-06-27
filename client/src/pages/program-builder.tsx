@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "../components/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
@@ -12,7 +12,9 @@ import {
   Calendar,
   Dumbbell,
   Sparkles,
-  Info
+  Info,
+  Moon,
+  Sun
 } from "lucide-react";
 import { useLocation } from "wouter";
 import styles from "./program-builder.module.css";
