@@ -258,17 +258,25 @@ export async function generateSimplifiedProgram(params: {
       bro_split: "Body part split dedicating each workout to one primary muscle group for focused, high-volume training."
     };
 
-    const prompt = `Create a ${params.daysPerWeek}-day ${params.splitName} program for ${params.experience} goals: ${params.goals.join(', ')}.
+    const prompt = params.splitType === "ai_optimal" 
+      ? `Design the optimal workout program for ${params.experience} level with goals: ${params.goals.join(', ')}.
 
 Equipment: ${params.equipment.join(', ')}
+
+As an expert coach, choose the best split type and frequency based on science and goals. Consider:
+- Recovery needs for ${params.experience} level
+- Goal prioritization: ${params.goals.join(', ')}
+- Equipment constraints
 
 JSON format:
 {
   "name": "Program Name",
-  "description": "Brief description",
+  "description": "Brief description explaining why this split was chosen",
+  "optimalSplit": "Chosen split type (e.g., Push/Pull/Legs, Upper/Lower, etc.)",
+  "daysPerWeek": 4,
   "schedule": {
     "day1": {
-      "name": "Day Name", 
+      "name": "Day Name",
       "exercises": [
         {"name": "Exercise", "sets": "3", "reps": "8-12", "restTime": "2 min"}
       ]
@@ -276,7 +284,26 @@ JSON format:
   }
 }
 
-Create ${params.daysPerWeek} days, 5-6 exercises each. Be concise.`;
+Choose optimal frequency and split. 5-6 exercises per day.`
+      : `Create a ${params.daysPerWeek}-day ${params.splitName} program for ${params.experience} goals: ${params.goals.join(', ')}.
+
+Equipment: ${params.equipment.join(', ')}
+
+JSON format:
+{
+  "name": "Program Name", 
+  "description": "Brief description",
+  "schedule": {
+    "day1": {
+      "name": "Day Name",
+      "exercises": [
+        {"name": "Exercise", "sets": "3", "reps": "8-12", "restTime": "2 min"}
+      ]
+    }
+  }
+}
+
+Create ${params.daysPerWeek} days, 5-6 exercises each.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",

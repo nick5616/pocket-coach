@@ -27,12 +27,16 @@ Mobile-first fitness tracking PWA with AI-powered workout analysis, personalized
 
 ## Current Issues - Active Development
 
-### June 27, 2025 - Critical Performance & Theme Improvements (COMPLETED)
+### June 27, 2025 - Critical Performance & Theme Improvements + AI Coach Feature (COMPLETED)
 - **Performance Optimization**: Reduced AI program generation time from 28+ seconds to under 10 seconds by streamlining prompts
 - **Theme System Fix**: Enhanced device preference detection with automatic light/dark mode switching
 - **Goal Descriptions**: Added detailed programming explanations for each fitness goal (muscle building, strength, etc.)
 - **Tailwind Cleanup**: Removed remaining Tailwind classes from body-visualization component, converted to CSS Modules
 - **Enhanced UX**: Program builder now shows programming details for each goal selection
+- **AI Optimal Split**: Added new "AI Optimal (Recommended)" split option that gives Pocket Coach full control over program design
+  - AI analyzes user goals, experience, and equipment to choose the best split type and frequency
+  - Highlighted as recommended option with special styling and "RECOMMENDED" badge
+  - Adapts program structure based on exercise science principles for optimal results
 
 ### Previous Critical Fixes
 - `/api/programs/active/today` endpoint routing conflicts resolved

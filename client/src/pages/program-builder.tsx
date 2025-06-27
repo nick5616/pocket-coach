@@ -31,6 +31,15 @@ interface SplitOption {
 
 const splitOptions: SplitOption[] = [
   {
+    id: "ai_optimal",
+    name: "AI Optimal (Recommended)",
+    simpleDescription: "Let Pocket Coach design the perfect split based on your goals and experience",
+    detailedDescription: "The AI analyzes your goals, experience level, and available time to create the most effective training split for you. This adapts over time and considers exercise science principles for optimal results.",
+    daysPerWeek: 0, // Will be determined by AI
+    bestFor: ["Best results", "Science-based", "Adaptive programming"],
+    example: "Customized based on your specific goals and constraints"
+  },
+  {
     id: "ppl",
     name: "Push Pull Legs",
     simpleDescription: "Push muscles one day, pull muscles another, legs on the third",
@@ -182,7 +191,12 @@ export default function ProgramBuilder() {
   ];
 
   const handleSplitSelect = (split: SplitOption) => {
-    setFormData({ ...formData, split: split.id, daysPerWeek: split.daysPerWeek });
+    if (split.id === "ai_optimal") {
+      // For AI optimal, don't set daysPerWeek - let AI decide
+      setFormData({ ...formData, split: split.id, daysPerWeek: 0 });
+    } else {
+      setFormData({ ...formData, split: split.id, daysPerWeek: split.daysPerWeek });
+    }
     setStep(2);
   };
 
@@ -314,13 +328,15 @@ export default function ProgramBuilder() {
               {splitOptions.map((split) => (
                 <Card 
                   key={split.id} 
-                  className={`${styles.splitCard} ${formData.split === split.id ? styles.selected : ''}`}
+                  className={`${styles.splitCard} ${formData.split === split.id ? styles.selected : ''} ${split.id === 'ai_optimal' ? styles.recommended : ''}`}
                   onClick={() => handleSplitSelect(split)}
                 >
                   <CardHeader>
                     <CardTitle className={styles.splitName}>{split.name}</CardTitle>
                     <div className={styles.splitMeta}>
-                      <span className={styles.daysPerWeek}>{split.daysPerWeek} days/week</span>
+                      <span className={styles.daysPerWeek}>
+                        {split.id === 'ai_optimal' ? 'AI decides' : `${split.daysPerWeek} days/week`}
+                      </span>
                     </div>
                   </CardHeader>
                   <CardContent>

@@ -262,6 +262,31 @@
   box-shadow: 0 8px 24px rgba(88, 204, 2, 0.15);
 }
 
+.splitCard.recommended {
+  position: relative;
+  border-color: var(--pb-primary);
+  background: linear-gradient(135deg, var(--pb-primary-light) 0%, var(--pb-card) 100%);
+}
+
+.splitCard.recommended::before {
+  content: "RECOMMENDED";
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  background: var(--pb-primary);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0 1rem 0 0.5rem;
+  letter-spacing: 0.025em;
+}
+
+.splitCard.recommended:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(88, 204, 2, 0.2);
+}
+
 .splitName {
   font-size: 1.25rem;
   font-weight: 600;
