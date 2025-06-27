@@ -85,6 +85,7 @@ export default function ProgramBuilder() {
   const [theme, setTheme] = useState(() => 
     localStorage.getItem('theme') || 'light'
   );
+  const [hoveredSplit, setHoveredSplit] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     split: '',
     experience: '',
@@ -330,6 +331,8 @@ export default function ProgramBuilder() {
                   key={split.id} 
                   className={`${styles.splitCard} ${formData.split === split.id ? styles.selected : ''} ${split.id === 'ai_optimal' ? styles.recommended : ''}`}
                   onClick={() => handleSplitSelect(split)}
+                  onMouseEnter={() => setHoveredSplit(split.id)}
+                  onMouseLeave={() => setHoveredSplit(null)}
                 >
                   <CardHeader>
                     <CardTitle className={styles.splitName}>{split.name}</CardTitle>
@@ -344,13 +347,30 @@ export default function ProgramBuilder() {
                     <div className={styles.bestFor}>
                       <strong>Best for:</strong> {split.bestFor.join(", ")}
                     </div>
-                    <div className={styles.example}>
-                      <Info style={{ width: '0.875rem', height: '0.875rem' }} />
-                      <span>{split.example}</span>
-                    </div>
                   </CardContent>
                 </Card>
               ))}
+            </div>
+
+            <div className={styles.splitDescriptionArea}>
+              {hoveredSplit && (() => {
+                const split = splitOptions.find(s => s.id === hoveredSplit);
+                return split ? (
+                  <div className={styles.splitDetailedDescription}>
+                    <h3 className={styles.splitDetailTitle}>About {split.name}</h3>
+                    <p className={styles.splitDetailText}>{split.detailedDescription}</p>
+                    <div className={styles.splitExample}>
+                      <Info style={{ width: '1rem', height: '1rem' }} />
+                      <span>{split.example}</span>
+                    </div>
+                  </div>
+                ) : null;
+              })()}
+              {!hoveredSplit && (
+                <div className={styles.splitPlaceholder}>
+                  <p>Hover over a split option to see detailed information</p>
+                </div>
+              )}
             </div>
           </div>
         )}
