@@ -82,9 +82,17 @@ export default function ProgramBuilder() {
   const { toast } = useToast();
   
   const [step, setStep] = useState(1);
-  const [theme, setTheme] = useState(() => 
-    localStorage.getItem('theme') || 'light'
-  );
+  const [theme, setTheme] = useState(() => {
+    // Check for system preference first, then localStorage
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved) return saved;
+      
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return prefersDark ? 'dark' : 'light';
+    }
+    return 'light';
+  });
   const [hoveredSplit, setHoveredSplit] = useState<string | null>(null);
   const [hoveredGoal, setHoveredGoal] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -104,6 +112,18 @@ export default function ProgramBuilder() {
   useEffect(() => {
     localStorage.setItem('theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
+    
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      const savedTheme = localStorage.getItem('theme');
+      if (!savedTheme) {
+        setTheme(e.matches ? 'dark' : 'light');
+      }
+    };
+    
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
   }, [theme]);
 
   // Redirect to auth if not logged in

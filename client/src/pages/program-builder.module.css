@@ -34,6 +34,26 @@
   --pb-selected: rgba(88, 204, 2, 0.2);
 }
 
+/* System Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pb-primary: #58cc02;
+    --pb-primary-hover: #6dd604;
+    --pb-primary-light: rgba(88, 204, 2, 0.15);
+    --pb-text: #ffffff;
+    --pb-text-secondary: #b0b0b0;
+    --pb-text-muted: #666;
+    --pb-card: #2a2a2a;
+    --pb-card-border: #404040;
+    --pb-card-shadow: rgba(0, 0, 0, 0.3);
+    --pb-background: #1a1a1a;
+    --pb-border: #404040;
+    --pb-backdrop: rgba(88, 204, 2, 0.08);
+    --pb-accent: #1e3d1e;
+    --pb-selected: rgba(88, 204, 2, 0.2);
+  }
+}
+
 .container {
   display: flex;
   flex-direction: column;
