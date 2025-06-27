@@ -20,13 +20,14 @@ import SplashScreen from "@/components/splash-screen";
 import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
 function AppRouter() {
-  // Iframe detection and auto-redirect to demo
+  // Iframe detection and auto-redirect to demo (only once per session)
   const [location, setLocation] = useLocation();
   
   useEffect(() => {
     const inIframe = window.self !== window.top;
-    if (inIframe && location === "/auth") {
+    if (inIframe && location === "/auth" && !sessionStorage.getItem('iframe-redirected')) {
       console.log('Iframe detected on auth page, redirecting to demo mode');
+      sessionStorage.setItem('iframe-redirected', 'true');
       setLocation("/demo");
     }
   }, [location, setLocation]);
