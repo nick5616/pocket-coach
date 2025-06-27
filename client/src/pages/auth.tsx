@@ -30,7 +30,7 @@ export default function AuthPage() {
       console.log('Iframe detected, redirecting to demo mode');
       setLocation("/demo");
     }
-  }, [setLocation, location]);
+  }, [setLocation]);
 
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {

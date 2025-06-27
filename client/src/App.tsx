@@ -19,7 +19,6 @@ import SplashScreen from "@/components/splash-screen";
 import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
 function AppRouter() {
-  const [location] = useLocation();
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['/api/auth/user'],
     enabled: true,
@@ -27,13 +26,7 @@ function AppRouter() {
     staleTime: 5000,
   });
 
-  console.log('Router state:', { location, user: !!user, isLoading, error });
-
-  // Handle demo route specifically to prevent loops
-  if (location === '/demo') {
-    console.log('Rendering Demo component');
-    return <Demo />;
-  }
+  console.log('Router state:', { user: !!user, isLoading, error });
 
   // Show loading screen while checking auth
   if (isLoading) {
@@ -43,29 +36,28 @@ function AppRouter() {
     }} />;
   }
 
-  // Show auth if no user
-  if (!user) {
-    console.log('No user, rendering Auth');
-    return <Auth />;
-  }
-
-  console.log('User authenticated, rendering main routes');
-
-  // Authenticated routes
+  // Use Switch and Route to handle all routing, including auth and demo
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/workouts" component={Workouts} />
-      <Route path="/workout-journal" component={WorkoutJournal} />
-      <Route path="/workout-journal/:id" component={WorkoutJournal} />
-      <Route path="/workouts/program/:programId" component={ProgramWorkout} />
-      <Route path="/progress" component={Progress} />
-      <Route path="/programs" component={Programs} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/beta-subscription" component={BetaSubscription} />
-      <Route path="/admin" component={Admin} />
-      <Route path="/muscle-targeting" component={MuscleTargeting} />
-      <Route component={NotFound} />
+      <Route path="/demo" component={Demo} />
+      {!user ? (
+        <Route component={Auth} />
+      ) : (
+        <>
+          <Route path="/" component={Home} />
+          <Route path="/workouts" component={Workouts} />
+          <Route path="/workout-journal" component={WorkoutJournal} />
+          <Route path="/workout-journal/:id" component={WorkoutJournal} />
+          <Route path="/workouts/program/:programId" component={ProgramWorkout} />
+          <Route path="/progress" component={Progress} />
+          <Route path="/programs" component={Programs} />
+          <Route path="/profile" component={Profile} />
+          <Route path="/beta-subscription" component={BetaSubscription} />
+          <Route path="/admin" component={Admin} />
+          <Route path="/muscle-targeting" component={MuscleTargeting} />
+          <Route component={NotFound} />
+        </>
+      )}
     </Switch>
   );
 }
