@@ -1,60 +1,15 @@
-import React, { useState, useEffect, Component } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
 import { useToast } from "@/hooks/use-toast";
 import styles from "./auth.module.css";
 
-// Class-based error boundary
-class AuthErrorBoundary extends Component {
-  constructor(props: any) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error: any) {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: any, errorInfo: any) {
-    console.error('Auth page error:', error, errorInfo);
-  }
-
-  render() {
-    if ((this.state as any).hasError) {
-      return (
-        <div style={{ padding: '2rem', textAlign: 'center', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-          <h1 style={{ color: '#1a1a1a', marginBottom: '1rem' }}>Authentication</h1>
-          <p style={{ color: '#666', marginBottom: '2rem' }}>Loading authentication system...</p>
-          <button 
-            onClick={() => window.location.href = '/demo'}
-            style={{ 
-              padding: '0.75rem 1.5rem', 
-              backgroundColor: '#58cc02', 
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '0.5rem',
-              fontSize: '1rem',
-              cursor: 'pointer'
-            }}
-          >
-            Continue with Demo
-          </button>
-        </div>
-      );
-    }
-
-    return (this.props as any).children;
-  }
-}
-
-function AuthPageContent() {
-  // Initialize all hooks first, before any logic
+export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
-  const [isInIframe, setIsInIframe] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -62,31 +17,14 @@ function AuthPageContent() {
     lastName: "",
   });
   const { toast } = useToast();
-  
-  // Router hook initialization with fallback
-  const [, setLoc] = useLocation();
-  const setLocation = setLoc || ((path: string) => {
-    window.location.href = path;
-  });
-
-  // Detect if running in iframe and auto-redirect to demo
-  useEffect(() => {
-    const inIframe = window.self !== window.top;
-    setIsInIframe(inIframe);
-    
-    // If in iframe, redirect to demo mode immediately
-    if (inIframe && setLocation) {
-      console.log('Iframe detected, redirecting to demo mode');
-      setLocation("/demo");
-    }
-  }, [setLocation]);
+  const [, setLocation] = useLocation();
 
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Include cookies for cross-origin requests
+        credentials: 'include',
         body: JSON.stringify(data),
       });
       if (!response.ok) {
@@ -96,56 +34,55 @@ function AuthPageContent() {
       return response.json();
     },
     onSuccess: () => {
-      // Invalidate auth query to refetch user data
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Welcome back!",
         description: "You've been logged in successfully.",
       });
-      setLocation && setLocation("/");
+      setLocation("/");
     },
     onError: (error: Error) => {
-      console.error('Login error details:', error);
-      if (isInIframe) {
-        // Redirect to demo mode for iframe users
-        setLocation && setLocation("/demo");
-      } else {
-        toast({
-          title: "Login failed",
-          description: "Please check your email and password.",
-          variant: "destructive",
-        });
-      }
+      console.error('Login error:', error);
+      toast({
+        title: "Login failed",
+        description: error.message || "Please check your credentials and try again.",
+        variant: "destructive",
+      });
     },
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (data: { email: string; password: string; firstName?: string; lastName?: string }) => {
+    mutationFn: async (data: {
+      email: string;
+      password: string;
+      firstName?: string;
+      lastName?: string;
+    }) => {
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Include cookies for cross-origin requests
+        credentials: 'include',
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Registration failed' }));
-        throw new Error(error.message || 'Registration failed');
+        const errorData = await response.json().catch(() => ({ message: 'Registration failed' }));
+        throw new Error(errorData.message || 'Registration failed');
       }
       return response.json();
     },
     onSuccess: () => {
-      // Invalidate auth query to refetch user data
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
-        title: "Account created!",
-        description: "Welcome to Pocket Coach.",
+        title: "Welcome to Pocket Coach!",
+        description: "Your account has been created successfully.",
       });
-      setLocation && setLocation("/");
+      setLocation("/");
     },
     onError: (error: Error) => {
+      console.error('Registration error:', error);
       toast({
         title: "Registration failed",
-        description: error.message,
+        description: error.message || "Please try again with different details.",
         variant: "destructive",
       });
     },
@@ -186,84 +123,77 @@ function AuthPageContent() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.content}>
-        <Card className={styles.authCard}>
+      <div className={styles.authCard}>
+        <Card>
           <CardHeader>
             <CardTitle className={styles.title}>
-              {isLogin ? "Welcome Back" : "Join Pocket Coach"}
+              {isLogin ? "Welcome Back" : "Create Account"}
             </CardTitle>
-            {isInIframe && (
-              <div className={styles.iframeWarning}>
-                <p>Portfolio demo mode available. <a href="/demo">Try demo version</a> or <a href={window.location.href} target="_blank" rel="noopener noreferrer">open in new tab</a> for full access.</p>
-              </div>
-            )}
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className={styles.form}>
-              <div className={styles.formField}>
-                <label htmlFor="email" className={styles.label}>Email</label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="your@email.com"
-                  required
-                />
+              <div className={styles.formGrid}>
+                {!isLogin && (
+                  <>
+                    <div className={styles.inputGroup}>
+                      <Input
+                        type="text"
+                        placeholder="First Name"
+                        value={formData.firstName}
+                        onChange={(e) => handleInputChange("firstName", e.target.value)}
+                        className={styles.input}
+                      />
+                    </div>
+                    <div className={styles.inputGroup}>
+                      <Input
+                        type="text"
+                        placeholder="Last Name"
+                        value={formData.lastName}
+                        onChange={(e) => handleInputChange("lastName", e.target.value)}
+                        className={styles.input}
+                      />
+                    </div>
+                  </>
+                )}
+                <div className={styles.inputGroup}>
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    required
+                    className={styles.input}
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                    required
+                    className={styles.input}
+                  />
+                </div>
               </div>
-
-              <div className={styles.formField}>
-                <label htmlFor="password" className={styles.label}>Password</label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
-                  placeholder="Your password"
-                  required
-                />
-              </div>
-
-              {!isLogin && (
-                <>
-                  <div className={styles.formField}>
-                    <label htmlFor="firstName" className={styles.label}>First Name (Optional)</label>
-                    <Input
-                      id="firstName"
-                      type="text"
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange("firstName", e.target.value)}
-                      placeholder="Your first name"
-                    />
-                  </div>
-
-                  <div className={styles.formField}>
-                    <label htmlFor="lastName" className={styles.label}>Last Name (Optional)</label>
-                    <Input
-                      id="lastName"
-                      type="text"
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange("lastName", e.target.value)}
-                      placeholder="Your last name"
-                    />
-                  </div>
-                </>
-              )}
 
               <Button
                 type="submit"
                 disabled={isLoading}
                 className={styles.submitButton}
               >
-                {isLoading ? "Please wait..." : (isLogin ? "Sign In" : "Create Account")}
+                {isLoading
+                  ? (isLogin ? "Signing in..." : "Creating account...")
+                  : (isLogin ? "Sign In" : "Create Account")
+                }
               </Button>
             </form>
 
-            <div className={styles.switchMode}>
+            <div className={styles.toggleContainer}>
               <button
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
-                className={styles.switchButton}
+                className={styles.toggleButton}
               >
                 {isLogin 
                   ? "Don't have an account? Sign up" 
@@ -275,14 +205,5 @@ function AuthPageContent() {
         </Card>
       </div>
     </div>
-  );
-}
-
-// Main export with error boundary protection
-export default function AuthPage() {
-  return (
-    <AuthErrorBoundary>
-      <AuthPageContent />
-    </AuthErrorBoundary>
   );
 }
