@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
 import { useToast } from "@/hooks/use-toast";
 import styles from "./auth.module.css";
 
-export default function AuthPage() {
+function AuthPageContent() {
   // Safe hook usage with error boundary
   let setLocation: ((path: string) => void) | null = null;
   try {
@@ -21,6 +21,7 @@ export default function AuthPage() {
       window.location.href = path;
     };
   }
+  
   const [isLogin, setIsLogin] = useState(true);
   const [isInIframe, setIsInIframe] = useState(false);
   const [formData, setFormData] = useState({
@@ -238,4 +239,34 @@ export default function AuthPage() {
       </div>
     </div>
   );
+}
+
+// Error boundary wrapper component
+export default function AuthPage() {
+  try {
+    return <AuthPageContent />;
+  } catch (error) {
+    console.error("Auth page error:", error);
+    // Fallback UI for when React context is completely broken
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <h1>Loading...</h1>
+        <p>If this page doesn't load, please refresh your browser.</p>
+        <button 
+          onClick={() => window.location.href = '/demo'}
+          style={{ 
+            padding: '0.5rem 1rem', 
+            backgroundColor: '#58cc02', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '0.5rem',
+            marginTop: '1rem',
+            cursor: 'pointer'
+          }}
+        >
+          Try Demo Mode
+        </button>
+      </div>
+    );
+  }
 }
