@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/Button";
 import { Card, CardContent } from "@/components/Card";
 import { Badge } from "@/components/Badge";
@@ -29,12 +29,20 @@ import { useAuth } from "@/hooks/use-auth";
 import styles from "./home.module.css";
 
 export default function Home() {
+  const [, setLocation] = useLocation();
   const [showAchievement, setShowAchievement] = useState(false);
   const [achievementData, setAchievementData] = useState<any>(null);
-  const { user: authUser } = useAuth();
+  const { user: authUser, isLoading: authLoading } = useAuth();
   
   // Check if this is demo mode
   const isDemoUser = authUser?.email === 'demo@pocketcoach.app';
+
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!authLoading && !authUser) {
+      setLocation('/auth');
+    }
+  }, [authUser, authLoading, setLocation]);
 
   const { data: user, isLoading: userLoading } = useQuery<User>({
     queryKey: [`/api/user/${authUser?.id}`],
