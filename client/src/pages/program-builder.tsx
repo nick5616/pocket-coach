@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "../components/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
 import BottomNavigation from "../components/bottom-navigation";
@@ -73,6 +73,9 @@ export default function ProgramBuilder() {
   const { toast } = useToast();
   
   const [step, setStep] = useState(1);
+  const [theme, setTheme] = useState(() => 
+    localStorage.getItem('theme') || 'light'
+  );
   const [formData, setFormData] = useState({
     split: '',
     experience: '',
@@ -81,9 +84,38 @@ export default function ProgramBuilder() {
     equipment: [] as string[]
   });
 
+  // Check if user is authenticated
+  const { data: user, isLoading: userLoading } = useQuery({
+    queryKey: ["/api/auth/user"],
+    retry: false
+  });
+
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (!userLoading && !user) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to create workout programs.",
+        variant: "destructive",
+      });
+      setLocation("/auth");
+    }
+  }, [user, userLoading, setLocation, toast]);
+
   const generateProgramMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest("POST", "/api/programs/generate-simple", data);
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Please log in to create programs");
+        }
+        throw new Error("Failed to generate program");
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -94,12 +126,17 @@ export default function ProgramBuilder() {
       });
       setLocation("/programs");
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: "Generation Failed",
-        description: "Unable to create program. Please try again.",
+        description: error.message || "Unable to create program. Please try again.",
         variant: "destructive",
       });
+      
+      // If unauthorized, redirect to login
+      if (error.message?.includes("log in")) {
+        setLocation("/auth");
+      }
     },
   });
 
@@ -154,8 +191,66 @@ export default function ProgramBuilder() {
     }
   };
 
+  // Show loading while checking authentication
+  if (userLoading) {
+    return (
+      <div className={styles.container} data-theme={theme}>
+        <div className={styles.header}>
+          <div></div>
+          <h1 className={styles.headerTitle}>Loading...</h1>
+          <div></div>
+        </div>
+        <div className={styles.content}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <div className={styles.spinner}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render content if not authenticated
+  if (!user) {
+    return null;
+  }
+
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-theme={theme}>
+      {/* Backdrop SVGs */}
+      <div className={styles.backdrop}>
+        <svg className={styles.shape1} viewBox="0 0 120 120">
+          <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="var(--pb-primary)" stopOpacity="0.1"/>
+              <stop offset="100%" stopColor="var(--pb-primary)" stopOpacity="0.05"/>
+            </linearGradient>
+          </defs>
+          <circle cx="60" cy="60" r="50" fill="url(#grad1)"/>
+          <path d="M30 60 L50 40 L90 80 L70 100 Z" fill="var(--pb-primary)" opacity="0.08"/>
+        </svg>
+        
+        <svg className={styles.shape2} viewBox="0 0 80 80">
+          <defs>
+            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="var(--pb-primary)" stopOpacity="0.08"/>
+              <stop offset="100%" stopColor="var(--pb-primary)" stopOpacity="0.03"/>
+            </linearGradient>
+          </defs>
+          <rect x="10" y="10" width="60" height="60" rx="15" fill="url(#grad2)"/>
+          <circle cx="40" cy="40" r="15" fill="var(--pb-primary)" opacity="0.06"/>
+        </svg>
+        
+        <svg className={styles.shape3} viewBox="0 0 60 60">
+          <defs>
+            <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="var(--pb-primary)" stopOpacity="0.06"/>
+              <stop offset="100%" stopColor="var(--pb-primary)" stopOpacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <polygon points="30,5 55,25 45,55 15,55 5,25" fill="url(#grad3)"/>
+        </svg>
+      </div>
+
       <div className={styles.header}>
         <Button
           variant="ghost"
@@ -165,8 +260,16 @@ export default function ProgramBuilder() {
           <ArrowLeft style={{ width: '1rem', height: '1rem' }} />
         </Button>
         <h1 className={styles.headerTitle}>Create Your Program</h1>
-        <div className={styles.stepIndicator}>
-          {step}/4
+        <div className={styles.headerRight}>
+          <button 
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            className={styles.themeToggle}
+          >
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
+          <div className={styles.stepIndicator}>
+            {step}/4
+          </div>
         </div>
       </div>
 
