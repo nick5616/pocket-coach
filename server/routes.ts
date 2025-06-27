@@ -9,7 +9,7 @@ import {
   insertGoalSchema,
   insertProgramSchema 
 } from "@shared/schema";
-import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePersonalizedProgram } from "./services/openai";
+import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePersonalizedProgram, generateSimplifiedProgram } from "./services/openai";
 import Stripe from "stripe";
 
 // Initialize Stripe with conditional check for development
@@ -983,6 +983,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Today's workout fetch error:", error);
       res.status(500).json({ message: "Failed to fetch today's workout" });
+    }
+  });
+
+  app.post("/api/programs/generate-simple", isAuthenticated, async (req, res) => {
+    try {
+      const { splitType, splitName, experience, goals, daysPerWeek, equipment } = req.body;
+      const userId = req.user.id;
+
+      // Generate program using AI with simplified inputs
+      const program = await generateSimplifiedProgram({
+        splitType,
+        splitName,
+        experience,
+        goals,
+        daysPerWeek,
+        equipment
+      });
+
+      // Save the generated program
+      const createdProgram = await storage.createProgram({
+        userId,
+        name: program.name,
+        description: program.description,
+        programType: splitType,
+        splitType: splitType,
+        schedule: program.schedule,
+        durationWeeks: 8, // Default 8-week program
+        difficulty: experience,
+        focusAreas: goals,
+        isActive: false
+      });
+
+      res.json(createdProgram);
+    } catch (error) {
+      console.error("Simplified program generation error:", error);
+      res.status(500).json({ message: "Failed to generate program" });
     }
   });
 

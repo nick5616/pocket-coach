@@ -238,6 +238,99 @@ Return only the workout name, no quotes or extra text.
   }
 }
 
+export async function generateSimplifiedProgram(params: {
+  splitType: string;
+  splitName: string;
+  experience: string;
+  goals: string[];
+  daysPerWeek: number;
+  equipment: string[];
+}): Promise<{
+  name: string;
+  description: string;
+  schedule: any;
+}> {
+  try {
+    const splitDescriptions = {
+      ppl: "Push-Pull-Legs split where Day 1 focuses on pushing movements (chest, shoulders, triceps), Day 2 on pulling movements (back, biceps), and Day 3 on legs and glutes. This pattern repeats.",
+      upper_lower: "Upper-Lower split alternating between upper body workouts (chest, back, shoulders, arms) and lower body workouts (legs, glutes, calves).",
+      full_body: "Full body workouts that target all major muscle groups in each session with compound movements and efficient exercise selection.",
+      bro_split: "Body part split dedicating each workout to one primary muscle group for focused, high-volume training."
+    };
+
+    const prompt = `
+Create a ${params.splitName} workout program for a ${params.experience} level person.
+
+PROGRAM DETAILS:
+- Split Type: ${params.splitType} (${splitDescriptions[params.splitType as keyof typeof splitDescriptions] || 'Custom split'})
+- Days per week: ${params.daysPerWeek}
+- Goals: ${params.goals.join(', ')}
+- Equipment: ${params.equipment.join(', ')}
+- Experience: ${params.experience}
+
+Create a structured program in this JSON format:
+{
+  "name": "Descriptive program name that includes the split type",
+  "description": "2-3 sentence program description explaining what this program will help achieve",
+  "schedule": {
+    "day1": {
+      "name": "Day name (e.g., Push Day, Upper Body, etc.)",
+      "description": "Brief description of this day's focus",
+      "exercises": [
+        {
+          "name": "Exercise name",
+          "sets": "3-4",
+          "reps": "8-12",
+          "weight": "Progressive",
+          "restTime": "2-3 minutes",
+          "notes": "Form cues and tips"
+        }
+      ]
+    }
+  }
+}
+
+PROGRAM REQUIREMENTS:
+1. Create ${params.daysPerWeek} different workout days
+2. Include 4-6 exercises per workout day
+3. Use equipment available: ${params.equipment.join(', ')}
+4. Appropriate for ${params.experience} level
+5. Focus on goals: ${params.goals.join(', ')}
+6. Include proper rest times and progression notes
+7. Ensure balanced muscle development
+8. Provide helpful form cues for each exercise
+
+Make the program progressive, safe, and aligned with the specified goals and experience level.
+`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert personal trainer creating workout programs. Design effective, safe, and progressive programs that are appropriate for the user's experience level and goals. Focus on compound movements and proven training principles."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7
+    });
+
+    const result = JSON.parse(response.choices[0].message.content || "{}");
+    return result;
+  } catch (error) {
+    console.error("Simplified program generation error:", error);
+    return {
+      name: `${params.splitName} Program`,
+      description: `A personalized ${params.splitName.toLowerCase()} program designed to help you ${params.goals.join(' and ')}.`,
+      schedule: {}
+    };
+  }
+}
+
 export async function generatePersonalizedProgram(
   userGoals: Array<{
     title: string;

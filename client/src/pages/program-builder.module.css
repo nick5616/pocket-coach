@@ -1,0 +1,350 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--text);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.backButton {
+  padding: 0.5rem;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.backButton:hover {
+  background: var(--hover);
+}
+
+.headerTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.stepIndicator {
+  background: var(--primary);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.content {
+  flex: 1;
+  padding: 1rem;
+  padding-bottom: 6rem;
+}
+
+.step {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stepIcon {
+  width: 2rem;
+  height: 2rem;
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.stepTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.stepDescription {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Split Options */
+.splitOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.splitCard {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid var(--border);
+}
+
+.splitCard:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.splitCard.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.splitName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.splitMeta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.daysPerWeek {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.splitDescription {
+  color: var(--text-secondary);
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+.bestFor {
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.bestFor strong {
+  color: var(--primary);
+}
+
+.example {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  background: var(--muted);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* Option Grids */
+.optionGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.optionCard {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid var(--border);
+  padding: 1.5rem;
+}
+
+.optionCard:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.optionCard.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.optionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.optionDescription {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Goals Grid */
+.goalGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.goalCard {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid var(--border);
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+.goalCard:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.goalCard.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.goalText {
+  font-weight: 500;
+  display: block;
+}
+
+/* Equipment Grid */
+.equipmentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.equipmentCard {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid var(--border);
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+.equipmentCard:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.equipmentCard.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.equipmentText {
+  font-weight: 500;
+  display: block;
+}
+
+/* Footer */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  background: var(--background);
+  border-top: 1px solid var(--border);
+  z-index: 10;
+}
+
+.nextButton,
+.createButton {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.loadingIcon {
+  width: 1rem;
+  height: 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .content {
+    padding: 0.75rem;
+  }
+  
+  .stepHeader {
+    margin-bottom: 1.5rem;
+  }
+  
+  .stepTitle {
+    font-size: 1.25rem;
+  }
+  
+  .goalGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .equipmentGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .splitCard {
+    padding: 1rem;
+  }
+}
+
+/* Dark mode support */
+:root {
+  --background: #ffffff;
+  --text: #000000;
+  --text-secondary: #666666;
+  --border: #e2e2e2;
+  --primary: #58CC02;
+  --primary-light: #58CC0220;
+  --accent: #f3f4f6;
+  --accent-foreground: #374151;
+  --muted: #f9fafb;
+  --hover: #f3f4f6;
+}
+
+[data-theme="dark"] {
+  --background: #000000;
+  --text: #ffffff;
+  --text-secondary: #a3a3a3;
+  --border: #262626;
+  --primary: #58CC02;
+  --primary-light: #58CC0220;
+  --accent: #1f1f1f;
+  --accent-foreground: #d1d5db;
+  --muted: #171717;
+  --hover: #1f1f1f;
+}

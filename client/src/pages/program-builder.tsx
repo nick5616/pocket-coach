@@ -1,0 +1,341 @@
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { Button } from "../components/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
+import BottomNavigation from "../components/bottom-navigation";
+import { useToast } from "../hooks/use-toast";
+import { apiRequest, queryClient } from "../lib/queryClient";
+import { 
+  ArrowLeft,
+  Users,
+  Target,
+  Calendar,
+  Dumbbell,
+  Sparkles,
+  Info
+} from "lucide-react";
+import { useLocation } from "wouter";
+import styles from "./program-builder.module.css";
+
+interface SplitOption {
+  id: string;
+  name: string;
+  simpleDescription: string;
+  detailedDescription: string;
+  daysPerWeek: number;
+  bestFor: string[];
+  example: string;
+}
+
+const splitOptions: SplitOption[] = [
+  {
+    id: "ppl",
+    name: "Push Pull Legs",
+    simpleDescription: "Push muscles one day, pull muscles another, legs on the third",
+    detailedDescription: "Day 1: Chest, shoulders, triceps (pushing movements). Day 2: Back, biceps (pulling movements). Day 3: Legs and glutes. Repeat the cycle.",
+    daysPerWeek: 6,
+    bestFor: ["Building muscle", "Getting stronger", "Balanced development"],
+    example: "Monday: Push | Tuesday: Pull | Wednesday: Legs | Thursday: Push | Friday: Pull | Saturday: Legs"
+  },
+  {
+    id: "upper_lower",
+    name: "Upper Lower Split",
+    simpleDescription: "Upper body one day, lower body the next",
+    detailedDescription: "Alternate between upper body workouts (arms, chest, back, shoulders) and lower body workouts (legs, glutes). Simple and effective.",
+    daysPerWeek: 4,
+    bestFor: ["Beginners", "Busy schedules", "Recovery focus"],
+    example: "Monday: Upper | Tuesday: Lower | Thursday: Upper | Friday: Lower"
+  },
+  {
+    id: "full_body",
+    name: "Full Body",
+    simpleDescription: "Work your entire body in each workout session",
+    detailedDescription: "Every workout includes exercises for all major muscle groups. Great for beginners or people with limited time.",
+    daysPerWeek: 3,
+    bestFor: ["Beginners", "Fat loss", "Limited time"],
+    example: "Monday: Full Body | Wednesday: Full Body | Friday: Full Body"
+  },
+  {
+    id: "bro_split",
+    name: "Body Part Split",
+    simpleDescription: "Focus on one muscle group per day (like chest day, back day)",
+    detailedDescription: "Each workout targets one specific muscle group intensely. Popular with experienced lifters who want to really focus on individual muscles.",
+    daysPerWeek: 5,
+    bestFor: ["Advanced lifters", "Muscle specialization", "High volume"],
+    example: "Monday: Chest | Tuesday: Back | Wednesday: Shoulders | Thursday: Arms | Friday: Legs"
+  }
+];
+
+export default function ProgramBuilder() {
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    split: '',
+    experience: '',
+    goals: [] as string[],
+    daysPerWeek: 3,
+    equipment: [] as string[]
+  });
+
+  const generateProgramMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("POST", "/api/programs/generate-simple", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
+      toast({
+        title: "Program Created!",
+        description: "Your personalized workout program is ready.",
+      });
+      setLocation("/programs");
+    },
+    onError: () => {
+      toast({
+        title: "Generation Failed",
+        description: "Unable to create program. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const goalOptions = [
+    "Build muscle",
+    "Lose weight", 
+    "Get stronger",
+    "Improve fitness",
+    "Tone up",
+    "Train for sport"
+  ];
+
+  const equipmentOptions = [
+    "Full gym access",
+    "Home with dumbbells",
+    "Bodyweight only",
+    "Resistance bands",
+    "Basic home gym"
+  ];
+
+  const handleSplitSelect = (split: SplitOption) => {
+    setFormData({ ...formData, split: split.id, daysPerWeek: split.daysPerWeek });
+    setStep(2);
+  };
+
+  const handleGoalToggle = (goal: string) => {
+    const newGoals = formData.goals.includes(goal)
+      ? formData.goals.filter(g => g !== goal)
+      : [...formData.goals, goal];
+    setFormData({ ...formData, goals: newGoals });
+  };
+
+  const handleSubmit = () => {
+    const selectedSplit = splitOptions.find(s => s.id === formData.split);
+    generateProgramMutation.mutate({
+      splitType: formData.split,
+      splitName: selectedSplit?.name,
+      experience: formData.experience,
+      goals: formData.goals,
+      daysPerWeek: formData.daysPerWeek,
+      equipment: formData.equipment
+    });
+  };
+
+  const canProceed = () => {
+    switch (step) {
+      case 1: return formData.split !== '';
+      case 2: return formData.experience !== '';
+      case 3: return formData.goals.length > 0;
+      case 4: return formData.equipment.length > 0;
+      default: return false;
+    }
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <Button
+          variant="ghost"
+          onClick={() => step === 1 ? setLocation("/programs") : setStep(step - 1)}
+          className={styles.backButton}
+        >
+          <ArrowLeft style={{ width: '1rem', height: '1rem' }} />
+        </Button>
+        <h1 className={styles.headerTitle}>Create Your Program</h1>
+        <div className={styles.stepIndicator}>
+          {step}/4
+        </div>
+      </div>
+
+      <div className={styles.content}>
+        {step === 1 && (
+          <div className={styles.step}>
+            <div className={styles.stepHeader}>
+              <Calendar className={styles.stepIcon} />
+              <div>
+                <h2 className={styles.stepTitle}>Choose Your Workout Split</h2>
+                <p className={styles.stepDescription}>
+                  How do you want to organize your workouts during the week?
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.splitOptions}>
+              {splitOptions.map((split) => (
+                <Card 
+                  key={split.id} 
+                  className={`${styles.splitCard} ${formData.split === split.id ? styles.selected : ''}`}
+                  onClick={() => handleSplitSelect(split)}
+                >
+                  <CardHeader>
+                    <CardTitle className={styles.splitName}>{split.name}</CardTitle>
+                    <div className={styles.splitMeta}>
+                      <span className={styles.daysPerWeek}>{split.daysPerWeek} days/week</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className={styles.splitDescription}>{split.simpleDescription}</p>
+                    <div className={styles.bestFor}>
+                      <strong>Best for:</strong> {split.bestFor.join(", ")}
+                    </div>
+                    <div className={styles.example}>
+                      <Info style={{ width: '0.875rem', height: '0.875rem' }} />
+                      <span>{split.example}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className={styles.step}>
+            <div className={styles.stepHeader}>
+              <Users className={styles.stepIcon} />
+              <div>
+                <h2 className={styles.stepTitle}>Your Experience Level</h2>
+                <p className={styles.stepDescription}>
+                  This helps us create the right intensity for you
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.optionGrid}>
+              {[
+                { value: "beginner", label: "Beginner", desc: "New to working out or getting back into it" },
+                { value: "intermediate", label: "Intermediate", desc: "Been working out consistently for 6+ months" },
+                { value: "advanced", label: "Advanced", desc: "2+ years of consistent training experience" }
+              ].map((option) => (
+                <Card 
+                  key={option.value}
+                  className={`${styles.optionCard} ${formData.experience === option.value ? styles.selected : ''}`}
+                  onClick={() => setFormData({ ...formData, experience: option.value })}
+                >
+                  <CardContent>
+                    <h3 className={styles.optionTitle}>{option.label}</h3>
+                    <p className={styles.optionDescription}>{option.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className={styles.step}>
+            <div className={styles.stepHeader}>
+              <Target className={styles.stepIcon} />
+              <div>
+                <h2 className={styles.stepTitle}>What's Your Goal?</h2>
+                <p className={styles.stepDescription}>
+                  Select all that apply - we'll balance your program accordingly
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.goalGrid}>
+              {goalOptions.map((goal) => (
+                <Card 
+                  key={goal}
+                  className={`${styles.goalCard} ${formData.goals.includes(goal) ? styles.selected : ''}`}
+                  onClick={() => handleGoalToggle(goal)}
+                >
+                  <CardContent>
+                    <span className={styles.goalText}>{goal}</span>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className={styles.step}>
+            <div className={styles.stepHeader}>
+              <Dumbbell className={styles.stepIcon} />
+              <div>
+                <h2 className={styles.stepTitle}>What Equipment Do You Have?</h2>
+                <p className={styles.stepDescription}>
+                  We'll create exercises that work with what you've got
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.equipmentGrid}>
+              {equipmentOptions.map((equipment) => (
+                <Card 
+                  key={equipment}
+                  className={`${styles.equipmentCard} ${formData.equipment.includes(equipment) ? styles.selected : ''}`}
+                  onClick={() => {
+                    const newEquipment = formData.equipment.includes(equipment)
+                      ? formData.equipment.filter(e => e !== equipment)
+                      : [...formData.equipment, equipment];
+                    setFormData({ ...formData, equipment: newEquipment });
+                  }}
+                >
+                  <CardContent>
+                    <span className={styles.equipmentText}>{equipment}</span>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className={styles.footer}>
+        {step < 4 ? (
+          <Button
+            onClick={() => setStep(step + 1)}
+            disabled={!canProceed()}
+            className={styles.nextButton}
+          >
+            Continue
+          </Button>
+        ) : (
+          <Button
+            onClick={handleSubmit}
+            disabled={!canProceed() || generateProgramMutation.isPending}
+            className={styles.createButton}
+          >
+            {generateProgramMutation.isPending ? (
+              <>
+                <Sparkles className={styles.loadingIcon} />
+                Creating Your Program...
+              </>
+            ) : (
+              <>
+                <Sparkles style={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} />
+                Create My Program
+              </>
+            )}
+          </Button>
+        )}
+      </div>
+
+      <BottomNavigation />
+    </div>
+  );
+}
