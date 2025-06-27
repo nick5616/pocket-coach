@@ -86,6 +86,7 @@ export default function ProgramBuilder() {
     localStorage.getItem('theme') || 'light'
   );
   const [hoveredSplit, setHoveredSplit] = useState<string | null>(null);
+  const [hoveredGoal, setHoveredGoal] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     split: '',
     experience: '',
@@ -426,15 +427,33 @@ export default function ProgramBuilder() {
                   key={goal.value}
                   className={`${styles.goalCard} ${formData.goals.includes(goal.value) ? styles.selected : ''}`}
                   onClick={() => handleGoalToggle(goal.value)}
+                  onMouseEnter={() => setHoveredGoal(goal.value)}
+                  onMouseLeave={() => setHoveredGoal(null)}
                 >
                   <CardContent>
                     <div className={styles.goalHeader}>
                       <span className={styles.goalText}>{goal.title}</span>
                     </div>
-                    <p className={styles.goalDescription}>{goal.description}</p>
                   </CardContent>
                 </Card>
               ))}
+            </div>
+
+            <div className={styles.goalDescriptionArea}>
+              {hoveredGoal && (() => {
+                const goal = goalOptions.find(g => g.value === hoveredGoal);
+                return goal ? (
+                  <div className={styles.goalDetailedDescription}>
+                    <h3 className={styles.goalDetailTitle}>{goal.title}</h3>
+                    <p className={styles.goalDetailText}>{goal.description}</p>
+                  </div>
+                ) : null;
+              })()}
+              {!hoveredGoal && (
+                <div className={styles.goalPlaceholder}>
+                  <p>Hover over a goal to see how we'll design your program</p>
+                </div>
+              )}
             </div>
           </div>
         )}
