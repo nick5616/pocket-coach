@@ -27,6 +27,12 @@
   justify-content: space-between;
 }
 
+.headerButtons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .activeBanner {
   padding: 1rem;
   background: #eff6ff;

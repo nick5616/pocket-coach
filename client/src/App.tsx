@@ -38,6 +38,7 @@ function AppRouter() {
       <Route path="/beta-subscription" component={BetaSubscription} />
       <Route path="/admin" component={Admin} />
       <Route path="/muscle-targeting" component={MuscleTargeting} />
+      <Route path="/program-builder" component={ProgramBuilder} />
       
       {/* Fallback */}
       <Route component={NotFound} />
