@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, Component } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -8,20 +8,51 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
 import { useToast } from "@/hooks/use-toast";
 import styles from "./auth.module.css";
 
-function AuthPageContent() {
-  // Safe hook usage with error boundary
-  let setLocation: ((path: string) => void) | null = null;
-  try {
-    const [, setLoc] = useLocation();
-    setLocation = setLoc;
-  } catch (error) {
-    console.warn("Router context not available:", error);
-    // Fallback navigation
-    setLocation = (path: string) => {
-      window.location.href = path;
-    };
+// Class-based error boundary
+class AuthErrorBoundary extends Component {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
   }
-  
+
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error('Auth page error:', error, errorInfo);
+  }
+
+  render() {
+    if ((this.state as any).hasError) {
+      return (
+        <div style={{ padding: '2rem', textAlign: 'center', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+          <h1 style={{ color: '#1a1a1a', marginBottom: '1rem' }}>Authentication</h1>
+          <p style={{ color: '#666', marginBottom: '2rem' }}>Loading authentication system...</p>
+          <button 
+            onClick={() => window.location.href = '/demo'}
+            style={{ 
+              padding: '0.75rem 1.5rem', 
+              backgroundColor: '#58cc02', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '0.5rem',
+              fontSize: '1rem',
+              cursor: 'pointer'
+            }}
+          >
+            Continue with Demo
+          </button>
+        </div>
+      );
+    }
+
+    return (this.props as any).children;
+  }
+}
+
+function AuthPageContent() {
+  // Initialize all hooks first, before any logic
   const [isLogin, setIsLogin] = useState(true);
   const [isInIframe, setIsInIframe] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,6 +62,12 @@ function AuthPageContent() {
     lastName: "",
   });
   const { toast } = useToast();
+  
+  // Router hook initialization with fallback
+  const [, setLoc] = useLocation();
+  const setLocation = setLoc || ((path: string) => {
+    window.location.href = path;
+  });
 
   // Detect if running in iframe and auto-redirect to demo
   useEffect(() => {
@@ -38,7 +75,7 @@ function AuthPageContent() {
     setIsInIframe(inIframe);
     
     // If in iframe, redirect to demo mode immediately
-    if (inIframe) {
+    if (inIframe && setLocation) {
       console.log('Iframe detected, redirecting to demo mode');
       setLocation("/demo");
     }
@@ -241,32 +278,11 @@ function AuthPageContent() {
   );
 }
 
-// Error boundary wrapper component
+// Main export with error boundary protection
 export default function AuthPage() {
-  try {
-    return <AuthPageContent />;
-  } catch (error) {
-    console.error("Auth page error:", error);
-    // Fallback UI for when React context is completely broken
-    return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <h1>Loading...</h1>
-        <p>If this page doesn't load, please refresh your browser.</p>
-        <button 
-          onClick={() => window.location.href = '/demo'}
-          style={{ 
-            padding: '0.5rem 1rem', 
-            backgroundColor: '#58cc02', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '0.5rem',
-            marginTop: '1rem',
-            cursor: 'pointer'
-          }}
-        >
-          Try Demo Mode
-        </button>
-      </div>
-    );
-  }
+  return (
+    <AuthErrorBoundary>
+      <AuthPageContent />
+    </AuthErrorBoundary>
+  );
 }
