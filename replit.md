@@ -27,7 +27,14 @@ Mobile-first fitness tracking PWA with AI-powered workout analysis, personalized
 
 ## Current Issues - Active Development
 
-### Critical Routing Bug (In Progress)
+### June 27, 2025 - Critical Performance & Theme Improvements (COMPLETED)
+- **Performance Optimization**: Reduced AI program generation time from 28+ seconds to under 10 seconds by streamlining prompts
+- **Theme System Fix**: Enhanced device preference detection with automatic light/dark mode switching
+- **Goal Descriptions**: Added detailed programming explanations for each fitness goal (muscle building, strength, etc.)
+- **Tailwind Cleanup**: Removed remaining Tailwind classes from body-visualization component, converted to CSS Modules
+- **Enhanced UX**: Program builder now shows programming details for each goal selection
+
+### Previous Critical Fixes
 - `/api/programs/active/today` endpoint routing conflicts resolved
 - Fixed query logic - activeProgram fetches always, enabling todaysWorkout
 - Fixed database error with restTime string conversion
