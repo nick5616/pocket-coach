@@ -55,25 +55,51 @@ function App() {
     registerServiceWorker();
     setupPWAInstallPrompt();
     
-    // Check for dark mode preference
+    // Check for dark mode preference with priority: saved > device preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const savedTheme = localStorage.getItem('theme');
-    const shouldUseDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+    
+    let shouldUseDark = prefersDark; // Default to device preference
+    if (savedTheme) {
+      shouldUseDark = savedTheme === 'dark';
+    }
     
     setIsDark(shouldUseDark);
     
     // Apply dark class to document
     if (shouldUseDark) {
       document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
     }
+    
+    // Listen for device preference changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('theme')) {
+        const newIsDark = e.matches;
+        setIsDark(newIsDark);
+        if (newIsDark) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
     
     // Set theme color for mobile browsers
     const metaThemeColor = document.querySelector("meta[name=theme-color]");
     if (metaThemeColor) {
-      metaThemeColor.setAttribute("content", "#58CC02");
+      metaThemeColor.setAttribute("content", shouldUseDark ? "#1a1a1a" : "#58CC02");
     }
+    
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
   return (

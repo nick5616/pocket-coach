@@ -141,12 +141,36 @@ export default function ProgramBuilder() {
   });
 
   const goalOptions = [
-    "Build muscle",
-    "Lose weight", 
-    "Get stronger",
-    "Improve fitness",
-    "Tone up",
-    "Train for sport"
+    {
+      value: "Build muscle",
+      title: "Build Muscle",
+      description: "Higher volume training (3-4 sets, 8-12 reps) with progressive overload. Focus on compound movements and adequate rest between sets for muscle growth."
+    },
+    {
+      value: "Lose weight",
+      title: "Lose Weight", 
+      description: "Circuit-style training with shorter rest periods. Mix of resistance and cardio exercises to maximize calorie burn while preserving muscle mass."
+    },
+    {
+      value: "Get stronger",
+      title: "Get Stronger",
+      description: "Lower rep ranges (3-6 reps) with heavier weights. Emphasis on compound movements like squats, deadlifts, and bench press with longer rest periods."
+    },
+    {
+      value: "Improve fitness",
+      title: "Improve Fitness",
+      description: "Balanced approach combining strength, endurance, and mobility. Moderate intensity with functional movements and varied training styles."
+    },
+    {
+      value: "Tone up",
+      title: "Tone Up",
+      description: "Moderate weight with higher reps (12-15) focusing on muscle endurance. Targets muscle definition while burning calories effectively."
+    },
+    {
+      value: "Train for sport",
+      title: "Train for Sport",
+      description: "Sport-specific movements and explosive power training. Includes plyometrics, agility work, and functional patterns relevant to athletic performance."
+    }
   ];
 
   const equipmentOptions = [
@@ -162,10 +186,10 @@ export default function ProgramBuilder() {
     setStep(2);
   };
 
-  const handleGoalToggle = (goal: string) => {
-    const newGoals = formData.goals.includes(goal)
-      ? formData.goals.filter(g => g !== goal)
-      : [...formData.goals, goal];
+  const handleGoalToggle = (goalValue: string) => {
+    const newGoals = formData.goals.includes(goalValue)
+      ? formData.goals.filter(g => g !== goalValue)
+      : [...formData.goals, goalValue];
     setFormData({ ...formData, goals: newGoals });
   };
 
@@ -363,12 +387,15 @@ export default function ProgramBuilder() {
             <div className={styles.goalGrid}>
               {goalOptions.map((goal) => (
                 <Card 
-                  key={goal}
-                  className={`${styles.goalCard} ${formData.goals.includes(goal) ? styles.selected : ''}`}
-                  onClick={() => handleGoalToggle(goal)}
+                  key={goal.value}
+                  className={`${styles.goalCard} ${formData.goals.includes(goal.value) ? styles.selected : ''}`}
+                  onClick={() => handleGoalToggle(goal.value)}
                 >
                   <CardContent>
-                    <span className={styles.goalText}>{goal}</span>
+                    <div className={styles.goalHeader}>
+                      <span className={styles.goalText}>{goal.title}</span>
+                    </div>
+                    <p className={styles.goalDescription}>{goal.description}</p>
                   </CardContent>
                 </Card>
               ))}
