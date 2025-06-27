@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import styles from "./body-visualization.module.css";
 
 interface MuscleGroup {
   id: number;
@@ -73,31 +74,26 @@ export default function BodyVisualization({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className={styles.loadingContainer}>
+        <div style={{ width: '3rem', height: '3rem', border: '2px solid transparent', borderTop: '2px solid var(--pb-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className={styles.container}>
       {/* View Toggle */}
-      <div className="flex justify-center mb-4">
-        <div className="flex bg-gray-100 rounded-lg p-1">
+      <div className={styles.viewToggle}>
+        <div className={styles.toggleButtons}>
           <button
             onClick={() => setViewMode('front')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              viewMode === 'front'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
+            className={`${styles.toggleButton} ${viewMode === 'front' ? styles.active : ''}`}
           >
             Front
           </button>
           <button
             onClick={() => setViewMode('back')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              viewMode === 'back'
+            className={`${styles.toggleButton} ${viewMode === 'back'
                 ? 'bg-white text-gray-900 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
             }`}

@@ -258,50 +258,25 @@ export async function generateSimplifiedProgram(params: {
       bro_split: "Body part split dedicating each workout to one primary muscle group for focused, high-volume training."
     };
 
-    const prompt = `
-Create a ${params.splitName} workout program for a ${params.experience} level person.
+    const prompt = `Create a ${params.daysPerWeek}-day ${params.splitName} program for ${params.experience} goals: ${params.goals.join(', ')}.
 
-PROGRAM DETAILS:
-- Split Type: ${params.splitType} (${splitDescriptions[params.splitType as keyof typeof splitDescriptions] || 'Custom split'})
-- Days per week: ${params.daysPerWeek}
-- Goals: ${params.goals.join(', ')}
-- Equipment: ${params.equipment.join(', ')}
-- Experience: ${params.experience}
+Equipment: ${params.equipment.join(', ')}
 
-Create a structured program in this JSON format:
+JSON format:
 {
-  "name": "Descriptive program name that includes the split type",
-  "description": "2-3 sentence program description explaining what this program will help achieve",
+  "name": "Program Name",
+  "description": "Brief description",
   "schedule": {
     "day1": {
-      "name": "Day name (e.g., Push Day, Upper Body, etc.)",
-      "description": "Brief description of this day's focus",
+      "name": "Day Name", 
       "exercises": [
-        {
-          "name": "Exercise name",
-          "sets": "3-4",
-          "reps": "8-12",
-          "weight": "Progressive",
-          "restTime": "2-3 minutes",
-          "notes": "Form cues and tips"
-        }
+        {"name": "Exercise", "sets": "3", "reps": "8-12", "restTime": "2 min"}
       ]
     }
   }
 }
 
-PROGRAM REQUIREMENTS:
-1. Create ${params.daysPerWeek} different workout days
-2. Include 4-6 exercises per workout day
-3. Use equipment available: ${params.equipment.join(', ')}
-4. Appropriate for ${params.experience} level
-5. Focus on goals: ${params.goals.join(', ')}
-6. Include proper rest times and progression notes
-7. Ensure balanced muscle development
-8. Provide helpful form cues for each exercise
-
-Make the program progressive, safe, and aligned with the specified goals and experience level.
-`;
+Create ${params.daysPerWeek} days, 5-6 exercises each. Be concise.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
