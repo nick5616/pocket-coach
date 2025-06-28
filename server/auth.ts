@@ -22,9 +22,9 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Enable secure cookies in production
+      secure: 'auto', // Let express-session handle HTTPS detection automatically
       maxAge: sessionTtl,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Allow cross-site cookies in production for iframe embedding
+      sameSite: 'lax',
     },
   });
 }
@@ -130,8 +130,8 @@ export async function setupAuth(app: Express) {
       if (err) {
         return res.status(500).json({ message: 'Logout failed' });
       }
-      // Redirect to demo to avoid React context issues on main page
-      res.redirect('/demo');
+      // Redirect to the root path after logout
+      res.redirect('/');
     });
   });
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import styles from "./auth.module.css";
 
 export default function AuthPage() {
+  const [, setLocation] = useLocation();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
@@ -17,23 +18,21 @@ export default function AuthPage() {
     lastName: "",
   });
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
 
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Login failed' }));
-        throw new Error(errorData.message || 'Login failed');
+        throw new Error('Login failed');
       }
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate auth query to refetch user data
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Welcome back!",
@@ -41,48 +40,41 @@ export default function AuthPage() {
       });
       setLocation("/");
     },
-    onError: (error: Error) => {
-      console.error('Login error:', error);
+    onError: () => {
       toast({
         title: "Login failed",
-        description: error.message || "Please check your credentials and try again.",
+        description: "Please check your email and password.",
         variant: "destructive",
       });
     },
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (data: {
-      email: string;
-      password: string;
-      firstName?: string;
-      lastName?: string;
-    }) => {
+    mutationFn: async (data: { email: string; password: string; firstName?: string; lastName?: string }) => {
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Registration failed' }));
-        throw new Error(errorData.message || 'Registration failed');
+        const error = await response.json();
+        throw new Error(error.message || 'Registration failed');
       }
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate auth query to refetch user data
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
-        title: "Welcome to Pocket Coach!",
-        description: "Your account has been created successfully.",
+        title: "Account created!",
+        description: "Welcome to Pocket Coach.",
       });
       setLocation("/");
     },
     onError: (error: Error) => {
-      console.error('Registration error:', error);
       toast({
         title: "Registration failed",
-        description: error.message || "Please try again with different details.",
+        description: error.message,
         variant: "destructive",
       });
     },
@@ -123,77 +115,79 @@ export default function AuthPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.authCard}>
-        <Card>
+      <div className={styles.content}>
+        <Card className={styles.authCard}>
           <CardHeader>
             <CardTitle className={styles.title}>
-              {isLogin ? "Welcome Back" : "Create Account"}
+              {isLogin ? "Welcome Back" : "Join Pocket Coach"}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className={styles.form}>
-              <div className={styles.formGrid}>
-                {!isLogin && (
-                  <>
-                    <div className={styles.inputGroup}>
-                      <Input
-                        type="text"
-                        placeholder="First Name"
-                        value={formData.firstName}
-                        onChange={(e) => handleInputChange("firstName", e.target.value)}
-                        className={styles.input}
-                      />
-                    </div>
-                    <div className={styles.inputGroup}>
-                      <Input
-                        type="text"
-                        placeholder="Last Name"
-                        value={formData.lastName}
-                        onChange={(e) => handleInputChange("lastName", e.target.value)}
-                        className={styles.input}
-                      />
-                    </div>
-                  </>
-                )}
-                <div className={styles.inputGroup}>
-                  <Input
-                    type="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    required
-                    className={styles.input}
-                  />
-                </div>
-                <div className={styles.inputGroup}>
-                  <Input
-                    type="password"
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={(e) => handleInputChange("password", e.target.value)}
-                    required
-                    className={styles.input}
-                  />
-                </div>
+              <div className={styles.formField}>
+                <label htmlFor="email" className={styles.label}>Email</label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                />
               </div>
+
+              <div className={styles.formField}>
+                <label htmlFor="password" className={styles.label}>Password</label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  placeholder="Your password"
+                  required
+                />
+              </div>
+
+              {!isLogin && (
+                <>
+                  <div className={styles.formField}>
+                    <label htmlFor="firstName" className={styles.label}>First Name (Optional)</label>
+                    <Input
+                      id="firstName"
+                      type="text"
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange("firstName", e.target.value)}
+                      placeholder="Your first name"
+                    />
+                  </div>
+
+                  <div className={styles.formField}>
+                    <label htmlFor="lastName" className={styles.label}>Last Name (Optional)</label>
+                    <Input
+                      id="lastName"
+                      type="text"
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                      placeholder="Your last name"
+                    />
+                  </div>
+                </>
+              )}
 
               <Button
                 type="submit"
                 disabled={isLoading}
                 className={styles.submitButton}
               >
-                {isLoading
-                  ? (isLogin ? "Signing in..." : "Creating account...")
-                  : (isLogin ? "Sign In" : "Create Account")
-                }
+                {isLoading ? "Please wait..." : (isLogin ? "Sign In" : "Create Account")}
               </Button>
             </form>
 
-            <div className={styles.toggleContainer}>
+            <div className={styles.switchMode}>
               <button
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
-                className={styles.toggleButton}
+                className={styles.switchButton}
               >
                 {isLogin 
                   ? "Don't have an account? Sign up" 

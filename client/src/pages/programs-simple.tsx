@@ -17,8 +17,7 @@ import {
   Clock, 
   Target,
   Dumbbell,
-  CheckCircle,
-  Sparkles
+  CheckCircle
 } from "lucide-react";
 import type { Program } from "@shared/schema";
 import styles from "./programs-simple.module.css";
@@ -209,18 +208,10 @@ export default function Programs() {
               <h1 className={`${styles.title} ${isDark ? styles.dark : ''}`}>Programs</h1>
               <p className={`${styles.subtitle} ${isDark ? styles.dark : ''}`}>Structured workout plans</p>
             </div>
-            <div className={styles.headerButtons}>
-              <Link href="/program-builder">
-                <Button variant="primary">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Quick Setup
-                </Button>
-              </Link>
-              <Button onClick={() => setIsCreateOpen(true)} variant="outline">
-                <Plus className="w-4 h-4 mr-2" />
-                Custom
-              </Button>
-            </div>
+            <Button onClick={() => setIsCreateOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              New Program
+            </Button>
           </div>
         </header>
 

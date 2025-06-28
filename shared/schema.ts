@@ -23,28 +23,8 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   currentStreak: integer("current_streak").default(0),
-  // Subscription fields
-  stripeCustomerId: varchar("stripe_customer_id"),
-  stripeSubscriptionId: varchar("stripe_subscription_id"),
-  subscriptionStatus: varchar("subscription_status").default("inactive"), // "active", "inactive", "canceled", "past_due"
-  subscriptionType: varchar("subscription_type").default("free"), // "free", "beta", "premium"
-  freeAccessGranted: boolean("free_access_granted").default(false), // Admin can grant free premium access
-  freeAccessReason: text("free_access_reason"), // Why free access was granted
-  subscriptionEndsAt: timestamp("subscription_ends_at"),
-  trialEndsAt: timestamp("trial_ends_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// Admin actions log for tracking who gets free access
-export const adminActions = pgTable("admin_actions", {
-  id: serial("id").primaryKey(),
-  adminUserId: varchar("admin_user_id").notNull(),
-  targetUserId: varchar("target_user_id").notNull(),
-  action: text("action").notNull(), // "grant_free_access", "revoke_access", etc.
-  reason: text("reason"),
-  metadata: jsonb("metadata"), // Additional action data
-  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const goals = pgTable("goals", {
@@ -103,27 +83,15 @@ export const programs = pgTable("programs", {
   difficulty: text("difficulty").default("beginner"), // "beginner", "intermediate", "advanced"
   focusAreas: text("focus_areas").array(), // ["strength", "cardio", "flexibility"]
   equipment: text("equipment").array(), // ["dumbbells", "barbell", "bodyweight"]
-  programType: text("program_type"), // "ppl", "bro_split", "upper_lower", "full_body", "custom"
-  splitType: text("split_type"), // "push_pull_legs", "chest_back_shoulders_arms_legs", "upper_lower"
-  targetMuscles: text("target_muscles").array(), // ["rear_delt", "medial_delt", "chest_upper"]
-  weeklyFrequency: integer("weekly_frequency").default(3), // Days per week
-  currentWeek: integer("current_week").default(1),
-  currentDay: integer("current_day").default(0), // Day of week (0-6)
-  autoProgression: boolean("auto_progression").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const muscleGroups = pgTable("muscle_groups", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(), // "rear_delt", "medial_delt", "anterior_delt", etc.
-  parentGroup: text("parent_group"), // "shoulders", "chest", "back" - for grouping
+  name: text("name").notNull(), // "chest", "back", "shoulders", etc.
   region: text("region").notNull(), // "upper", "lower", "core"
-  displayName: text("display_name").notNull(), // "Rear Deltoid", "Medial Deltoid"
+  displayName: text("display_name").notNull(), // "Chest", "Back", "Shoulders"
   svgId: text("svg_id").notNull(), // SVG element ID for mapping
-  svgPath: text("svg_path"), // SVG path data for detailed mapping
-  anatomicalName: text("anatomical_name"), // Scientific muscle name
-  primaryFunction: text("primary_function"), // "shoulder abduction", "shoulder flexion"
-  exerciseCount: integer("exercise_count").default(0), // Track how many exercises target this
 });
 
 export const exerciseMuscleMapping = pgTable("exercise_muscle_mapping", {
@@ -131,19 +99,6 @@ export const exerciseMuscleMapping = pgTable("exercise_muscle_mapping", {
   exerciseName: text("exercise_name").notNull(),
   muscleGroupId: integer("muscle_group_id").notNull().references(() => muscleGroups.id),
   primaryMuscle: boolean("primary_muscle").notNull().default(true),
-  activationLevel: integer("activation_level").default(80), // 0-100 how much this exercise targets the muscle
-});
-
-// User preferences for muscle targeting
-export const userMusclePreferences = pgTable("user_muscle_preferences", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull(),
-  muscleGroupId: integer("muscle_group_id").notNull().references(() => muscleGroups.id),
-  priority: integer("priority").default(5), // 1-10, how important is building this muscle
-  currentSatisfaction: integer("current_satisfaction").default(5), // 1-10, how happy with current size
-  targetGrowth: text("target_growth").default("maintain"), // "shrink", "maintain", "grow", "grow_significantly"
-  weeklyVolumeTarget: integer("weekly_volume_target"), // Target weekly sets for this muscle
-  lastUpdated: timestamp("last_updated").defaultNow(),
 });
 
 export const achievements = pgTable("achievements", {
@@ -203,34 +158,11 @@ export const exerciseMuscleMappingRelations = relations(exerciseMuscleMapping, (
 
 export const muscleGroupsRelations = relations(muscleGroups, ({ many }) => ({
   exerciseMappings: many(exerciseMuscleMapping),
-  userPreferences: many(userMusclePreferences),
-}));
-
-export const userMusclePreferencesRelations = relations(userMusclePreferences, ({ one }) => ({
-  user: one(users, {
-    fields: [userMusclePreferences.userId],
-    references: [users.id],
-  }),
-  muscleGroup: one(muscleGroups, {
-    fields: [userMusclePreferences.muscleGroupId],
-    references: [muscleGroups.id],
-  }),
 }));
 
 export const achievementsRelations = relations(achievements, ({ one }) => ({
   user: one(users, {
     fields: [achievements.userId],
-    references: [users.id],
-  }),
-}));
-
-export const adminActionsRelations = relations(adminActions, ({ one }) => ({
-  adminUser: one(users, {
-    fields: [adminActions.adminUserId],
-    references: [users.id],
-  }),
-  targetUser: one(users, {
-    fields: [adminActions.targetUserId],
     references: [users.id],
   }),
 }));
@@ -287,16 +219,6 @@ export const insertAchievementSchema = createInsertSchema(achievements).omit({
   createdAt: true,
 });
 
-export const insertAdminActionSchema = createInsertSchema(adminActions).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertUserMusclePreferenceSchema = createInsertSchema(userMusclePreferences).omit({
-  id: true,
-  lastUpdated: true,
-});
-
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -322,9 +244,3 @@ export type InsertExerciseMuscleMapping = z.infer<typeof insertExerciseMuscleMap
 
 export type Achievement = typeof achievements.$inferSelect;
 export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
-
-export type AdminAction = typeof adminActions.$inferSelect;
-export type InsertAdminAction = z.infer<typeof insertAdminActionSchema>;
-
-export type UserMusclePreference = typeof userMusclePreferences.$inferSelect;
-export type InsertUserMusclePreference = z.infer<typeof insertUserMusclePreferenceSchema>;

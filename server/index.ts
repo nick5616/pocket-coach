@@ -3,34 +3,6 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
-
-// Add CORS and iframe headers for portfolio embedding
-app.use((req, res, next) => {
-  // Allow embedding in iframes from any origin
-  res.removeHeader('X-Frame-Options'); // Remove any conflicting headers
-  res.setHeader('Content-Security-Policy', "frame-ancestors *");
-  
-  // Enable CORS for cross-origin requests
-  const origin = req.headers.origin;
-  if (origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With');
-  
-  // Handle SameSite=None directive for cross-site cookies in production
-  // Note: This will be handled by express-session configuration
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  next();
-});
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

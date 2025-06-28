@@ -9,57 +9,12 @@ import {
   insertGoalSchema,
   insertProgramSchema 
 } from "@shared/schema";
-import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePersonalizedProgram, generateSimplifiedProgram } from "./services/openai";
-import Stripe from "stripe";
-
-// Initialize Stripe with conditional check for development
-let stripe: Stripe | null = null;
-if (process.env.STRIPE_SECRET_KEY) {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2025-05-28.basil",
-  });
-}
+import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePersonalizedProgram } from "./services/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Auth middleware
   await setupAuth(app);
-
-  // Demo mode for iframe embedding
-  app.post('/api/auth/demo', async (req, res) => {
-    try {
-      console.log('Demo login request received');
-      
-      // Create or get demo user
-      let demoUser = await storage.getUserByEmail('demo@pocketcoach.app');
-      if (!demoUser) {
-        console.log('Creating new demo user');
-        const bcrypt = await import('bcrypt');
-        const passwordHash = await bcrypt.hash('demo123', 10);
-        demoUser = await storage.createUser({
-          email: 'demo@pocketcoach.app',
-          passwordHash,
-          firstName: 'Demo',
-          lastName: 'User',
-        });
-      } else {
-        console.log('Found existing demo user:', demoUser.id);
-      }
-
-      // Log them in automatically
-      req.login(demoUser, (err) => {
-        if (err) {
-          console.error('Demo login error:', err);
-          return res.status(500).json({ message: 'Demo login failed' });
-        }
-        console.log('Demo user logged in successfully');
-        res.json({ user: demoUser, isDemo: true });
-      });
-    } catch (error) {
-      console.error('Demo login error:', error);
-      res.status(500).json({ message: 'Demo mode failed' });
-    }
-  });
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
@@ -76,197 +31,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/protected", isAuthenticated, async (req, res) => {
     const userId = req.user.id;
     res.json({ message: "This is a protected route", userId });
-  });
-
-  // Beta Subscription Routes
-  app.get('/api/subscription/status', isAuthenticated, async (req, res) => {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: 'User not authenticated' });
-      }
-
-      const subscriptionStatus = await storage.getUserSubscriptionStatus(userId);
-      res.json(subscriptionStatus);
-    } catch (error) {
-      console.error('Error fetching subscription status:', error);
-      res.status(500).json({ message: 'Failed to fetch subscription status' });
-    }
-  });
-
-  app.post('/api/subscription/create-beta-subscription', isAuthenticated, async (req, res) => {
-    if (!stripe) {
-      return res.status(500).json({ message: 'Stripe not configured' });
-    }
-
-    try {
-      const userId = req.user?.id;
-      const userEmail = req.user?.email;
-      if (!userId || !userEmail) {
-        return res.status(401).json({ message: 'User not authenticated' });
-      }
-
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      // Check if user already has a subscription
-      if (user.stripeCustomerId && user.stripeSubscriptionId) {
-        const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-        if (subscription.status === 'active') {
-          return res.json({
-            subscriptionId: subscription.id,
-            clientSecret: subscription.latest_invoice?.payment_intent?.client_secret
-          });
-        }
-      }
-
-      // Create Stripe customer if doesn't exist
-      let customerId = user.stripeCustomerId;
-      if (!customerId) {
-        const customer = await stripe.customers.create({
-          email: userEmail,
-          name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || userEmail,
-          metadata: {
-            userId: userId
-          }
-        });
-        customerId = customer.id;
-        await storage.updateUserStripeInfo(userId, customerId);
-      }
-
-      // Create beta subscription ($2.99/month)
-      const subscription = await stripe.subscriptions.create({
-        customer: customerId,
-        items: [{
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'Pocket Coach Beta Access',
-              description: 'Early access to all premium features at beta pricing'
-            },
-            unit_amount: 299, // $2.99 in cents
-            recurring: {
-              interval: 'month'
-            }
-          }
-        }],
-        payment_behavior: 'default_incomplete',
-        payment_settings: {
-          save_default_payment_method: 'on_subscription'
-        },
-        expand: ['latest_invoice.payment_intent'],
-        metadata: {
-          userId: userId,
-          subscriptionType: 'beta'
-        }
-      });
-
-      // Update user with subscription info
-      await storage.updateUserStripeInfo(userId, customerId, subscription.id);
-      await storage.updateUserSubscription(userId, {
-        subscriptionType: 'beta',
-        subscriptionStatus: 'incomplete'
-      });
-
-      res.json({
-        subscriptionId: subscription.id,
-        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret
-      });
-
-    } catch (error) {
-      console.error('Error creating beta subscription:', error);
-      res.status(500).json({ message: 'Failed to create subscription' });
-    }
-  });
-
-  // Stripe webhook for subscription updates
-  app.post('/api/webhooks/stripe', async (req, res) => {
-    if (!stripe) {
-      return res.status(500).json({ message: 'Stripe not configured' });
-    }
-
-    try {
-      const event = req.body;
-
-      switch (event.type) {
-        case 'customer.subscription.updated':
-        case 'customer.subscription.deleted':
-          const subscription = event.data.object;
-          const userId = subscription.metadata?.userId;
-          
-          if (userId) {
-            await storage.updateUserSubscription(userId, {
-              subscriptionStatus: subscription.status,
-              subscriptionType: subscription.status === 'active' ? 'beta' : 'free'
-            });
-          }
-          break;
-
-        case 'invoice.payment_succeeded':
-          const invoice = event.data.object;
-          if (invoice.subscription) {
-            const sub = await stripe.subscriptions.retrieve(invoice.subscription);
-            const userId = sub.metadata?.userId;
-            
-            if (userId) {
-              await storage.updateUserSubscription(userId, {
-                subscriptionStatus: 'active',
-                subscriptionType: 'beta'
-              });
-            }
-          }
-          break;
-
-        case 'invoice.payment_failed':
-          const failedInvoice = event.data.object;
-          if (failedInvoice.subscription) {
-            const sub = await stripe.subscriptions.retrieve(failedInvoice.subscription);
-            const userId = sub.metadata?.userId;
-            
-            if (userId) {
-              await storage.updateUserSubscription(userId, {
-                subscriptionStatus: 'past_due'
-              });
-            }
-          }
-          break;
-      }
-
-      res.json({ received: true });
-    } catch (error) {
-      console.error('Stripe webhook error:', error);
-      res.status(400).json({ message: 'Webhook error' });
-    }
-  });
-
-  // Admin routes for granting free access
-  app.post('/api/admin/grant-free-access', isAuthenticated, async (req, res) => {
-    try {
-      const adminUserId = req.user?.id;
-      if (!adminUserId) {
-        return res.status(401).json({ message: 'Admin not authenticated' });
-      }
-
-      // Simple admin check - you can enhance this with proper admin roles
-      const adminUser = await storage.getUser(adminUserId);
-      if (!adminUser || !adminUser.email?.includes('admin') && adminUser.email !== 'demo@pocketcoach.app') {
-        return res.status(403).json({ message: 'Admin access required' });
-      }
-
-      const { targetUserId, reason } = req.body;
-      if (!targetUserId || !reason) {
-        return res.status(400).json({ message: 'Target user ID and reason required' });
-      }
-
-      await storage.grantFreeAccess(adminUserId, targetUserId, reason);
-      res.json({ message: 'Free access granted successfully' });
-
-    } catch (error) {
-      console.error('Error granting free access:', error);
-      res.status(500).json({ message: 'Failed to grant free access' });
-    }
   });
 
   // Workout routes
@@ -532,18 +296,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { getExerciseMuscleGroups } = await import('./services/muscle-groups.js');
       const muscleGroups = await getExerciseMuscleGroups(programmedExercise.name);
       
-      // Convert restTime string to seconds if it's a string
-      let restTimeSeconds = null;
-      if (programmedExercise.restTime) {
-        if (typeof programmedExercise.restTime === 'string') {
-          // Parse "30-60 seconds" or "2 minutes" etc to a number
-          const match = programmedExercise.restTime.match(/(\d+)/);
-          restTimeSeconds = match ? parseInt(match[1]) : null;
-        } else {
-          restTimeSeconds = programmedExercise.restTime;
-        }
-      }
-
       const exercise = await storage.createExercise({
         workoutId,
         name: programmedExercise.name,
@@ -551,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         reps: programmedExercise.reps,
         weight: programmedExercise.weight || null,
         rpe: programmedExercise.rpe || null,
-        restTime: restTimeSeconds,
+        restTime: programmedExercise.restTime || null,
         notes: "Completed as programmed",
         muscleGroups: muscleGroups
       });
@@ -688,78 +440,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to fetch active program:", error);
       res.status(500).json({ message: "Failed to fetch active program" });
-    }
-  });
-
-  // CRITICAL: Move specific /api/programs/active/today route before ANY parameterized routes
-  app.get("/api/programs/active/today", isAuthenticated, async (req, res) => {
-    try {
-      const userId = (req.user as any)?.id;
-      const program = await storage.getActiveProgram(userId);
-      
-      if (!program) {
-        return res.status(404).json({ message: "Program not found or not active" });
-      }
-
-      // Calculate which day of the program we're on based on completed workouts
-      const completedWorkouts = await storage.getUserWorkouts(userId);
-      const programWorkouts = completedWorkouts.filter(w => 
-        w.isCompleted && 
-        w.createdAt && 
-        new Date(w.createdAt) >= new Date(program.createdAt!)
-      );
-      const daysDiff = programWorkouts.length;
-      console.log(`[ACTIVE/TODAY DEBUG] Program progress: ${programWorkouts.length} completed workouts since program created`);
-      console.log(`[ACTIVE/TODAY DEBUG] Program created: ${program.createdAt}, Completed workouts:`, programWorkouts.map(w => ({id: w.id, completed: w.isCompleted, created: w.createdAt})));
-      
-      // Parse the schedule to get today's workout
-      let schedule: any = {};
-      try {
-        schedule = typeof program.schedule === 'string' ? JSON.parse(program.schedule) : program.schedule;
-      } catch (error) {
-        return res.status(500).json({ message: "Invalid program schedule format" });
-      }
-
-      // Handle object format with numeric keys (0-6 for days of week)
-      let todaysWorkout: any = null;
-      
-      if (schedule.days && Array.isArray(schedule.days)) {
-        // Array format: cycle through program days
-        const programDays = schedule.days;
-        const currentDayIndex = daysDiff % programDays.length;
-        todaysWorkout = programDays[currentDayIndex];
-      } else if (schedule.weeks && Array.isArray(schedule.weeks)) {
-        // Weeks format: weeks with days
-        const weekNumber = Math.floor(daysDiff / 7) % schedule.weeks.length;
-        const dayNumber = daysDiff % 7;
-        const currentWeek = schedule.weeks[weekNumber];
-        todaysWorkout = currentWeek?.days?.[dayNumber];
-      } else if (typeof schedule === 'object' && schedule !== null) {
-        // Object format with numeric keys (0-6)
-        const dayKeys = Object.keys(schedule).sort((a, b) => parseInt(a) - parseInt(b));
-        const currentDayIndex = daysDiff % dayKeys.length;
-        const dayKey = dayKeys[currentDayIndex];
-        todaysWorkout = schedule[dayKey];
-        console.log(`[ACTIVE/TODAY] Program workouts completed: ${programWorkouts.length}, daysDiff: ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
-        console.log(`[ACTIVE/TODAY] Workout exercises:`, todaysWorkout?.exercises?.length || 0, 'exercises found');
-      } else {
-        return res.status(400).json({ message: "Invalid program schedule format" });
-      }
-      
-      if (!todaysWorkout || todaysWorkout.isRestDay) {
-        return res.status(404).json({ message: "Today is a rest day or no workout scheduled" });
-      }
-      
-      const response = {
-        program,
-        workout: todaysWorkout,
-        exercises: todaysWorkout.exercises || []
-      };
-      console.log(`[ACTIVE/TODAY] Returning response with ${response.exercises.length} exercises`);
-      res.json(response);
-    } catch (error) {
-      console.error("Today's workout error:", error);
-      res.status(500).json({ message: "Failed to fetch today's workout" });
     }
   });
 
@@ -986,42 +666,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/programs/generate-simple", isAuthenticated, async (req, res) => {
-    try {
-      const { splitType, splitName, experience, goals, daysPerWeek, equipment } = req.body;
-      const userId = req.user.id;
-
-      // Generate program using AI with simplified inputs
-      const program = await generateSimplifiedProgram({
-        splitType,
-        splitName,
-        experience,
-        goals,
-        daysPerWeek,
-        equipment
-      });
-
-      // Save the generated program
-      const createdProgram = await storage.createProgram({
-        userId,
-        name: program.name,
-        description: program.description,
-        programType: splitType,
-        splitType: splitType,
-        schedule: program.schedule,
-        durationWeeks: 8, // Default 8-week program
-        difficulty: experience,
-        focusAreas: goals,
-        isActive: false
-      });
-
-      res.json(createdProgram);
-    } catch (error) {
-      console.error("Simplified program generation error:", error);
-      res.status(500).json({ message: "Failed to generate program" });
-    }
-  });
-
   app.post("/api/programs/generate", isAuthenticated, async (req, res) => {
     try {
       const { experience, availableDays, equipment } = req.body;
@@ -1088,6 +732,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Program update error:", error);
       res.status(500).json({ message: "Failed to update program" });
+    }
+  });
+
+  app.get("/api/programs/active/today", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const program = await storage.getActiveProgram(userId);
+      
+      if (!program) {
+        return res.status(404).json({ message: "Program not found or not active" });
+      }
+
+      // Calculate which day of the program we're on based on completed workouts
+      const completedWorkouts = await storage.getUserWorkouts(userId);
+      const programWorkouts = completedWorkouts.filter(w => 
+        w.isCompleted && 
+        w.createdAt && 
+        new Date(w.createdAt) >= new Date(program.createdAt!)
+      );
+      const daysDiff = programWorkouts.length;
+      console.log(`[ACTIVE/TODAY DEBUG] Program progress: ${programWorkouts.length} completed workouts since program created`);
+      console.log(`[ACTIVE/TODAY DEBUG] Program created: ${program.createdAt}, Completed workouts:`, programWorkouts.map(w => ({id: w.id, completed: w.isCompleted, created: w.createdAt})));
+      
+      // Parse the schedule to get today's workout
+      let schedule: any = {};
+      try {
+        schedule = typeof program.schedule === 'string' ? JSON.parse(program.schedule) : program.schedule;
+      } catch (error) {
+        return res.status(500).json({ message: "Invalid program schedule format" });
+      }
+
+      // Handle object format with numeric keys (0-6 for days of week)
+      let todaysWorkout: any = null;
+      
+      if (schedule.days && Array.isArray(schedule.days)) {
+        // Array format: cycle through program days
+        const programDays = schedule.days;
+        const currentDayIndex = daysDiff % programDays.length;
+        todaysWorkout = programDays[currentDayIndex];
+      } else if (schedule.weeks && Array.isArray(schedule.weeks)) {
+        // Weeks format: weeks with days
+        const weekNumber = Math.floor(daysDiff / 7) % schedule.weeks.length;
+        const dayNumber = daysDiff % 7;
+        const currentWeek = schedule.weeks[weekNumber];
+        todaysWorkout = currentWeek?.days?.[dayNumber];
+      } else if (typeof schedule === 'object' && schedule !== null) {
+        // Object format with numeric keys (0-6)
+        const dayKeys = Object.keys(schedule).sort((a, b) => parseInt(a) - parseInt(b));
+        const currentDayIndex = daysDiff % dayKeys.length;
+        const dayKey = dayKeys[currentDayIndex];
+        todaysWorkout = schedule[dayKey];
+        console.log(`[ACTIVE/TODAY] Program workouts completed: ${programWorkouts.length}, daysDiff: ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
+        console.log(`[ACTIVE/TODAY] Workout exercises:`, todaysWorkout?.exercises?.length || 0, 'exercises found');
+      } else {
+        return res.status(400).json({ message: "Invalid program schedule format" });
+      }
+      
+      if (!todaysWorkout || todaysWorkout.isRestDay) {
+        return res.status(404).json({ message: "Today is a rest day or no workout scheduled" });
+      }
+      
+      const response = {
+        program,
+        workout: todaysWorkout,
+        exercises: todaysWorkout.exercises || []
+      };
+      console.log(`[ACTIVE/TODAY] Returning response with ${response.exercises.length} exercises`);
+      res.json(response);
+    } catch (error) {
+      console.error("Today's workout error:", error);
+      res.status(500).json({ message: "Failed to fetch today's workout" });
     }
   });
 
@@ -1280,136 +995,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(heatMapData);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch heat map data" });
-    }
-  });
-
-  // Muscle Preference API Routes
-  app.get("/api/muscles/detailed-map", async (req, res) => {
-    try {
-      const muscleMap = await storage.getDetailedMuscleMap();
-      res.json(muscleMap);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch detailed muscle map" });
-    }
-  });
-
-  app.get("/api/muscles/preferences", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.sendStatus(401);
-    }
-    
-    try {
-      const preferences = await storage.getUserMusclePreferences(req.user.id);
-      res.json(preferences);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch muscle preferences" });
-    }
-  });
-
-  app.put("/api/muscles/preferences/:muscleGroupId", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.sendStatus(401);
-    }
-    
-    try {
-      const muscleGroupId = parseInt(req.params.muscleGroupId);
-      const preference = await storage.updateMusclePreference(
-        req.user.id,
-        muscleGroupId,
-        req.body
-      );
-      res.json(preference);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to update muscle preference" });
-    }
-  });
-
-  app.get("/api/muscles/by-parent/:parentGroup", async (req, res) => {
-    try {
-      const parentGroup = req.params.parentGroup;
-      const muscles = await storage.getMusclesByParentGroup(parentGroup);
-      res.json(muscles);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch muscles by parent group" });
-    }
-  });
-
-  // Program Type Detection
-  app.post("/api/programs/detect-type", async (req, res) => {
-    try {
-      const { schedule, targetMuscles } = req.body;
-      const detection = await storage.detectProgramType(schedule, targetMuscles);
-      res.json(detection);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to detect program type" });
-    }
-  });
-
-  // Advanced Muscle Targeting Routes
-  app.post("/api/programs/generate-targeted", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.sendStatus(401);
-    }
-
-    try {
-      const { generateTargetedProgram } = await import('./services/muscle-targeting');
-      const program = await generateTargetedProgram(req.body);
-      
-      // Save the generated program to database
-      const savedProgram = await storage.createProgram({
-        userId: req.user.id,
-        name: program.name,
-        description: program.description,
-        schedule: program.schedule,
-        aiGenerated: true,
-        programType: program.programType,
-        splitType: program.splitType,
-        targetMuscles: program.targetMuscles,
-        focusAreas: program.focusAreas,
-        durationWeeks: program.durationWeeks,
-        difficulty: program.difficulty
-      });
-
-      res.json(savedProgram);
-    } catch (error) {
-      console.error('Generate targeted program error:', error);
-      res.status(500).json({ message: "Failed to generate targeted program" });
-    }
-  });
-
-  app.post("/api/programs/detect-optimal-split", async (req, res) => {
-    try {
-      const { detectOptimalSplit } = await import('./services/muscle-targeting');
-      const { targetMuscles } = req.body;
-      const analysis = await detectOptimalSplit(targetMuscles);
-      res.json(analysis);
-    } catch (error) {
-      console.error('Detect optimal split error:', error);
-      res.status(500).json({ message: "Failed to detect optimal split" });
-    }
-  });
-
-  app.post("/api/muscles/analyze", async (req, res) => {
-    try {
-      const { analyzeTargetMuscles } = await import('./services/muscle-targeting');
-      const { targetMuscles } = req.body;
-      const analysis = await analyzeTargetMuscles(targetMuscles);
-      res.json(analysis);
-    } catch (error) {
-      console.error('Analyze muscles error:', error);
-      res.status(500).json({ message: "Failed to analyze target muscles" });
-    }
-  });
-
-  app.post("/api/muscles/exercise-recommendations", async (req, res) => {
-    try {
-      const { generateExerciseRecommendations } = await import('./services/muscle-targeting');
-      const { targetMuscle, muscleFunction } = req.body;
-      const recommendations = await generateExerciseRecommendations(targetMuscle, muscleFunction);
-      res.json(recommendations);
-    } catch (error) {
-      console.error('Exercise recommendations error:', error);
-      res.status(500).json({ message: "Failed to generate exercise recommendations" });
     }
   });
 

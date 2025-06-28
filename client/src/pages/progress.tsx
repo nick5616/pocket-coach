@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { Badge } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import BottomNavigation from "@/components/bottom-navigation";
-import EnhancedBodyMap from "@/components/enhanced-body-map";
+import BodyVisualization from "@/components/body-visualization";
 import LoadingScreen from "@/components/loading-screen";
 import { 
   Target, 
@@ -23,7 +22,6 @@ import {
   BarChart3
 } from "lucide-react";
 import type { Workout, Goal, MuscleGroup } from "@shared/schema";
-import { useAuth } from "@/hooks/use-auth";
 
 interface MuscleProgress {
   frequency: number;
@@ -37,17 +35,16 @@ export default function Progress() {
   const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | null>(null);
   const [showMuscleDetails, setShowMuscleDetails] = useState(false);
   
-  const { user: authUser } = useAuth();
-  const userId = authUser?.id || "user_demo";
+  const userId = 1;
 
   const { data: workouts = [], isLoading: workoutsLoading } = useQuery<Workout[]>({
-    queryKey: ["/api/workouts"],
-    enabled: !!userId,
+    queryKey: ["/api/workouts", { userId }],
+    queryFn: () => fetch(`/api/workouts?userId=${userId}`).then(res => res.json()),
   });
 
   const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
-    queryKey: ["/api/goals"],
-    enabled: !!userId,
+    queryKey: ["/api/goals", { userId }],
+    queryFn: () => fetch(`/api/goals?userId=${userId}`).then(res => res.json()),
   });
 
   const { data: muscleProgress, isLoading: progressLoading } = useQuery<MuscleProgress>({
@@ -108,7 +105,7 @@ export default function Progress() {
         <h1 className="text-lg font-bold text-gray-900">Progress</h1>
       </header>
 
-      <main className="pb-32">
+      <main className="pb-20">
         {/* Stats Overview */}
         <section className="px-4 py-6" style={{
           background: 'linear-gradient(135deg, #65a30d 0%, #16a34a 100%)',
@@ -149,7 +146,7 @@ export default function Progress() {
           </div>
         </section>
 
-        <Tabs defaultValue="body" className="px-4 py-6 pb-24">
+        <Tabs defaultValue="body" className="px-4 py-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="body">Body Map</TabsTrigger>
             <TabsTrigger value="goals">Goals</TabsTrigger>
@@ -177,11 +174,10 @@ export default function Progress() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <EnhancedBodyMap
-                  userId={userId.toString()}
+                <BodyVisualization
+                  userId={userId}
                   onMuscleSelect={handleMuscleSelect}
                   selectedMuscles={selectedMuscles}
-                  mode="heat"
                 />
                 
                 {selectedMuscles.length > 0 && (

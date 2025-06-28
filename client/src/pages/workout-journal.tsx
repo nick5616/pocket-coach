@@ -110,19 +110,14 @@ export default function WorkoutJournal() {
     queryKey: ["/api/programs/active"],
     queryFn: () =>
       fetch("/api/programs/active", { credentials: "include" }).then((res) => res.json()),
-    // Always fetch active program to get today's workout
+    enabled: !workoutId,
   });
 
   const { data: todaysWorkout, isLoading: todaysWorkoutLoading } = useQuery({
     queryKey: ["/api/programs/active/today"],
-    queryFn: async () => {
-      console.log("Fetching today's workout from /api/programs/active/today");
-      const response = await fetch("/api/programs/active/today", { credentials: "include" });
-      const data = await response.json();
-      console.log("Today's workout response:", data);
-      return data;
-    },
-    enabled: !!activeProgram, // Fetch when active program exists
+    queryFn: () =>
+      fetch("/api/programs/active/today", { credentials: "include" }).then((res) => res.json()),
+    enabled: !workoutId && !!activeProgram,
   });
 
   const totalVolume = calculateWorkoutVolume(exercises as Exercise[]);

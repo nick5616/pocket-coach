@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Switch, Route, useLocation, Router } from "wouter";
+import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
-import Auth from "@/pages/auth";
-import Demo from "@/pages/demo";
+import Landing from "@/pages/landing";
+import AuthPage from "@/pages/auth";
 import Home from "@/pages/home";
 import Workouts from "@/pages/workouts";
 import WorkoutJournal from "@/pages/workout-journal";
@@ -12,38 +13,28 @@ import ProgramWorkout from "@/pages/program-workout";
 import Progress from "@/pages/progress-simple";
 import Programs from "@/pages/programs-simple";
 import Profile from "@/pages/profile-simple";
-import BetaSubscription from "@/pages/beta-subscription";
-import Admin from "@/pages/admin";
-import MuscleTargeting from "@/pages/muscle-targeting";
-import ProgramBuilder from "@/pages/program-builder";
 import SplashScreen from "@/components/splash-screen";
-import ErrorBoundary from "@/components/error-boundary";
 import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
-function AppRouter() {
+function Router() {
+  const { isAuthenticated, isLoading } = useAuth();
+
   return (
     <Switch>
-      {/* Auth route first */}
-      <Route path="/auth" component={Auth} />
-      <Route path="/demo" component={Demo} />
-      
-      {/* Main route */}
-      <Route path="/" component={Home} />
-      
-      {/* Other routes */}
-      <Route path="/workouts" component={Workouts} />
-      <Route path="/workout-journal" component={WorkoutJournal} />
-      <Route path="/workout-journal/:id" component={WorkoutJournal} />
-      <Route path="/workouts/program/:programId" component={ProgramWorkout} />
-      <Route path="/progress" component={Progress} />
-      <Route path="/programs" component={Programs} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/beta-subscription" component={BetaSubscription} />
-      <Route path="/admin" component={Admin} />
-      <Route path="/muscle-targeting" component={MuscleTargeting} />
-      <Route path="/program-builder" component={ProgramBuilder} />
-      
-      {/* Fallback */}
+      {isLoading || !isAuthenticated ? (
+        <Route path="/" component={AuthPage} />
+      ) : (
+        <>
+          <Route path="/" component={Home} />
+          <Route path="/workouts" component={Workouts} />
+          <Route path="/workout-journal" component={WorkoutJournal} />
+          <Route path="/workout-journal/:id" component={WorkoutJournal} />
+          <Route path="/workouts/program/:programId" component={ProgramWorkout} />
+          <Route path="/progress" component={Progress} />
+          <Route path="/programs" component={Programs} />
+          <Route path="/profile" component={Profile} />
+        </>
+      )}
       <Route component={NotFound} />
     </Switch>
   );
@@ -58,60 +49,31 @@ function App() {
     registerServiceWorker();
     setupPWAInstallPrompt();
     
-    // Check for dark mode preference with priority: saved > device preference
+    // Check for dark mode preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const savedTheme = localStorage.getItem('theme');
-    
-    let shouldUseDark = prefersDark; // Default to device preference
-    if (savedTheme) {
-      shouldUseDark = savedTheme === 'dark';
-    }
+    const shouldUseDark = savedTheme ? savedTheme === 'dark' : prefersDark;
     
     setIsDark(shouldUseDark);
     
     // Apply dark class to document
     if (shouldUseDark) {
       document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
-      document.documentElement.setAttribute('data-theme', 'light');
     }
-    
-    // Listen for device preference changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('theme')) {
-        const newIsDark = e.matches;
-        setIsDark(newIsDark);
-        if (newIsDark) {
-          document.documentElement.classList.add('dark');
-          document.documentElement.setAttribute('data-theme', 'dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-          document.documentElement.setAttribute('data-theme', 'light');
-        }
-      }
-    };
-    
-    mediaQuery.addEventListener('change', handleChange);
     
     // Set theme color for mobile browsers
     const metaThemeColor = document.querySelector("meta[name=theme-color]");
     if (metaThemeColor) {
-      metaThemeColor.setAttribute("content", shouldUseDark ? "#1a1a1a" : "#58CC02");
+      metaThemeColor.setAttribute("content", "#58CC02");
     }
-    
-    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       {showSplash ? (
-        <SplashScreen onComplete={() => {
-          console.log('Main splash complete, showing app');
-          setShowSplash(false);
-        }} />
+        <SplashScreen onComplete={() => setShowSplash(false)} />
       ) : (
         <div style={{
           height: '100vh',
@@ -121,9 +83,7 @@ function App() {
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           position: 'relative'
         }}>
-          <Router>
-            <AppRouter />
-          </Router>
+          <Router />
         </div>
       )}
     </QueryClientProvider>

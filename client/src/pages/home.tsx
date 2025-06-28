@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { Button } from "@/components/Button";
 import { Card, CardContent } from "@/components/Card";
 import { Badge } from "@/components/Badge";
@@ -9,7 +9,6 @@ import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
 import WorkoutCard from "@/components/workout-card";
 import LoadingScreen from "@/components/loading-screen";
-import DemoBanner from "@/components/demo-banner";
 import {
   Bell,
   User as UserIcon,
@@ -28,70 +27,10 @@ import type { User, Workout, Goal, Achievement } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import styles from "./home.module.css";
 
-// Static fallback component for when React context is broken
-function StaticHomeFallback() {
-  return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#ffffff',
-      color: '#000000',
-      padding: '2rem',
-      fontFamily: 'system-ui, sans-serif'
-    }}>
-      <div style={{
-        maxWidth: '400px',
-        margin: '2rem auto',
-        padding: '2rem',
-        border: '1px solid #e2e8f0',
-        borderRadius: '0.5rem',
-        backgroundColor: '#ffffff'
-      }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>Pocket Coach</h1>
-        <p style={{ textAlign: 'center', marginBottom: '2rem', color: '#666' }}>
-          Please reload the page or try demo mode.
-        </p>
-        <button
-          onClick={() => window.location.href = '/demo'}
-          style={{
-            width: '100%',
-            padding: '0.75rem',
-            backgroundColor: '#58cc02',
-            color: 'white',
-            border: 'none',
-            borderRadius: '0.5rem',
-            fontSize: '1rem',
-            cursor: 'pointer',
-            marginBottom: '1rem'
-          }}
-        >
-          Continue with Demo
-        </button>
-        <button
-          onClick={() => window.location.href = '/auth'}
-          style={{
-            width: '100%',
-            padding: '0.75rem',
-            backgroundColor: 'transparent',
-            color: '#000000',
-            border: '1px solid #e2e8f0',
-            borderRadius: '0.5rem',
-            fontSize: '1rem',
-            cursor: 'pointer'
-          }}
-        >
-          Go to Login
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
-  // ALL HOOKS MUST BE AT THE TOP - Rules of Hooks
-  const [, setLocation] = useLocation();
   const [showAchievement, setShowAchievement] = useState(false);
   const [achievementData, setAchievementData] = useState<any>(null);
-  const { user: authUser, isLoading: authLoading } = useAuth();
+  const { user: authUser } = useAuth();
 
   const { data: user, isLoading: userLoading } = useQuery<User>({
     queryKey: [`/api/user/${authUser?.id}`],
@@ -117,78 +56,6 @@ export default function Home() {
     queryKey: ["/api/programs/active"],
     enabled: !!authUser?.id,
   });
-
-  // Redirect to auth if not authenticated (but avoid redirect loops)
-  useEffect(() => {
-    if (!authLoading && !authUser && window.location.pathname === '/') {
-      console.log('Not authenticated, redirecting to auth page');
-      setLocation('/auth');
-    }
-  }, [authUser, authLoading, setLocation]);
-
-  // Check if this is demo mode
-  const isDemoUser = authUser?.email === 'demo@pocketcoach.app';
-
-  // Show loading state while auth is being checked
-  if (authLoading) {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        backgroundColor: 'var(--background, #ffffff)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: 'system-ui, sans-serif'
-      }}>
-        <div>Loading...</div>
-      </div>
-    );
-  }
-
-  // Show login prompt if not authenticated
-  if (!authUser) {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        backgroundColor: 'var(--background, #ffffff)',
-        color: 'var(--foreground, #000000)',
-        padding: '2rem',
-        fontFamily: 'system-ui, sans-serif',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{
-          maxWidth: '400px',
-          padding: '2rem',
-          border: '1px solid #e2e8f0',
-          borderRadius: '0.5rem',
-          backgroundColor: 'var(--card, #ffffff)',
-          textAlign: 'center'
-        }}>
-          <h1 style={{ marginBottom: '1rem' }}>Pocket Coach</h1>
-          <p style={{ marginBottom: '2rem', color: '#666' }}>
-            Please log in to continue
-          </p>
-          <button
-            onClick={() => setLocation('/auth')}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              backgroundColor: '#58cc02',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.5rem',
-              fontSize: '1rem',
-              cursor: 'pointer'
-            }}
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   // Show loading screen if any essential data is still loading
   const isLoading = userLoading || workoutsLoading || goalsLoading || achievementsLoading || programLoading;
@@ -289,7 +156,6 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      {isDemoUser && <DemoBanner />}
       {/* Header */}
       <header className={styles.header}>
         <h1 className={styles.headerTitle}>Pocket Coach</h1>
