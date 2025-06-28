@@ -42,31 +42,35 @@ function Router() {
 
 function App() {
   const [isDark, setIsDark] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(false); // Disable splash for debugging
 
   useEffect(() => {
-    // Initialize PWA features
-    registerServiceWorker();
-    setupPWAInstallPrompt();
-    
-    // Check for dark mode preference
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const savedTheme = localStorage.getItem('theme');
-    const shouldUseDark = savedTheme ? savedTheme === 'dark' : prefersDark;
-    
-    setIsDark(shouldUseDark);
-    
-    // Apply dark class to document
-    if (shouldUseDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    
-    // Set theme color for mobile browsers
-    const metaThemeColor = document.querySelector("meta[name=theme-color]");
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute("content", "#58CC02");
+    try {
+      // Initialize PWA features
+      registerServiceWorker();
+      setupPWAInstallPrompt();
+      
+      // Check for dark mode preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const savedTheme = localStorage.getItem('theme');
+      const shouldUseDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+      
+      setIsDark(shouldUseDark);
+      
+      // Apply dark class to document
+      if (shouldUseDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      
+      // Set theme color for mobile browsers
+      const metaThemeColor = document.querySelector("meta[name=theme-color]");
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute("content", "#58CC02");
+      }
+    } catch (error) {
+      console.error('App initialization error:', error);
     }
   }, []);
 
