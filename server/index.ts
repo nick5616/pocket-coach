@@ -6,9 +6,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Add cache-busting headers for production deployments
+// Add cache-busting headers only for production deployments
 app.use((req, res, next) => {
-  if (process.env.NODE_ENV === "production" && !req.path.startsWith("/api")) {
+  if (process.env.NODE_ENV === "production" && !req.path.startsWith("/api") && !req.path.includes("/@")) {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
