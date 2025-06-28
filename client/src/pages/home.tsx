@@ -87,13 +87,36 @@ function StaticHomeFallback() {
 }
 
 export default function Home() {
+  // ALL HOOKS MUST BE AT THE TOP - Rules of Hooks
   const [, setLocation] = useLocation();
   const [showAchievement, setShowAchievement] = useState(false);
   const [achievementData, setAchievementData] = useState<any>(null);
   const { user: authUser, isLoading: authLoading } = useAuth();
-  
-  // Check if this is demo mode
-  const isDemoUser = authUser?.email === 'demo@pocketcoach.app';
+
+  const { data: user, isLoading: userLoading } = useQuery<User>({
+    queryKey: [`/api/user/${authUser?.id}`],
+    enabled: !!authUser?.id,
+  });
+
+  const { data: workouts = [], isLoading: workoutsLoading } = useQuery<Workout[]>({
+    queryKey: ["/api/workouts"],
+    enabled: !!authUser?.id,
+  });
+
+  const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
+    queryKey: ["/api/goals"],
+    enabled: !!authUser?.id,
+  });
+
+  const { data: achievements = [], isLoading: achievementsLoading } = useQuery<Achievement[]>({
+    queryKey: ["/api/achievements"],
+    enabled: !!authUser?.id,
+  });
+
+  const { data: activeProgram, isLoading: programLoading } = useQuery({
+    queryKey: ["/api/programs/active"],
+    enabled: !!authUser?.id,
+  });
 
   // Redirect to auth if not authenticated (but avoid redirect loops)
   useEffect(() => {
@@ -102,6 +125,9 @@ export default function Home() {
       setLocation('/auth');
     }
   }, [authUser, authLoading, setLocation]);
+
+  // Check if this is demo mode
+  const isDemoUser = authUser?.email === 'demo@pocketcoach.app';
 
   // Show loading state while auth is being checked
   if (authLoading) {
@@ -163,31 +189,6 @@ export default function Home() {
       </div>
     );
   }
-
-  const { data: user, isLoading: userLoading } = useQuery<User>({
-    queryKey: [`/api/user/${authUser?.id}`],
-    enabled: !!authUser?.id,
-  });
-
-  const { data: workouts = [], isLoading: workoutsLoading } = useQuery<Workout[]>({
-    queryKey: ["/api/workouts"],
-    enabled: !!authUser?.id,
-  });
-
-  const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
-    queryKey: ["/api/goals"],
-    enabled: !!authUser?.id,
-  });
-
-  const { data: achievements = [], isLoading: achievementsLoading } = useQuery<Achievement[]>({
-    queryKey: ["/api/achievements"],
-    enabled: !!authUser?.id,
-  });
-
-  const { data: activeProgram, isLoading: programLoading } = useQuery({
-    queryKey: ["/api/programs/active"],
-    enabled: !!authUser?.id,
-  });
 
   // Show loading screen if any essential data is still loading
   const isLoading = userLoading || workoutsLoading || goalsLoading || achievementsLoading || programLoading;
