@@ -41,57 +41,29 @@ function Router() {
 }
 
 function App() {
-  const [isDark, setIsDark] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
-
-  useEffect(() => {
-    try {
-      // Initialize PWA features
-      registerServiceWorker();
-      setupPWAInstallPrompt();
-      
-      // Check for dark mode preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const savedTheme = localStorage.getItem('theme');
-      const shouldUseDark = savedTheme ? savedTheme === 'dark' : prefersDark;
-      
-      setIsDark(shouldUseDark);
-      
-      // Apply dark class to document
-      if (shouldUseDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      
-      // Set theme color for mobile browsers
-      const metaThemeColor = document.querySelector("meta[name=theme-color]");
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute("content", "#58CC02");
-      }
-    } catch (error) {
-      console.error('App initialization error:', error);
-    }
-  }, []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      {showSplash ? (
-        <SplashScreen onComplete={() => setShowSplash(false)} />
-      ) : (
+  try {
+    return (
+      <QueryClientProvider client={queryClient}>
         <div style={{
           height: '100vh',
           maxWidth: '28rem',
           margin: '0 auto',
-          backgroundColor: isDark ? '#111827' : '#ffffff',
+          backgroundColor: '#ffffff',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          position: 'relative'
+          position: 'relative',
+          padding: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}>
-          <Router />
+          <div>PocketCoach Loading...</div>
         </div>
-      )}
-    </QueryClientProvider>
-  );
+      </QueryClientProvider>
+    );
+  } catch (error) {
+    console.error('App render error:', error);
+    return <div style={{padding: '20px'}}>Error loading app: {error.message}</div>;
+  }
 }
 
 export default App;
