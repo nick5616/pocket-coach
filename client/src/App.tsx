@@ -42,7 +42,7 @@ function Router() {
 
 function App() {
   const [isDark, setIsDark] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(false);
 
   useEffect(() => {
     try {
