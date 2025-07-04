@@ -2,7 +2,6 @@ import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import AuthPage from "@/pages/auth";
@@ -16,12 +15,31 @@ import Profile from "@/pages/profile-simple";
 import SplashScreen from "@/components/splash-screen";
 import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
-function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+function AppContent() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  
+  useEffect(() => {
+    // Check authentication status
+    fetch("/api/auth/user", { credentials: "include" })
+      .then(res => res.ok ? res.json() : null)
+      .then(user => setIsAuthenticated(!!user))
+      .catch(() => setIsAuthenticated(false));
+  }, []);
+
+  // Show loading state while checking auth
+  if (isAuthenticated === null) {
+    return <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh',
+      fontSize: '1.125rem' 
+    }}>Loading...</div>;
+  }
 
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
+      {!isAuthenticated ? (
         <Route path="/" component={AuthPage} />
       ) : (
         <>
@@ -87,7 +105,7 @@ function App() {
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           backgroundColor: isDark ? '#111827' : '#ffffff'
         }}>
-          <Router />
+          <AppContent />
         </div>
       )}
     </QueryClientProvider>
