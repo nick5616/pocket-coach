@@ -37,7 +37,9 @@ export default function Profile() {
     unit: "reps"
   });
   const { toast } = useToast();
-  const { user, isLoading: userLoading } = useAuth();
+  // const { user, isLoading: userLoading } = useAuth(); // Removed - auth handled in main App
+  const user = { id: "auth-user" }; // Placeholder
+  const userLoading = false;
 
   const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
     queryKey: ["/api/goals"],
