@@ -204,16 +204,9 @@ function AppContent() {
     return <AuthPage />;
   }
 
-  // Import the actual pages dynamically to avoid static references
-  const Home = () => import('./pages/home.tsx').then(m => m.default).catch(() => HomePage);
-  const Programs = () => import('./pages/programs.tsx').then(m => m.default).catch(() => HomePage);
-  const Profile = () => import('./pages/profile-simple.tsx').then(m => m.default).catch(() => HomePage);
-
   return (
     <Switch>
       <Route path="/" component={HomePage} />
-      <Route path="/programs" component={HomePage} />
-      <Route path="/profile" component={HomePage} />
       <Route>
         <div style={{ padding: "2rem", textAlign: "center" }}>
           <h1>Page Not Found</h1>
