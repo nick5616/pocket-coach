@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -8,31 +6,38 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const queryClient = useQueryClient();
-
-  const loginMutation = useMutation({
-    mutationFn: async (data: { email: string; password: string }) =>
-      apiRequest("/api/auth/login", "POST", data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-    },
-  });
-
-  const registerMutation = useMutation({
-    mutationFn: async (data: { email: string; password: string; firstName: string; lastName: string }) =>
-      apiRequest("/api/auth/register", "POST", data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLogin) {
-      loginMutation.mutate({ email, password });
-    } else {
-      registerMutation.mutate({ email, password, firstName, lastName });
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
+      const data = isLogin 
+        ? { email, password }
+        : { email, password, firstName, lastName };
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        // Successful auth - reload the page to trigger auth check
+        window.location.reload();
+      } else {
+        const errorData = await response.text();
+        setError(errorData || "Authentication failed");
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -169,7 +174,7 @@ export default function AuthPage() {
 
           <button
             type="submit"
-            disabled={loginMutation.isPending || registerMutation.isPending}
+            disabled={isLoading}
             style={{
               width: "100%",
               backgroundColor: "#059669",
@@ -179,23 +184,23 @@ export default function AuthPage() {
               border: "none",
               fontSize: "1rem",
               cursor: "pointer",
-              opacity: loginMutation.isPending || registerMutation.isPending ? 0.5 : 1
+              opacity: isLoading ? 0.5 : 1
             }}
           >
-            {loginMutation.isPending || registerMutation.isPending
+            {isLoading
               ? "Please wait..."
               : isLogin
               ? "Sign In"
               : "Create Account"}
           </button>
 
-          {(loginMutation.error || registerMutation.error) && (
+          {error && (
             <div style={{
               color: "#dc2626",
               fontSize: "0.875rem",
               textAlign: "center"
             }}>
-              {loginMutation.error?.message || registerMutation.error?.message}
+              {error}
             </div>
           )}
         </form>
