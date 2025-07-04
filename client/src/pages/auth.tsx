@@ -1,202 +1,132 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/Card";
-import { useToast } from "@/hooks/use-toast";
-import styles from "./auth.module.css";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function AuthPage() {
-  const [, setLocation] = useLocation();
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    firstName: "",
-    lastName: "",
-  });
-  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+  const queryClient = useQueryClient();
 
   const loginMutation = useMutation({
-    mutationFn: async (data: { email: string; password: string }) => {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-      return response.json();
-    },
+    mutationFn: async (data: { email: string; password: string }) =>
+      apiRequest("/api/auth/login", "POST", data),
     onSuccess: () => {
-      // Invalidate auth query to refetch user data
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      toast({
-        title: "Welcome back!",
-        description: "You've been logged in successfully.",
-      });
-      setLocation("/");
-    },
-    onError: () => {
-      toast({
-        title: "Login failed",
-        description: "Please check your email and password.",
-        variant: "destructive",
-      });
     },
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (data: { email: string; password: string; firstName?: string; lastName?: string }) => {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
-      }
-      return response.json();
-    },
+    mutationFn: async (data: { email: string; password: string; firstName: string; lastName: string }) =>
+      apiRequest("/api/auth/register", "POST", data),
     onSuccess: () => {
-      // Invalidate auth query to refetch user data
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      toast({
-        title: "Account created!",
-        description: "Welcome to Pocket Coach.",
-      });
-      setLocation("/");
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Registration failed",
-        description: error.message,
-        variant: "destructive",
-      });
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.email || !formData.password) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (isLogin) {
-      loginMutation.mutate({
-        email: formData.email,
-        password: formData.password,
-      });
+      loginMutation.mutate({ email, password });
     } else {
-      registerMutation.mutate({
-        email: formData.email,
-        password: formData.password,
-        firstName: formData.firstName || undefined,
-        lastName: formData.lastName || undefined,
-      });
+      registerMutation.mutate({ email, password, firstName, lastName });
     }
   };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const isLoading = loginMutation.isPending || registerMutation.isPending;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.content}>
-        <Card className={styles.authCard}>
-          <CardHeader>
-            <CardTitle className={styles.title}>
-              {isLogin ? "Welcome Back" : "Join Pocket Coach"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className={styles.form}>
-              <div className={styles.formField}>
-                <label htmlFor="email" className={styles.label}>Email</label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="your@email.com"
-                  required
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">PocketCoach</h1>
+          <p className="text-gray-600">Your Personal Fitness Journey</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {!isLogin && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required={!isLogin}
                 />
               </div>
-
-              <div className={styles.formField}>
-                <label htmlFor="password" className={styles.label}>Password</label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
-                  placeholder="Your password"
-                  required
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required={!isLogin}
                 />
               </div>
-
-              {!isLogin && (
-                <>
-                  <div className={styles.formField}>
-                    <label htmlFor="firstName" className={styles.label}>First Name (Optional)</label>
-                    <Input
-                      id="firstName"
-                      type="text"
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange("firstName", e.target.value)}
-                      placeholder="Your first name"
-                    />
-                  </div>
-
-                  <div className={styles.formField}>
-                    <label htmlFor="lastName" className={styles.label}>Last Name (Optional)</label>
-                    <Input
-                      id="lastName"
-                      type="text"
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange("lastName", e.target.value)}
-                      placeholder="Your last name"
-                    />
-                  </div>
-                </>
-              )}
-
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className={styles.submitButton}
-              >
-                {isLoading ? "Please wait..." : (isLogin ? "Sign In" : "Create Account")}
-              </Button>
-            </form>
-
-            <div className={styles.switchMode}>
-              <button
-                type="button"
-                onClick={() => setIsLogin(!isLogin)}
-                className={styles.switchButton}
-              >
-                {isLogin 
-                  ? "Don't have an account? Sign up" 
-                  : "Already have an account? Sign in"
-                }
-              </button>
             </div>
-          </CardContent>
-        </Card>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loginMutation.isPending || registerMutation.isPending}
+            className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
+          >
+            {loginMutation.isPending || registerMutation.isPending
+              ? "Please wait..."
+              : isLogin
+              ? "Sign In"
+              : "Create Account"}
+          </button>
+
+          {(loginMutation.error || registerMutation.error) && (
+            <div className="text-red-600 text-sm text-center">
+              {loginMutation.error?.message || registerMutation.error?.message}
+            </div>
+          )}
+        </form>
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => setIsLogin(!isLogin)}
+            className="text-green-600 hover:underline"
+          >
+            {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
+          </button>
+        </div>
       </div>
     </div>
   );

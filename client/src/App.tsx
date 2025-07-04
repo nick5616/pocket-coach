@@ -79,14 +79,9 @@ function App() {
       {showSplash ? (
         <SplashScreen onComplete={() => setShowSplash(false)} />
       ) : (
-        <div style={{
-          height: '100vh',
-          maxWidth: '28rem',
-          margin: '0 auto',
-          backgroundColor: isDark ? '#111827' : '#ffffff',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          position: 'relative'
-        }}>
+        <div className={`h-screen max-w-md mx-auto relative shadow-2xl ${
+          isDark ? 'bg-gray-900' : 'bg-white'
+        }`}>
           <Router />
         </div>
       )}
