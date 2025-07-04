@@ -1,82 +1,56 @@
-import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import NotFound from "@/pages/not-found";
-import Landing from "@/pages/landing";
-import AuthPage from "@/pages/auth";
-import Home from "@/pages/home";
-import Workouts from "@/pages/workouts";
-import WorkoutJournal from "@/pages/workout-journal";
-import ProgramWorkout from "@/pages/program-workout";
-import Progress from "@/pages/progress-simple";
-import Programs from "@/pages/programs-simple";
-import Profile from "@/pages/profile-simple";
-import SplashScreen from "@/components/splash-screen";
-import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
+import { useState } from "react";
 
-function AppContent() {
-  // Just show AuthPage for now until React is working
+// Simple test component to verify React works
+function SimpleAuth() {
+  const [email, setEmail] = useState("");
+  
   return (
-    <Switch>
-      <Route path="/" component={AuthPage} />
-      <Route component={NotFound} />
-    </Switch>
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #f0fff4 0%, #e6f3ff 100%)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "1rem"
+    }}>
+      <div style={{
+        backgroundColor: "white",
+        borderRadius: "8px",
+        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+        padding: "2rem",
+        width: "100%",
+        maxWidth: "400px"
+      }}>
+        <h1 style={{
+          fontSize: "2rem",
+          fontWeight: "bold",
+          color: "#1f2937",
+          marginBottom: "1rem",
+          textAlign: "center"
+        }}>PocketCoach</h1>
+        <p style={{ color: "#6b7280", textAlign: "center", marginBottom: "2rem" }}>
+          React hooks are working: {email.length} characters typed
+        </p>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Type to test React..."
+          style={{
+            width: "100%",
+            padding: "0.5rem 0.75rem",
+            border: "1px solid #d1d5db",
+            borderRadius: "0.375rem",
+            fontSize: "1rem"
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
 function App() {
-  const [isDark, setIsDark] = useState(false);
-  const [showSplash, setShowSplash] = useState(false);
-
-  useEffect(() => {
-    try {
-      // Initialize PWA features
-      registerServiceWorker();
-      setupPWAInstallPrompt();
-      
-      // Check for dark mode preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const savedTheme = localStorage.getItem('theme');
-      const shouldUseDark = savedTheme ? savedTheme === 'dark' : prefersDark;
-      
-      setIsDark(shouldUseDark);
-      
-      // Apply dark class to document
-      if (shouldUseDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      
-      // Set theme color for mobile browsers
-      const metaThemeColor = document.querySelector("meta[name=theme-color]");
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute("content", "#58CC02");
-      }
-    } catch (error) {
-      console.error('App initialization error:', error);
-    }
-  }, []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      {showSplash ? (
-        <SplashScreen onComplete={() => setShowSplash(false)} />
-      ) : (
-        <div style={{
-          height: '100vh',
-          maxWidth: '448px',
-          margin: '0 auto',
-          position: 'relative',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          backgroundColor: isDark ? '#111827' : '#ffffff'
-        }}>
-          <AppContent />
-        </div>
-      )}
-    </QueryClientProvider>
-  );
+  return <SimpleAuth />;
 }
 
 export default App;
