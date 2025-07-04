@@ -1,0 +1,48 @@
+2hook.js:608 Warning: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem. Error Component Stack
+    at AuthPage (auth.tsx:4:33)
+    at Route (wouter.js?v=85927175:278:16)
+    at Switch (wouter.js?v=85927175:334:17)
+    at Router (<anonymous>)
+    at div (<anonymous>)
+    at QueryClientProvider (@tanstack_react-query.js?v=63b9e4bd:2931:3)
+    at App (App.tsx:44:31)
+overrideMethod @ hook.js:608Understand this error
+chunk-UYNX3HOC.js?v=9dd588d9:1108 Uncaught TypeError: Cannot read properties of null (reading 'useState')
+    at useState (chunk-UYNX3HOC.js?v=9dd588d9:1108:29)
+    at AuthPage (auth.tsx:4:33)
+    at renderWithHooks (chunk-XBADDG25.js?v=4ca97812:11546:26)
+    at mountIndeterminateComponent (chunk-XBADDG25.js?v=4ca97812:14924:21)
+    at beginWork (chunk-XBADDG25.js?v=4ca97812:15912:22)
+    at HTMLUnknownElement.callCallback2 (chunk-XBADDG25.js?v=4ca97812:3672:22)
+    at Object.invokeGuardedCallbackDev (chunk-XBADDG25.js?v=4ca97812:3697:24)
+    at invokeGuardedCallback (chunk-XBADDG25.js?v=4ca97812:3731:39)
+    at beginWork$1 (chunk-XBADDG25.js?v=4ca97812:19763:15)
+    at performUnitOfWork (chunk-XBADDG25.js?v=4ca97812:19196:20)Understand this error
+hook.js:608 The above error occurred in the <AuthPage> component:
+
+    at AuthPage (https://b4352e61-2a57-4b85-90e4-7519670fa1dd-00-2wgkqx6bepp78.worf.replit.dev/src/pages/auth.tsx:21:33)
+    at Route (https://b4352e61-2a57-4b85-90e4-7519670fa1dd-00-2wgkqx6bepp78.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=85927175:278:16)
+    at Switch (https://b4352e61-2a57-4b85-90e4-7519670fa1dd-00-2wgkqx6bepp78.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=85927175:334:17)
+    at Router
+    at div
+    at QueryClientProvider (https://b4352e61-2a57-4b85-90e4-7519670fa1dd-00-2wgkqx6bepp78.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=63b9e4bd:2931:3)
+    at App (https://b4352e61-2a57-4b85-90e4-7519670fa1dd-00-2wgkqx6bepp78.worf.replit.dev/src/App.tsx?v=mUUBmBc4fQZsm73OkfBAX:105:31)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+overrideMethod @ hook.js:608Understand this error
+chunk-XBADDG25.js?v=4ca97812:19411 Uncaught TypeError: Cannot read properties of null (reading 'useState')
+    at useState (chunk-UYNX3HOC.js?v=9dd588d9:1108:29)
+    at AuthPage (auth.tsx:4:33)
+    at renderWithHooks (chunk-XBADDG25.js?v=4ca97812:11546:26)
+    at mountIndeterminateComponent (chunk-XBADDG25.js?v=4ca97812:14924:21)
+    at beginWork (chunk-XBADDG25.js?v=4ca97812:15912:22)
+    at beginWork$1 (chunk-XBADDG25.js?v=4ca97812:19751:22)
+    at performUnitOfWork (chunk-XBADDG25.js?v=4ca97812:19196:20)
+    at workLoopSync (chunk-XBADDG25.js?v=4ca97812:19135:13)
+    at renderRootSync (chunk-XBADDG25.js?v=4ca97812:19114:15)
+    at recoverFromConcurrentError (chunk-XBADDG25.js?v=4ca97812:18734:28)
