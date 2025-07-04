@@ -37,37 +37,80 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">PocketCoach</h1>
-          <p className="text-gray-600">Your Personal Fitness Journey</p>
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #f0fff4 0%, #e6f3ff 100%)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "1rem"
+    }}>
+      <div style={{
+        backgroundColor: "white",
+        borderRadius: "8px",
+        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+        padding: "2rem",
+        width: "100%",
+        maxWidth: "400px"
+      }}>
+        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <h1 style={{
+            fontSize: "2rem",
+            fontWeight: "bold",
+            color: "#1f2937",
+            marginBottom: "0.5rem"
+          }}>PocketCoach</h1>
+          <p style={{ color: "#6b7280" }}>Your Personal Fitness Journey</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           {!isLogin && (
-            <div className="grid grid-cols-2 gap-4">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: "500",
+                  color: "#374151",
+                  marginBottom: "0.5rem"
+                }}>
                   First Name
                 </label>
                 <input
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  style={{
+                    width: "100%",
+                    padding: "0.5rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "0.375rem",
+                    fontSize: "1rem"
+                  }}
                   required={!isLogin}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: "500",
+                  color: "#374151",
+                  marginBottom: "0.5rem"
+                }}>
                   Last Name
                 </label>
                 <input
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  style={{
+                    width: "100%",
+                    padding: "0.5rem 0.75rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "0.375rem",
+                    fontSize: "1rem"
+                  }}
                   required={!isLogin}
                 />
               </div>
@@ -75,27 +118,51 @@ export default function AuthPage() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label style={{
+              display: "block",
+              fontSize: "0.875rem",
+              fontWeight: "500",
+              color: "#374151",
+              marginBottom: "0.5rem"
+            }}>
               Email
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              style={{
+                width: "100%",
+                padding: "0.5rem 0.75rem",
+                border: "1px solid #d1d5db",
+                borderRadius: "0.375rem",
+                fontSize: "1rem"
+              }}
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label style={{
+              display: "block",
+              fontSize: "0.875rem",
+              fontWeight: "500",
+              color: "#374151",
+              marginBottom: "0.5rem"
+            }}>
               Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              style={{
+                width: "100%",
+                padding: "0.5rem 0.75rem",
+                border: "1px solid #d1d5db",
+                borderRadius: "0.375rem",
+                fontSize: "1rem"
+              }}
               required
             />
           </div>
@@ -103,7 +170,17 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loginMutation.isPending || registerMutation.isPending}
-            className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
+            style={{
+              width: "100%",
+              backgroundColor: "#059669",
+              color: "white",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.375rem",
+              border: "none",
+              fontSize: "1rem",
+              cursor: "pointer",
+              opacity: loginMutation.isPending || registerMutation.isPending ? 0.5 : 1
+            }}
           >
             {loginMutation.isPending || registerMutation.isPending
               ? "Please wait..."
@@ -113,16 +190,26 @@ export default function AuthPage() {
           </button>
 
           {(loginMutation.error || registerMutation.error) && (
-            <div className="text-red-600 text-sm text-center">
+            <div style={{
+              color: "#dc2626",
+              fontSize: "0.875rem",
+              textAlign: "center"
+            }}>
               {loginMutation.error?.message || registerMutation.error?.message}
             </div>
           )}
         </form>
 
-        <div className="mt-6 text-center">
+        <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="text-green-600 hover:underline"
+            style={{
+              color: "#059669",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              textDecoration: "underline"
+            }}
           >
             {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
           </button>
