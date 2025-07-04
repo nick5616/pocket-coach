@@ -7,7 +7,7 @@ import { Badge } from "@/components/Badge";
 import { Progress } from "@/components/Progress";
 import { ExerciseMuscleGroups } from "@/components/exercise-muscle-groups";
 import LoadingScreen from "@/components/loading-screen";
-import { useAuth } from "@/hooks/use-auth";
+// Removed useAuth import - authentication handled in main App
 import { useToast } from "@/hooks/use-toast";
 import {
   Play,
@@ -25,7 +25,7 @@ import styles from "./program-workout.module.css";
 export default function ProgramWorkout() {
   const { programId } = useParams();
   const [, setLocation] = useLocation();
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Removed - auth handled in main App
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDark, setIsDark] = useState(false);

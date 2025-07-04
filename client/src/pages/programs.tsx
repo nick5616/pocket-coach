@@ -7,7 +7,7 @@ import { Dialog } from "@/components/Dialog";
 import BottomNavigation from "@/components/bottom-navigation";
 import LoadingScreen from "@/components/loading-screen";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
+// Removed useAuth import
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";

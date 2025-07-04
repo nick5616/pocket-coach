@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/D
 import BottomNavigation from "@/components/bottom-navigation";
 import LoadingScreen from "@/components/loading-screen";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+// Removed useAuth import
 import { 
   User, 
   Settings, 
