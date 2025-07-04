@@ -168,7 +168,7 @@ function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/user", { credentials: "include" })
+    fetch("/api/auth/user", { credentials: "include" })
       .then(response => response.ok ? response.json() : null)
       .then(userData => {
         setUser(userData);
