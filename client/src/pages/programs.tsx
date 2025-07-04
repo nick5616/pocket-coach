@@ -44,11 +44,8 @@ const equipmentOptions = [
 export default function Programs() {
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
-  
-  if (!user) {
-    return <div className={styles.container}>Loading...</div>;
-  }
+  // const { user } = useAuth(); // Removed - auth handled in main App
+  const user = { id: "authenticated" }; // Placeholder since auth is handled in main App
 
   const form = useForm<ProgramFormData>({
     resolver: zodResolver(programGenerationSchema),
