@@ -2,6 +2,13 @@ import { useState, useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
+import Home from "./pages/home";
+import Programs from "./pages/programs";
+import Progress from "./pages/progress";
+import ProfileSimple from "./pages/profile-simple";
+import WorkoutJournal from "./pages/workout-journal";
+import ProgramWorkout from "./pages/program-workout";
+import BottomNavigation from "./components/bottom-navigation";
 
 // Authentication Page Component
 function AuthPage() {
@@ -153,15 +160,7 @@ function AuthPage() {
   );
 }
 
-// Simple Home Page
-function HomePage() {
-  return (
-    <div style={{ padding: "2rem", textAlign: "center" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>Welcome to PocketCoach</h1>
-      <p>Your fitness journey starts here!</p>
-    </div>
-  );
-}
+
 
 // Check authentication status
 function useAuth() {
@@ -205,15 +204,25 @@ function AppContent() {
   }
 
   return (
-    <Switch>
-      <Route path="/" component={HomePage} />
-      <Route>
-        <div style={{ padding: "2rem", textAlign: "center" }}>
-          <h1>Page Not Found</h1>
-          <a href="/" style={{ color: "#059669" }}>Go Home</a>
-        </div>
-      </Route>
-    </Switch>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      <div style={{ flex: 1, overflow: 'auto' }}>
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/programs" component={Programs} />
+          <Route path="/progress" component={Progress} />
+          <Route path="/profile" component={ProfileSimple} />
+          <Route path="/workouts/:id?" component={WorkoutJournal} />
+          <Route path="/workouts/program/:programId" component={ProgramWorkout} />
+          <Route>
+            <div style={{ padding: "2rem", textAlign: "center" }}>
+              <h1>Page Not Found</h1>
+              <a href="/" style={{ color: "#059669" }}>Go Home</a>
+            </div>
+          </Route>
+        </Switch>
+      </div>
+      <BottomNavigation />
+    </div>
   );
 }
 
