@@ -16,43 +16,10 @@ import SplashScreen from "@/components/splash-screen";
 import { registerServiceWorker, setupPWAInstallPrompt } from "@/lib/pwa";
 
 function AppContent() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  
-  useEffect(() => {
-    // Check authentication status
-    fetch("/api/auth/user", { credentials: "include" })
-      .then(res => res.ok ? res.json() : null)
-      .then(user => setIsAuthenticated(!!user))
-      .catch(() => setIsAuthenticated(false));
-  }, []);
-
-  // Show loading state while checking auth
-  if (isAuthenticated === null) {
-    return <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      height: '100vh',
-      fontSize: '1.125rem' 
-    }}>Loading...</div>;
-  }
-
+  // Just show AuthPage for now until React is working
   return (
     <Switch>
-      {!isAuthenticated ? (
-        <Route path="/" component={AuthPage} />
-      ) : (
-        <>
-          <Route path="/" component={Home} />
-          <Route path="/workouts" component={Workouts} />
-          <Route path="/workout-journal" component={WorkoutJournal} />
-          <Route path="/workout-journal/:id" component={WorkoutJournal} />
-          <Route path="/workouts/program/:programId" component={ProgramWorkout} />
-          <Route path="/progress" component={Progress} />
-          <Route path="/programs" component={Programs} />
-          <Route path="/profile" component={Profile} />
-        </>
-      )}
+      <Route path="/" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>
   );
