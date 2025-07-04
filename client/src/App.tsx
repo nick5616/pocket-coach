@@ -227,6 +227,7 @@ function AppContent() {
 }
 
 function App() {
+  console.log("PocketCoach: App component rendering");
   return (
     <QueryClientProvider client={queryClient}>
       <div style={{
