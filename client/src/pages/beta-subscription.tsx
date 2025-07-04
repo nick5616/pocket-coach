@@ -1,3 +1,5 @@
+import React from "react";
+
 export default function BetaSubscription() {
-  return null;
+  return <div>Beta Subscription Page</div>;
 }

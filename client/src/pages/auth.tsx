@@ -1,3 +1,5 @@
+import React from "react";
+
 export default function Auth() {
-  return null;
+  return <div>Auth Page</div>;
 }

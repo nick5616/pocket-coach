@@ -1,3 +1,5 @@
+import React from "react";
+
 export default function Demo() {
-  return null;
+  return <div>Demo Page</div>;
 }

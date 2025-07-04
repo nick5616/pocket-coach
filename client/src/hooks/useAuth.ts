@@ -1,3 +1,7 @@
 export function useAuth() {
-  return { user: null, isLoading: false, isAuthenticated: false };
+  return { 
+    user: null as any, 
+    isLoading: false, 
+    isAuthenticated: false 
+  };
 }
