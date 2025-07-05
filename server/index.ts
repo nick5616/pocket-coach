@@ -1,4 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
+import fs from "fs";
+import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -63,6 +65,32 @@ app.use((req, res, next) => {
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
+    // Check if static files exist, if not try to copy them
+    const staticPath = path.resolve(import.meta.dirname, "public");
+    const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
+    
+    if (!fs.existsSync(staticPath) && fs.existsSync(distPath)) {
+      log("Static files not found, copying from dist/public...");
+      try {
+        await fs.promises.mkdir(staticPath, { recursive: true });
+        const files = await fs.promises.readdir(distPath);
+        for (const file of files) {
+          const srcFile = path.join(distPath, file);
+          const destFile = path.join(staticPath, file);
+          const stat = await fs.promises.stat(srcFile);
+          if (stat.isDirectory()) {
+            await fs.promises.cp(srcFile, destFile, { recursive: true });
+          } else {
+            await fs.promises.copyFile(srcFile, destFile);
+          }
+        }
+        log("Static files copied successfully!");
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        log(`Error copying static files: ${errorMessage}`);
+      }
+    }
+    
     serveStatic(app);
   }
 
