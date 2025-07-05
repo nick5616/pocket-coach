@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { z } from "zod";
+import passport from "passport";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
 import { 
@@ -17,34 +18,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Auth routes
-  app.post('/api/auth/login', async (req, res) => {
-    try {
-      const { email, password } = req.body;
-      
-      if (!email || !password) {
-        return res.status(400).json({ message: "Email and password required" });
+  app.post('/api/auth/login', (req, res, next) => {
+    passport.authenticate('local', (err: any, user: any, info: any) => {
+      if (err) {
+        console.error("Login error:", err);
+        return res.status(500).json({ message: "Login failed" });
       }
-      
-      const user = await storage.getUserByEmail(email);
-      if (!user || !user.passwordHash) {
+      if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
-      const bcrypt = await import('bcrypt');
-      const isValid = await bcrypt.compare(password, user.passwordHash);
-      if (!isValid) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-      
-      // Set session
-      (req.session as any).userId = user.id;
-      
-      const { passwordHash, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
-    } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ message: "Login failed" });
-    }
+      req.logIn(user, (err) => {
+        if (err) {
+          console.error("Session creation error:", err);
+          return res.status(500).json({ message: "Login failed" });
+        }
+        
+        const { passwordHash, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
+      });
+    })(req, res, next);
   });
 
   app.post('/api/auth/register', async (req, res) => {
