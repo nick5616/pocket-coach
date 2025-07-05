@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
+import { ThemeProvider } from "./components/theme-provider";
 import Home from "./pages/home";
 import Programs from "./pages/programs";
 import Progress from "./pages/progress";
@@ -231,16 +232,19 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div style={{
-        height: '100vh',
-        maxWidth: '448px',
-        margin: '0 auto',
-        position: 'relative',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        backgroundColor: '#ffffff'
-      }}>
-        <AppContent />
-      </div>
+      <ThemeProvider>
+        <div style={{
+          height: '100vh',
+          maxWidth: '28rem',
+          margin: '0 auto',
+          position: 'relative',
+          backgroundColor: 'var(--bg-primary)',
+          boxShadow: '0 0 0 1px var(--border-primary), 0 10px 15px -3px var(--shadow-color)',
+          transition: 'all 0.2s ease'
+        }}>
+          <AppContent />
+        </div>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
