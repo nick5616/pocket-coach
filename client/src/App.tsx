@@ -8,6 +8,7 @@ import Progress from "./pages/progress";
 import ProfileSimple from "./pages/profile-simple";
 import WorkoutJournal from "./pages/workout-journal";
 import ProgramWorkout from "./pages/program-workout";
+import Workouts from "./pages/workouts";
 import BottomNavigation from "./components/bottom-navigation";
 
 // Authentication Page Component
@@ -211,7 +212,8 @@ function AppContent() {
           <Route path="/programs" component={Programs} />
           <Route path="/progress" component={Progress} />
           <Route path="/profile" component={ProfileSimple} />
-          <Route path="/workouts/:id?" component={WorkoutJournal} />
+          <Route path="/workouts" component={Workouts} />
+          <Route path="/workout-journal/:id?" component={WorkoutJournal} />
           <Route path="/workouts/program/:programId" component={ProgramWorkout} />
           <Route>
             <div style={{ padding: "2rem", textAlign: "center" }}>

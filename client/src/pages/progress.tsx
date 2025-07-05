@@ -31,27 +31,24 @@ interface MuscleProgress {
 }
 
 export default function Progress() {
+  const [selectedTab, setSelectedTab] = useState<'body' | 'goals' | 'insights'>('body');
   const [selectedMuscles, setSelectedMuscles] = useState<number[]>([]);
   const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | null>(null);
   const [showMuscleDetails, setShowMuscleDetails] = useState(false);
   
-  const userId = 1;
-
   const { data: workouts = [], isLoading: workoutsLoading } = useQuery<Workout[]>({
-    queryKey: ["/api/workouts", { userId }],
-    queryFn: () => fetch(`/api/workouts?userId=${userId}`).then(res => res.json()),
+    queryKey: ["/api/workouts"],
   });
 
   const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
-    queryKey: ["/api/goals", { userId }],
-    queryFn: () => fetch(`/api/goals?userId=${userId}`).then(res => res.json()),
+    queryKey: ["/api/goals"],
   });
 
   const { data: muscleProgress, isLoading: progressLoading } = useQuery<MuscleProgress>({
-    queryKey: ["/api/muscle-groups", selectedMuscle?.id, "progress", userId],
+    queryKey: ["/api/muscle-groups", selectedMuscle?.id, "progress"],
     queryFn: async () => {
       if (!selectedMuscle) return null;
-      const response = await fetch(`/api/muscle-groups/${selectedMuscle.id}/progress?userId=${userId}`);
+      const response = await fetch(`/api/muscle-groups/${selectedMuscle.id}/progress`);
       if (!response.ok) throw new Error('Failed to fetch muscle progress');
       return response.json();
     },
@@ -93,378 +90,451 @@ export default function Progress() {
   };
 
   // Show loading screen if any essential data is still loading
-  const isLoading = workoutsLoading || goalsLoading || progressLoading;
+  const isLoading = workoutsLoading || goalsLoading;
 
   if (isLoading) {
     return <LoadingScreen message="Analyzing your progress data..." />;
   }
 
   return (
-    <>
-      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-8 z-40">
-        <h1 className="text-lg font-bold text-gray-900">Progress</h1>
+    <div className="page">
+      {/* Header */}
+      <header className="page-header">
+        <div className="container">
+          <h1 className="text-heading-2">Progress</h1>
+        </div>
       </header>
 
-      <main className="pb-20">
+      <div className="page-content">
         {/* Stats Overview */}
-        <section className="px-4 py-6" style={{
-          background: 'linear-gradient(135deg, #65a30d 0%, #16a34a 100%)',
-          color: 'white'
+        <section style={{
+          background: 'linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%)',
+          color: 'white',
+          padding: 'var(--spacing-xl) var(--spacing-md)'
         }}>
-          <h2 className="text-xl font-bold mb-4" style={{color: '#ffffff'}}>Your Stats</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="rounded-xl p-3 text-center" style={{
-              backgroundColor: 'rgba(21, 128, 61, 0.7)',
-              border: '1px solid rgba(34, 197, 94, 0.4)'
-            }}>
-              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{progressStats.totalWorkouts}</div>
-              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Total Workouts</div>
-            </div>
-            <div className="rounded-xl p-3 text-center" style={{
-              backgroundColor: 'rgba(21, 128, 61, 0.7)',
-              border: '1px solid rgba(34, 197, 94, 0.4)'
-            }}>
-              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{Math.round(progressStats.totalTime / 60)}h</div>
-              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Time Trained</div>
-            </div>
-            <div className="rounded-xl p-3 text-center" style={{
-              backgroundColor: 'rgba(21, 128, 61, 0.7)',
-              border: '1px solid rgba(34, 197, 94, 0.4)'
-            }}>
-              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>
-                {progressStats.totalVolume > 0 ? `${Math.round(progressStats.totalVolume / 1000)}K` : "0"}
+          <div className="container">
+            <h2 className="text-heading-2" style={{ color: 'white', marginBottom: 'var(--spacing-lg)' }}>Your Stats</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--spacing-md)' }}>
+              <div className="stat-card" style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.15)', 
+                borderColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}>
+                <div className="stat-value" style={{ color: 'white' }}>{progressStats.totalWorkouts}</div>
+                <div className="stat-label" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Total Workouts</div>
               </div>
-              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Volume (lbs)</div>
-            </div>
-            <div className="rounded-xl p-3 text-center" style={{
-              backgroundColor: 'rgba(21, 128, 61, 0.7)',
-              border: '1px solid rgba(34, 197, 94, 0.4)'
-            }}>
-              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{progressStats.currentStreak}</div>
-              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Day Streak</div>
+              <div className="stat-card" style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.15)', 
+                borderColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}>
+                <div className="stat-value" style={{ color: 'white' }}>{Math.round(progressStats.totalTime / 60)}h</div>
+                <div className="stat-label" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Time Trained</div>
+              </div>
+              <div className="stat-card" style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.15)', 
+                borderColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}>
+                <div className="stat-value" style={{ color: 'white' }}>
+                  {progressStats.totalVolume > 0 ? `${Math.round(progressStats.totalVolume / 1000)}K` : "0"}
+                </div>
+                <div className="stat-label" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Volume (lbs)</div>
+              </div>
+              <div className="stat-card" style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.15)', 
+                borderColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}>
+                <div className="stat-value" style={{ color: 'white' }}>{progressStats.currentStreak}</div>
+                <div className="stat-label" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Day Streak</div>
+              </div>
             </div>
           </div>
         </section>
 
-        <Tabs defaultValue="body" className="px-4 py-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="body">Body Map</TabsTrigger>
-            <TabsTrigger value="goals">Goals</TabsTrigger>
-            <TabsTrigger value="insights">Insights</TabsTrigger>
-          </TabsList>
+        <div className="container" style={{ paddingTop: 'var(--spacing-xl)' }}>
+          {/* Tab Navigation */}
+          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              width: '100%',
+              background: 'var(--gray-100)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--spacing-xs)',
+              gap: 'var(--spacing-xs)'
+            }}>
+              <button
+                className={`btn ${selectedTab === 'body' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setSelectedTab('body')}
+                style={{ margin: 0, fontSize: '0.75rem', padding: 'var(--spacing-xs) var(--spacing-sm)' }}
+              >
+                Body Map
+              </button>
+              <button
+                className={`btn ${selectedTab === 'goals' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setSelectedTab('goals')}
+                style={{ margin: 0, fontSize: '0.75rem', padding: 'var(--spacing-xs) var(--spacing-sm)' }}
+              >
+                Goals
+              </button>
+              <button
+                className={`btn ${selectedTab === 'insights' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setSelectedTab('insights')}
+                style={{ margin: 0, fontSize: '0.75rem', padding: 'var(--spacing-xs) var(--spacing-sm)' }}
+              >
+                Insights
+              </button>
+            </div>
+          </div>
 
-          <TabsContent value="body" className="space-y-6 mt-6">
-            {/* Body Visualization */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="flex items-center">
-                    <Activity className="h-5 w-5 mr-2 text-blue-600" />
-                    Muscle Group Progress
-                  </span>
+          {/* Tab Content */}
+          {selectedTab === 'body' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+              {/* Body Visualization */}
+              <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                <h3 className="text-heading-3" style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  marginBottom: 'var(--spacing-lg)' 
+                }}>
+                  <Activity style={{ width: '1.25rem', height: '1.25rem', marginRight: 'var(--spacing-sm)', color: 'var(--secondary-600)' }} />
+                  Muscle Group Progress
                   {selectedMuscles.length > 0 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
+                    <button
+                      className="btn btn-secondary"
                       onClick={() => setSelectedMuscles([])}
+                      style={{ marginLeft: 'auto', fontSize: '0.75rem', padding: 'var(--spacing-xs) var(--spacing-sm)' }}
                     >
                       Clear Selection
-                    </Button>
+                    </button>
                   )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BodyVisualization
-                  userId={userId}
-                  onMuscleSelect={handleMuscleSelect}
-                  selectedMuscles={selectedMuscles}
-                />
+                </h3>
+                
+                {/* Placeholder for BodyVisualization */}
+                <div style={{
+                  height: '20rem',
+                  background: 'var(--gray-50)',
+                  borderRadius: 'var(--radius-lg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2px dashed var(--gray-200)'
+                }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <Activity style={{ width: '3rem', height: '3rem', color: 'var(--gray-400)', margin: '0 auto var(--spacing-md)' }} />
+                    <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-sm)' }}>Body Visualization</h4>
+                    <p className="text-body">Interactive muscle group heat map coming soon</p>
+                  </div>
+                </div>
                 
                 {selectedMuscles.length > 0 && (
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                    <h4 className="font-medium text-blue-900 mb-2">Selected Muscle Groups</h4>
-                    <div className="flex flex-wrap gap-2">
+                  <div style={{
+                    marginTop: 'var(--spacing-lg)',
+                    padding: 'var(--spacing-lg)',
+                    background: 'var(--secondary-50)',
+                    borderRadius: 'var(--radius-lg)'
+                  }}>
+                    <h4 className="text-heading-3" style={{ color: 'var(--secondary-700)', marginBottom: 'var(--spacing-md)' }}>
+                      Selected Muscle Groups
+                    </h4>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-lg)' }}>
                       {selectedMuscles.map(muscleId => (
-                        <Badge key={muscleId} variant="secondary">
+                        <Badge key={muscleId} style={{ background: 'var(--secondary-100)', color: 'var(--secondary-700)' }}>
                           Muscle {muscleId}
                         </Badge>
                       ))}
                     </div>
-                    <Button
-                      className="mt-3 w-full"
+                    <button
+                      className="btn btn-primary"
                       onClick={() => {
-                        // TODO: Integrate with AI program generation
                         console.log("Generate program for muscles:", selectedMuscles);
                       }}
+                      style={{ width: '100%' }}
                     >
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus style={{ width: '1rem', height: '1rem', marginRight: 'var(--spacing-sm)' }} />
                       Generate Program for Selected Muscles
-                    </Button>
+                    </button>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Target className="h-5 w-5 mr-2 text-green-600" />
+              {/* Quick Actions */}
+              <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                <h3 className="text-heading-3" style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  marginBottom: 'var(--spacing-lg)' 
+                }}>
+                  <Target style={{ width: '1.25rem', height: '1.25rem', marginRight: 'var(--spacing-sm)', color: 'var(--primary-600)' }} />
                   Quick Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-between"
-                  onClick={() => {
-                    // TODO: Navigate to workout creation with muscle focus
-                  }}
-                >
-                  <span className="flex items-center">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Start Targeted Workout
-                  </span>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-between"
-                  onClick={() => {
-                    // TODO: Navigate to goal creation
-                  }}
-                >
-                  <span className="flex items-center">
-                    <Target className="h-4 w-4 mr-2" />
-                    Set Muscle Group Goal
-                  </span>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                  <button className="btn btn-secondary" style={{ 
+                    width: '100%', 
+                    justifyContent: 'space-between',
+                    padding: 'var(--spacing-md)'
+                  }}>
+                    <span style={{ display: 'flex', alignItems: 'center' }}>
+                      <Plus style={{ width: '1rem', height: '1rem', marginRight: 'var(--spacing-sm)' }} />
+                      Start Targeted Workout
+                    </span>
+                    <ChevronRight style={{ width: '1rem', height: '1rem' }} />
+                  </button>
+                  
+                  <button className="btn btn-secondary" style={{ 
+                    width: '100%', 
+                    justifyContent: 'space-between',
+                    padding: 'var(--spacing-md)'
+                  }}>
+                    <span style={{ display: 'flex', alignItems: 'center' }}>
+                      <Target style={{ width: '1rem', height: '1rem', marginRight: 'var(--spacing-sm)' }} />
+                      Set Muscle Group Goal
+                    </span>
+                    <ChevronRight style={{ width: '1rem', height: '1rem' }} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
-          <TabsContent value="goals" className="space-y-4 mt-6">
-            {goals.length > 0 ? (
-              goals.map((goal) => {
-                const progress = goal.targetValue ? 
-                  Math.min(100, (goal.currentValue! / goal.targetValue) * 100) : 0;
-                
-                return (
-                  <Card key={goal.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                            <Target className="h-5 w-5 text-green-600" />
+          {selectedTab === 'goals' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+              {goals.length > 0 ? (
+                goals.map((goal) => {
+                  const progress = goal.targetValue ? 
+                    Math.min(100, (goal.currentValue! / goal.targetValue) * 100) : 0;
+                  
+                  return (
+                    <div key={goal.id} className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--spacing-md)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div style={{
+                            width: '2.5rem',
+                            height: '2.5rem',
+                            background: 'var(--primary-100)',
+                            borderRadius: 'var(--radius-lg)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginRight: 'var(--spacing-md)'
+                          }}>
+                            <Target style={{ width: '1.25rem', height: '1.25rem', color: 'var(--primary-600)' }} />
                           </div>
                           <div>
-                            <h4 className="font-semibold text-gray-900">{goal.title}</h4>
-                            <p className="text-sm text-gray-500 capitalize">{goal.category}</p>
+                            <h4 className="text-heading-3">{goal.title}</h4>
+                            <p className="text-body" style={{ textTransform: 'capitalize' }}>{goal.category}</p>
                           </div>
                         </div>
-                        <Badge 
-                          className={
-                            progress >= 80 ? "bg-green-100 text-green-600" :
-                            progress >= 50 ? "bg-orange-100 text-orange-600" :
-                            "bg-gray-100 text-gray-600"
-                          }
-                        >
+                        <Badge style={{
+                          background: progress >= 80 ? 'var(--success)' :
+                                    progress >= 50 ? 'var(--warning)' : 'var(--gray-400)',
+                          color: 'white'
+                        }}>
                           {Math.round(progress)}%
                         </Badge>
                       </div>
 
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Progress</span>
-                          <span>
+                      <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
+                          <span className="text-body">Progress</span>
+                          <span className="text-body">
                             {goal.currentValue || 0} / {goal.targetValue} {goal.unit}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-green-600 h-2 rounded-full transition-all duration-300" 
-                            style={{ width: `${progress}%` }}
-                          />
+                        <div style={{
+                          width: '100%',
+                          height: '0.5rem',
+                          background: 'var(--gray-200)',
+                          borderRadius: 'var(--radius-sm)',
+                          overflow: 'hidden'
+                        }}>
+                          <div style={{
+                            width: `${progress}%`,
+                            height: '100%',
+                            background: progress >= 80 ? 'var(--success)' :
+                                      progress >= 50 ? 'var(--warning)' : 'var(--gray-400)',
+                            transition: 'width 0.3s ease',
+                            borderRadius: 'var(--radius-sm)'
+                          }} />
                         </div>
                       </div>
 
                       {goal.description && (
-                        <p className="text-sm text-gray-600 mt-3">{goal.description}</p>
+                        <p className="text-body" style={{ marginBottom: 'var(--spacing-md)' }}>{goal.description}</p>
                       )}
 
                       {goal.targetDate && (
-                        <div className="flex items-center text-xs text-gray-500 mt-2">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          Target: {new Date(goal.targetDate).toLocaleDateString()}
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <Calendar style={{ width: '0.875rem', height: '0.875rem', marginRight: 'var(--spacing-xs)', color: 'var(--gray-400)' }} />
+                          <span className="text-caption">
+                            Target: {new Date(goal.targetDate).toLocaleDateString()}
+                          </span>
                         </div>
                       )}
-                    </CardContent>
-                  </Card>
-                );
-              })
-            ) : (
-              <Card className="border-dashed border-2 border-gray-200">
-                <CardContent className="p-8 text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Target className="h-8 w-8 text-gray-400" />
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="card" style={{ 
+                  padding: 'var(--spacing-2xl)', 
+                  textAlign: 'center',
+                  border: '2px dashed var(--gray-200)'
+                }}>
+                  <div style={{
+                    width: '4rem',
+                    height: '4rem',
+                    background: 'var(--gray-100)',
+                    borderRadius: 'var(--radius-xl)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto var(--spacing-lg)'
+                  }}>
+                    <Target style={{ width: '2rem', height: '2rem', color: 'var(--gray-400)' }} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No goals set</h3>
-                  <p className="text-gray-500 mb-4">
+                  <h3 className="text-heading-3" style={{ marginBottom: 'var(--spacing-sm)' }}>No goals set</h3>
+                  <p className="text-body" style={{ marginBottom: 'var(--spacing-lg)' }}>
                     Set fitness goals to track your progress and stay motivated!
                   </p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="insights" className="space-y-4 mt-6">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-start">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                    <span className="text-green-600"><TrendingUp className="h-5 w-5" /></span>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">Strength Gains Detected</h4>
-                    <p className="text-sm text-gray-600">Your bench press has improved 8% over the last 3 weeks</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-start">
-                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                    <span className="text-orange-600"><Flame className="h-5 w-5" /></span>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">Consistency Champion</h4>
-                    <p className="text-sm text-gray-600">7 day workout streak! Keep the momentum going</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-start">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                    <span className="text-blue-600"><Zap className="h-5 w-5" /></span>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">Volume Milestone</h4>
-                    <p className="text-sm text-gray-600">You've lifted over 50,000 lbs this month!</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* AI Insights */}
-            <Card className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-0">
-              <CardContent className="p-4">
-                <h4 className="font-semibold mb-2 flex items-center">
-                  <BarChart3 className="h-5 w-5 mr-2" />
-                  AI Pattern Analysis
-                </h4>
-                <p className="text-purple-100 text-sm mb-3">
-                  Your workout intensity has been increasing steadily. Consider adding a deload week to prevent overtraining.
-                </p>
-                <div className="flex gap-2">
-                  <Badge className="bg-white/20 text-white border-white/30">
-                    Strength Focus
-                  </Badge>
-                  <Badge className="bg-white/20 text-white border-white/30">
-                    Progressive Overload
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
-
-      {/* Muscle Details Modal */}
-      <Dialog open={showMuscleDetails} onOpenChange={setShowMuscleDetails}>
-        <DialogContent className="max-w-sm mx-auto">
-          <DialogHeader>
-            <DialogTitle>{selectedMuscle?.displayName} Progress</DialogTitle>
-          </DialogHeader>
-          
-          {selectedMuscle && (
-            <div className="space-y-4">
-              {progressLoading ? (
-                <div className="flex items-center justify-center h-24">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                </div>
-              ) : muscleProgress ? (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <div className="text-lg font-bold text-gray-900">{muscleProgress.frequency}</div>
-                      <div className="text-xs text-gray-500">Workouts</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <div className="text-lg font-bold text-gray-900">
-                        {muscleProgress.volume > 0 ? `${Math.round(muscleProgress.volume / 1000)}K` : "0"}
-                      </div>
-                      <div className="text-xs text-gray-500">Volume (lbs)</div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Training Intensity</span>
-                      <span className="text-sm text-gray-500">
-                        {Math.round(muscleProgress.intensity * 100)}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                        style={{ width: `${muscleProgress.intensity * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Clock className="h-4 w-4 mr-2" />
-                    Last trained: {formatLastWorked(muscleProgress.lastWorked)}
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button
-                      className="flex-1"
-                      onClick={() => {
-                        handleMuscleToggle(selectedMuscle);
-                        setShowMuscleDetails(false);
-                      }}
-                    >
-                      Add to Selection
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        // TODO: Set goal for this muscle group
-                      }}
-                    >
-                      <Target className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center text-gray-500">
-                  No progress data available
                 </div>
               )}
             </div>
           )}
-        </DialogContent>
-      </Dialog>
 
-      <BottomNavigation />
-    </>
+          {selectedTab === 'insights' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+              <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{
+                    width: '2.5rem',
+                    height: '2.5rem',
+                    background: 'var(--primary-100)',
+                    borderRadius: 'var(--radius-lg)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 'var(--spacing-md)',
+                    flexShrink: 0
+                  }}>
+                    <TrendingUp style={{ width: '1.25rem', height: '1.25rem', color: 'var(--primary-600)' }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>Strength Gains Detected</h4>
+                    <p className="text-body">Your bench press has improved 8% over the last 3 weeks</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{
+                    width: '2.5rem',
+                    height: '2.5rem',
+                    background: 'var(--warning)',
+                    borderRadius: 'var(--radius-lg)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 'var(--spacing-md)',
+                    flexShrink: 0
+                  }}>
+                    <Flame style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>Consistency Champion</h4>
+                    <p className="text-body">7 day workout streak! Keep the momentum going</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{
+                    width: '2.5rem',
+                    height: '2.5rem',
+                    background: 'var(--secondary-500)',
+                    borderRadius: 'var(--radius-lg)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 'var(--spacing-md)',
+                    flexShrink: 0
+                  }}>
+                    <Zap style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>Volume Milestone</h4>
+                    <p className="text-body">You've lifted over 50,000 lbs this month!</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* AI Insights */}
+              <div className="card" style={{ 
+                padding: 'var(--spacing-lg)',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+                color: 'white',
+                border: 'none'
+              }}>
+                <h4 className="text-heading-3" style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  color: 'white',
+                  marginBottom: 'var(--spacing-md)' 
+                }}>
+                  <BarChart3 style={{ width: '1.25rem', height: '1.25rem', marginRight: 'var(--spacing-sm)' }} />
+                  AI Pattern Analysis
+                </h4>
+                <p className="text-body" style={{ color: 'rgba(255, 255, 255, 0.9)', marginBottom: 'var(--spacing-md)' }}>
+                  Your workout intensity has been increasing steadily. Consider adding a deload week to optimize recovery.
+                </p>
+                <button className="btn" style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  color: 'white',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  fontSize: '0.875rem'
+                }}>
+                  <TrendingUp style={{ width: '1rem', height: '1rem', marginRight: 'var(--spacing-sm)' }} />
+                  View Full Analysis
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Muscle Details Dialog */}
+        {showMuscleDetails && selectedMuscle && (
+          <Dialog open={showMuscleDetails} onOpenChange={setShowMuscleDetails}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{selectedMuscle.name} Progress</DialogTitle>
+              </DialogHeader>
+              <div style={{ padding: 'var(--spacing-md)' }}>
+                {muscleProgress ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span className="text-body">Frequency</span>
+                      <span className="text-body">{muscleProgress.frequency}x/week</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span className="text-body">Volume</span>
+                      <span className="text-body">{muscleProgress.volume.toLocaleString()} lbs</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span className="text-body">Last Worked</span>
+                      <span className="text-body">{formatLastWorked(muscleProgress.lastWorked)}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-body">Loading muscle group data...</p>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
+    </div>
   );
 }
