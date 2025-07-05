@@ -110,6 +110,13 @@ The application uses a comprehensive PostgreSQL schema with the following core e
 
 ## Recent Changes
 
+- July 4, 2025: **COMPLETED** - Fixed Critical Service Worker Cache Issue Causing Next.js Errors
+  - Identified root cause: Service worker was serving cached Next.js content instead of current Vite React application
+  - Created temporary cleanup service worker to clear all browser caches and unregister existing service workers
+  - Fixed API endpoint mismatch from `/api/user` to `/api/auth/user` for proper authentication flow
+  - Restored proper service worker functionality with network-first caching strategy for development
+  - Application now loads correctly without React Fast Refresh errors or Next.js conflicts
+  - Authentication flow working properly with correct JSON API responses
 - June 23, 2025: **COMPLETED** - Complete CSS Modules Migration for Program Workout Page
   - Converted entire program-workout page from Tailwind CSS to CSS Modules architecture
   - Fixed viewport height background issue ensuring proper full-screen display

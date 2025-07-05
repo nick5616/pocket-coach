@@ -1,41 +1,58 @@
-// Service Worker Cleanup - This will unregister itself and clear caches
-console.log('PocketCoach: Service Worker cleanup starting');
+const CACHE_NAME = 'pocket-coach-v2';
+const urlsToCache = [
+  '/',
+  '/manifest.json',
+  '/src/index.css'
+];
 
-// Clear all caches on install
+// Install event
 self.addEventListener('install', function(event) {
-  console.log('PocketCoach: Clearing all caches');
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        console.log('PocketCoach: Service Worker installed');
+        return cache.addAll(urlsToCache);
+      })
+  );
+  self.skipWaiting();
+});
+
+// Activate event
+self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(
         cacheNames.map(function(cacheName) {
-          console.log('PocketCoach: Deleting cache:', cacheName);
-          return caches.delete(cacheName);
+          if (cacheName !== CACHE_NAME) {
+            console.log('PocketCoach: Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
         })
       );
     })
   );
-  // Force activation
-  self.skipWaiting();
+  self.clients.claim();
 });
 
-// Activate and unregister
-self.addEventListener('activate', function(event) {
-  console.log('PocketCoach: Service Worker activating and self-destructing');
-  event.waitUntil(
-    self.registration.unregister().then(function() {
-      console.log('PocketCoach: Service Worker unregistered successfully');
-      return self.clients.matchAll();
-    }).then(function(clients) {
-      clients.forEach(client => {
-        console.log('PocketCoach: Reloading client');
-        client.navigate(client.url);
-      });
-    })
-  );
-});
-
-// Don't intercept any fetches - let everything go to network
+// Fetch event - network first strategy for development
 self.addEventListener('fetch', function(event) {
-  // Do nothing - let all requests go to network
-  return;
+  // Always try network first in development
+  event.respondWith(
+    fetch(event.request)
+      .then(function(response) {
+        // If network request succeeds, cache it
+        if (response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME)
+            .then(function(cache) {
+              cache.put(event.request, responseClone);
+            });
+        }
+        return response;
+      })
+      .catch(function() {
+        // If network fails, try cache
+        return caches.match(event.request);
+      })
+  );
 });
