@@ -230,6 +230,15 @@ function AppContent() {
 }
 
 function App() {
+  // Initialize theme on app load
+  useEffect(() => {
+    const root = window.document.documentElement;
+    // Ensure light theme is applied by default if no theme is set
+    if (!root.classList.contains('light') && !root.classList.contains('dark')) {
+      root.classList.add('light');
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
@@ -238,8 +247,8 @@ function App() {
           maxWidth: '28rem',
           margin: '0 auto',
           position: 'relative',
-          backgroundColor: 'var(--bg-primary)',
-          boxShadow: '0 0 0 1px var(--border-primary), 0 10px 15px -3px var(--shadow-color)',
+          backgroundColor: 'var(--bg-primary, #ffffff)',
+          boxShadow: '0 0 0 1px var(--border-primary, #e5e7eb), 0 10px 15px -3px var(--shadow-color, rgba(0, 0, 0, 0.1))',
           transition: 'all 0.2s ease'
         }}>
           <AppContent />
