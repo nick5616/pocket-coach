@@ -8,6 +8,20 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Configure MIME types for production to fix module script loading
+if (process.env.NODE_ENV === "production") {
+  app.use((req, res, next) => {
+    if (req.path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+    } else if (req.path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css; charset=UTF-8');
+    } else if (req.path.endsWith('.html')) {
+      res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    }
+    next();
+  });
+}
+
 // Add cache-busting headers only for production deployments
 app.use((req, res, next) => {
   if (process.env.NODE_ENV === "production" && !req.path.startsWith("/api") && !req.path.includes("/@")) {
@@ -90,6 +104,17 @@ app.use((req, res, next) => {
         log(`Error copying static files: ${errorMessage}`);
       }
     }
+    
+    // Add specific static file handling before calling serveStatic
+    app.use('/assets', express.static(path.join(staticPath, 'assets'), {
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.js')) {
+          res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+        } else if (filePath.endsWith('.css')) {
+          res.setHeader('Content-Type', 'text/css; charset=UTF-8');
+        }
+      }
+    }));
     
     serveStatic(app);
   }
