@@ -8,7 +8,7 @@ import { Progress } from "@/components/Progress";
 import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
 import WorkoutCard from "@/components/workout-card";
-import LoadingScreen from "@/components/loading-screen";
+import LoadingScreen from "../components/loading-screen";
 import {
   Bell,
   User as UserIcon,

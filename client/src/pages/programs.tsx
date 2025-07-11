@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { Badge } from "@/components/Badge";
 import { Dialog } from "@/components/Dialog";
 import BottomNavigation from "@/components/bottom-navigation";
-import LoadingScreen from "@/components/loading-screen";
+import LoadingScreen from "../components/loading-screen";
 import { useToast } from "@/hooks/use-toast";
 // Removed useAuth import
 import { useForm } from "react-hook-form";

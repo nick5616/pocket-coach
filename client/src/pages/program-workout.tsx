@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { Badge } from "@/components/Badge";
 import { Progress } from "@/components/Progress";
 import { ExerciseMuscleGroups } from "@/components/exercise-muscle-groups";
-import LoadingScreen from "@/components/loading-screen";
+import LoadingScreen from "../components/loading-screen";
 // Removed useAuth import - authentication handled in main App
 import { useToast } from "@/hooks/use-toast";
 import {

@@ -17,7 +17,7 @@ import {
   Weight,
 } from "lucide-react";
 import { Link, useParams, useLocation } from "wouter";
-import LoadingScreen from "@/components/loading-screen";
+import LoadingScreen from "../components/loading-screen";
 
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";

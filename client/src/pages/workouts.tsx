@@ -13,7 +13,7 @@ import {
   Timer,
   Weight
 } from "lucide-react";
-import LoadingScreen from "@/components/loading-screen";
+import LoadingScreen from "../components/loading-screen";
 import type { Workout, Exercise } from "@shared/schema";
 
 interface WorkoutWithExercises extends Workout {

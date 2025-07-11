@@ -6,7 +6,7 @@ import { Button } from "@/components/Button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
 import BottomNavigation from "@/components/bottom-navigation";
 import BodyVisualization from "@/components/body-visualization";
-import LoadingScreen from "@/components/loading-screen";
+import LoadingScreen from "../components/loading-screen";
 import { 
   Target, 
   Calendar, 

@@ -13,7 +13,7 @@ import {
   Plus,
   ChevronRight
 } from "lucide-react";
-import LoadingScreen from "@/components/loading-screen";
+import LoadingScreen from "../components/loading-screen";
 import type { Workout, Goal } from "@shared/schema";
 
 export default function Home() {

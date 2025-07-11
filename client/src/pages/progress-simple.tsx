@@ -21,7 +21,7 @@ import {
   Activity,
 } from "lucide-react";
 import type { Goal, Workout, Achievement } from "@shared/schema";
-import LoadingScreen from "@/components/loading-screen";
+import LoadingScreen from "../components/loading-screen";
 
 export default function Progress() {
   const [selectedTab, setSelectedTab] = useState<
