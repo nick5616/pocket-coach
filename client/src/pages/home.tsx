@@ -274,7 +274,7 @@ export default function Home() {
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(3, 1fr)",
-                gap: "var(--spacing-md)",
+                gap: "var(--spacing-sm)",
               }}
             >
               <div className="stat-card">
@@ -317,7 +317,7 @@ export default function Home() {
                   <div
                     className="card"
                     style={{
-                      padding: "var(--spacing-lg)",
+                      padding: "var(--spacing-md)",
                       cursor: "pointer",
                       transition: "all 0.2s ease",
                       border: "2px solid var(--primary-200)",
@@ -392,7 +392,7 @@ export default function Home() {
                   <div
                     className="card"
                     style={{
-                      padding: "var(--spacing-lg)",
+                      padding: "var(--spacing-md)",
                       cursor: "pointer",
                       transition: "all 0.2s ease",
                       border: "2px solid var(--primary-200)",
@@ -461,7 +461,7 @@ export default function Home() {
                 <div
                   className="card"
                   style={{
-                    padding: "var(--spacing-lg)",
+                    padding: "var(--spacing-md)",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
                   }}
