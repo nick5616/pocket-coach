@@ -244,8 +244,8 @@ function App() {
       <ThemeProvider>
         <div style={{
           height: '100vh',
-          maxWidth: '100%',
-          margin: '0 auto',
+          width: '100%',
+          margin: '0',
           position: 'relative',
           backgroundColor: 'var(--bg-primary, #ffffff)',
           transition: 'all 0.2s ease'
