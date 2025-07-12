@@ -31,16 +31,103 @@
   gap: 0.25rem;
   color: #64748b;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: all 0.3s ease;
   padding: 0.5rem;
+  position: relative;
+  outline: none; /* Remove green outline */
+  border: none; /* Remove any border */
+  background: none; /* Ensure no background */
+}
+
+.navItem:focus {
+  outline: none; /* Explicitly remove focus outline */
+  box-shadow: none; /* Remove any focus box-shadow */
 }
 
 .navItem:hover {
   color: #3b82f6;
+  transform: translateY(-1px);
 }
 
 .navItemActive {
   color: #3b82f6;
+}
+
+/* Unique backsplash for each tab */
+.navItem:nth-child(1).navItemActive::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2rem;
+  height: 0.25rem;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 0 0 0.5rem 0.5rem;
+  animation: slideDown 0.3s ease;
+}
+
+.navItem:nth-child(2).navItemActive::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2rem;
+  height: 0.25rem;
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+  border-radius: 0 0 0.5rem 0.5rem;
+  animation: slideDown 0.3s ease;
+}
+
+.navItem:nth-child(3).navItemActive::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2rem;
+  height: 0.25rem;
+  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+  border-radius: 0 0 0.5rem 0.5rem;
+  animation: slideDown 0.3s ease;
+}
+
+.navItem:nth-child(4).navItemActive::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2rem;
+  height: 0.25rem;
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  border-radius: 0 0 0.5rem 0.5rem;
+  animation: slideDown 0.3s ease;
+}
+
+.navItem:nth-child(5).navItemActive::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2rem;
+  height: 0.25rem;
+  background: linear-gradient(90deg, #06b6d4, #0891b2);
+  border-radius: 0 0 0.5rem 0.5rem;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: 0.25rem;
+    opacity: 1;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
