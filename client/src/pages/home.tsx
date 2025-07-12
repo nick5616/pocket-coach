@@ -65,7 +65,7 @@ export default function Home() {
           background:
             "linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%)",
           color: "white",
-          padding: "var(--spacing-xl) var(--spacing-md) var(--spacing-2xl)",
+          padding: "var(--spacing-xl) 0 var(--spacing-2xl)",
         }}
       >
         <div className="container">
