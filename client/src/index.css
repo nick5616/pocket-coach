@@ -178,9 +178,8 @@ body {
 
 /* Utility Classes */
 .container {
-  max-width: 28rem;
   margin: 0 auto;
-  padding: 0 var(--spacing-md);
+  padding: 0 var(--spacing-lg);
   width: 100%;
 }
 
