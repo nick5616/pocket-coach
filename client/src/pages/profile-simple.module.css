@@ -138,28 +138,27 @@
   height: 1.25rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  .page {
-    background: var(--bg-secondary, #1e293b);
-  }
-  
-  .pageHeader {
-    background: var(--surface-primary, #0f172a);
-    border-bottom-color: var(--border-primary, #334155);
-  }
-  
-  .themeButton {
-    background: var(--surface-primary, #0f172a);
-    border-color: var(--border-primary, #334155);
-    color: var(--text-secondary, #94a3b8);
-  }
-  
-  .themeButton:hover {
-    background: var(--bg-tertiary, #334155);
-  }
-  
-  .userAvatar {
-    background: var(--primary-900, #14532d);
-    color: var(--primary-300, #86efac);
-  }
+/* Dark theme styles */
+.dark .page {
+  background: var(--bg-secondary);
+}
+
+.dark .pageHeader {
+  background: var(--surface-primary);
+  border-bottom-color: var(--border-primary);
+}
+
+.dark .themeButton {
+  background: var(--surface-primary);
+  border-color: var(--border-primary);
+  color: var(--text-secondary);
+}
+
+.dark .themeButton:hover {
+  background: var(--bg-tertiary);
+}
+
+.dark .userAvatar {
+  background: var(--primary-900);
+  color: var(--primary-300);
 }

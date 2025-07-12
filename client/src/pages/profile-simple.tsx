@@ -39,7 +39,10 @@ export default function Profile() {
             return (
               <button
                 key={option.value}
-                onClick={() => setTheme(option.value as any)}
+                onClick={() => {
+                  console.log('Theme button clicked:', option.value);
+                  setTheme(option.value as any);
+                }}
                 className={`${styles.themeButton} ${theme === option.value ? styles.themeButtonActive : ""}`}
               >
                 <Icon className={styles.iconMedium} />
