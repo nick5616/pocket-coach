@@ -1,0 +1,165 @@
+/* Profile Simple Page Styles */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary, #f8fafc);
+}
+
+.pageHeader {
+  background: var(--surface-primary, #ffffff);
+  border-bottom: 1px solid var(--border-primary, #e5e7eb);
+  padding: var(--spacing-lg) 0;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.pageContent {
+  flex: 1;
+  padding-bottom: 5rem; /* Space for bottom navigation */
+}
+
+.container {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.spaceY6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.py6 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.themeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.themeButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--border-primary, #e5e7eb);
+  background: var(--surface-primary, #ffffff);
+  color: var(--text-secondary, #6b7280);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.themeButton:hover {
+  background: var(--bg-tertiary, #f1f5f9);
+}
+
+.themeButtonActive {
+  border-color: var(--primary-500, #22c55e);
+  background: var(--primary-50, #f0fdf4);
+  color: var(--primary-700, #15803d);
+}
+
+.userInfoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.userAvatar {
+  width: 3rem;
+  height: 3rem;
+  background: var(--primary-100, #dcfce7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-700, #15803d);
+  font-weight: bold;
+  font-size: 1.125rem;
+}
+
+.userInfo h2 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+.userInfo p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.settingsSection {
+  margin-top: 1.5rem;
+}
+
+.settingItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-primary, #e5e7eb);
+}
+
+.settingItem:last-child {
+  border-bottom: none;
+}
+
+.settingInfo h4 {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+}
+
+.settingInfo p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.logoutButton {
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.iconMedium {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .page {
+    background: var(--bg-secondary, #1e293b);
+  }
+  
+  .pageHeader {
+    background: var(--surface-primary, #0f172a);
+    border-bottom-color: var(--border-primary, #334155);
+  }
+  
+  .themeButton {
+    background: var(--surface-primary, #0f172a);
+    border-color: var(--border-primary, #334155);
+    color: var(--text-secondary, #94a3b8);
+  }
+  
+  .themeButton:hover {
+    background: var(--bg-tertiary, #334155);
+  }
+  
+  .userAvatar {
+    background: var(--primary-900, #14532d);
+    color: var(--primary-300, #86efac);
+  }
+}

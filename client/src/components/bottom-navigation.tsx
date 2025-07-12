@@ -61,39 +61,25 @@ export default function BottomNavigation() {
             >
               <div className={styles.navSvgContainer}>
                 <svg 
-                  width="48" 
-                  height="16" 
-                  viewBox="0 0 48 16" 
                   className={svgClass}
+                  viewBox="0 0 100 8" 
+                  preserveAspectRatio="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <defs>
-                    <linearGradient id="homeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#22c55e" />
-                      <stop offset="100%" stopColor="#16a34a" />
-                    </linearGradient>
-                    <linearGradient id="workoutGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#f59e0b" />
-                      <stop offset="100%" stopColor="#d97706" />
-                    </linearGradient>
-                    <linearGradient id="historyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#8b5cf6" />
-                      <stop offset="100%" stopColor="#7c3aed" />
-                    </linearGradient>
-                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#ef4444" />
-                      <stop offset="100%" stopColor="#dc2626" />
-                    </linearGradient>
-                    <linearGradient id="profileGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#06b6d4" />
-                      <stop offset="100%" stopColor="#0891b2" />
+                    <linearGradient id={`${gradient}-${index}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor={index === 0 ? "#22c55e" : index === 1 ? "#f59e0b" : index === 2 ? "#8b5cf6" : index === 3 ? "#ef4444" : "#06b6d4"} />
+                      <stop offset="100%" stopColor={index === 0 ? "#16a34a" : index === 1 ? "#d97706" : index === 2 ? "#7c3aed" : index === 3 ? "#dc2626" : "#0891b2"} />
                     </linearGradient>
                   </defs>
                   <path 
-                    d={svgPath} 
-                    fill={`url(#${gradient})`} 
+                    d={index === 0 ? "M0,4 Q25,2 50,4 T100,4 L100,8 L0,8 Z" : 
+                        index === 1 ? "M0,6 Q20,2 40,6 Q60,2 80,6 Q90,3 100,6 L100,8 L0,8 Z" :
+                        index === 2 ? "M0,5 Q30,1 60,5 Q70,7 100,3 L100,8 L0,8 Z" :
+                        index === 3 ? "M0,3 Q25,7 50,3 Q75,7 100,3 L100,8 L0,8 Z" :
+                        "M0,4 Q20,6 40,4 Q60,2 80,4 Q90,6 100,4 L100,8 L0,8 Z"} 
+                    fill={`url(#${gradient}-${index})`} 
                     stroke="none"
-                    fillOpacity="0.9"
                   />
                 </svg>
               </div>

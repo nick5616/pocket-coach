@@ -57,38 +57,47 @@
 .navSvgContainer {
   position: absolute;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 3rem;
-  height: 1rem;
+  left: 0;
+  right: 0;
+  height: 0.5rem;
   overflow: hidden;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s ease;
 }
 
 .navItemActive .navSvgContainer {
-  opacity: 1;
+  opacity: 0.3;
 }
 
 /* SVG animations for different shapes */
 .homeSvg {
-  animation: waveAnimation 2s ease-in-out infinite;
+  animation: waveAnimation 6s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
 }
 
 .workoutSvg {
-  animation: pulseAnimation 1.5s ease-in-out infinite;
+  animation: pulseAnimation 8s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
 }
 
 .historySvg {
-  animation: morphAnimation 3s ease-in-out infinite;
+  animation: morphAnimation 10s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
 }
 
 .progressSvg {
-  animation: growAnimation 2s ease-in-out infinite;
+  animation: growAnimation 7s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
 }
 
 .profileSvg {
-  animation: rippleAnimation 2.5s ease-in-out infinite;
+  animation: rippleAnimation 9s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
 }
 
 @keyframes waveAnimation {
@@ -96,18 +105,16 @@
     transform: scaleY(1) scaleX(1); 
   }
   50% { 
-    transform: scaleY(0.8) scaleX(1.1); 
+    transform: scaleY(0.9) scaleX(1.05); 
   }
 }
 
 @keyframes pulseAnimation {
   0%, 100% { 
     transform: scale(1);
-    opacity: 1;
   }
   50% { 
-    transform: scale(1.2);
-    opacity: 0.8;
+    transform: scale(1.05);
   }
 }
 
@@ -116,41 +123,37 @@
     transform: skew(0deg) scaleX(1);
   }
   33% { 
-    transform: skew(5deg) scaleX(0.9);
+    transform: skew(1deg) scaleX(0.98);
   }
   66% { 
-    transform: skew(-5deg) scaleX(1.1);
+    transform: skew(-1deg) scaleX(1.02);
   }
 }
 
 @keyframes growAnimation {
   0% { 
-    transform: scaleX(0.5) scaleY(1);
+    transform: scaleX(0.95) scaleY(1);
   }
   50% { 
-    transform: scaleX(1.2) scaleY(0.8);
+    transform: scaleX(1.05) scaleY(0.95);
   }
   100% { 
-    transform: scaleX(0.5) scaleY(1);
+    transform: scaleX(0.95) scaleY(1);
   }
 }
 
 @keyframes rippleAnimation {
   0%, 100% { 
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
+    transform: scale(1);
   }
   25% { 
-    transform: scale(1.1) rotate(2deg);
-    opacity: 0.9;
+    transform: scale(1.02);
   }
   50% { 
-    transform: scale(1.05) rotate(-1deg);
-    opacity: 0.95;
+    transform: scale(0.98);
   }
   75% { 
-    transform: scale(1.15) rotate(1deg);
-    opacity: 0.85;
+    transform: scale(1.03);
   }
 }
 

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
 import LoadingScreen from "../components/loading-screen";
 import { useTheme } from "../components/theme-provider";
 import BottomNavigation from "../components/bottom-navigation";
+import styles from "./profile-simple.module.css";
 
 export default function Profile() {
   const { theme, setTheme } = useTheme();
@@ -30,25 +31,19 @@ export default function Profile() {
     ];
 
     return (
-      <div className="space-y-3">
-        <h3 className="text-heading-3">Theme Preference</h3>
-        <div className="grid grid-cols-3 gap-2">
+      <div style={{ marginBottom: "1.5rem" }}>
+        <h3 style={{ fontSize: "1.125rem", fontWeight: "600", marginBottom: "0.75rem", color: "var(--text-primary)" }}>Theme Preference</h3>
+        <div className={styles.themeGrid}>
           {themeOptions.map((option) => {
             const Icon = option.icon;
             return (
               <button
                 key={option.value}
                 onClick={() => setTheme(option.value as any)}
-                className={`
-                  flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all
-                  ${theme === option.value 
-                    ? 'border-green-500 bg-green-50 text-green-700' 
-                    : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
-                  }
-                `}
+                className={`${styles.themeButton} ${theme === option.value ? styles.themeButtonActive : ""}`}
               >
-                <Icon className="w-5 h-5" />
-                <span className="text-sm font-medium">{option.label}</span>
+                <Icon className={styles.iconMedium} />
+                <span>{option.label}</span>
               </button>
             );
           })}
@@ -58,27 +53,29 @@ export default function Profile() {
   };
 
   return (
-    <div className="page">
-      <div className="page-header">
-        <div className="container">
-          <h1 className="text-heading-2">Profile</h1>
+    <div className={styles.page}>
+      <div className={styles.pageHeader}>
+        <div className={styles.container}>
+          <h1 style={{ fontSize: "1.5rem", fontWeight: "600", color: "var(--text-primary)" }}>Profile</h1>
         </div>
       </div>
       
-      <div className="page-content">
-        <div className="container space-y-6 py-6">
+      <div className={styles.pageContent}>
+        <div className={`${styles.container} ${styles.spaceY6} ${styles.py6}`}>
           {/* User Info Card */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <span className="text-green-700 font-bold text-lg">
-                    {user?.email?.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                <div>
-                  <div className="text-lg font-semibold">{user?.email}</div>
-                  <div className="text-caption">PocketCoach Member</div>
+              <CardTitle>
+                <div className={styles.userInfoHeader}>
+                  <div className={styles.userAvatar}>
+                    <span>
+                      {user?.email?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className={styles.userInfo}>
+                    <h2>{user?.email}</h2>
+                    <p>PocketCoach Member</p>
+                  </div>
                 </div>
               </CardTitle>
             </CardHeader>
@@ -87,9 +84,11 @@ export default function Profile() {
           {/* Theme Settings */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                App Settings
+              <CardTitle>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <Settings className={styles.iconMedium} />
+                  App Settings
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -98,25 +97,30 @@ export default function Profile() {
           </Card>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="stat-card">
-              <div className="stat-value">5</div>
-              <div className="stat-label">Workouts This Week</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">12</div>
-              <div className="stat-label">Day Streak</div>
-            </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "1rem" }}>
+            <Card>
+              <CardContent style={{ padding: "1rem", textAlign: "center" }}>
+                <div style={{ fontSize: "1.5rem", fontWeight: "bold", color: "var(--primary-600)" }}>5</div>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Workouts This Week</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent style={{ padding: "1rem", textAlign: "center" }}>
+                <div style={{ fontSize: "1.5rem", fontWeight: "bold", color: "var(--primary-600)" }}>12</div>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Day Streak</div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Actions */}
-          <div className="space-y-3">
+          <div>
             <Button
               variant="secondary"
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2"
+              className={styles.logoutButton}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut style={{ width: "1rem", height: "1rem" }} />
               Sign Out
             </Button>
           </div>
