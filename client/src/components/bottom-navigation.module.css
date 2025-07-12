@@ -53,80 +53,104 @@
   color: #3b82f6;
 }
 
-/* Unique backsplash for each tab */
-.navItem:nth-child(1).navItemActive::before {
-  content: '';
+/* Animated SVG backsplash container */
+.navSvgContainer {
   position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 2rem;
-  height: 0.25rem;
-  background: linear-gradient(90deg, #22c55e, #16a34a);
-  border-radius: 0 0 0.5rem 0.5rem;
-  animation: slideDown 0.3s ease;
+  width: 3rem;
+  height: 1rem;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.navItem:nth-child(2).navItemActive::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2rem;
-  height: 0.25rem;
-  background: linear-gradient(90deg, #f59e0b, #d97706);
-  border-radius: 0 0 0.5rem 0.5rem;
-  animation: slideDown 0.3s ease;
+.navItemActive .navSvgContainer {
+  opacity: 1;
 }
 
-.navItem:nth-child(3).navItemActive::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2rem;
-  height: 0.25rem;
-  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
-  border-radius: 0 0 0.5rem 0.5rem;
-  animation: slideDown 0.3s ease;
+/* SVG animations for different shapes */
+.homeSvg {
+  animation: waveAnimation 2s ease-in-out infinite;
 }
 
-.navItem:nth-child(4).navItemActive::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2rem;
-  height: 0.25rem;
-  background: linear-gradient(90deg, #ef4444, #dc2626);
-  border-radius: 0 0 0.5rem 0.5rem;
-  animation: slideDown 0.3s ease;
+.workoutSvg {
+  animation: pulseAnimation 1.5s ease-in-out infinite;
 }
 
-.navItem:nth-child(5).navItemActive::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2rem;
-  height: 0.25rem;
-  background: linear-gradient(90deg, #06b6d4, #0891b2);
-  border-radius: 0 0 0.5rem 0.5rem;
-  animation: slideDown 0.3s ease;
+.historySvg {
+  animation: morphAnimation 3s ease-in-out infinite;
 }
 
-@keyframes slideDown {
-  from {
-    height: 0;
-    opacity: 0;
+.progressSvg {
+  animation: growAnimation 2s ease-in-out infinite;
+}
+
+.profileSvg {
+  animation: rippleAnimation 2.5s ease-in-out infinite;
+}
+
+@keyframes waveAnimation {
+  0%, 100% { 
+    transform: scaleY(1) scaleX(1); 
   }
-  to {
-    height: 0.25rem;
+  50% { 
+    transform: scaleY(0.8) scaleX(1.1); 
+  }
+}
+
+@keyframes pulseAnimation {
+  0%, 100% { 
+    transform: scale(1);
     opacity: 1;
+  }
+  50% { 
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes morphAnimation {
+  0%, 100% { 
+    transform: skew(0deg) scaleX(1);
+  }
+  33% { 
+    transform: skew(5deg) scaleX(0.9);
+  }
+  66% { 
+    transform: skew(-5deg) scaleX(1.1);
+  }
+}
+
+@keyframes growAnimation {
+  0% { 
+    transform: scaleX(0.5) scaleY(1);
+  }
+  50% { 
+    transform: scaleX(1.2) scaleY(0.8);
+  }
+  100% { 
+    transform: scaleX(0.5) scaleY(1);
+  }
+}
+
+@keyframes rippleAnimation {
+  0%, 100% { 
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  25% { 
+    transform: scale(1.1) rotate(2deg);
+    opacity: 0.9;
+  }
+  50% { 
+    transform: scale(1.05) rotate(-1deg);
+    opacity: 0.95;
+  }
+  75% { 
+    transform: scale(1.15) rotate(1deg);
+    opacity: 0.85;
   }
 }
 
