@@ -3,6 +3,11 @@
 .container {
   min-height: 100vh;
   background-color: #f9fafb;
+  /* Override global container styles for full-width layout */
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
 }
 
 .header {
