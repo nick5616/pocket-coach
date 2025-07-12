@@ -244,11 +244,10 @@ function App() {
       <ThemeProvider>
         <div style={{
           height: '100vh',
-          maxWidth: '28rem',
+          maxWidth: '100%',
           margin: '0 auto',
           position: 'relative',
           backgroundColor: 'var(--bg-primary, #ffffff)',
-          boxShadow: '0 0 0 1px var(--border-primary, #e5e7eb), 0 10px 15px -3px var(--shadow-color, rgba(0, 0, 0, 0.1))',
           transition: 'all 0.2s ease'
         }}>
           <AppContent />

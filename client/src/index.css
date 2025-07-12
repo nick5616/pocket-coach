@@ -178,10 +178,17 @@ body {
 
 /* Utility Classes */
 .container {
-  max-width: 28rem;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 var(--spacing-md);
   width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 600px;
+    padding: 0 var(--spacing-lg);
+  }
 }
 
 .card {
