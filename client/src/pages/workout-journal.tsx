@@ -576,7 +576,7 @@ export default function WorkoutJournal() {
                                 handleExactCompletion(currentExercise, index)
                               }
                             >
-                              ✅ As Prescribed
+                              As Prescribed
                             </Button>
                             <Button
                               variant="outline"
@@ -686,7 +686,7 @@ export default function WorkoutJournal() {
                                 handleExactCompletion(currentExercise, index)
                               }
                             >
-                              ✅ As Prescribed
+                              As Prescribed
                             </Button>
                             <Button
                               variant="outline"

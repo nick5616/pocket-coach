@@ -339,10 +339,10 @@ export default function Programs() {
                     <div className={`${styles.bottomRow} ${isDark ? styles.dark : ''}`}>
                       <div className={styles.badgeGroup}>
                         <Badge variant="outline" className="text-xs">
-                          🕕 {program.durationWeeks || 4} weeks
+                          {program.durationWeeks || 4} weeks
                         </Badge>
                         <Badge variant="outline" className="text-xs">
-                          🎯 {program.difficulty || "Beginner"}
+                          {program.difficulty || "Beginner"}
                         </Badge>
                         {program.isActive && (
                           <Badge variant="default" className="text-xs">

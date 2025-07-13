@@ -74,7 +74,7 @@ export default function Home() {
               className="text-heading-1"
               style={{ color: "white", marginBottom: "var(--spacing-xs)" }}
             >
-              Welcome back! 💪
+              Welcome back!
             </h1>
             <p
               className="text-body"
@@ -153,7 +153,7 @@ export default function Home() {
                   color: "white",
                 }}
               >
-                🔥 ON FIRE
+                ON FIRE
               </div>
             </div>
           </div>
