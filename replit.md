@@ -55,6 +55,7 @@ Core entities: Users, Goals, Workouts, Exercises, Programs, Achievements, Muscle
 - Custom CSS with semantic class names
 - CSS custom properties for theming
 - Inline styles for dynamic values only
+- All CSS modules MUST include both dark and light mode styles using @media (prefers-color-scheme: dark)
 
 ## Authentication
 Email/password authentication with bcrypt hashing and PostgreSQL session store using connect-pg-simple.
