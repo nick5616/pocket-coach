@@ -364,8 +364,7 @@ body {
   letter-spacing: 0.025em;
 }
 
-/* Component-specific utility classes only - no Tailwind mimicking */
-
+/* Component utility classes */
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;

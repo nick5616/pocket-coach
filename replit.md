@@ -13,7 +13,7 @@ Keep this document concise and focused on essential project information only.
 - **Framework**: React 18 with TypeScript
 - **Routing**: Wouter for lightweight client-side routing
 - **State Management**: TanStack Query for server state and caching
-- **Styling**: CSS Modules ONLY - NO Tailwind CSS, NO shadcn/ui components
+- **Styling**: CSS Modules ONLY - NO Tailwind CSS, NO shadcn/ui, NO @radix-ui components
 - **Forms**: React Hook Form with Zod validation
 - **PWA Features**: Service worker registration and install prompts
 
@@ -38,10 +38,23 @@ Core entities: Users, Goals, Workouts, Exercises, Programs, Achievements, Muscle
 
 ## User Preferences
 - **Communication Style**: Simple, everyday language (non-technical)
-- **Styling System**: CSS Modules ONLY - Complete removal of Tailwind CSS
+- **Styling System**: CSS Modules ONLY - Complete removal of Tailwind CSS and shadcn/ui
 - **UI Improvements**: Show current date on workout creation screen
 - **Workout Naming**: AI-generated workout names based on exercises
 - **Data Storage**: Hybrid approach with offline capabilities
+
+## Styling Guidelines (MANDATORY)
+⚠️ **STRICTLY FORBIDDEN**: 
+- Never use Tailwind CSS classes (bg-, text-, flex, etc.)
+- Never install or use shadcn/ui components
+- Never install or use @radix-ui components
+- Never install utility-first CSS frameworks
+
+✅ **APPROVED STYLING APPROACH**:
+- CSS Modules only (.module.css files)
+- Custom CSS with semantic class names
+- CSS custom properties for theming
+- Inline styles for dynamic values only
 
 ## Authentication
 Email/password authentication with bcrypt hashing and PostgreSQL session store using connect-pg-simple.
