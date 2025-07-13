@@ -13,10 +13,14 @@ if (process.env.NODE_ENV === "production") {
   app.use((req, res, next) => {
     if (req.path.endsWith('.js')) {
       res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+    } else if (req.path.endsWith('.mjs')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
     } else if (req.path.endsWith('.css')) {
       res.setHeader('Content-Type', 'text/css; charset=UTF-8');
     } else if (req.path.endsWith('.html')) {
       res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    } else if (req.path.endsWith('.json')) {
+      res.setHeader('Content-Type', 'application/json; charset=UTF-8');
     }
     next();
   });

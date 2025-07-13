@@ -152,11 +152,7 @@ function AuthPage() {
           )}
         </form>
 
-        <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
-          <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-            Use any email/password to login for demo
-          </p>
-        </div>
+
       </div>
     </div>
   );
