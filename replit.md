@@ -77,3 +77,18 @@ Email/password authentication with bcrypt hashing and PostgreSQL session store u
 - Express serves on port 5000, mapped to external port 80
 - Static files served from `dist/public`
 - Replit Autoscale deployment target
+
+### Critical Deployment Fix for Chrome Errors
+**Issue**: Chrome shows "Unexpected token '<'" and blank screen due to asset filename mismatch and incorrect environment mode.
+
+**Solution**: 
+1. Ensure `NODE_ENV=production` in Replit deployment environment variables
+2. Use start command: `node dist/index.js` (not npm run dev)
+3. Build assets with: `npm run build` before deployment
+4. Verify `dist/public/assets/` contains the built JavaScript and CSS files
+
+**Recent Changes (July 2025)**:
+- ✅ Removed service worker references that caused `sw.js` errors
+- ✅ Fixed demo text removal from login page  
+- ✅ Enhanced production MIME type configuration
+- ✅ Improved static file serving for production builds

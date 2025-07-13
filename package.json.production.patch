@@ -1,0 +1,14 @@
+#!/bin/bash
+# This script helps fix production deployment issues
+
+echo "Building production assets..."
+npm run build
+
+echo "Setting NODE_ENV to production..."
+export NODE_ENV=production
+
+echo "Production build completed. Assets in dist/public:"
+ls -la dist/public/
+
+echo "Starting production server..."
+node dist/index.js
