@@ -73,6 +73,26 @@ export default function WorkoutJournal() {
   const [swappedExercises, setSwappedExercises] = useState<Map<number, any>>(
     new Map(),
   );
+
+  // Group exercises by name for display
+  const groupExercisesByName = (exercises: Exercise[]) => {
+    const grouped = new Map<string, Exercise[]>();
+    
+    exercises.forEach(exercise => {
+      const name = exercise.name;
+      if (!grouped.has(name)) {
+        grouped.set(name, []);
+      }
+      grouped.get(name)!.push(exercise);
+    });
+    
+    return Array.from(grouped.entries()).map(([name, exerciseGroup]) => ({
+      name,
+      exercises: exerciseGroup,
+      muscleGroups: exerciseGroup[0]?.muscleGroups || [],
+      notes: exerciseGroup.find(e => e.notes)?.notes || null
+    }));
+  };
   const [deleteExerciseId, setDeleteExerciseId] = useState<number | null>(null);
 
   // Refs
@@ -714,91 +734,102 @@ export default function WorkoutJournal() {
             {/* Completed Exercises */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Completed Exercises</h2>
-              <div className="_completedExercises_eqdug_250 pl-[0px] pr-[0px] pt-[0px] pb-[0px]">
-                {exercises.map((exercise: Exercise) => (
-                  <div
-                    key={exercise.id}
-                    className={styles.completedExerciseCard}
-                  >
-                    <div className={styles.completedExerciseHeader}>
-                      <div className={styles.completedExerciseInfo}>
-                        <h3 className={styles.completedExerciseTitle}>
-                          {exercise.name}
-                        </h3>
-                      </div>
-                      <div className={styles.completedExerciseActions}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditExercise(exercise)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setDeleteExerciseId(exercise.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
+              <div className={styles.completedExercises}>
+                {groupExercisesByName(exercises).map((exerciseGroup, groupIndex) => {
+                  const totalSets = exerciseGroup.exercises.length;
+                  const totalVolume = exerciseGroup.exercises.reduce((sum, ex) => 
+                    sum + (ex.weight || 0) * (ex.sets || 1) * (ex.reps || 0), 0
+                  );
+                  const avgRpe = exerciseGroup.exercises
+                    .filter(ex => ex.rpe)
+                    .reduce((sum, ex, _, arr) => sum + (ex.rpe || 0) / arr.length, 0);
 
-                    {/* Muscle Groups outside the header */}
-                    {exercise.muscleGroups &&
-                      exercise.muscleGroups.length > 0 && (
+                  return (
+                    <div
+                      key={`${exerciseGroup.name}-${groupIndex}`}
+                      className={styles.completedExerciseCard}
+                    >
+                      <div className={styles.completedExerciseHeader}>
+                        <div className={styles.completedExerciseInfo}>
+                          <h3 className={styles.completedExerciseTitle}>
+                            {exerciseGroup.name}
+                          </h3>
+                        </div>
+                        <div className={styles.completedExerciseActions}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditExercise(exerciseGroup.exercises[0])}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDeleteExerciseId(exerciseGroup.exercises[0].id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Muscle Groups */}
+                      {exerciseGroup.muscleGroups.length > 0 && (
                         <div className={styles.completedMuscleGroups}>
-                          {exercise.muscleGroups.map((muscle, index) => (
-                            <Badge
-                              key={index}
-                              variant="secondary"
-                            >
+                          {exerciseGroup.muscleGroups.map((muscle, index) => (
+                            <Badge key={index} variant="secondary">
                               {muscle}
                             </Badge>
                           ))}
                         </div>
                       )}
 
-                    {/* Compact Exercise Stats */}
-                    <div className={styles.completedExerciseStats}>
-                      <div className={styles.completedStatsLeft}>
-                        <span className={styles.completedStatsText}>
-                          {exercise.sets} sets × {exercise.reps} reps
-                        </span>
-                        {exercise.weight && (
-                          <span className={styles.completedStatsText}>
-                            {exercise.weight} lbs
-                          </span>
-                        )}
+                      {/* Sets Display */}
+                      <div className={styles.exerciseSetsContainer}>
+                        {exerciseGroup.exercises.map((exercise, setIndex) => (
+                          <div key={exercise.id} className={styles.exerciseSet}>
+                            <span className={styles.setNumber}>Set {setIndex + 1}:</span>
+                            <span className={styles.setDetails}>
+                              {exercise.reps} reps
+                              {exercise.weight && ` @ ${exercise.weight} lbs`}
+                              {exercise.rpe && ` (RPE ${exercise.rpe})`}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                      <div className={styles.completedStatsRight}>
-                        {exercise.rpe && (
-                          <span className={styles.completedRpeText}>
-                            RPE {exercise.rpe}
-                          </span>
-                        )}
-                        {exercise.weight && exercise.sets && (
-                          <span className={styles.completedVolumeText}>
-                            Vol:{" "}
-                            {exercise.weight *
-                              exercise.sets *
-                              (exercise.reps || 10)}{" "}
-                            lbs
-                          </span>
-                        )}
-                      </div>
-                    </div>
 
-                    {exercise.notes && (
-                      <div className={styles.exerciseNotesContainer}>
-                        <div className={styles.exerciseNotesLabel}>Notes:</div>
-                        <p className={styles.exerciseNotesText}>
-                          {exercise.notes}
-                        </p>
+                      {/* Summary Stats */}
+                      <div className={styles.completedExerciseStats}>
+                        <div className={styles.completedStatsLeft}>
+                          <span className={styles.completedStatsText}>
+                            {totalSets} sets total
+                          </span>
+                        </div>
+                        <div className={styles.completedStatsRight}>
+                          {avgRpe > 0 && (
+                            <span className={styles.completedRpeText}>
+                              Avg RPE {avgRpe.toFixed(1)}
+                            </span>
+                          )}
+                          {totalVolume > 0 && (
+                            <span className={styles.completedVolumeText}>
+                              Vol: {totalVolume} lbs
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ))}
+
+                      {exerciseGroup.notes && (
+                        <div className={styles.exerciseNotesContainer}>
+                          <div className={styles.exerciseNotesLabel}>Notes:</div>
+                          <p className={styles.exerciseNotesText}>
+                            {exerciseGroup.notes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </section>
             {/* Complete Workout Button */}

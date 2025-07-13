@@ -557,6 +557,57 @@
   }
 }
 
+/* Exercise Sets Display */
+.completedExercises {
+  padding: 0;
+}
+
+.exerciseSetsContainer {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background-color: #f8fafc;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.exerciseSet {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.exerciseSet:last-child {
+  margin-bottom: 0;
+}
+
+.setNumber {
+  font-weight: 600;
+  color: #475569;
+  min-width: 3rem;
+}
+
+.setDetails {
+  color: #1e293b;
+  flex: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .exerciseSetsContainer {
+    background-color: #1e293b;
+    border-color: #374151;
+  }
+  
+  .setNumber {
+    color: #94a3b8;
+  }
+  
+  .setDetails {
+    color: #f1f5f9;
+  }
+}
+
 .demoExercises {
   padding: 1.5rem 1rem;
 }
