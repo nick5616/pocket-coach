@@ -66,6 +66,9 @@ export default function WorkoutJournal() {
   const [aiGenerateName, setAiGenerateName] = useState(false);
   const [editExerciseName, setEditExerciseName] = useState("");
   const [editExerciseNotes, setEditExerciseNotes] = useState("");
+  const [editingGroupIndex, setEditingGroupIndex] = useState<number | null>(null);
+  const [editGroupName, setEditGroupName] = useState("");
+  const [editGroupNotes, setEditGroupNotes] = useState("");
 
   const [skippedExercises, setSkippedExercises] = useState<Set<number>>(
     new Set(),
@@ -751,25 +754,61 @@ export default function WorkoutJournal() {
                     >
                       <div className={styles.completedExerciseHeader}>
                         <div className={styles.completedExerciseInfo}>
-                          <h3 className={styles.completedExerciseTitle}>
-                            {exerciseGroup.name}
-                          </h3>
+                          {editingGroupIndex === groupIndex ? (
+                            <Input
+                              value={editGroupName}
+                              onChange={(e) => setEditGroupName(e.target.value)}
+                              className={styles.editExerciseNameInput}
+                            />
+                          ) : (
+                            <h3 className={styles.completedExerciseTitle}>
+                              {exerciseGroup.name}
+                            </h3>
+                          )}
                         </div>
                         <div className={styles.completedExerciseActions}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditExercise(exerciseGroup.exercises[0])}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeleteExerciseId(exerciseGroup.exercises[0].id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          {editingGroupIndex === groupIndex ? (
+                            <>
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => {
+                                  // Save logic here
+                                  setEditingGroupIndex(null);
+                                }}
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setEditingGroupIndex(null)}
+                              >
+                                Cancel
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setEditingGroupIndex(groupIndex);
+                                  setEditGroupName(exerciseGroup.name);
+                                  setEditGroupNotes(exerciseGroup.notes || "");
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDeleteExerciseId(exerciseGroup.exercises[0].id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </div>
 
@@ -785,14 +824,22 @@ export default function WorkoutJournal() {
                       )}
 
                       {/* Sets Display */}
-                      <div className={styles.exerciseSetsContainer}>
+                      <div className={styles.exerciseSetsGrid}>
+                        <div className={styles.setsHeader}>
+                          <span className={styles.setHeaderItem}>Set</span>
+                          <span className={styles.setHeaderItem}>Reps</span>
+                          <span className={styles.setHeaderItem}>Weight</span>
+                          <span className={styles.setHeaderItem}>RPE</span>
+                        </div>
                         {exerciseGroup.exercises.map((exercise, setIndex) => (
-                          <div key={exercise.id} className={styles.exerciseSet}>
-                            <span className={styles.setNumber}>Set {setIndex + 1}:</span>
-                            <span className={styles.setDetails}>
-                              {exercise.reps} reps
-                              {exercise.weight && ` @ ${exercise.weight} lbs`}
-                              {exercise.rpe && ` (RPE ${exercise.rpe})`}
+                          <div key={exercise.id} className={styles.exerciseSetRow}>
+                            <span className={styles.setNumber}>{setIndex + 1}</span>
+                            <span className={styles.setReps}>{exercise.reps}</span>
+                            <span className={styles.setWeight}>
+                              {exercise.weight ? `${exercise.weight} lbs` : '-'}
+                            </span>
+                            <span className={styles.setRpe}>
+                              {exercise.rpe || '-'}
                             </span>
                           </div>
                         ))}
@@ -819,7 +866,17 @@ export default function WorkoutJournal() {
                         </div>
                       </div>
 
-                      {exerciseGroup.notes && (
+                      {editingGroupIndex === groupIndex ? (
+                        <div className={styles.exerciseNotesContainer}>
+                          <div className={styles.exerciseNotesLabel}>Notes:</div>
+                          <Textarea
+                            value={editGroupNotes}
+                            onChange={(e) => setEditGroupNotes(e.target.value)}
+                            placeholder="Add notes about this exercise..."
+                            rows={2}
+                          />
+                        </div>
+                      ) : exerciseGroup.notes && (
                         <div className={styles.exerciseNotesContainer}>
                           <div className={styles.exerciseNotesLabel}>Notes:</div>
                           <p className={styles.exerciseNotesText}>
