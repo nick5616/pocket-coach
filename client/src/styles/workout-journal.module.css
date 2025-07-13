@@ -60,6 +60,21 @@
   font-weight: 600;
   color: #111827;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.completedBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #10b981;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .exerciseGrid {
@@ -825,6 +840,10 @@
   
   .sectionTitle {
     color: #f9fafb;
+  }
+  
+  .completedBadge {
+    background: #059669;
   }
   
   .exerciseCard {

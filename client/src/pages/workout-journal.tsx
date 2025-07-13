@@ -160,6 +160,9 @@ export default function WorkoutJournal() {
   });
 
   const totalVolume = calculateWorkoutVolume(exercises as Exercise[]);
+  
+  // Check if workout is completed
+  const isWorkoutCompleted = workout?.isCompleted || false;
 
   // Mutations - Must be declared before any conditional returns
   const createWorkoutMutation = useMutation({
@@ -672,87 +675,99 @@ export default function WorkoutJournal() {
                             )}
                         </div>
 
-                        {/* 2x2 Action Buttons */}
-                        <div className={styles.actionButtons}>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={isSkipped}
-                            onClick={() =>
-                              handleExactCompletion(currentExercise, index)
-                            }
-                          >
-                            ✅ As Prescribed
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={isSkipped}
-                            onClick={() =>
-                              handleModifiedCompletion(currentExercise, index)
-                            }
-                          >
-                            📝 With Changes
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={isSkipped}
-                            onClick={() =>
-                              handleSwapExercise(currentExercise, index)
-                            }
-                          >
-                            🔄 Swap Exercise
-                          </Button>
-                          <Button
-                            variant={isSkipped ? "secondary" : "outline"}
-                            size="sm"
-                            onClick={() => handleSkipExercise(index)}
-                          >
-                            {isSkipped ? "↩️ Unskip" : "⏭️ Skip Today"}
-                          </Button>
-                        </div>
+                        {/* 2x2 Action Buttons - Only show for active workouts */}
+                        {!isWorkoutCompleted && (
+                          <div className={styles.actionButtons}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={isSkipped}
+                              onClick={() =>
+                                handleExactCompletion(currentExercise, index)
+                              }
+                            >
+                              ✅ As Prescribed
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={isSkipped}
+                              onClick={() =>
+                                handleModifiedCompletion(currentExercise, index)
+                              }
+                            >
+                              📝 With Changes
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={isSkipped}
+                              onClick={() =>
+                                handleSwapExercise(currentExercise, index)
+                              }
+                            >
+                              🔄 Swap Exercise
+                            </Button>
+                            <Button
+                              variant={isSkipped ? "secondary" : "outline"}
+                              size="sm"
+                              onClick={() => handleSkipExercise(index)}
+                            >
+                              {isSkipped ? "↩️ Unskip" : "⏭️ Skip Today"}
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
                 </div>
               )}
             </section>
-            {/* Workout Input */}
-            <section className={styles.workoutInput}>
-              <div className={styles.inputContainer}>
-                <Textarea
-                  ref={inputRef}
-                  value={currentInput}
-                  onChange={(e) => setCurrentInput(e.target.value)}
-                  placeholder="How's your workout going? Log exercises, sets, reps, or just your thoughts..."
-                />
-                <div className={styles.inputFooter}>
-                  <div className={styles.inputStatus}>
-                    <div className={styles.statusText}>
-                      {saveStatus === "typing" && "Typing..."}
-                      {saveStatus === "saved" && "✓ Saved!"}
+            {/* Workout Input - Only show for active workouts */}
+            {!isWorkoutCompleted && (
+              <section className={styles.workoutInput}>
+                <div className={styles.inputContainer}>
+                  <Textarea
+                    ref={inputRef}
+                    value={currentInput}
+                    onChange={(e) => setCurrentInput(e.target.value)}
+                    placeholder="How's your workout going? Log exercises, sets, reps, or just your thoughts..."
+                  />
+                  <div className={styles.inputFooter}>
+                    <div className={styles.inputStatus}>
+                      <div className={styles.statusText}>
+                        {saveStatus === "typing" && "Typing..."}
+                        {saveStatus === "saved" && "✓ Saved!"}
+                      </div>
+                      <Button
+                        onClick={handleSendThoughts}
+                        disabled={!currentInput.trim() || isSending}
+                        size="sm"
+                      >
+                        <Send className="h-4 w-4 mr-2" />
+                        Send to AI
+                      </Button>
                     </div>
-                    <Button
-                      onClick={handleSendThoughts}
-                      disabled={!currentInput.trim() || isSending}
-                      size="sm"
-                    >
-                      <Send className="h-4 w-4 mr-2" />
-                      Send to AI
-                    </Button>
+                    {isSending && sendProgress > 0 && (
+                      <div className={styles.progressBar}>
+                        <Progress value={sendProgress} />
+                      </div>
+                    )}
                   </div>
-                  {isSending && sendProgress > 0 && (
-                    <div className={styles.progressBar}>
-                      <Progress value={sendProgress} />
-                    </div>
-                  )}
                 </div>
-              </div>
-            </section>
+              </section>
+            )}
             {/* Completed Exercises */}
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Completed Exercises</h2>
+              <h2 className={styles.sectionTitle}>
+                {isWorkoutCompleted ? "Workout Summary" : "Completed Exercises"}
+                {isWorkoutCompleted && (
+                  <span className={styles.completedBadge}>
+                    <CheckCircle className="h-4 w-4" />
+                    Completed
+                  </span>
+                )}
+              </h2>
               <div className={styles.completedExercises}>
                 {groupExercisesByName(exercises).map((exerciseGroup, groupIndex) => {
                   const totalSets = exerciseGroup.exercises.length;
@@ -785,34 +800,38 @@ export default function WorkoutJournal() {
                             </h3>
                           </div>
                           <div className={styles.completedExerciseActions}>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setEditingGroupIndex(groupIndex);
-                                setEditGroupName(exerciseGroup.name);
-                                setEditGroupNotes(exerciseGroup.notes || "");
-                                // Initialize editing data for each set
-                                const initialSetData: Record<number, { reps?: number; weight?: number; rpe?: number }> = {};
-                                exerciseGroup.exercises.forEach(exercise => {
-                                  initialSetData[exercise.id] = {
-                                    reps: exercise.reps || undefined,
-                                    weight: exercise.weight || undefined,
-                                    rpe: exercise.rpe || undefined
-                                  };
-                                });
-                                setEditingSetData(initialSetData);
-                              }}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDeleteExerciseId(exerciseGroup.exercises[0].id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            {!isWorkoutCompleted && (
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setEditingGroupIndex(groupIndex);
+                                    setEditGroupName(exerciseGroup.name);
+                                    setEditGroupNotes(exerciseGroup.notes || "");
+                                    // Initialize editing data for each set
+                                    const initialSetData: Record<number, { reps?: number; weight?: number; rpe?: number }> = {};
+                                    exerciseGroup.exercises.forEach(exercise => {
+                                      initialSetData[exercise.id] = {
+                                        reps: exercise.reps || undefined,
+                                        weight: exercise.weight || undefined,
+                                        rpe: exercise.rpe || undefined
+                                      };
+                                    });
+                                    setEditingSetData(initialSetData);
+                                  }}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeleteExerciseId(exerciseGroup.exercises[0].id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </div>
                       )}
@@ -986,17 +1005,19 @@ export default function WorkoutJournal() {
                 })}
               </div>
             </section>
-            {/* Complete Workout Button */}
-            <section className={styles.completeWorkoutSection}>
-              <Button
-                onClick={() => setShowCompleteDialog(true)}
-                variant="primary"
-                style={{ width: "100%" }}
-              >
-                <Trophy className="h-4 w-4 mr-2" />
-                Complete Workout
-              </Button>
-            </section>
+            {/* Complete Workout Button - Only show for active workouts */}
+            {!isWorkoutCompleted && (
+              <section className={styles.completeWorkoutSection}>
+                <Button
+                  onClick={() => setShowCompleteDialog(true)}
+                  variant="primary"
+                  style={{ width: "100%" }}
+                >
+                  <Trophy className="h-4 w-4 mr-2" />
+                  Complete Workout
+                </Button>
+              </section>
+            )}
           </div>
         )}
       </main>
