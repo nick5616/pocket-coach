@@ -78,6 +78,13 @@ export default function WorkoutJournal() {
   );
 
   // Group exercises by name for display
+  // Helper function to title case strings
+  const toTitleCase = (str: string) => {
+    return str.replace(/\w\S*/g, (txt) => 
+      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
+  };
+
   const groupExercisesByName = (exercises: Exercise[]) => {
     const grouped = new Map<string, Exercise[]>();
     
@@ -89,12 +96,20 @@ export default function WorkoutJournal() {
       grouped.get(name)!.push(exercise);
     });
     
-    return Array.from(grouped.entries()).map(([name, exerciseGroup]) => ({
-      name,
-      exercises: exerciseGroup,
-      muscleGroups: exerciseGroup[0]?.muscleGroups || [],
-      notes: exerciseGroup.find(e => e.notes)?.notes || null
-    }));
+    return Array.from(grouped.entries()).map(([name, exerciseGroup]) => {
+      // Collect all unique notes from exercises in this group
+      const allNotes = exerciseGroup
+        .map(e => e.notes)
+        .filter(note => note && note.trim())
+        .filter((note, index, arr) => arr.indexOf(note) === index);
+      
+      return {
+        name: toTitleCase(name),
+        exercises: exerciseGroup,
+        muscleGroups: exerciseGroup[0]?.muscleGroups || [],
+        notes: allNotes.length > 0 ? allNotes.join('; ') : null
+      };
+    });
   };
   const [deleteExerciseId, setDeleteExerciseId] = useState<number | null>(null);
 
@@ -752,65 +767,65 @@ export default function WorkoutJournal() {
                       key={`${exerciseGroup.name}-${groupIndex}`}
                       className={styles.completedExerciseCard}
                     >
-                      <div className={styles.completedExerciseHeader}>
-                        <div className={styles.completedExerciseInfo}>
-                          {editingGroupIndex === groupIndex ? (
-                            <Input
-                              value={editGroupName}
-                              onChange={(e) => setEditGroupName(e.target.value)}
-                              className={styles.editExerciseNameInput}
-                            />
-                          ) : (
+                      {editingGroupIndex === groupIndex ? (
+                        <div className={styles.editModeContainer}>
+                          <Input
+                            value={editGroupName}
+                            onChange={(e) => setEditGroupName(e.target.value)}
+                            className={styles.editExerciseNameInput}
+                            placeholder="Exercise name"
+                          />
+                          <div className={styles.editModeButtons}>
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => {
+                                // Save logic here - update exercise names
+                                setEditingGroupIndex(null);
+                              }}
+                              className={styles.editModeButton}
+                            >
+                              Save
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingGroupIndex(null)}
+                              className={styles.editModeButton}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className={styles.completedExerciseHeader}>
+                          <div className={styles.completedExerciseInfo}>
                             <h3 className={styles.completedExerciseTitle}>
                               {exerciseGroup.name}
                             </h3>
-                          )}
+                          </div>
+                          <div className={styles.completedExerciseActions}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditingGroupIndex(groupIndex);
+                                setEditGroupName(exerciseGroup.name);
+                                setEditGroupNotes(exerciseGroup.notes || "");
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeleteExerciseId(exerciseGroup.exercises[0].id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <div className={styles.completedExerciseActions}>
-                          {editingGroupIndex === groupIndex ? (
-                            <>
-                              <Button
-                                variant="primary"
-                                size="sm"
-                                onClick={() => {
-                                  // Save logic here
-                                  setEditingGroupIndex(null);
-                                }}
-                              >
-                                Save
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setEditingGroupIndex(null)}
-                              >
-                                Cancel
-                              </Button>
-                            </>
-                          ) : (
-                            <>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setEditingGroupIndex(groupIndex);
-                                  setEditGroupName(exerciseGroup.name);
-                                  setEditGroupNotes(exerciseGroup.notes || "");
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setDeleteExerciseId(exerciseGroup.exercises[0].id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </>
-                          )}
-                        </div>
-                      </div>
+                      )}
 
                       {/* Muscle Groups */}
                       {exerciseGroup.muscleGroups.length > 0 && (
@@ -830,17 +845,51 @@ export default function WorkoutJournal() {
                           <span className={styles.setHeaderItem}>Reps</span>
                           <span className={styles.setHeaderItem}>Weight</span>
                           <span className={styles.setHeaderItem}>RPE</span>
+                          {editingGroupIndex === groupIndex && <span className={styles.setHeaderItem}>Action</span>}
                         </div>
                         {exerciseGroup.exercises.map((exercise, setIndex) => (
-                          <div key={exercise.id} className={styles.exerciseSetRow}>
+                          <div key={exercise.id} className={`${styles.exerciseSetRow} ${editingGroupIndex === groupIndex ? styles.exerciseSetRowEditing : ''}`}>
                             <span className={styles.setNumber}>{setIndex + 1}</span>
-                            <span className={styles.setReps}>{exercise.reps}</span>
-                            <span className={styles.setWeight}>
-                              {exercise.weight ? `${exercise.weight} lbs` : '-'}
-                            </span>
-                            <span className={styles.setRpe}>
-                              {exercise.rpe || '-'}
-                            </span>
+                            {editingGroupIndex === groupIndex ? (
+                              <>
+                                <input 
+                                  type="number" 
+                                  value={exercise.reps || ''} 
+                                  className={styles.setInput}
+                                  placeholder="Reps"
+                                />
+                                <input 
+                                  type="number" 
+                                  value={exercise.weight || ''} 
+                                  className={styles.setInput}
+                                  placeholder="Weight"
+                                />
+                                <input 
+                                  type="number" 
+                                  value={exercise.rpe || ''} 
+                                  className={styles.setInput}
+                                  placeholder="RPE"
+                                />
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeleteExerciseId(exercise.id)}
+                                  className={styles.deleteSetButton}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <span className={styles.setReps}>{exercise.reps}</span>
+                                <span className={styles.setWeight}>
+                                  {exercise.weight ? `${exercise.weight} lbs` : '-'}
+                                </span>
+                                <span className={styles.setRpe}>
+                                  {exercise.rpe || '-'}
+                                </span>
+                              </>
+                            )}
                           </div>
                         ))}
                       </div>
