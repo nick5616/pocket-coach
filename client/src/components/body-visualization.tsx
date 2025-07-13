@@ -74,7 +74,7 @@ export default function BodyVisualization({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin h-12 w-12 border-b-2 border-blue-600" style={{ borderRadius: '50%' }}></div>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export default function BodyVisualization({
     <div className="w-full max-w-md mx-auto">
       {/* View Toggle */}
       <div className="flex justify-center mb-4">
-        <div className="flex bg-gray-100 rounded-lg p-1">
+        <div className="flex bg-gray-100 p-1" style={{ borderRadius: 'var(--radius-lg)' }}>
           <button
             onClick={() => setViewMode('front')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -108,7 +108,7 @@ export default function BodyVisualization({
       </div>
 
       {/* Body SVG */}
-      <div className="relative bg-white rounded-lg shadow-sm p-4">
+      <div className="relative bg-white shadow-sm p-4" style={{ borderRadius: 'var(--radius-lg)' }}>
         <svg
           viewBox="0 0 300 500"
           className="w-full h-auto"
@@ -454,7 +454,7 @@ export default function BodyVisualization({
 
         {/* Hover tooltip */}
         {hoveredMuscle && (
-          <div className="absolute top-2 left-2 bg-black/80 text-white px-3 py-2 rounded-lg text-sm">
+          <div className="absolute top-2 left-2 bg-black/80 text-white px-3 py-2 text-sm" style={{ borderRadius: 'var(--radius-lg)' }}>
             <div className="font-medium">{hoveredMuscle.displayName}</div>
             {heatMapData && (
               <div className="text-xs text-gray-300">

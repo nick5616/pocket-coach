@@ -37,7 +37,7 @@ export default function WorkoutCard({ workout, onViewDetails }: WorkoutCardProps
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-success-green/10 rounded-lg flex items-center justify-center mr-3">
+            <div className={styles.iconContainer}>
               <CheckCircle className="h-5 w-5 text-success-green" />
             </div>
             <div>
@@ -56,7 +56,7 @@ export default function WorkoutCard({ workout, onViewDetails }: WorkoutCardProps
         </div>
 
         {workout.notes && (
-          <div className="bg-gray-50 rounded-lg p-3 mb-3">
+          <div className={styles.detailsContainer}>
             <div className="text-xs text-gray-700 mb-2">Workout Notes:</div>
             <p className="text-sm text-gray-900 line-clamp-2">{workout.notes}</p>
           </div>

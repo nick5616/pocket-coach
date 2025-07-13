@@ -36,7 +36,7 @@ export default function AchievementModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-4 rounded-2xl p-0 overflow-hidden">
+      <DialogContent className="max-w-sm mx-4 p-0 overflow-hidden" style={{ borderRadius: 'var(--radius-xl)' }}>
         <DialogHeader className="sr-only">
           <DialogTitle>{achievement.title}</DialogTitle>
         </DialogHeader>
@@ -51,7 +51,8 @@ export default function AchievementModal({
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring" }}
-            className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4"
+            className="w-20 h-20 bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-4"
+            style={{ borderRadius: '50%' }}
           >
             <Icon className="h-10 w-10 text-white" />
           </motion.div>
