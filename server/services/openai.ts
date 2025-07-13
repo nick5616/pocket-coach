@@ -143,52 +143,53 @@ export async function parseWorkoutJournal(journalText: string): Promise<{
 }> {
   try {
     const prompt = `
-Parse the following free-form workout journal entry and extract structured exercise data:
+Parse the following free-form workout journal entry and extract structured exercise data. The user wrote this while exhausted in the gym, so use semantic understanding rather than relying on punctuation or delimiters.
 
 JOURNAL ENTRY:
 ${journalText}
 
-IMPORTANT PARSING RULES:
-1. For exercises with multiple sets of different weights/reps (e.g., "cable low row 45 for 12, 100 for 12, 145 for 10, 175 for 6"), create separate exercise entries for each set
-2. For exercises with consistent sets/reps (e.g., "pull-ups 4x8"), create one entry with sets=4, reps=8
-3. Always extract muscle groups for each exercise
+CRITICAL PARSING RULES:
+1. SEMANTIC DETECTION: Identify exercises based on context and exercise names, not just punctuation. Examples:
+   - "deadlifts 225x5 bench press 185x8 squats 315x3" should be parsed as 3 separate exercises
+   - "did some pullups then moved to lat pulldowns 100lbs for 12 also did bicep curls" should be 3 exercises
+   - "bench 135 for 10 then 155 for 8 then 175 for 5" should be 3 separate entries for bench press
+
+2. WEIGHT PROGRESSIONS: For exercises with multiple weights mentioned, create separate entries for each weight:
+   - "cable low row 45 for 12, 100 for 12, 145 for 10, 175 for 6" = 4 separate cable low row entries
+   - "squats worked up to 315 did 225x5, 275x3, 315x1" = 3 separate squat entries
+
+3. CONSISTENT SETS: For uniform sets/reps (e.g., "pull-ups 4x8"), create one entry with sets=4, reps=8
+
+4. EXERCISE NAME NORMALIZATION: Standardize exercise names:
+   - "pullups", "pull ups", "pull-ups" → "pull-ups"
+   - "lat pulldown", "lat pull down" → "lat pulldown"
+   - "bicep curls", "biceps curls" → "bicep curls"
+
+5. ALWAYS extract muscle groups for each exercise
 
 Extract exercises and return in this JSON format:
 {
   "exercises": [
     {
-      "name": "pull-ups",
-      "sets": 4,
+      "name": "deadlifts",
+      "sets": 1,
+      "reps": 5,
+      "weight": 225,
+      "muscleGroups": ["back", "legs", "glutes"]
+    },
+    {
+      "name": "bench press",
+      "sets": 1,
       "reps": 8,
-      "muscleGroups": ["back", "biceps"]
+      "weight": 185,
+      "muscleGroups": ["chest", "shoulders", "triceps"]
     },
     {
-      "name": "cable low row",
+      "name": "squats",
       "sets": 1,
-      "reps": 12,
-      "weight": 45,
-      "muscleGroups": ["back"]
-    },
-    {
-      "name": "cable low row",
-      "sets": 1,
-      "reps": 12,
-      "weight": 100,
-      "muscleGroups": ["back"]
-    },
-    {
-      "name": "cable low row",
-      "sets": 1,
-      "reps": 10,
-      "weight": 145,
-      "muscleGroups": ["back"]
-    },
-    {
-      "name": "cable low row",
-      "sets": 1,
-      "reps": 6,
-      "weight": 175,
-      "muscleGroups": ["back"]
+      "reps": 3,
+      "weight": 315,
+      "muscleGroups": ["legs", "glutes"]
     }
   ],
   "duration": 45,
@@ -196,9 +197,9 @@ Extract exercises and return in this JSON format:
   "summary": "Brief summary of the workout"
 }
 
-For muscle groups, use: chest, back, shoulders, biceps, triceps, legs, glutes, core, calves
-For intensity, use: light, moderate, high, very_high
-Duration should be in minutes if mentioned, otherwise omit.
+Muscle groups: chest, back, shoulders, biceps, triceps, legs, glutes, core, calves
+Intensity levels: light, moderate, high, very_high
+Duration in minutes if mentioned, otherwise omit.
 `;
 
     const response = await openai.chat.completions.create({
@@ -206,7 +207,7 @@ Duration should be in minutes if mentioned, otherwise omit.
       messages: [
         {
           role: "system",
-          content: "You are an expert at parsing workout logs and extracting structured data from free-form text. When exercises have multiple sets with different weights/reps, create separate entries for each set. Be precise with exercise names and conservative with estimates."
+          content: "You are an expert at parsing workout logs from exhausted gym users. Use semantic understanding to identify exercises without relying on punctuation or formatting. When exercises have multiple weights/reps mentioned, create separate entries for each set. Standardize exercise names and be precise with data extraction."
         },
         {
           role: "user",

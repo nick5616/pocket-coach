@@ -1,3 +1,63 @@
+/* Dialog Components */
+.dialogOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100; /* Higher than bottom navigation (z-index: 50) */
+  padding: 1rem;
+}
+
+.dialogContent {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 28rem;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.dialogInner {
+  padding: 1.5rem;
+}
+
+.dialogHeader {
+  margin-bottom: 1rem;
+}
+
+.dialogTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.dialogDescription {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0.5rem 0 0 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dialogContent {
+    background-color: #1f2937;
+  }
+  
+  .dialogTitle {
+    color: #f9fafb;
+  }
+  
+  .dialogDescription {
+    color: #9ca3af;
+  }
+}
+
 /* Button Components */
 .button {
   display: inline-flex;

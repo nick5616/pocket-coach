@@ -817,58 +817,53 @@ export default function WorkoutJournal() {
       </main>
       {/* Complete Workout Dialog */}
       <Dialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
-        <DialogContent className="w-[95vw] max-w-md">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Complete Workout</DialogTitle>
+            <p>Are you ready to finish this workout? AI will analyze your session and provide insights.</p>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <p className="text-gray-600">
-              Are you ready to finish this workout? AI will analyze your session
-              and provide insights.
-            </p>
-
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-center space-x-3 mb-2">
-                <Target className="h-5 w-5 text-green-500" />
-                <span className="font-medium">
-                  {exercises.length} exercises logged
-                </span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Clock className="h-5 w-5 text-blue-500" />
-                <span className="text-sm text-gray-600">
-                  Started{" "}
-                  {workout?.createdAt
-                    ? new Date(workout.createdAt).toLocaleTimeString()
-                    : "today"}
-                </span>
-              </div>
+          <div className={styles.dialogSummary}>
+            <div className={styles.dialogSummaryItem}>
+              <Target className="h-5 w-5" style={{ color: "#10b981" }} />
+              <span className={styles.dialogSummaryText}>
+                {exercises.length} exercises logged
+              </span>
             </div>
-
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowCompleteDialog(false)}
-                className="flex-1"
-              >
-                Keep Going
-              </Button>
-              <Button
-                onClick={() => completeWorkoutMutation.mutate()}
-                disabled={completeWorkoutMutation.isPending}
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
-              >
-                {completeWorkoutMutation.isPending ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border border-white border-t-transparent rounded-full mr-2" />
-                    Completing...
-                  </>
-                ) : (
-                  "Complete Workout"
-                )}
-              </Button>
+            <div className={styles.dialogSummaryItem}>
+              <Clock className="h-5 w-5" style={{ color: "#3b82f6" }} />
+              <span className={styles.dialogTimeText}>
+                Started{" "}
+                {workout?.createdAt
+                  ? new Date(workout.createdAt).toLocaleTimeString()
+                  : "today"}
+              </span>
             </div>
+          </div>
+
+          <div className={styles.dialogButtonRow}>
+            <Button
+              variant="outline"
+              onClick={() => setShowCompleteDialog(false)}
+              style={{ flex: 1 }}
+            >
+              Keep Going
+            </Button>
+            <Button
+              onClick={() => completeWorkoutMutation.mutate()}
+              disabled={completeWorkoutMutation.isPending}
+              variant="primary"
+              style={{ flex: 1 }}
+            >
+              {completeWorkoutMutation.isPending ? (
+                <>
+                  <div className={styles.dialogLoadingSpinner} />
+                  Completing...
+                </>
+              ) : (
+                "Complete Workout"
+              )}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -877,17 +872,22 @@ export default function WorkoutJournal() {
         open={!!editingExercise}
         onOpenChange={() => setEditingExercise(null)}
       >
-        <DialogContent className="w-[95vw] max-w-md">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Exercise</DialogTitle>
           </DialogHeader>
 
           {editingExercise && (
-            <form onSubmit={handleUpdateExercise} className="space-y-4">
-              <div>
+            <form onSubmit={handleUpdateExercise}>
+              <div style={{ marginBottom: "1rem" }}>
                 <label
                   htmlFor="exerciseName"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  style={{
+                    display: "block",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    marginBottom: "0.5rem"
+                  }}
                 >
                   Exercise Name
                 </label>
@@ -899,10 +899,15 @@ export default function WorkoutJournal() {
                 />
               </div>
 
-              <div>
+              <div style={{ marginBottom: "1rem" }}>
                 <label
                   htmlFor="exerciseNotes"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  style={{
+                    display: "block",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    marginBottom: "0.5rem"
+                  }}
                 >
                   Notes
                 </label>
