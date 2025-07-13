@@ -181,16 +181,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create exercises from parsed data
       const exercises = [];
       for (const exerciseData of parsedData.exercises) {
-        const exercise = await storage.createExercise({
-          workoutId: workoutId,
-          name: exerciseData.name,
-          sets: exerciseData.sets,
-          reps: exerciseData.reps,
-          weight: exerciseData.weight,
-          rpe: exerciseData.rpe,
-          muscleGroups: exerciseData.muscleGroups
-        });
-        exercises.push(exercise);
+        // Handle arrays by creating individual exercise entries
+        if (Array.isArray(exerciseData.reps) || Array.isArray(exerciseData.weight)) {
+          // If AI returned arrays, create individual entries for each set
+          const repsArray = Array.isArray(exerciseData.reps) ? exerciseData.reps : [exerciseData.reps];
+          const weightsArray = Array.isArray(exerciseData.weight) ? exerciseData.weight : [exerciseData.weight];
+          const maxLength = Math.max(repsArray.length, weightsArray.length);
+          
+          for (let i = 0; i < maxLength; i++) {
+            const exerciseToCreate = {
+              workoutId: workoutId,
+              name: exerciseData.name,
+              sets: 1, // Each entry represents one set
+              reps: typeof repsArray[i] === 'number' ? repsArray[i] : undefined,
+              weight: typeof weightsArray[i] === 'number' ? weightsArray[i] : undefined,
+              rpe: typeof exerciseData.rpe === 'number' ? exerciseData.rpe : undefined,
+              muscleGroups: Array.isArray(exerciseData.muscleGroups) ? exerciseData.muscleGroups : []
+            };
+            
+            const exercise = await storage.createExercise(exerciseToCreate);
+            exercises.push(exercise);
+          }
+        } else {
+          // Normal case - single exercise
+          const exerciseToCreate = {
+            workoutId: workoutId,
+            name: exerciseData.name,
+            sets: typeof exerciseData.sets === 'number' ? exerciseData.sets : undefined,
+            reps: typeof exerciseData.reps === 'number' ? exerciseData.reps : undefined,
+            weight: typeof exerciseData.weight === 'number' ? exerciseData.weight : undefined,
+            rpe: typeof exerciseData.rpe === 'number' ? exerciseData.rpe : undefined,
+            muscleGroups: Array.isArray(exerciseData.muscleGroups) ? exerciseData.muscleGroups : []
+          };
+          
+          const exercise = await storage.createExercise(exerciseToCreate);
+          exercises.push(exercise);
+        }
       }
 
       res.json({ workout: { ...workout, exercises }, parsedData });

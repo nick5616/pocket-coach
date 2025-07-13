@@ -516,7 +516,6 @@ export default function WorkoutJournal() {
                                       <Badge
                                         key={idx}
                                         variant="secondary"
-                                        className="text-xs"
                                       >
                                         {muscle}
                                       </Badge>
@@ -526,12 +525,10 @@ export default function WorkoutJournal() {
                               )}
                           </div>
 
-                          {/* 2x2 Action Buttons */}
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className={styles.actionButtons}>
                             <Button
                               variant="outline"
                               size="sm"
-                              className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
                               disabled={isSkipped}
                               onClick={() =>
                                 handleExactCompletion(currentExercise, index)
@@ -542,7 +539,6 @@ export default function WorkoutJournal() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
                               disabled={isSkipped}
                               onClick={() =>
                                 handleModifiedCompletion(currentExercise, index)
@@ -553,7 +549,6 @@ export default function WorkoutJournal() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
                               disabled={isSkipped}
                               onClick={() =>
                                 handleSwapExercise(currentExercise, index)
@@ -564,7 +559,6 @@ export default function WorkoutJournal() {
                             <Button
                               variant={isSkipped ? "secondary" : "outline"}
                               size="sm"
-                              className="text-xs"
                               onClick={() => handleSkipExercise(index)}
                             >
                               {isSkipped ? "↩️ Unskip" : "⏭️ Skip Today"}
@@ -591,9 +585,13 @@ export default function WorkoutJournal() {
                             : styles.programmedExerciseCard
                         }
                       >
-                        <div className="mb-3">
+                        <div className={styles.exerciseHeader}>
                           <h3
-                            className={`font-semibold text-base mb-1 ${isSkipped ? "text-gray-500" : "text-blue-900"}`}
+                            className={
+                              isSkipped
+                                ? `${styles.exerciseName} ${styles.exerciseNameSkipped}`
+                                : styles.exerciseName
+                            }
                           >
                             {currentExercise.name}
                           </h3>
@@ -620,13 +618,12 @@ export default function WorkoutJournal() {
                           </div>
                           {currentExercise.muscleGroups &&
                             currentExercise.muscleGroups.length > 0 && (
-                              <div className="flex flex-wrap gap-1">
+                              <div className={styles.muscleGroupsContainer}>
                                 {currentExercise.muscleGroups.map(
                                   (muscle: string, idx: number) => (
                                     <Badge
                                       key={idx}
                                       variant="secondary"
-                                      className="text-xs"
                                     >
                                       {muscle}
                                     </Badge>
@@ -639,9 +636,8 @@ export default function WorkoutJournal() {
                         {/* 2x2 Action Buttons */}
                         <div className={styles.actionButtons}>
                           <Button
-                            variant="secondary"
+                            variant="outline"
                             size="sm"
-                            className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
                             disabled={isSkipped}
                             onClick={() =>
                               handleExactCompletion(currentExercise, index)
@@ -650,9 +646,8 @@ export default function WorkoutJournal() {
                             ✅ As Prescribed
                           </Button>
                           <Button
-                            variant="secondary"
+                            variant="outline"
                             size="sm"
-                            className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
                             disabled={isSkipped}
                             onClick={() =>
                               handleModifiedCompletion(currentExercise, index)
@@ -661,9 +656,8 @@ export default function WorkoutJournal() {
                             📝 With Changes
                           </Button>
                           <Button
-                            variant="secondary"
+                            variant="outline"
                             size="sm"
-                            className={`text-xs ${isSkipped ? "opacity-50 cursor-not-allowed" : ""}`}
                             disabled={isSkipped}
                             onClick={() =>
                               handleSwapExercise(currentExercise, index)
@@ -672,9 +666,8 @@ export default function WorkoutJournal() {
                             🔄 Swap Exercise
                           </Button>
                           <Button
-                            variant="secondary"
+                            variant={isSkipped ? "secondary" : "outline"}
                             size="sm"
-                            className="text-xs"
                             onClick={() => handleSkipExercise(index)}
                           >
                             {isSkipped ? "↩️ Unskip" : "⏭️ Skip Today"}
@@ -687,18 +680,17 @@ export default function WorkoutJournal() {
               )}
             </section>
             {/* Workout Input */}
-            <section className="px-4 py-4">
-              <div className="bg-white rounded-lg border border-gray-200">
+            <section className={styles.workoutInput}>
+              <div className={styles.inputContainer}>
                 <Textarea
                   ref={inputRef}
                   value={currentInput}
                   onChange={(e) => setCurrentInput(e.target.value)}
                   placeholder="How's your workout going? Log exercises, sets, reps, or just your thoughts..."
-                  className="border-0 resize-none min-h-[120px]"
                 />
-                <div className="border-t border-gray-200 p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-500">
+                <div className={styles.inputFooter}>
+                  <div className={styles.inputStatus}>
+                    <div className={styles.statusText}>
                       {saveStatus === "typing" && "Typing..."}
                       {saveStatus === "saved" && "✓ Saved!"}
                     </div>
@@ -711,14 +703,9 @@ export default function WorkoutJournal() {
                       Send to AI
                     </Button>
                   </div>
-                  {isSending && (
-                    <div className="mt-2">
-                      <div className="bg-gray-200 rounded-full h-1">
-                        <div
-                          className="bg-blue-500 h-1 rounded-full transition-all duration-300"
-                          style={{ width: `${sendProgress}%` }}
-                        />
-                      </div>
+                  {isSending && sendProgress > 0 && (
+                    <div className={styles.progressBar}>
+                      <Progress value={sendProgress} />
                     </div>
                   )}
                 </div>
@@ -765,7 +752,6 @@ export default function WorkoutJournal() {
                             <Badge
                               key={index}
                               variant="secondary"
-                              className="text-xs"
                             >
                               {muscle}
                             </Badge>
@@ -816,10 +802,11 @@ export default function WorkoutJournal() {
               </div>
             </section>
             {/* Complete Workout Button */}
-            <section className="px-4 pb-6">
+            <section className={styles.completeWorkoutSection}>
               <Button
                 onClick={() => setShowCompleteDialog(true)}
-                className="w-full bg-green-500 hover:bg-green-600 text-white"
+                variant="primary"
+                style={{ width: "100%" }}
               >
                 <Trophy className="h-4 w-4 mr-2" />
                 Complete Workout
