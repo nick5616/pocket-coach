@@ -148,16 +148,47 @@ Parse the following free-form workout journal entry and extract structured exerc
 JOURNAL ENTRY:
 ${journalText}
 
+IMPORTANT PARSING RULES:
+1. For exercises with multiple sets of different weights/reps (e.g., "cable low row 45 for 12, 100 for 12, 145 for 10, 175 for 6"), create separate exercise entries for each set
+2. For exercises with consistent sets/reps (e.g., "pull-ups 4x8"), create one entry with sets=4, reps=8
+3. Always extract muscle groups for each exercise
+
 Extract exercises and return in this JSON format:
 {
   "exercises": [
     {
-      "name": "exercise name",
-      "sets": 3,
+      "name": "pull-ups",
+      "sets": 4,
+      "reps": 8,
+      "muscleGroups": ["back", "biceps"]
+    },
+    {
+      "name": "cable low row",
+      "sets": 1,
+      "reps": 12,
+      "weight": 45,
+      "muscleGroups": ["back"]
+    },
+    {
+      "name": "cable low row",
+      "sets": 1,
+      "reps": 12,
+      "weight": 100,
+      "muscleGroups": ["back"]
+    },
+    {
+      "name": "cable low row",
+      "sets": 1,
       "reps": 10,
-      "weight": 135,
-      "rpe": 7,
-      "muscleGroups": ["chest", "triceps"]
+      "weight": 145,
+      "muscleGroups": ["back"]
+    },
+    {
+      "name": "cable low row",
+      "sets": 1,
+      "reps": 6,
+      "weight": 175,
+      "muscleGroups": ["back"]
     }
   ],
   "duration": 45,
@@ -175,7 +206,7 @@ Duration should be in minutes if mentioned, otherwise omit.
       messages: [
         {
           role: "system",
-          content: "You are an expert at parsing workout logs and extracting structured data from free-form text. Be precise with exercise names and conservative with estimates."
+          content: "You are an expert at parsing workout logs and extracting structured data from free-form text. When exercises have multiple sets with different weights/reps, create separate entries for each set. Be precise with exercise names and conservative with estimates."
         },
         {
           role: "user",
