@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "../lib/queryClient";
 import { Sun, Moon, Monitor, LogOut, Settings } from "lucide-react";
 import { Button } from "../components/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
@@ -19,8 +20,25 @@ export default function Profile() {
     return <LoadingScreen message="Loading profile..." />;
   }
 
-  const handleLogout = () => {
-    window.location.href = '/api/logout';
+  const handleLogout = async () => {
+    try {
+      // Clear React Query cache before logout
+      queryClient.clear();
+      
+      const response = await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        // Clear any client-side cache and redirect to root
+        window.location.href = '/';
+      }
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Fallback to hard redirect
+      window.location.href = '/api/logout';
+    }
   };
 
   const ThemeToggle = () => {

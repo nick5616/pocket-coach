@@ -13,7 +13,7 @@ import Workouts from "./pages/workouts";
 import BottomNavigation from "./components/bottom-navigation";
 
 // Authentication Page Component
-function AuthPage() {
+function AuthPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +33,8 @@ function AuthPage() {
       });
 
       if (response.ok) {
-        window.location.reload();
+        // Instead of window.location.reload(), refresh auth state
+        onLoginSuccess();
       } else {
         const errorData = await response.text();
         setError(errorData || "Login failed");
@@ -165,24 +166,39 @@ function useAuth() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetch("/api/auth/user", { credentials: "include" })
-      .then(response => response.ok ? response.json() : null)
-      .then(userData => {
+  const checkAuth = async () => {
+    try {
+      const response = await fetch("/api/auth/user", { credentials: "include" });
+      if (response.ok) {
+        const userData = await response.json();
         setUser(userData);
-        setIsLoading(false);
-      })
-      .catch(() => {
+      } else {
         setUser(null);
-        setIsLoading(false);
-      });
+      }
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
   }, []);
 
-  return { user, isLoading, isAuthenticated: !!user };
+  const refreshAuth = () => {
+    setIsLoading(true);
+    // Clear all cached queries on auth change
+    queryClient.clear();
+    checkAuth();
+  };
+
+  return { user, isLoading, isAuthenticated: !!user, refreshAuth };
 }
 
 function AppContent() {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated, refreshAuth } = useAuth();
 
   if (isLoading) {
     return (
@@ -198,7 +214,7 @@ function AppContent() {
   }
 
   if (!isAuthenticated) {
-    return <AuthPage />;
+    return <AuthPage onLoginSuccess={refreshAuth} />;
   }
 
   return (
