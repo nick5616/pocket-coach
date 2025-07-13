@@ -69,6 +69,7 @@ export default function WorkoutJournal() {
   const [editingGroupIndex, setEditingGroupIndex] = useState<number | null>(null);
   const [editGroupName, setEditGroupName] = useState("");
   const [editGroupNotes, setEditGroupNotes] = useState("");
+  const [editingSetData, setEditingSetData] = useState<Record<number, { reps?: number; weight?: number; rpe?: number }>>({});
 
   const [skippedExercises, setSkippedExercises] = useState<Set<number>>(
     new Set(),
@@ -775,27 +776,6 @@ export default function WorkoutJournal() {
                             className={styles.editExerciseNameInput}
                             placeholder="Exercise name"
                           />
-                          <div className={styles.editModeButtons}>
-                            <Button
-                              variant="primary"
-                              size="sm"
-                              onClick={() => {
-                                // Save logic here - update exercise names
-                                setEditingGroupIndex(null);
-                              }}
-                              className={styles.editModeButton}
-                            >
-                              Save
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingGroupIndex(null)}
-                              className={styles.editModeButton}
-                            >
-                              Cancel
-                            </Button>
-                          </div>
                         </div>
                       ) : (
                         <div className={styles.completedExerciseHeader}>
@@ -812,6 +792,16 @@ export default function WorkoutJournal() {
                                 setEditingGroupIndex(groupIndex);
                                 setEditGroupName(exerciseGroup.name);
                                 setEditGroupNotes(exerciseGroup.notes || "");
+                                // Initialize editing data for each set
+                                const initialSetData: Record<number, { reps?: number; weight?: number; rpe?: number }> = {};
+                                exerciseGroup.exercises.forEach(exercise => {
+                                  initialSetData[exercise.id] = {
+                                    reps: exercise.reps || undefined,
+                                    weight: exercise.weight || undefined,
+                                    rpe: exercise.rpe || undefined
+                                  };
+                                });
+                                setEditingSetData(initialSetData);
                               }}
                             >
                               <Edit className="h-4 w-4" />
@@ -854,21 +844,44 @@ export default function WorkoutJournal() {
                               <>
                                 <input 
                                   type="number" 
-                                  value={exercise.reps || ''} 
+                                  value={editingSetData[exercise.id]?.reps || ''} 
+                                  onChange={(e) => setEditingSetData(prev => ({
+                                    ...prev,
+                                    [exercise.id]: {
+                                      ...prev[exercise.id],
+                                      reps: e.target.value ? parseInt(e.target.value) : undefined
+                                    }
+                                  }))}
                                   className={styles.setInput}
                                   placeholder="Reps"
                                 />
                                 <input 
                                   type="number" 
-                                  value={exercise.weight || ''} 
+                                  value={editingSetData[exercise.id]?.weight || ''} 
+                                  onChange={(e) => setEditingSetData(prev => ({
+                                    ...prev,
+                                    [exercise.id]: {
+                                      ...prev[exercise.id],
+                                      weight: e.target.value ? parseFloat(e.target.value) : undefined
+                                    }
+                                  }))}
                                   className={styles.setInput}
                                   placeholder="Weight"
                                 />
                                 <input 
                                   type="number" 
-                                  value={exercise.rpe || ''} 
+                                  value={editingSetData[exercise.id]?.rpe || ''} 
+                                  onChange={(e) => setEditingSetData(prev => ({
+                                    ...prev,
+                                    [exercise.id]: {
+                                      ...prev[exercise.id],
+                                      rpe: e.target.value ? parseInt(e.target.value) : undefined
+                                    }
+                                  }))}
                                   className={styles.setInput}
                                   placeholder="RPE"
+                                  min="1"
+                                  max="10"
                                 />
                                 <Button
                                   variant="ghost"
@@ -915,6 +928,7 @@ export default function WorkoutJournal() {
                         </div>
                       </div>
 
+                      {/* Notes Section */}
                       {editingGroupIndex === groupIndex ? (
                         <div className={styles.exerciseNotesContainer}>
                           <div className={styles.exerciseNotesLabel}>Notes:</div>
@@ -925,12 +939,46 @@ export default function WorkoutJournal() {
                             rows={2}
                           />
                         </div>
-                      ) : exerciseGroup.notes && (
+                      ) : exerciseGroup.notes ? (
                         <div className={styles.exerciseNotesContainer}>
                           <div className={styles.exerciseNotesLabel}>Notes:</div>
                           <p className={styles.exerciseNotesText}>
                             {exerciseGroup.notes}
                           </p>
+                        </div>
+                      ) : null}
+
+                      {/* Edit Mode Buttons - Always at bottom when editing */}
+                      {editingGroupIndex === groupIndex && (
+                        <div className={styles.editModeButtons}>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => {
+                              // Save logic here - update exercise names and set data
+                              console.log('Saving changes:', { 
+                                name: editGroupName, 
+                                notes: editGroupNotes, 
+                                setData: editingSetData 
+                              });
+                              setEditingGroupIndex(null);
+                              setEditingSetData({});
+                            }}
+                            className={styles.editModeButton}
+                          >
+                            Save Changes
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setEditingGroupIndex(null);
+                              setEditingSetData({});
+                            }}
+                            className={styles.editModeButton}
+                          >
+                            Cancel
+                          </Button>
                         </div>
                       )}
                     </div>
