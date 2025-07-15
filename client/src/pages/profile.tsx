@@ -262,15 +262,15 @@ export default function Profile() {
         {/* Tab Content */}
         <section className="px-4">
           {activeTab === "profile" && (
-            <div className="space-y-4">
+            <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
+                  <CardTitle className={styles.headerLeft}>
                     <Settings className="h-5 w-5 marginRight: "0.5rem"}} />
                     Settings
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Push Notifications</Label>
@@ -299,19 +299,19 @@ export default function Profile() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
+                  <CardTitle className={styles.headerLeft}>
                     <Smartphone className="h-5 w-5 marginRight: "0.5rem"}} />
                     App Info
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent style={{display: "flex", flexDirection: "column", gap: "0.75rem"}}>
                   <div className="flex items-center justify-between">
                     <span>Version</span>
-                    <span className="text-gray-500">1.0.0</span>
+                    <span style={{color: "var(--text-secondary)"}}>1.0.0</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Storage Used</span>
-                    <span className="text-gray-500">12.4 MB</span>
+                    <span style={{color: "var(--text-secondary)"}}>12.4 MB</span>
                   </div>
                   <Button variant="outline" className="w-full">
                     <Download className="h-4 w-4 marginRight: "0.5rem"}} />
@@ -323,7 +323,7 @@ export default function Profile() {
           )}
 
           {activeTab === "goals" && (
-            <div className="space-y-4">
+            <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Fitness Goals</h3>
                 <Button
@@ -341,17 +341,17 @@ export default function Profile() {
               </div>
 
               {goals.length > 0 ? (
-                <div className="space-y-3">
+                <div style={{display: "flex", flexDirection: "column", gap: "0.75rem"}}>
                   {goals.map((goal) => {
                     const progress = goal.targetValue ? 
                       Math.min(100, (goal.currentValue! / goal.targetValue) * 100) : 0;
                     
                     return (
                       <Card key={goal.id}>
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-gray-900">{goal.title}</h4>
+                        <CardContent className={styles.content}>
+                          <div className={styles.header}>
+                            <div style={{flex: "1"}}>
+                              <h4 style={{fontWeight: "600", color: "var(--text-primary)"}}>{goal.title}</h4>
                               <p className="text-sm text-gray-500 capitalize">
                                 {goal.category} {goal.muscleGroup && `• ${goal.muscleGroup}`}
                               </p>
@@ -404,8 +404,8 @@ export default function Profile() {
                   })}
                 </div>
               ) : (
-                <Card className="border-dashed border-2 border-gray-200">
-                  <CardContent className="p-8 text-center">
+                <Card style={{border: "2px dashed var(--border-secondary)"}}>
+                  <CardContent style={{padding: "2rem", textAlign: "center"}}>
                     <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                       <Target className="h-8 w-8 text-gray-400" />
                     </div>
@@ -427,16 +427,16 @@ export default function Profile() {
           )}
 
           {activeTab === "achievements" && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Card className="text-center">
-                  <CardContent className="p-4">
+            <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
+              <div style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "1rem"}}>
+                <Card style={{textAlign: "center"}}>
+                  <CardContent className={styles.content}>
                     <div style={{fontSize: "1.5rem", fontWeight: "bold", color: "var(--text-primary)"}}>{achievements.length}</div>
                     <div className="text-sm text-gray-500">Total Badges</div>
                   </CardContent>
                 </Card>
-                <Card className="text-center">
-                  <CardContent className="p-4">
+                <Card style={{textAlign: "center"}}>
+                  <CardContent className={styles.content}>
                     <div style={{fontSize: "1.5rem", fontWeight: "bold", color: "var(--text-primary)"}}>{userStats.longestStreak}</div>
                     <div className="text-sm text-gray-500">Longest Streak</div>
                   </CardContent>
@@ -444,16 +444,16 @@ export default function Profile() {
               </div>
 
               {achievements.length > 0 ? (
-                <div className="space-y-3">
+                <div style={{display: "flex", flexDirection: "column", gap: "0.75rem"}}>
                   {achievements.map((achievement) => (
                     <Card key={achievement.id}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center">
+                      <CardContent className={styles.content}>
+                        <div className={styles.headerLeft}>
                           <div className="w-12 h-12 bg-duolingo-green/10 rounded-full flex items-center justify-center mr-4">
                             <Trophy className="h-6 w-6 text-duolingo-green" />
                           </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-900">{achievement.title}</h4>
+                          <div style={{flex: "1"}}>
+                            <h4 style={{fontWeight: "600", color: "var(--text-primary)"}}>{achievement.title}</h4>
                             <p className="text-sm text-gray-600">{achievement.description}</p>
                             <div className="text-xs text-gray-500 mt-1">
                               {new Date(achievement.createdAt!).toLocaleDateString()}
@@ -468,13 +468,13 @@ export default function Profile() {
                   ))}
                 </div>
               ) : (
-                <Card className="border-dashed border-2 border-gray-200">
-                  <CardContent className="p-8 text-center">
+                <Card style={{border: "2px dashed var(--border-secondary)"}}>
+                  <CardContent style={{padding: "2rem", textAlign: "center"}}>
                     <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                       <Award className="h-8 w-8 text-gray-400" />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">No badges yet</h3>
-                    <p className="text-gray-500">
+                    <p style={{color: "var(--text-secondary)"}}>
                       Complete workouts and reach your goals to earn achievement badges!
                     </p>
                   </CardContent>
@@ -495,7 +495,7 @@ export default function Profile() {
           </DialogHeader>
           
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmitGoal)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmitGoal)} style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
               <FormField
                 control={form.control}
                 name="title"
@@ -558,7 +558,7 @@ export default function Profile() {
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "1rem"}}>
                 <FormField
                   control={form.control}
                   name="targetValue"
@@ -642,7 +642,7 @@ export default function Profile() {
                   type="button"
                   variant="outline"
                   onClick={() => setShowGoalDialog(false)}
-                  className="flex-1"
+                  style={{flex: "1"}}
                 >
                   Cancel
                 </Button>

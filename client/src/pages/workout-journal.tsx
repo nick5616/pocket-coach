@@ -1129,7 +1129,7 @@ export default function WorkoutJournal() {
                   type="button"
                   variant="outline"
                   onClick={() => setEditingExercise(null)}
-                  className="flex-1"
+                  style={{flex: "1"}}
                 >
                   Cancel
                 </Button>
@@ -1175,7 +1175,7 @@ export default function WorkoutJournal() {
             <Button
               variant="outline"
               onClick={() => setDeleteExerciseId(null)}
-              className="flex-1"
+              style={{flex: "1"}}
             >
               Cancel
             </Button>

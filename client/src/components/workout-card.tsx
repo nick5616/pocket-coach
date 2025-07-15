@@ -33,21 +33,21 @@ export default function WorkoutCard({ workout, onViewDetails }: WorkoutCardProps
   };
 
   return (
-    <Card className="shadow-sm border border-gray-100">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center">
+    <Card className={styles.card}>
+      <CardContent className={styles.content}>
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
             <div className={styles.iconContainer}>
               <CheckCircle className="h-5 w-5 text-success-green" />
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900">{workout.name}</h4>
+              <h4 style={{fontWeight: "600", color: "var(--text-primary)"}}>{workout.name}</h4>
               <p className="text-xs text-gray-600">
                 {formatDate(workout.createdAt!)} {workout.completedAt && `, ${formatTime(workout.completedAt)}`}
               </p>
             </div>
           </div>
-          <div className="text-right">
+          <div style={{textAlign: "right"}}>
             <div className="text-lg font-bold text-gray-900">
               {workout.duration ? `${workout.duration}m` : "--"}
             </div>

@@ -122,7 +122,7 @@ export default function Progress() {
         <section className="px-4 py-4">
           {selectedTab === "overview" && (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "1rem"}}>
                 <Card>
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-blue-600">
@@ -170,16 +170,16 @@ export default function Progress() {
           )}
 
           {selectedTab === "goals" && (
-            <div className="space-y-4">
+            <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
               {goals.map((goal) => (
                 <Card
                   key={goal.id}
                   className="cursor-pointer hover:shadow-md transition-shadow"
                   onClick={() => setSelectedGoalId(goal.id)}
                 >
-                  <CardContent className="p-4">
+                  <CardContent className={styles.content}>
                     <div className="flex items-center justify-between">
-                      <div className="flex-1">
+                      <div style={{flex: "1"}}>
                         <h3 className="font-medium">{goal.title}</h3>
                         <p className="text-sm text-gray-600 mt-1">
                           {goal.description}
@@ -208,12 +208,12 @@ export default function Progress() {
 
               {goals.length === 0 && (
                 <Card>
-                  <CardContent className="p-8 text-center">
+                  <CardContent style={{padding: "2rem", textAlign: "center"}}>
                     <Target className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
                       No goals set
                     </h3>
-                    <p className="text-gray-600">
+                    <p style={{color: "var(--text-secondary)"}}>
                       Set your first fitness goal to start tracking progress
                     </p>
                   </CardContent>
@@ -223,7 +223,7 @@ export default function Progress() {
           )}
 
           {selectedTab === "body" && (
-            <div className="space-y-4">
+            <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
               <Card>
                 <CardHeader>
                   <CardTitle>Body Heat Map</CardTitle>
@@ -236,15 +236,15 @@ export default function Progress() {
           )}
 
           {selectedTab === "achievements" && (
-            <div className="space-y-4">
+            <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
               {achievements.map((achievement) => (
                 <Card key={achievement.id}>
-                  <CardContent className="p-4">
+                  <CardContent className={styles.content}>
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
                         <Award style={{width: "1.25rem", height: "1.25rem"}} text-yellow-600" />
                       </div>
-                      <div className="flex-1">
+                      <div style={{flex: "1"}}>
                         <h3 className="font-medium">{achievement.title}</h3>
                         <p className="text-sm text-gray-600">
                           {achievement.description}
@@ -263,12 +263,12 @@ export default function Progress() {
 
               {achievements.length === 0 && (
                 <Card>
-                  <CardContent className="p-8 text-center">
+                  <CardContent style={{padding: "2rem", textAlign: "center"}}>
                     <Award className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
                       No achievements yet
                     </h3>
-                    <p className="text-gray-600">
+                    <p style={{color: "var(--text-secondary)"}}>
                       Complete workouts and goals to earn achievements
                     </p>
                   </CardContent>
@@ -289,8 +289,8 @@ export default function Progress() {
             <DialogHeader>
               <DialogTitle>{selectedGoal.title}</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <p className="text-gray-600">{selectedGoal.description}</p>
+            <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
+              <p style={{color: "var(--text-secondary)"}}>{selectedGoal.description}</p>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Progress:</span>

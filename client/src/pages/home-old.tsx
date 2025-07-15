@@ -276,7 +276,7 @@ export default function Home() {
               </Button>
             </Link>
           ) : activeProgram ? (
-            <div className="space-y-3">
+            <div style={{display: "flex", flexDirection: "column", gap: "0.75rem"}}>
               <Link href={`/workouts/program/${activeProgram?.id}`}>
                 <Button
                   size="lg"
@@ -316,11 +316,11 @@ export default function Home() {
               </Link>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
               <div className="text-center text-gray-600 text-sm mb-4">
                 You do not appear to be in a program
               </div>
-              <div className="space-y-3">
+              <div style={{display: "flex", flexDirection: "column", gap: "0.75rem"}}>
                 <Link href="/workout-journal">
                   <Button
                     size="lg"
@@ -402,7 +402,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="space-y-3">
+          <div style={{display: "flex", flexDirection: "column", gap: "0.75rem"}}>
             {recentWorkouts.length > 0 ? (
               recentWorkouts.map((workout) => (
                 <WorkoutCard
@@ -415,7 +415,7 @@ export default function Home() {
                 />
               ))
             ) : (
-              <Card className="border-dashed border-2 border-gray-200">
+              <Card style={{border: "2px dashed var(--border-secondary)"}}>
                 <CardContent className="p-6 text-center">
                   <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                     <Plus className="h-6 w-6 text-gray-400" />
@@ -446,7 +446,7 @@ export default function Home() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Your Progress Insights
             </h3>
-            <Card className="border-dashed border-2 border-gray-200">
+            <Card style={{border: "2px dashed var(--border-secondary)"}}>
               <CardContent className="p-6 text-center">
                 <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <ChartLine className="h-6 w-6 text-gray-400" />
@@ -478,7 +478,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="space-y-3">
+          <div style={{display: "flex", flexDirection: "column", gap: "0.75rem"}}>
             {goals.length > 0 ? (
               goals.slice(0, 2).map((goal) => {
                 const progress = goal.targetValue
@@ -495,13 +495,13 @@ export default function Home() {
 
                 return (
                   <Card key={goal.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center">
+                    <CardContent className={styles.content}>
+                      <div className={styles.header}>
+                        <div className={styles.headerLeft}>
                           <div className="w-8 h-8 bg-duolingo-blue/10 rounded-lg flex items-center justify-center mr-3">
                             <Target className="h-4 w-4 text-duolingo-blue" />
                           </div>
-                          <h4 className="font-semibold text-gray-900">
+                          <h4 style={{fontWeight: "600", color: "var(--text-primary)"}}>
                             {goal.title}
                           </h4>
                         </div>
@@ -530,7 +530,7 @@ export default function Home() {
                 );
               })
             ) : (
-              <Card className="border-dashed border-2 border-gray-200">
+              <Card style={{border: "2px dashed var(--border-secondary)"}}>
                 <CardContent className="p-6 text-center">
                   <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                     <Target className="h-6 w-6 text-gray-400" />

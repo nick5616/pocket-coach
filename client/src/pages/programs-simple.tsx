@@ -308,7 +308,7 @@ export default function Programs() {
                               <span className={styles.metadataLabel}>Focus:</span>
                               <div className={styles.metadataBadges}>
                                 {program.focusAreas.map((area, index) => (
-                                  <Badge key={index} variant="outline" className="text-xs">
+                                  <Badge key={index} variant="outline" style={{fontSize: "0.75rem"}}>
                                     {area}
                                   </Badge>
                                 ))}
@@ -324,7 +324,7 @@ export default function Programs() {
                               <span className={styles.metadataLabel}>Equipment:</span>
                               <div className={styles.metadataBadges}>
                                 {program.equipment.map((item, index) => (
-                                  <Badge key={index} variant="outline" className="text-xs">
+                                  <Badge key={index} variant="outline" style={{fontSize: "0.75rem"}}>
                                     {item}
                                   </Badge>
                                 ))}
@@ -338,14 +338,14 @@ export default function Programs() {
                     {/* Bottom row with badges and action button */}
                     <div className={`${styles.bottomRow} ${isDark ? styles.dark : ''}`}>
                       <div className={styles.badgeGroup}>
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" style={{fontSize: "0.75rem"}}>
                           {program.durationWeeks || 4} weeks
                         </Badge>
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" style={{fontSize: "0.75rem"}}>
                           {program.difficulty || "Beginner"}
                         </Badge>
                         {program.isActive && (
-                          <Badge variant="default" className="text-xs">
+                          <Badge variant="default" style={{fontSize: "0.75rem"}}>
                             <div className={styles.pulseDot}></div>
                             Active
                           </Badge>
