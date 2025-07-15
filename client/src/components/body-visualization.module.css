@@ -1,0 +1,155 @@
+/* Body Visualization Component Styles */
+
+.container {
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.viewToggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.toggleButtons {
+  display: flex;
+  background: var(--bg-secondary);
+  padding: 0.25rem;
+  border-radius: var(--radius-lg);
+}
+
+.toggleButton {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.toggleButton.active {
+  background: white;
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.toggleButton.inactive {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.toggleButton.inactive:hover {
+  color: var(--text-primary);
+}
+
+.svgContainer {
+  position: relative;
+  background: var(--bg-primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-primary);
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  max-height: 600px;
+}
+
+.muscleElement {
+  cursor: pointer;
+  transition: stroke 0.2s ease;
+}
+
+.muscleElement:hover {
+  stroke: #3b82f6;
+}
+
+.tooltip {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.75rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+  z-index: 10;
+}
+
+.tooltipTitle {
+  font-weight: 500;
+}
+
+.tooltipSubtext {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.legend {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.legendColors {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.legendColor {
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--radius-sm);
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24rem;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  height: 3rem;
+  width: 3rem;
+  border-bottom: 2px solid #2563eb;
+  border-radius: 50%;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  .toggleButtons {
+    background: var(--gray-800);
+  }
+  
+  .toggleButton.active {
+    background: var(--gray-700);
+    color: var(--gray-100);
+  }
+  
+  .toggleButton.inactive {
+    color: var(--gray-400);
+  }
+  
+  .toggleButton.inactive:hover {
+    color: var(--gray-200);
+  }
+  
+  .svgContainer {
+    background: var(--gray-800);
+    border-color: var(--gray-700);
+  }
+  
+  .legend {
+    color: var(--gray-300);
+  }
+}

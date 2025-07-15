@@ -21,16 +21,16 @@ body {
 }
 
 #root {
-  height: 100vh;
-  max-height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--bg-secondary, #f8fafc);
   /* Improve mobile scrolling behavior */
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   position: relative;
-  /* Fix mobile scrolling position */
-  scroll-behavior: auto;
 }
 
 /* Duolingo-inspired Design System */
@@ -477,18 +477,36 @@ body {
   overflow-x: hidden;
 }
 
-/* Fix for iOS Safari address bar bouncing and viewport changes */
+/* Mobile-optimized viewport that handles browser UI changes */
 #root {
+  /* Use min-height instead of height to allow natural content flow */
   min-height: 100vh;
-  max-height: 100vh;
-  overflow: hidden;
+  /* Prevent horizontal scrolling */
+  overflow-x: hidden;
+  /* Allow vertical scrolling with momentum on iOS */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Prevent bounce effect when reaching the top/bottom */
+  overscroll-behavior-y: contain;
 }
 
 .page {
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  /* Let content determine height naturally */
+  min-height: 100vh;
+  /* Add padding to prevent content from hiding behind browser UI */
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  /* Ensure smooth scrolling */
+  scroll-behavior: smooth;
+  /* Prevent text selection on touch devices */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Re-enable text selection for interactive elements */
+.page input, .page textarea, .page [contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 /* Mobile touch scrolling improvements */
@@ -531,7 +549,7 @@ input, textarea, [contenteditable] {
   }
 }
 
-/* Additional mobile viewport fixes */
+/* Additional mobile viewport fixes and touch handling */
 @media screen and (max-width: 768px) {
   /* Ensure mobile browsers don't add extra space */
   html, body {
@@ -539,14 +557,31 @@ input, textarea, [contenteditable] {
     overflow-x: hidden;
   }
   
-  /* Fix viewport on mobile when keyboard appears */
+  /* Better mobile scrolling - no forced height constraints */
   .page {
-    min-height: 100dvh;
+    min-height: 100vh;
     position: relative;
+    /* Prevent bounce at top/bottom */
+    overscroll-behavior-y: contain;
+    /* Enable momentum scrolling */
+    -webkit-overflow-scrolling: touch;
   }
   
   /* Prevent zoom on input focus */
   input, select, textarea {
     font-size: 16px;
+  }
+  
+  /* Improve touch targets */
+  button, [role="button"], .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better scroll behavior for content areas */
+  .container, .page-content, main {
+    /* Allow natural scrolling without forcing viewport constraints */
+    scroll-behavior: auto;
+    overscroll-behavior-y: contain;
   }
 }

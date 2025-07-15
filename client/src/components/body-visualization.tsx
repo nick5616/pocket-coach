@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import styles from './body-visualization.module.css';
 
 interface MuscleGroup {
   id: number;
@@ -73,79 +74,26 @@ export default function BodyVisualization({
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '24rem' }}>
-        <div style={{ 
-          animation: 'spin 1s linear infinite',
-          height: '3rem',
-          width: '3rem',
-          borderBottom: '2px solid #2563eb',
-          borderRadius: '50%'
-        }}></div>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingSpinner}></div>
       </div>
     );
   }
 
   return (
-    <div style={{ width: '100%', maxWidth: '28rem', margin: '0 auto' }}>
+    <div className={styles.container}>
       {/* View Toggle */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-        <div style={{ 
-          display: 'flex', 
-          background: 'var(--bg-secondary)', 
-          padding: '0.25rem',
-          borderRadius: 'var(--radius-lg)' 
-        }}>
+      <div className={styles.viewToggle}>
+        <div className={styles.toggleButtons}>
           <button
             onClick={() => setViewMode('front')}
-            style={{
-              padding: '0.5rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              transition: 'all 0.2s ease',
-              background: viewMode === 'front' ? 'white' : 'transparent',
-              color: viewMode === 'front' ? 'var(--text-primary)' : 'var(--text-secondary)',
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: viewMode === 'front' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
-            }}
-            onMouseEnter={(e) => {
-              if (viewMode !== 'front') {
-                e.currentTarget.style.color = 'var(--text-primary)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (viewMode !== 'front') {
-                e.currentTarget.style.color = 'var(--text-secondary)';
-              }
-            }}
+            className={`${styles.toggleButton} ${viewMode === 'front' ? styles.active : styles.inactive}`}
           >
             Front
           </button>
           <button
             onClick={() => setViewMode('back')}
-            style={{
-              padding: '0.5rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              transition: 'all 0.2s ease',
-              background: viewMode === 'back' ? 'white' : 'transparent',
-              color: viewMode === 'back' ? 'var(--text-primary)' : 'var(--text-secondary)',
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: viewMode === 'back' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
-            }}
-            onMouseEnter={(e) => {
-              if (viewMode !== 'back') {
-                e.currentTarget.style.color = 'var(--text-primary)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (viewMode !== 'back') {
-                e.currentTarget.style.color = 'var(--text-secondary)';
-              }
-            }}
+            className={`${styles.toggleButton} ${viewMode === 'back' ? styles.active : styles.inactive}`}
           >
             Back
           </button>
@@ -153,21 +101,10 @@ export default function BodyVisualization({
       </div>
 
       {/* Body SVG */}
-      <div style={{ 
-        position: 'relative', 
-        background: 'var(--bg-primary)', 
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)', 
-        padding: '1rem',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-primary)'
-      }}>
+      <div className={styles.svgContainer}>
         <svg
           viewBox="0 0 300 500"
-          style={{ 
-            width: '100%', 
-            height: 'auto',
-            maxHeight: '600px'
-          }}
+          className={styles.svg}
         >
           {viewMode === 'front' ? (
             // Front view body parts
@@ -517,20 +454,10 @@ export default function BodyVisualization({
 
         {/* Hover tooltip */}
         {hoveredMuscle && (
-          <div style={{ 
-            position: 'absolute',
-            top: '0.5rem',
-            left: '0.5rem',
-            background: 'rgba(0, 0, 0, 0.8)',
-            color: 'white',
-            padding: '0.75rem',
-            borderRadius: 'var(--radius-lg)',
-            fontSize: '0.875rem',
-            zIndex: 10
-          }}>
-            <div style={{ fontWeight: '500' }}>{hoveredMuscle.displayName}</div>
+          <div className={styles.tooltip}>
+            <div className={styles.tooltipTitle}>{hoveredMuscle.displayName}</div>
             {heatMapData && (
-              <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.7)' }}>
+              <div className={styles.tooltipSubtext}>
                 {getMuscleData(hoveredMuscle.svgId)?.progress.frequency || 0} workouts •{' '}
                 {getMuscleData(hoveredMuscle.svgId)?.progress.lastWorked 
                   ? `${Math.floor((Date.now() - new Date(getMuscleData(hoveredMuscle.svgId)!.progress.lastWorked!).getTime()) / (1000 * 60 * 60 * 24))} days ago`
@@ -543,26 +470,14 @@ export default function BodyVisualization({
       </div>
 
       {/* Heat Map Legend */}
-      <div style={{ 
-        marginTop: '1rem',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '0.5rem',
-        fontSize: '0.75rem',
-        color: 'var(--text-secondary)'
-      }}>
+      <div className={styles.legend}>
         <span>Low</span>
-        <div style={{ display: 'flex', gap: '0.25rem' }}>
+        <div className={styles.legendColors}>
           {[0, 0.2, 0.4, 0.6, 0.8, 1].map((intensity, index) => (
             <div
               key={index}
-              style={{ 
-                width: '1rem',
-                height: '1rem',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: getHeatColor(intensity)
-              }}
+              className={styles.legendColor}
+              style={{ backgroundColor: getHeatColor(intensity) }}
             />
           ))}
         </div>
