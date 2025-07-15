@@ -1,7 +1,7 @@
 /* Workout Journal Component Styles */
 
 .container {
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: #f9fafb;
   /* Override global container styles for full-width layout */
   max-width: none !important;

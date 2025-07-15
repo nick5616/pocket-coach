@@ -13,13 +13,24 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.2s ease, color 0.2s ease;
+  /* Fix iOS Safari elastic scrolling and touch handling */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+  /* Prevent iOS Safari from jumping to middle of page */
+  scroll-behavior: auto;
 }
 
 #root {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--bg-secondary, #f8fafc);
+  /* Improve mobile scrolling behavior */
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  position: relative;
+  /* Fix mobile scrolling position */
+  scroll-behavior: auto;
 }
 
 /* Duolingo-inspired Design System */
@@ -277,7 +288,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg-secondary);
 }
 
@@ -444,6 +455,73 @@ body {
   100% { background-position: -200% 0; }
 }
 
+/* Mobile-specific fixes for iOS Safari viewport and scrolling */
+html {
+  /* Set explicit height to help mobile browsers understand viewport */
+  height: 100%;
+  /* Prevent zoom on double tap in iOS Safari */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  /* Ensure body takes full height and eliminates any extra space */
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  /* Prevent horizontal scrolling on mobile */
+  overflow-x: hidden;
+}
+
+/* Fix for iOS Safari address bar bouncing and viewport changes */
+@supports (height: 100dvh) {
+  #root {
+    min-height: 100dvh;
+  }
+  
+  .page {
+    min-height: 100dvh;
+  }
+}
+
+/* Fallback for browsers that don't support dvh */
+@supports not (height: 100dvh) {
+  #root {
+    min-height: 100vh;
+  }
+  
+  .page {
+    min-height: 100vh;
+  }
+}
+
+/* Mobile touch scrolling improvements */
+* {
+  /* Improve touch scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent content from being selected accidentally */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection for inputs and text areas */
+input, textarea, [contenteditable] {
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Fix iOS elastic scrolling and prevent rubber band effect */
+.page, .main, [data-scrollable] {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Responsive adjustments */
 @media (max-width: 380px) {
   .container {
@@ -453,5 +531,25 @@ body {
   .btn {
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: 0.8rem;
+  }
+}
+
+/* Additional mobile viewport fixes */
+@media screen and (max-width: 768px) {
+  /* Ensure mobile browsers don't add extra space */
+  html, body {
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  /* Fix viewport on mobile when keyboard appears */
+  .page {
+    min-height: 100dvh;
+    position: relative;
+  }
+  
+  /* Prevent zoom on input focus */
+  input, select, textarea {
+    font-size: 16px;
   }
 }

@@ -48,7 +48,7 @@ function AuthPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
 
   return (
     <div style={{
-      minHeight: "100vh",
+      minHeight: "100dvh",
       background: "linear-gradient(135deg, #f0fff4 0%, #e6f3ff 100%)",
       display: "flex",
       alignItems: "center",
