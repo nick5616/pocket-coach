@@ -58,7 +58,7 @@ export default function Home() {
   const inProgressWorkout = workouts.find((w) => !w.isCompleted);
 
   return (
-    <div>
+    <div className="page">
       {/* Welcome Header */}
       <header
         style={{

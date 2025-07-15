@@ -98,7 +98,7 @@ export default function Programs() {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} page`}>
       <div className={styles.header}>
         <h1 className={styles.headerTitle}>Programs</h1>
         <Button

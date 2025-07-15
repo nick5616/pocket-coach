@@ -21,13 +21,13 @@ body {
 }
 
 #root {
-  min-height: 100dvh;
+  height: 100vh;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--bg-secondary, #f8fafc);
   /* Improve mobile scrolling behavior */
-  -webkit-overflow-scrolling: touch;
-  overflow-y: auto;
+  overflow: hidden;
   position: relative;
   /* Fix mobile scrolling position */
   scroll-behavior: auto;
@@ -455,6 +455,11 @@ body {
   100% { background-position: -200% 0; }
 }
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Mobile-specific fixes for iOS Safari viewport and scrolling */
 html {
   /* Set explicit height to help mobile browsers understand viewport */
@@ -473,25 +478,17 @@ body {
 }
 
 /* Fix for iOS Safari address bar bouncing and viewport changes */
-@supports (height: 100dvh) {
-  #root {
-    min-height: 100dvh;
-  }
-  
-  .page {
-    min-height: 100dvh;
-  }
+#root {
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
 }
 
-/* Fallback for browsers that don't support dvh */
-@supports not (height: 100dvh) {
-  #root {
-    min-height: 100vh;
-  }
-  
-  .page {
-    min-height: 100vh;
-  }
+.page {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Mobile touch scrolling improvements */

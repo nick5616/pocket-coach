@@ -200,7 +200,7 @@ export default function Programs() {
 
   return (
     <>
-      <main className={`${styles.container} ${isDark ? styles.dark : ''}`}>
+      <main className={`${styles.container} ${isDark ? styles.dark : ''} page`}>
         {/* Header */}
         <header className={`${styles.header} ${isDark ? styles.dark : ''}`}>
           <div className={styles.headerFlex}>

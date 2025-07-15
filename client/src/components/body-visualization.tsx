@@ -73,34 +73,79 @@ export default function BodyVisualization({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="animate-spin h-12 w-12 border-b-2 border-blue-600" style={{ borderRadius: '50%' }}></div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '24rem' }}>
+        <div style={{ 
+          animation: 'spin 1s linear infinite',
+          height: '3rem',
+          width: '3rem',
+          borderBottom: '2px solid #2563eb',
+          borderRadius: '50%'
+        }}></div>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div style={{ width: '100%', maxWidth: '28rem', margin: '0 auto' }}>
       {/* View Toggle */}
-      <div className="flex justify-center mb-4">
-        <div className="flex bg-gray-100 p-1" style={{ borderRadius: 'var(--radius-lg)' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+        <div style={{ 
+          display: 'flex', 
+          background: 'var(--bg-secondary)', 
+          padding: '0.25rem',
+          borderRadius: 'var(--radius-lg)' 
+        }}>
           <button
             onClick={() => setViewMode('front')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              viewMode === 'front'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              transition: 'all 0.2s ease',
+              background: viewMode === 'front' ? 'white' : 'transparent',
+              color: viewMode === 'front' ? 'var(--text-primary)' : 'var(--text-secondary)',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: viewMode === 'front' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+            }}
+            onMouseEnter={(e) => {
+              if (viewMode !== 'front') {
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (viewMode !== 'front') {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }
+            }}
           >
             Front
           </button>
           <button
             onClick={() => setViewMode('back')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              viewMode === 'back'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              transition: 'all 0.2s ease',
+              background: viewMode === 'back' ? 'white' : 'transparent',
+              color: viewMode === 'back' ? 'var(--text-primary)' : 'var(--text-secondary)',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: viewMode === 'back' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+            }}
+            onMouseEnter={(e) => {
+              if (viewMode !== 'back') {
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (viewMode !== 'back') {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }
+            }}
           >
             Back
           </button>
@@ -108,11 +153,21 @@ export default function BodyVisualization({
       </div>
 
       {/* Body SVG */}
-      <div className="relative bg-white shadow-sm p-4" style={{ borderRadius: 'var(--radius-lg)' }}>
+      <div style={{ 
+        position: 'relative', 
+        background: 'var(--bg-primary)', 
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)', 
+        padding: '1rem',
+        borderRadius: 'var(--radius-lg)',
+        border: '1px solid var(--border-primary)'
+      }}>
         <svg
           viewBox="0 0 300 500"
-          className="w-full h-auto"
-          style={{ maxHeight: '600px' }}
+          style={{ 
+            width: '100%', 
+            height: 'auto',
+            maxHeight: '600px'
+          }}
         >
           {viewMode === 'front' ? (
             // Front view body parts
@@ -127,16 +182,24 @@ export default function BodyVisualization({
                 fill={getMuscleData('chest')?.progress.intensity ? getHeatColor(getMuscleData('chest')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('chest')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('chest')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                style={{ cursor: 'pointer', transition: 'stroke 0.2s ease' }}
                 onClick={() => {
                   const data = getMuscleData('chest');
                   if (data) handleMuscleClick(data.muscleGroup);
                 }}
-                onMouseEnter={() => {
+                onMouseEnter={(e) => {
                   const data = getMuscleData('chest');
                   if (data) setHoveredMuscle(data.muscleGroup);
+                  if (!selectedMuscles.includes(getMuscleData('chest')?.muscleGroup.id || 0)) {
+                    e.currentTarget.style.stroke = '#3b82f6';
+                  }
                 }}
-                onMouseLeave={() => setHoveredMuscle(null)}
+                onMouseLeave={(e) => {
+                  setHoveredMuscle(null);
+                  if (!selectedMuscles.includes(getMuscleData('chest')?.muscleGroup.id || 0)) {
+                    e.currentTarget.style.stroke = '#e5e7eb';
+                  }
+                }}
               />
               
               {/* Abs */}
@@ -454,10 +517,20 @@ export default function BodyVisualization({
 
         {/* Hover tooltip */}
         {hoveredMuscle && (
-          <div className="absolute top-2 left-2 bg-black/80 text-white px-3 py-2 text-sm" style={{ borderRadius: 'var(--radius-lg)' }}>
-            <div className="font-medium">{hoveredMuscle.displayName}</div>
+          <div style={{ 
+            position: 'absolute',
+            top: '0.5rem',
+            left: '0.5rem',
+            background: 'rgba(0, 0, 0, 0.8)',
+            color: 'white',
+            padding: '0.75rem',
+            borderRadius: 'var(--radius-lg)',
+            fontSize: '0.875rem',
+            zIndex: 10
+          }}>
+            <div style={{ fontWeight: '500' }}>{hoveredMuscle.displayName}</div>
             {heatMapData && (
-              <div className="text-xs text-gray-300">
+              <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.7)' }}>
                 {getMuscleData(hoveredMuscle.svgId)?.progress.frequency || 0} workouts •{' '}
                 {getMuscleData(hoveredMuscle.svgId)?.progress.lastWorked 
                   ? `${Math.floor((Date.now() - new Date(getMuscleData(hoveredMuscle.svgId)!.progress.lastWorked!).getTime()) / (1000 * 60 * 60 * 24))} days ago`
@@ -470,14 +543,26 @@ export default function BodyVisualization({
       </div>
 
       {/* Heat Map Legend */}
-      <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-600">
+      <div style={{ 
+        marginTop: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '0.5rem',
+        fontSize: '0.75rem',
+        color: 'var(--text-secondary)'
+      }}>
         <span>Low</span>
-        <div className="flex gap-1">
+        <div style={{ display: 'flex', gap: '0.25rem' }}>
           {[0, 0.2, 0.4, 0.6, 0.8, 1].map((intensity, index) => (
             <div
               key={index}
-              className="w-4 h-4 rounded"
-              style={{ backgroundColor: getHeatColor(intensity) }}
+              style={{ 
+                width: '1rem',
+                height: '1rem',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: getHeatColor(intensity)
+              }}
             />
           ))}
         </div>
