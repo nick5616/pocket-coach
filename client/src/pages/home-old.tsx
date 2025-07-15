@@ -178,7 +178,7 @@ export default function Home() {
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-duolingo-green rounded-full flex items-center justify-center">
               <svg
-                className="w-4 h-4 text-white"
+                style={{width: "1rem", height: "1rem"}} text-white"
                 fill="currentColor"
                 viewBox="0 0 24 24"
               >
@@ -358,7 +358,7 @@ export default function Home() {
               <div className="flex items-center mb-3">
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3">
                   <svg
-                    className="w-4 h-4"
+                    style={{width: "1rem", height: "1rem"}}"
                     fill="currentColor"
                     viewBox="0 0 24 24"
                   >
@@ -388,7 +388,7 @@ export default function Home() {
         {/* Recent Workouts */}
         <section className="px-4 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 style={{fontSize: "1.125rem", fontWeight: "600", color: "var(--text-primary)"}}>
               Recent Workouts
             </h3>
             <Link href="/workouts">
@@ -466,7 +466,7 @@ export default function Home() {
         {/* Goals */}
         <section className="px-4 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Your Goals</h3>
+            <h3 style={{fontSize: "1.125rem", fontWeight: "600", color: "var(--text-primary)"}}>Your Goals</h3>
             <Link href="/profile">
               <Button
                 variant="ghost"

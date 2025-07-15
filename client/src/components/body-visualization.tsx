@@ -146,7 +146,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('abs')?.progress.intensity ? getHeatColor(getMuscleData('abs')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('abs')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('abs')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('abs');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -165,7 +165,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('shoulders')?.progress.intensity ? getHeatColor(getMuscleData('shoulders')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('shoulders')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('shoulders')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('shoulders');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -184,7 +184,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('shoulders')?.progress.intensity ? getHeatColor(getMuscleData('shoulders')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('shoulders')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('shoulders')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('shoulders');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -203,7 +203,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('biceps')?.progress.intensity ? getHeatColor(getMuscleData('biceps')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('biceps')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('biceps')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('biceps');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -222,7 +222,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('biceps')?.progress.intensity ? getHeatColor(getMuscleData('biceps')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('biceps')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('biceps')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('biceps');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -241,7 +241,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('quads')?.progress.intensity ? getHeatColor(getMuscleData('quads')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('quads')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('quads')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('quads');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -260,7 +260,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('quads')?.progress.intensity ? getHeatColor(getMuscleData('quads')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('quads')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('quads')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('quads');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -279,7 +279,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('calves')?.progress.intensity ? getHeatColor(getMuscleData('calves')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('calves')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('calves')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('calves');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -298,7 +298,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('calves')?.progress.intensity ? getHeatColor(getMuscleData('calves')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('calves')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('calves')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('calves');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -323,7 +323,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('back')?.progress.intensity ? getHeatColor(getMuscleData('back')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('back')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('back')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('back');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -342,7 +342,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('lower-back')?.progress.intensity ? getHeatColor(getMuscleData('lower-back')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('lower-back')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('lower-back')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('lower-back');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -361,7 +361,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('triceps')?.progress.intensity ? getHeatColor(getMuscleData('triceps')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('triceps')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('triceps')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('triceps');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -380,7 +380,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('triceps')?.progress.intensity ? getHeatColor(getMuscleData('triceps')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('triceps')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('triceps')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('triceps');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -399,7 +399,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('glutes')?.progress.intensity ? getHeatColor(getMuscleData('glutes')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('glutes')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('glutes')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('glutes');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -418,7 +418,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('hamstrings')?.progress.intensity ? getHeatColor(getMuscleData('hamstrings')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('hamstrings')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('hamstrings')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('hamstrings');
                   if (data) handleMuscleClick(data.muscleGroup);
@@ -437,7 +437,7 @@ export default function BodyVisualization({
                 fill={getMuscleData('hamstrings')?.progress.intensity ? getHeatColor(getMuscleData('hamstrings')!.progress.intensity) : '#f3f4f6'}
                 stroke={selectedMuscles.includes(getMuscleData('hamstrings')?.muscleGroup.id || 0) ? '#3b82f6' : '#e5e7eb'}
                 strokeWidth={selectedMuscles.includes(getMuscleData('hamstrings')?.muscleGroup.id || 0) ? '3' : '2'}
-                className="cursor-pointer hover:stroke-blue-500 transition-colors"
+                className={styles.muscleElement}
                 onClick={() => {
                   const data = getMuscleData('hamstrings');
                   if (data) handleMuscleClick(data.muscleGroup);

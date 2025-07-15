@@ -209,7 +209,7 @@ export default function Programs() {
               <p className={`${styles.subtitle} ${isDark ? styles.dark : ''}`}>Structured workout plans</p>
             </div>
             <Button onClick={() => setIsCreateOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
               New Program
             </Button>
           </div>
@@ -222,7 +222,7 @@ export default function Programs() {
               <CardContent className={styles.activeCardContent}>
                 <div className={styles.activeInfo}>
                   <div className={`${styles.activeIcon} ${isDark ? styles.dark : ''}`}>
-                    <Play className="w-5 h-5" style={{color: isDark ? '#60a5fa' : '#2563eb'}} />
+                    <Play style={{ width: '1.25rem', height: '1.25rem', color: isDark ? '#60a5fa' : '#2563eb' }} />
                   </div>
                   <div>
                     <h3 className={`${styles.activeTitle} ${isDark ? styles.dark : ''}`}>Active Program</h3>
@@ -231,7 +231,7 @@ export default function Programs() {
                 </div>
                 <Link href="/workout-journal">
                   <Button size="sm">
-                    <Dumbbell className="w-4 h-4 mr-2" />
+                    <Dumbbell style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
                     Start Workout
                   </Button>
                 </Link>
@@ -363,14 +363,14 @@ export default function Programs() {
                             disabled={activateProgramMutation.isPending}
                             size="sm"
                           >
-                            <Play className="w-4 h-4 mr-2" />
+                            <Play style={{width: "1rem", height: "1rem"}} marginRight: "0.5rem"}} />
                             {activateProgramMutation.isPending ? "Activating..." : "Activate"}
                           </Button>
                         )}
                         {program.isActive && (
                           <Link href="/workout-journal">
                             <Button size="sm">
-                              <Dumbbell className="w-4 h-4 mr-2" />
+                              <Dumbbell style={{width: "1rem", height: "1rem"}} marginRight: "0.5rem"}} />
                               Workout
                             </Button>
                           </Link>
@@ -397,7 +397,7 @@ export default function Programs() {
                   </p>
                   {selectedTab === "all" && (
                     <Button onClick={() => setIsCreateOpen(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
+                      <Plus style={{width: "1rem", height: "1rem"}} marginRight: "0.5rem"}} />
                       Create First Program
                     </Button>
                   )}

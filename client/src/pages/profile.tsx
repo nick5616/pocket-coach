@@ -266,7 +266,7 @@ export default function Profile() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Settings className="h-5 w-5 mr-2" />
+                    <Settings className="h-5 w-5 marginRight: "0.5rem"}} />
                     Settings
                   </CardTitle>
                 </CardHeader>
@@ -300,7 +300,7 @@ export default function Profile() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Smartphone className="h-5 w-5 mr-2" />
+                    <Smartphone className="h-5 w-5 marginRight: "0.5rem"}} />
                     App Info
                   </CardTitle>
                 </CardHeader>
@@ -314,7 +314,7 @@ export default function Profile() {
                     <span className="text-gray-500">12.4 MB</span>
                   </div>
                   <Button variant="outline" className="w-full">
-                    <Download className="h-4 w-4 mr-2" />
+                    <Download className="h-4 w-4 marginRight: "0.5rem"}} />
                     Export Data
                   </Button>
                 </CardContent>
@@ -417,7 +417,7 @@ export default function Profile() {
                       onClick={() => setShowGoalDialog(true)}
                       className="bg-duolingo-green hover:bg-duolingo-green/90"
                     >
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus className="h-4 w-4 marginRight: "0.5rem"}} />
                       Create First Goal
                     </Button>
                   </CardContent>
@@ -431,13 +431,13 @@ export default function Profile() {
               <div className="grid grid-cols-2 gap-4">
                 <Card className="text-center">
                   <CardContent className="p-4">
-                    <div className="text-2xl font-bold text-gray-900">{achievements.length}</div>
+                    <div style={{fontSize: "1.5rem", fontWeight: "bold", color: "var(--text-primary)"}}>{achievements.length}</div>
                     <div className="text-sm text-gray-500">Total Badges</div>
                   </CardContent>
                 </Card>
                 <Card className="text-center">
                   <CardContent className="p-4">
-                    <div className="text-2xl font-bold text-gray-900">{userStats.longestStreak}</div>
+                    <div style={{fontSize: "1.5rem", fontWeight: "bold", color: "var(--text-primary)"}}>{userStats.longestStreak}</div>
                     <div className="text-sm text-gray-500">Longest Streak</div>
                   </CardContent>
                 </Card>

@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/D
 import { Button } from "@/components/Button";
 import { Trophy, Star, Zap, Target } from "lucide-react";
 import { motion } from "framer-motion";
+import styles from './achievement-modal.module.css';
 
 interface AchievementModalProps {
   isOpen: boolean;
@@ -36,8 +37,8 @@ export default function AchievementModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-4 p-0 overflow-hidden" style={{ borderRadius: 'var(--radius-xl)' }}>
-        <DialogHeader className="sr-only">
+      <DialogContent className={styles.container}>
+        <DialogHeader style={{ position: 'absolute', left: '-9999px' }}>
           <DialogTitle>{achievement.title}</DialogTitle>
         </DialogHeader>
         <motion.div
@@ -45,23 +46,22 @@ export default function AchievementModal({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ type: "spring", damping: 20, stiffness: 300 }}
-          className="p-6 text-center bg-gradient-to-br from-duolingo-green to-green-600 text-white"
+          className={styles.content}
         >
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring" }}
-            className="w-20 h-20 bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-4"
-            style={{ borderRadius: '50%' }}
+            className={styles.iconContainer}
           >
-            <Icon className="h-10 w-10 text-white" />
+            <Icon className={styles.icon} />
           </motion.div>
           
           <motion.h3
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="text-xl font-bold mb-2"
+            className={styles.title}
           >
             {achievement.title}
           </motion.h3>
@@ -70,7 +70,7 @@ export default function AchievementModal({
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-green-100 mb-6"
+            className={styles.description}
           >
             {achievement.description}
           </motion.p>
@@ -82,7 +82,7 @@ export default function AchievementModal({
           >
             <Button
               onClick={onClose}
-              className="bg-white text-duolingo-green hover:bg-gray-50 font-semibold w-full"
+              className={styles.button}
               size="lg"
             >
               Continue

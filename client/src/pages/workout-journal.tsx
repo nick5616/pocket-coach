@@ -744,7 +744,7 @@ export default function WorkoutJournal() {
                         disabled={!currentInput.trim() || isSending}
                         size="sm"
                       >
-                        <Send className="h-4 w-4 mr-2" />
+                        <Send style={{ width: "1rem", height: "1rem", marginRight: "0.5rem" }} />
                         Send to AI
                       </Button>
                     </div>
@@ -1013,7 +1013,7 @@ export default function WorkoutJournal() {
                   variant="primary"
                   style={{ width: "100%" }}
                 >
-                  <Trophy className="h-4 w-4 mr-2" />
+                  <Trophy style={{ width: "1rem", height: "1rem", marginRight: "0.5rem" }} />
                   Complete Workout
                 </Button>
               </section>

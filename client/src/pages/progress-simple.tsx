@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import type { Goal, Workout, Achievement } from "@shared/schema";
 import LoadingScreen from "../components/loading-screen";
+import styles from './progress-simple.module.css';
 
 export default function Progress() {
   const [selectedTab, setSelectedTab] = useState<
@@ -56,7 +57,7 @@ export default function Progress() {
 
   if (goalsLoading || workoutsLoading || achievementsLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className={styles.loadingContainer}>
         <LoadingScreen message="Loading your progress..." />
       </div>
     );
@@ -69,14 +70,14 @@ export default function Progress() {
         <header className="bg-white shadow-sm border-b px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Progress</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 style={{fontSize: "1.5rem", fontWeight: "bold", color: "var(--text-primary)"}}>Progress</h1>
+              <p style={{color: "var(--text-secondary)", marginTop: "0.25rem"}}>
                 Track your fitness achievements
               </p>
             </div>
             <div className="flex items-center space-x-2">
-              <Award className="w-6 h-6 text-yellow-500" />
-              <span className="text-lg font-semibold text-gray-900">
+              <Award style={{width: "1.5rem", height: "1.5rem"}} text-yellow-500" />
+              <span style={{fontSize: "1.125rem", fontWeight: "600", color: "var(--text-primary)"}}>
                 {achievements.length}
               </span>
             </div>
@@ -199,7 +200,7 @@ export default function Progress() {
                           </span>
                         </div>
                       </div>
-                      <Target className="w-5 h-5 text-gray-400" />
+                      <Target style={{width: "1.25rem", height: "1.25rem"}} text-gray-400" />
                     </div>
                   </CardContent>
                 </Card>
@@ -241,7 +242,7 @@ export default function Progress() {
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                        <Award className="w-5 h-5 text-yellow-600" />
+                        <Award style={{width: "1.25rem", height: "1.25rem"}} text-yellow-600" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-medium">{achievement.title}</h3>
