@@ -78,14 +78,19 @@ Email/password authentication with bcrypt hashing and PostgreSQL session store u
 - Static files served from `dist/public`
 - Replit Autoscale deployment target
 
-### Critical Deployment Fix for Chrome Errors
-**Issue**: Chrome shows "Unexpected token '<'" and blank screen due to asset filename mismatch and incorrect environment mode.
+### Desktop Browser Cache Issue - FIXED ✅
+**Issue**: Desktop browsers (Chrome, Firefox) showing blank screens with "Unexpected token '<'" errors due to cached asset filenames that no longer exist.
 
-**Solution**: 
-1. Ensure `NODE_ENV=production` in Replit deployment environment variables
-2. Use start command: `node dist/index.js` (not npm run dev)
-3. Build assets with: `npm run build` before deployment
-4. Verify `dist/public/assets/` contains the built JavaScript and CSS files
+**Root Cause**: Browser cache contains old asset URLs (e.g. `index-CgyiaBAf.js`) but current build has different hashes (e.g. `index-DIztqsJr.js`). When browser requests cached URL, development server returns HTML instead of 404, causing syntax errors.
+
+**Multi-Layer Solution Implemented (July 25, 2025)**:
+- ✅ **Client-Side Error Handling**: Global error detection with user-friendly cache clear instructions
+- ✅ **Fetch Override**: Prevents HTML responses for expected JS/CSS assets  
+- ✅ **Server Cache Control**: No-cache headers for development to prevent future issues
+- ✅ **Graceful Error Display**: Shows helpful instructions instead of blank screen
+- ✅ **Service Worker 404 Handling**: Proper JSON responses for missing sw.js requests
+
+**User Fix**: Clear browser cache completely and refresh page, or use incognito mode.
 
 **Recent Changes (July 2025)**:
 - ✅ Removed service worker references that caused `sw.js` errors

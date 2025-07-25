@@ -81,6 +81,16 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (process.env.NODE_ENV === "development") {
+    // Add cache-busting headers for development to prevent future issues
+    app.use((req, res, next) => {
+      if (!req.path.startsWith("/api") && !req.path.includes("/@vite")) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
+      next();
+    });
+
     await setupVite(app, server);
   } else {
     // Check if static files exist, if not try to copy them
