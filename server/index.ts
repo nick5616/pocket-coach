@@ -77,38 +77,45 @@ app.use((req, res, next) => {
     throw err;
   });
 
+  // UNIVERSAL ASSET BLOCKING: Must happen BEFORE any static file serving or Vite middleware
+  app.use((req, res, next) => {
+    // Handle service worker requests that no longer exist
+    if (req.path === '/sw.js') {
+      log("Service worker request blocked - returning 404", "cache-fix");
+      return res.status(404).send('Service worker not available');
+    }
+    
+    // Handle hashed asset files that are cached but don't exist
+    // Pattern matches: /assets/index-CgyiaBAf.js, /assets/main-ABC123XYZ.css, etc.
+    const hashedAssetPattern = /^\/assets\/[^\/]+\-[a-zA-Z0-9_]{8,12}\.(js|css)$/;
+    
+    if (hashedAssetPattern.test(req.path)) {
+      const mode = process.env.NODE_ENV === "production" ? "PRODUCTION" : "DEVELOPMENT";
+      log(`[${mode}] Cached asset blocked EARLY: ${req.path}`, "cache-fix");
+      
+      // Return proper content type with valid code to prevent syntax errors
+      if (req.path.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        return res.status(404).send(`// PocketCoach: Asset not found - cached file no longer exists
+console.error("Cached asset error - Please clear your browser cache and refresh the page");
+console.warn("Missing file: ${req.path}");
+// This prevents the 'Unexpected token <' error by providing valid JavaScript`);
+      } else if (req.path.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css; charset=UTF-8');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        return res.status(404).send('/* PocketCoach: Asset not found - cached file no longer exists */');
+      }
+      return res.status(404).send('Asset not found - cached file from browser cache');
+    }
+    
+    next();
+  });
+
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (process.env.NODE_ENV === "development") {
-    // CRITICAL FIX: Intercept cached asset requests before Vite middleware
-    // This prevents Vite from serving HTML for missing JS/CSS files
-    app.use((req, res, next) => {
-      // Handle service worker requests that no longer exist
-      if (req.path === '/sw.js') {
-        log("Service worker request blocked - returning 404", "cache-fix");
-        return res.status(404).send('Service worker not available');
-      }
-      
-      // Handle hashed asset files that are cached but don't exist
-      // Pattern matches: /assets/index-CgyiaBAf.js, /assets/main-ABC123XYZ.css, etc.
-      const hashedAssetPattern = /^\/assets\/[^\/]+\-[a-zA-Z0-9_]{8,12}\.(js|css)$/;
-      
-      if (hashedAssetPattern.test(req.path)) {
-        log(`Cached asset blocked: ${req.path}`, "cache-fix");
-        // Return proper JavaScript content type with error to prevent syntax errors
-        if (req.path.endsWith('.js')) {
-          res.setHeader('Content-Type', 'application/javascript');
-          return res.status(404).send('// Asset not found - cached file no longer exists\nconsole.error("Cached asset error: Please clear your browser cache and refresh the page");');
-        } else if (req.path.endsWith('.css')) {
-          res.setHeader('Content-Type', 'text/css');
-          return res.status(404).send('/* Asset not found - cached file no longer exists */');
-        }
-        return res.status(404).send('Asset not found - likely from browser cache');
-      }
-      
-      next();
-    });
 
     // AGGRESSIVE cache-busting for HTML to force fresh asset references
     app.use((req, res, next) => {
