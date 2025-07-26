@@ -96,15 +96,30 @@ app.use((req, res, next) => {
       
       if (hashedAssetPattern.test(req.path)) {
         log(`Cached asset blocked: ${req.path}`, "cache-fix");
+        // Return proper JavaScript content type with error to prevent syntax errors
+        if (req.path.endsWith('.js')) {
+          res.setHeader('Content-Type', 'application/javascript');
+          return res.status(404).send('// Asset not found - cached file no longer exists\nconsole.error("Cached asset error: Please clear your browser cache and refresh the page");');
+        } else if (req.path.endsWith('.css')) {
+          res.setHeader('Content-Type', 'text/css');
+          return res.status(404).send('/* Asset not found - cached file no longer exists */');
+        }
         return res.status(404).send('Asset not found - likely from browser cache');
       }
       
       next();
     });
 
-    // Add cache-busting headers for development to prevent future issues
+    // AGGRESSIVE cache-busting for HTML to force fresh asset references
     app.use((req, res, next) => {
-      if (!req.path.startsWith("/api") && !req.path.includes("/@vite")) {
+      if (req.path === '/' || req.path.endsWith('.html')) {
+        // Force complete cache invalidation for HTML pages
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('Surrogate-Control', 'no-store');
+        res.setHeader('Vary', '*');
+      } else if (!req.path.startsWith("/api") && !req.path.includes("/@vite")) {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');

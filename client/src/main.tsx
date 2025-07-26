@@ -42,52 +42,80 @@ window.fetch = async function(...args) {
   }
 };
 
-// CRITICAL FIX: Handle script loading errors from cached assets
-// This catches the "Unexpected token '<'" errors when browsers load old cached JS files
+// CRITICAL FIX: Enhanced error handling for cached asset issues
 window.addEventListener('error', (event) => {
   const errorMessage = event.message || '';
   const filename = event.filename || '';
   
-  // Check if this is the specific error from cached assets
-  if (errorMessage.includes('Unexpected token') && filename.includes('/assets/')) {
-    console.error('🚨 PocketCoach: Detected cached asset loading error');
+  // Check for cached asset errors - both syntax errors and loading failures
+  const isCachedAssetError = (
+    (errorMessage.includes('Unexpected token') && filename.includes('/assets/')) ||
+    (filename.includes('/assets/') && filename.match(/index-[a-zA-Z0-9_]{8,}\.js$/)) ||
+    (errorMessage.includes('Loading module') && filename.includes('/assets/'))
+  );
+  
+  if (isCachedAssetError) {
+    console.error('🚨 PocketCoach: Cached asset error detected');
     console.error(`❌ Error: ${errorMessage}`);
     console.error(`📁 File: ${filename}`);
-    console.warn('💡 SOLUTION: This error occurs when your browser has cached old asset files that no longer exist.');
-    console.warn('🔧 To fix: Clear your browser cache completely and refresh the page.');
-    console.warn('🕵️ Alternative: Open this page in incognito/private mode to bypass cache.');
     
-    // Show user-friendly error message
+    // Force immediate reload to try to get fresh assets
+    console.warn('🔄 Attempting automatic recovery...');
+    
+    // Clear any existing content and show recovery message
     const rootElement = document.getElementById("root");
-    if (rootElement && !rootElement.innerHTML.includes('cached asset')) {
+    if (rootElement) {
       rootElement.innerHTML = `
-        <div style="padding: 20px; font-family: system-ui; color: #333; max-width: 600px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; margin-top: 50px;">
-          <h1 style="color: #d63384; margin-bottom: 20px;">⚠️ PocketCoach - Cache Issue Detected</h1>
-          <p style="font-size: 16px; line-height: 1.5; margin-bottom: 15px;">
-            <strong>Problem:</strong> Your browser is trying to load old cached files that no longer exist.
-          </p>
-          <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-            <strong>Quick Fix:</strong>
-          </p>
-          <ol style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-            <li style="margin-bottom: 10px;"><strong>Clear browser cache completely</strong> (Ctrl+Shift+Delete on Windows/Linux, Cmd+Shift+Delete on Mac)</li>
-            <li style="margin-bottom: 10px;"><strong>Refresh this page</strong> (F5 or Ctrl+R)</li>
-            <li style="margin-bottom: 10px;"><strong>Alternative:</strong> Open in incognito/private mode</li>
-          </ol>
-          <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-top: 20px;">
-            <strong>Technical Details:</strong><br>
-            Error: ${errorMessage}<br>
-            File: ${filename}
+        <div style="padding: 20px; font-family: system-ui; color: #333; max-width: 600px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; margin-top: 50px; text-align: center;">
+          <h1 style="color: #d63384; margin-bottom: 20px;">🔄 PocketCoach - Recovering from Cache Issue</h1>
+          <p style="font-size: 18px; margin-bottom: 20px;">Detected old cached files. Attempting automatic recovery...</p>
+          <div style="background: #e7f3ff; border: 1px solid #bee5eb; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>If this page doesn't reload automatically:</strong></p>
+            <ol style="text-align: left; margin: 10px 0;">
+              <li>Clear your browser cache (Ctrl+Shift+Delete)</li>
+              <li>Hard refresh (Ctrl+Shift+R)</li>
+              <li>Or open in incognito mode</li>
+            </ol>
           </div>
+          <button onclick="location.reload()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+            Manual Refresh
+          </button>
         </div>
       `;
+      
+      // Try multiple recovery strategies
+      setTimeout(() => {
+        console.warn('🔄 Forcing hard reload...');
+        location.reload();
+      }, 2000);
     }
     
-    // Prevent the error from propagating further
     event.preventDefault();
     return false;
   }
 }, true);
+
+// Additional check for blank screens after load
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const rootElement = document.getElementById("root");
+    if (rootElement && (!rootElement.innerHTML || rootElement.innerHTML.trim() === '')) {
+      console.warn('🚨 PocketCoach: Blank screen detected - possible cache issue');
+      
+      // Check if we have script tags with old cached assets
+      const scripts = document.querySelectorAll('script[src*="/assets/"]');
+      const hasOldAssets = Array.from(scripts).some(script => {
+        const src = script.getAttribute('src') || '';
+        return src.match(/\/assets\/[^\/]+-[a-zA-Z0-9_]{8,}\.js$/);
+      });
+      
+      if (hasOldAssets) {
+        console.warn('🔄 Found old cached asset references - forcing reload');
+        location.reload();
+      }
+    }
+  }, 1000);
+});
 
 console.log('PocketCoach: Starting React application');
 
