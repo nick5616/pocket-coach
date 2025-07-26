@@ -8,22 +8,22 @@
 
 **Root Cause**: Browser cache containing old asset filenames that no longer exist. When browser requests these cached assets, the development server returns HTML instead of JavaScript, causing syntax errors.
 
-## Multi-Layer Solution Implemented
+## Core Solution Implemented ✅
 
-### 1. Client-Side Error Handling ✅
-**File**: `client/src/main.tsx`
-
-- **Global Error Handler**: Detects "Unexpected token" errors in asset files
-- **User-Friendly Interface**: Shows clear instructions when cache issues are detected
-- **Fetch Override**: Prevents HTML responses for expected JS/CSS assets
-- **Console Guidance**: Provides detailed debugging information
-
-### 2. Server-Side Cache Control ✅  
+### Server-Side Asset Interception (Primary Fix)
 **File**: `server/index.ts`
 
-- **Development Cache Headers**: Forces no-cache for all non-API requests
-- **MIME Type Enforcement**: Ensures correct content types in production
-- **Asset Handling**: Improved static file serving
+- **Request Interception**: Middleware catches cached asset requests BEFORE Vite processes them
+- **Pattern Matching**: Detects hashed asset filenames (`/assets/index-CgyiaBAf.js`) using regex
+- **Proper 404 Response**: Returns actual 404 status instead of HTML fallback
+- **Service Worker Handling**: Blocks `/sw.js` requests with clear error message
+
+### Supporting Features
+**File**: `client/src/main.tsx`
+
+- **Client-Side Error Handling**: Detects and guides users through cache issues
+- **Global Error Handler**: Catches "Unexpected token" errors with user-friendly messages
+- **Fetch Override**: Additional protection for dynamic asset requests
 
 ### 3. Automatic Recovery Features ✅
 

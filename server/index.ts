@@ -81,6 +81,27 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (process.env.NODE_ENV === "development") {
+    // CRITICAL FIX: Intercept cached asset requests before Vite middleware
+    // This prevents Vite from serving HTML for missing JS/CSS files
+    app.use((req, res, next) => {
+      // Handle service worker requests that no longer exist
+      if (req.path === '/sw.js') {
+        log("Service worker request blocked - returning 404", "cache-fix");
+        return res.status(404).send('Service worker not available');
+      }
+      
+      // Handle hashed asset files that are cached but don't exist
+      // Pattern matches: /assets/index-CgyiaBAf.js, /assets/main-ABC123XYZ.css, etc.
+      const hashedAssetPattern = /^\/assets\/[^\/]+\-[a-zA-Z0-9_]{8,12}\.(js|css)$/;
+      
+      if (hashedAssetPattern.test(req.path)) {
+        log(`Cached asset blocked: ${req.path}`, "cache-fix");
+        return res.status(404).send('Asset not found - likely from browser cache');
+      }
+      
+      next();
+    });
+
     // Add cache-busting headers for development to prevent future issues
     app.use((req, res, next) => {
       if (!req.path.startsWith("/api") && !req.path.includes("/@vite")) {
