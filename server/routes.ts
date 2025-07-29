@@ -601,6 +601,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // IMPORTANT: This specific route must come BEFORE the parameterized route below
+  // to prevent "active" from being interpreted as an ID parameter
+  app.get("/api/programs/active/today", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const program = await storage.getActiveProgram(userId);
+      
+      if (!program) {
+        return res.status(404).json({ message: "Program not found or not active" });
+      }
+
+      // Calculate which day of the program we're on based on completed workouts
+      const completedWorkouts = await storage.getUserWorkouts(userId);
+      const programWorkouts = completedWorkouts.filter(w => 
+        w.isCompleted && 
+        w.createdAt && 
+        new Date(w.createdAt) >= new Date(program.createdAt!)
+      );
+      const daysDiff = programWorkouts.length;
+      console.log(`[ACTIVE/TODAY DEBUG] Program progress: ${programWorkouts.length} completed workouts since program created`);
+      console.log(`[ACTIVE/TODAY DEBUG] Program created: ${program.createdAt}, Completed workouts:`, programWorkouts.map(w => ({id: w.id, completed: w.isCompleted, created: w.createdAt})));
+      
+      // Parse the schedule to get today's workout
+      let schedule: any = {};
+      try {
+        schedule = typeof program.schedule === 'string' ? JSON.parse(program.schedule) : program.schedule;
+      } catch (error) {
+        return res.status(500).json({ message: "Invalid program schedule format" });
+      }
+
+      // Handle object format with numeric keys (0-6 for days of week)
+      let todaysWorkout: any = null;
+      
+      if (schedule.days && Array.isArray(schedule.days)) {
+        // Array format: cycle through program days
+        const programDays = schedule.days;
+        const currentDayIndex = daysDiff % programDays.length;
+        todaysWorkout = programDays[currentDayIndex];
+      } else if (schedule.weeks && Array.isArray(schedule.weeks)) {
+        // Weeks format: weeks with days
+        const weekNumber = Math.floor(daysDiff / 7) % schedule.weeks.length;
+        const dayNumber = daysDiff % 7;
+        const currentWeek = schedule.weeks[weekNumber];
+        todaysWorkout = currentWeek?.days?.[dayNumber];
+      } else if (typeof schedule === 'object' && schedule !== null) {
+        // Object format with numeric keys (0-6)
+        const dayKeys = Object.keys(schedule).sort((a, b) => parseInt(a) - parseInt(b));
+        const currentDayIndex = daysDiff % dayKeys.length;
+        const dayKey = dayKeys[currentDayIndex];
+        todaysWorkout = schedule[dayKey];
+        console.log(`[ACTIVE/TODAY] Program workouts completed: ${programWorkouts.length}, daysDiff: ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
+        console.log(`[ACTIVE/TODAY] Workout exercises:`, todaysWorkout?.exercises?.length || 0, 'exercises found');
+      } else {
+        return res.status(400).json({ message: "Invalid program schedule format" });
+      }
+      
+      if (!todaysWorkout || todaysWorkout.isRestDay) {
+        return res.status(404).json({ message: "Today is a rest day or no workout scheduled" });
+      }
+      
+      const response = {
+        program,
+        workout: todaysWorkout,
+        exercises: todaysWorkout.exercises || []
+      };
+      console.log(`[ACTIVE/TODAY] Returning response with ${response.exercises.length} exercises`);
+      res.json(response);
+    } catch (error) {
+      console.error("Today's workout error:", error);
+      res.status(500).json({ message: "Failed to fetch today's workout" });
+    }
+  });
+
   app.get("/api/programs/:id/today", isAuthenticated, async (req, res) => {
     try {
       const programId = parseInt(req.params.id);
@@ -829,192 +902,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/programs/active/today", isAuthenticated, async (req, res) => {
-    try {
-      const userId = req.user.id;
-      const program = await storage.getActiveProgram(userId);
-      
-      if (!program) {
-        return res.status(404).json({ message: "Program not found or not active" });
-      }
 
-      // Calculate which day of the program we're on based on completed workouts
-      const completedWorkouts = await storage.getUserWorkouts(userId);
-      const programWorkouts = completedWorkouts.filter(w => 
-        w.isCompleted && 
-        w.createdAt && 
-        new Date(w.createdAt) >= new Date(program.createdAt!)
-      );
-      const daysDiff = programWorkouts.length;
-      console.log(`[ACTIVE/TODAY DEBUG] Program progress: ${programWorkouts.length} completed workouts since program created`);
-      console.log(`[ACTIVE/TODAY DEBUG] Program created: ${program.createdAt}, Completed workouts:`, programWorkouts.map(w => ({id: w.id, completed: w.isCompleted, created: w.createdAt})));
-      
-      // Parse the schedule to get today's workout
-      let schedule: any = {};
-      try {
-        schedule = typeof program.schedule === 'string' ? JSON.parse(program.schedule) : program.schedule;
-      } catch (error) {
-        return res.status(500).json({ message: "Invalid program schedule format" });
-      }
 
-      // Handle object format with numeric keys (0-6 for days of week)
-      let todaysWorkout: any = null;
-      
-      if (schedule.days && Array.isArray(schedule.days)) {
-        // Array format: cycle through program days
-        const programDays = schedule.days;
-        const currentDayIndex = daysDiff % programDays.length;
-        todaysWorkout = programDays[currentDayIndex];
-      } else if (schedule.weeks && Array.isArray(schedule.weeks)) {
-        // Weeks format: weeks with days
-        const weekNumber = Math.floor(daysDiff / 7) % schedule.weeks.length;
-        const dayNumber = daysDiff % 7;
-        const currentWeek = schedule.weeks[weekNumber];
-        todaysWorkout = currentWeek?.days?.[dayNumber];
-      } else if (typeof schedule === 'object' && schedule !== null) {
-        // Object format with numeric keys (0-6)
-        const dayKeys = Object.keys(schedule).sort((a, b) => parseInt(a) - parseInt(b));
-        const currentDayIndex = daysDiff % dayKeys.length;
-        const dayKey = dayKeys[currentDayIndex];
-        todaysWorkout = schedule[dayKey];
-        console.log(`[ACTIVE/TODAY] Program workouts completed: ${programWorkouts.length}, daysDiff: ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
-        console.log(`[ACTIVE/TODAY] Workout exercises:`, todaysWorkout?.exercises?.length || 0, 'exercises found');
-      } else {
-        return res.status(400).json({ message: "Invalid program schedule format" });
-      }
-      
-      if (!todaysWorkout || todaysWorkout.isRestDay) {
-        return res.status(404).json({ message: "Today is a rest day or no workout scheduled" });
-      }
-      
-      const response = {
-        program,
-        workout: todaysWorkout,
-        exercises: todaysWorkout.exercises || []
-      };
-      console.log(`[ACTIVE/TODAY] Returning response with ${response.exercises.length} exercises`);
-      res.json(response);
-    } catch (error) {
-      console.error("Today's workout error:", error);
-      res.status(500).json({ message: "Failed to fetch today's workout" });
-    }
-  });
 
-  app.get("/api/programs/:id/today", isAuthenticated, async (req, res) => {
-    try {
-      const programId = parseInt(req.params.id);
-      const userId = req.user.id;
-      const program = await storage.getActiveProgram(userId);
-      
-      if (!program || program.id !== programId) {
-        return res.status(404).json({ message: "Program not found or not active" });
-      }
-
-      // Calculate which day of the program we're on based on completed workouts
-      const completedWorkouts = await storage.getUserWorkouts(userId);
-      const programWorkouts = completedWorkouts.filter(w => 
-        w.isCompleted && 
-        w.createdAt && 
-        new Date(w.createdAt) >= new Date(program.createdAt!)
-      );
-      const daysDiff = programWorkouts.length;
-      
-      // Parse the schedule
-      let schedule: any = {};
-      try {
-        schedule = typeof program.schedule === 'string' ? JSON.parse(program.schedule) : program.schedule;
-      } catch (error) {
-        return res.status(500).json({ message: "Invalid program schedule format" });
-      }
-      
-      // Handle different schedule formats
-      let todaysWorkout: any = null;
-      let currentDayIndex: number = 0;
-      
-      if (schedule.days && Array.isArray(schedule.days)) {
-        // Array format: cycle through program days
-        const programDays = schedule.days;
-        currentDayIndex = daysDiff % programDays.length;
-        todaysWorkout = programDays[currentDayIndex];
-      } else if (typeof schedule === 'object' && schedule !== null) {
-        // Object format with numeric keys (0-6)
-        const dayKeys = Object.keys(schedule).sort((a, b) => parseInt(a) - parseInt(b));
-        if (dayKeys.length === 0) {
-          return res.status(400).json({ message: "Program has no schedule" });
-        }
-        currentDayIndex = daysDiff % dayKeys.length;
-        const dayKey = dayKeys[currentDayIndex];
-        todaysWorkout = schedule[dayKey];
-        console.log(`Program ${programId} - Completed workouts: ${programWorkouts.length}, daysDiff: ${daysDiff}, using index ${currentDayIndex}, key ${dayKey}, workout:`, todaysWorkout?.name);
-      } else {
-        return res.status(400).json({ message: "Program has no schedule" });
-      }
-
-      // Get user's workout history for realistic coaching insights
-      const userWorkouts = await storage.getUserWorkouts(userId, 10);
-      const isNewUser = userWorkouts.length === 0;
-      
-      // Generate workout-specific insights based on today's exercises
-      const exerciseNames = todaysWorkout.exercises?.map((ex: any) => ex.name.toLowerCase()) || [];
-      const isLegDay = exerciseNames.some((name: string) => 
-        name.includes('squat') || name.includes('lunge') || name.includes('leg') || name.includes('calf')
-      );
-      const isUpperBody = exerciseNames.some((name: string) => 
-        name.includes('push') || name.includes('pull') || name.includes('press') || name.includes('chest')
-      );
-      
-      // Generate coaching insights based on actual workout content
-      const insights = {
-        description: todaysWorkout.description || "Focus on proper form and controlled movements as you build strength.",
-        focusAreas: isLegDay ? [
-          "Proper squat depth and knee tracking",
-          "Controlled movement tempo", 
-          "Core stability throughout exercises"
-        ] : isUpperBody ? [
-          "Shoulder blade retraction and stability",
-          "Controlled eccentric (lowering) phase",
-          "Breathing rhythm during exercises"
-        ] : [
-          "Proper form and technique fundamentals",
-          "Controlled breathing throughout movements", 
-          "Building mind-muscle connection"
-        ],
-        challenges: isNewUser 
-          ? "Focus on learning proper form with these foundational movements. Listen to your body and don't rush."
-          : isLegDay 
-            ? "Lower body workouts challenge your largest muscle groups. Expect fatigue but push through - this builds real functional strength."
-            : "Today's session will test your upper body endurance. Focus on quality over speed.",
-        prOpportunities: isNewUser ? undefined : isLegDay 
-          ? "Your squat form has been improving. Consider adding slightly more weight if you can maintain perfect technique."
-          : "You've been consistent with your training. Today might be a good day to challenge yourself with an extra set.",
-        encouragement: isNewUser
-          ? "Every expert was once a beginner. Focus on consistency over intensity, and celebrate small wins."
-          : "Your dedication is paying off. Each workout builds on the last - keep pushing forward.",
-        estimatedTime: 45,
-        difficulty: 3
-      };
-
-      // Calculate total days for response
-      let totalDays = 7; // Default for object format
-      if (schedule.days && Array.isArray(schedule.days)) {
-        totalDays = schedule.days.length;
-      } else if (typeof schedule === 'object' && schedule !== null) {
-        totalDays = Object.keys(schedule).length;
-      }
-
-      res.json({
-        programName: program.name,
-        dayNumber: currentDayIndex + 1,
-        totalDays: totalDays,
-        workout: todaysWorkout,
-        exercises: todaysWorkout.exercises || [],
-        insights: insights
-      });
-    } catch (error) {
-      console.error("Program today workout error:", error);
-      res.status(500).json({ message: "Failed to get today's workout" });
-    }
-  });
 
   // Achievement routes
   app.get("/api/achievements", isAuthenticated, async (req, res) => {
