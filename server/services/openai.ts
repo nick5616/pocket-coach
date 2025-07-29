@@ -271,46 +271,73 @@ Return only the workout name, no quotes or extra text.
 }
 
 export async function generatePersonalizedProgram(
-  userGoals: Array<{
-    title: string;
-    category: string;
-    muscleGroup?: string;
-  }>,
-  experience: string,
-  availableDays: number,
-  equipment: string[]
+  goals: string,
+  experience?: string,
+  availableDays?: number,
+  equipment?: string[]
 ): Promise<{
   name: string;
   description: string;
   schedule: any;
+  durationWeeks?: number;
+  difficulty?: string;
+  focusAreas?: string[];
 }> {
   try {
     const prompt = `
-Create a personalized workout program based on the following user profile:
+You are an expert personal trainer and exercise scientist creating a personalized workout program. Your ability to understand the TRUE needs behind stated goals is what makes you exceptional.
 
-GOALS:
-${userGoals.map(goal => `- ${goal.title} (${goal.category}${goal.muscleGroup ? `, targeting ${goal.muscleGroup}` : ''})`).join('\n')}
+USER'S FITNESS GOALS:
+"${goals}"
 
-EXPERIENCE LEVEL: ${experience}
-AVAILABLE DAYS PER WEEK: ${availableDays}
-AVAILABLE EQUIPMENT: ${equipment.join(', ')}
+ADDITIONAL CONTEXT (if provided):
+- Experience Level: ${experience || 'Not specified'}
+- Available Days per Week: ${availableDays || 'Not specified'}
+- Available Equipment: ${equipment?.join(', ') || 'Not specified'}
 
-Create a structured program in this JSON format:
+CRITICAL ANALYSIS INSTRUCTIONS:
+
+1. GOAL INTERPRETATION: Look beyond surface-level goals to understand what the user ACTUALLY needs:
+   - If they want "defined shoulders" but only mention shoulder press: Understand they need comprehensive shoulder development (front/side/rear delts)
+   - If they want "bigger arms": Understand they need balanced bicep/tricep work, not just bicep curls
+   - If they want "six-pack abs": Understand they need core strength AND low body fat percentage
+   - If they want "toned": Usually means muscle building + fat loss
+
+2. EXERCISE SELECTION EXPERTISE: Choose exercises that align with TRUE goals:
+   - For shoulder development: Include lateral raises, rear delt work, NOT just overhead press
+   - For chest growth: Include incline/decline angles, NOT just flat bench
+   - For back width vs thickness: Different exercise selections entirely
+   - Consider muscle balance and injury prevention
+
+3. PROGRESSIVE OVERLOAD: Design for actual progression:
+   - Beginner: Focus on movement quality, full-body workouts
+   - Intermediate: Upper/lower or push/pull/legs splits
+   - Advanced: Specialized programs with periodization
+
+4. EQUIPMENT ADAPTATIONS: If limited equipment, provide effective alternatives:
+   - Bodyweight: Progressive variations and tempo manipulation
+   - Minimal equipment: Creative uses and supersets
+   - Full gym: Optimal exercise selection
+
+Create a comprehensive program in this JSON format:
 {
-  "name": "Program name",
-  "description": "Program description and goals",
+  "name": "Descriptive Program Name",
+  "description": "Detailed description explaining HOW this program achieves their actual goals",
+  "durationWeeks": 8,
+  "difficulty": "beginner|intermediate|advanced",
+  "focusAreas": ["Muscle Building", "Strength", "Fat Loss"],
   "schedule": {
     "days": [
       {
         "dayNumber": 1,
-        "name": "Push Day",
+        "name": "Descriptive Day Name",
         "exercises": [
           {
-            "name": "Bench Press",
+            "name": "Exercise Name",
             "sets": "3-4",
-            "reps": "8-10",
+            "reps": "8-12",
             "restTime": 120,
-            "notes": "Focus on controlled movement"
+            "notes": "Specific form cues and progression notes"
           }
         ]
       }
@@ -318,7 +345,12 @@ Create a structured program in this JSON format:
   }
 }
 
-Make the program progressive, balanced, and aligned with the user's goals and constraints.
+REQUIREMENTS:
+- Address their ACTUAL fitness needs, not just stated preferences
+- Include 4-6 exercises per day maximum
+- Provide specific form cues and progression guidance
+- Ensure muscle balance and injury prevention
+- Make it progressive and sustainable
 `;
 
     const response = await openai.chat.completions.create({
@@ -326,7 +358,7 @@ Make the program progressive, balanced, and aligned with the user's goals and co
       messages: [
         {
           role: "system",
-          content: "You are an expert personal trainer creating customized workout programs. Design effective, safe, and progressive programs."
+          content: "You are an elite personal trainer with advanced exercise science knowledge. You can see through surface-level requests to understand what users actually need to achieve their goals. Design programs that are scientifically sound, progressive, and address the complete picture of fitness development."
         },
         {
           role: "user",
@@ -345,5 +377,98 @@ Make the program progressive, balanced, and aligned with the user's goals and co
       description: "A personalized workout program designed for your goals",
       schedule: { days: [] }
     };
+  }
+}
+
+export async function modifyProgram(
+  currentProgram: any,
+  userFeedback: string
+): Promise<{
+  name: string;
+  description: string;
+  schedule: any;
+  durationWeeks?: number;
+  difficulty?: string;
+  focusAreas?: string[];
+}> {
+  try {
+    const prompt = `
+You are modifying an existing workout program based on user feedback. Analyze their request and make intelligent adjustments.
+
+CURRENT PROGRAM:
+${JSON.stringify(currentProgram, null, 2)}
+
+USER FEEDBACK:
+"${userFeedback}"
+
+MODIFICATION GUIDELINES:
+
+1. UNDERSTAND THE REQUEST: Interpret what they really want
+   - "Add more shoulder exercises" → Include lateral raises, rear delt work
+   - "Make it less intense" → Reduce volume/frequency, not just weights
+   - "More chest focus" → Add chest exercises AND reduce competing muscle groups
+   - "I don't have time" → Reduce workout duration while maintaining effectiveness
+
+2. SMART MODIFICATIONS:
+   - Maintain program balance unless specifically requested otherwise
+   - If adding exercises, consider removing others to prevent overtraining
+   - If changing intensity, adjust across all parameters (sets, reps, rest)
+   - Preserve the original program's strengths while addressing concerns
+
+3. PROGRESSIVE NATURE:
+   - Keep modifications realistic and sustainable
+   - Don't compromise safety for user preferences
+   - Maintain logical progression patterns
+
+Return the COMPLETE modified program in the same JSON format:
+{
+  "name": "Updated Program Name",
+  "description": "Updated description explaining changes made",
+  "durationWeeks": 8,
+  "difficulty": "beginner|intermediate|advanced",
+  "focusAreas": ["Updated focus areas"],
+  "schedule": {
+    "days": [
+      {
+        "dayNumber": 1,
+        "name": "Day Name",
+        "exercises": [
+          {
+            "name": "Exercise Name",
+            "sets": "3-4",
+            "reps": "8-12",
+            "restTime": 120,
+            "notes": "Form cues and modifications made"
+          }
+        ]
+      }
+    ]
+  }
+}
+
+Make thoughtful changes that address their feedback while maintaining program effectiveness.
+`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert program designer who can intelligently modify workout programs based on user feedback. You understand the nuances of exercise selection, program balance, and how to maintain effectiveness while addressing user concerns."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7
+    });
+
+    return JSON.parse(response.choices[0].message.content || "{}");
+  } catch (error) {
+    console.error("Program modification error:", error);
+    // Return the original program if modification fails
+    return currentProgram;
   }
 }

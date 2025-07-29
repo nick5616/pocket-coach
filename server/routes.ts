@@ -10,7 +10,7 @@ import {
   insertGoalSchema,
   insertProgramSchema 
 } from "@shared/schema";
-import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePersonalizedProgram } from "./services/openai";
+import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePersonalizedProgram, modifyProgram } from "./services/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -835,39 +835,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/programs/generate", isAuthenticated, async (req, res) => {
     try {
-      const { experience, availableDays, equipment } = req.body;
-      const userId = req.user.id;
+      const { goals, experience, availableDays, equipment } = req.body;
+      const userId = req.user!.id;
 
-      const userGoals = await storage.getUserGoals(userId);
-      
+      // Generate program based on user's natural language goals
       const generatedProgram = await generatePersonalizedProgram(
-        userGoals.map(goal => ({
-          title: goal.title,
-          category: goal.category,
-          muscleGroup: goal.muscleGroup || undefined
-        })),
-        experience || "intermediate",
-        availableDays || 3,
-        equipment || ["dumbbells", "barbell", "bench"]
+        goals,
+        experience,
+        availableDays,
+        equipment
       );
 
-      const program = await storage.createProgram({
-        userId: userId,
-        name: generatedProgram.name,
-        description: generatedProgram.description,
-        schedule: generatedProgram.schedule,
-        aiGenerated: true,
-        isActive: false,
-        focusAreas: generatedProgram.focusAreas || ["Strength", "Muscle Building"],
-        equipment: equipment || ["dumbbells", "barbell", "bench"],
-        durationWeeks: generatedProgram.durationWeeks || 8,
-        difficulty: generatedProgram.difficulty || "intermediate"
-      });
-
-      res.json(program);
+      // Return the generated program for confirmation (don't save yet)
+      res.json(generatedProgram);
     } catch (error) {
       console.error("Program generation error:", error);
       res.status(500).json({ message: "Failed to generate program" });
+    }
+  });
+
+  app.post("/api/programs/modify", isAuthenticated, async (req, res) => {
+    try {
+      const { program, feedback } = req.body;
+      
+      // Modify the program based on user feedback
+      const modifiedProgram = await modifyProgram(program, feedback);
+      
+      res.json(modifiedProgram);
+    } catch (error) {
+      console.error("Program modification error:", error);
+      res.status(500).json({ message: "Failed to modify program" });
+    }
+  });
+
+  app.post("/api/programs/confirm", isAuthenticated, async (req, res) => {
+    try {
+      const { program } = req.body;
+      const userId = req.user!.id;
+
+      // Save the confirmed program to database
+      const savedProgram = await storage.createProgram({
+        userId: userId,
+        name: program.name,
+        description: program.description,
+        schedule: program.schedule,
+        aiGenerated: true,
+        isActive: false,
+        focusAreas: program.focusAreas || ["Strength", "Muscle Building"],
+        equipment: program.equipment || ["dumbbells", "barbell", "bench"],
+        durationWeeks: program.durationWeeks || 8,
+        difficulty: program.difficulty || "intermediate"
+      });
+
+      res.json(savedProgram);
+    } catch (error) {
+      console.error("Program confirmation error:", error);
+      res.status(500).json({ message: "Failed to save program" });
     }
   });
 

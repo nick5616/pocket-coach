@@ -5,6 +5,8 @@ import { queryClient } from "./lib/queryClient";
 import { ThemeProvider } from "./components/theme-provider";
 import Home from "./pages/home";
 import Programs from "./pages/programs";
+import ProgramGeneration from "./pages/program-generation";
+import ProgramConfirmation from "./pages/program-confirmation";
 import Progress from "./pages/progress";
 import ProfileSimple from "./pages/profile-simple";
 import WorkoutJournal from "./pages/workout-journal";
@@ -223,6 +225,8 @@ function AppContent() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/programs" component={Programs} />
+          <Route path="/programs/generate" component={ProgramGeneration} />
+          <Route path="/programs/confirm" component={ProgramConfirmation} />
           <Route path="/progress" component={Progress} />
           <Route path="/profile" component={ProfileSimple} />
           <Route path="/workouts" component={Workouts} />

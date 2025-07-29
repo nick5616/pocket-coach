@@ -93,6 +93,13 @@ Email/password authentication with bcrypt hashing and PostgreSQL session store u
 **User Fix**: Clear browser cache completely and refresh page, or use incognito mode.
 
 **Recent Changes (July 2025)**:
+- ✅ **ENHANCED PROGRAM GENERATION FLOW (July 29, 2025)**: Complete overhaul of AI program creation
+  - Replaced simple form with intelligent goal analysis that "sees through" surface requests  
+  - Added natural language goals input with smart exercise selection (e.g., shoulder development gets all deltoid angles)
+  - Implemented human-in-the-loop confirmation page with program preview and modification capability
+  - Created dedicated program generation and confirmation pages with improved UX
+  - Enhanced OpenAI prompts to analyze true fitness needs vs stated preferences
+  - Added program modification API endpoint for iterative refinement
 - ✅ Removed service worker references that caused `sw.js` errors
 - ✅ Fixed demo text removal from login page  
 - ✅ Enhanced production MIME type configuration

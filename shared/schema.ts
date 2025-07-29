@@ -219,6 +219,26 @@ export const insertAchievementSchema = createInsertSchema(achievements).omit({
   createdAt: true,
 });
 
+// Program generation types
+export const programGenerationSchema = z.object({
+  // Primary input
+  goals: z.string().min(1, "Please describe your fitness goals"),
+  
+  // Optional info
+  experience: z.string().optional(),
+  availableDays: z.number().min(1).max(7).optional(),
+  equipment: z.array(z.string()).optional(),
+  
+  // Internal use for confirmation flow
+  isConfirmation: z.boolean().default(false),
+  generatedProgram: z.any().optional(), // Generated program data for confirmation
+});
+
+export const programConfirmationSchema = z.object({
+  program: z.any(), // Generated program structure
+  feedback: z.string().optional(), // User feedback for modifications
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -244,3 +264,6 @@ export type InsertExerciseMuscleMapping = z.infer<typeof insertExerciseMuscleMap
 
 export type Achievement = typeof achievements.$inferSelect;
 export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+
+export type ProgramGenerationData = z.infer<typeof programGenerationSchema>;
+export type ProgramConfirmationData = z.infer<typeof programConfirmationSchema>;

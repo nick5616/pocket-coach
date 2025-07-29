@@ -1,0 +1,366 @@
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1rem;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: white;
+  gap: 1rem;
+}
+
+.loadingIcon {
+  width: 2rem;
+  height: 2rem;
+  animation: spin 1s linear infinite;
+}
+
+.header {
+  margin-bottom: 1rem;
+}
+
+.backButton {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.overviewCard,
+.scheduleCard,
+.feedbackCard {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.titleIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.75rem;
+  color: #667eea;
+}
+
+.cardDescription {
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.programMeta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.metaBadge {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.scheduleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.dayCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: #f9fafb;
+}
+
+.dayHeader {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dayName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 0.25rem 0;
+}
+
+.dayType {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.exercisesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.exerciseItem {
+  padding: 0.75rem;
+  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.exerciseName {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.exerciseDetails {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.exerciseSpec {
+  font-size: 0.875rem;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.restTime {
+  font-size: 0.75rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+}
+
+.exerciseNotes {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-style: italic;
+  background: #f3f4f6;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.feedbackForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.feedbackTextarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.feedbackTextarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.feedbackTextarea:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.modifyButton {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+}
+
+.modifyButton:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #667eea;
+}
+
+.confirmButton {
+  padding: 1rem 2rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 0.75rem;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+}
+
+.confirmButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+}
+
+.confirmButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  }
+  
+  .overviewCard,
+  .scheduleCard,
+  .feedbackCard {
+    background: #1f2937;
+    color: white;
+  }
+  
+  .cardTitle {
+    color: white;
+  }
+  
+  .cardDescription {
+    color: #9ca3af;
+  }
+  
+  .dayCard {
+    background: #374151;
+    border-color: #4b5563;
+  }
+  
+  .dayName {
+    color: #9ca3af;
+  }
+  
+  .dayType {
+    color: #f3f4f6;
+  }
+  
+  .exerciseItem {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  
+  .exerciseName {
+    color: #f3f4f6;
+  }
+  
+  .restTime {
+    color: #9ca3af;
+  }
+  
+  .exerciseNotes {
+    background: #374151;
+    color: #d1d5db;
+  }
+  
+  .feedbackTextarea {
+    background: #374151;
+    border-color: #4b5563;
+    color: white;
+  }
+  
+  .feedbackTextarea:focus {
+    border-color: #667eea;
+  }
+  
+  .feedbackTextarea:disabled {
+    background: #4b5563;
+  }
+  
+  .modifyButton {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f3f4f6;
+  }
+  
+  .modifyButton:hover:not(:disabled) {
+    background: #4b5563;
+  }
+  
+  .backButton {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .content {
+    gap: 1rem;
+  }
+  
+  .scheduleGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .buttonGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .confirmButton {
+    order: -1;
+  }
+  
+  .programMeta {
+    gap: 0.5rem;
+  }
+  
+  .exerciseDetails {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
