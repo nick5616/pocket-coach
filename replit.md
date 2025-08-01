@@ -92,7 +92,15 @@ Email/password authentication with bcrypt hashing and PostgreSQL session store u
 
 **User Fix**: Clear browser cache completely and refresh page, or use incognito mode.
 
-**Recent Changes (July 2025)**:
+**Recent Changes (August 2025)**:
+- ✅ **PRODUCTION DEPLOYMENT FIX (August 1, 2025)**: Fixed blank screen and 404 asset errors in production
+  - Restructured production static file serving to use `dist/public` directly instead of copying files
+  - Added proper MIME type headers and cache control for hashed assets (JS/CSS files)  
+  - Implemented cache-busting for HTML files with no-cache headers and timestamp comments
+  - Fixed asset path resolution to prevent 404 errors on `/assets/index-[hash].js` files
+  - Added comprehensive error handling for missing build files with proper exit codes
+
+**Previous Changes (July 2025)**:
 - ✅ **ENHANCED PROGRAM GENERATION FLOW (July 29, 2025)**: Complete overhaul of AI program creation
   - Replaced simple form with intelligent goal analysis that "sees through" surface requests  
   - Added natural language goals input with smart exercise selection (e.g., shoulder development gets all deltoid angles)

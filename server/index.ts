@@ -2,7 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import fs from "fs";
 import path from "path";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { setupVite, log } from "./vite";
 
 const app = express();
 app.use(express.json());
@@ -136,44 +136,61 @@ console.warn("Missing file: ${req.path}");
 
     await setupVite(app, server);
   } else {
-    // Check if static files exist, if not try to copy them
-    const staticPath = path.resolve(import.meta.dirname, "public");
+    // In production, serve directly from dist/public
     const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
     
-    if (!fs.existsSync(staticPath) && fs.existsSync(distPath)) {
-      log("Static files not found, copying from dist/public...");
-      try {
-        await fs.promises.mkdir(staticPath, { recursive: true });
-        const files = await fs.promises.readdir(distPath);
-        for (const file of files) {
-          const srcFile = path.join(distPath, file);
-          const destFile = path.join(staticPath, file);
-          const stat = await fs.promises.stat(srcFile);
-          if (stat.isDirectory()) {
-            await fs.promises.cp(srcFile, destFile, { recursive: true });
-          } else {
-            await fs.promises.copyFile(srcFile, destFile);
-          }
-        }
-        log("Static files copied successfully!");
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : String(err);
-        log(`Error copying static files: ${errorMessage}`);
-      }
+    if (!fs.existsSync(distPath)) {
+      log("Build directory not found. Run 'npm run build' first.");
+      process.exit(1);
     }
     
-    // Add specific static file handling before calling serveStatic
-    app.use('/assets', express.static(path.join(staticPath, 'assets'), {
+    log(`Serving static files from: ${distPath}`);
+    
+    // Serve static assets with proper MIME types and cache headers
+    app.use('/assets', express.static(path.join(distPath, 'assets'), {
       setHeaders: (res, filePath) => {
         if (filePath.endsWith('.js')) {
           res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
         } else if (filePath.endsWith('.css')) {
           res.setHeader('Content-Type', 'text/css; charset=UTF-8');
         }
+        // Set proper cache headers for hashed assets
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
       }
     }));
     
-    serveStatic(app);
+    // Serve other static files (manifest, etc.)
+    app.use(express.static(distPath, {
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+          res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        }
+      }
+    }));
+    
+    // Fallback to index.html for SPA routing with cache-busting
+    app.use("*", (req, res) => {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
+      // Add timestamp to HTML to help with debugging cache issues
+      const indexPath = path.resolve(distPath, "index.html");
+      try {
+        let html = fs.readFileSync(indexPath, 'utf-8');
+        
+        // Add cache-busting comment at the end
+        const timestamp = new Date().toISOString();
+        html = html.replace('</html>', `<!-- Build timestamp: ${timestamp} -->\n</html>`);
+        
+        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+        res.send(html);
+      } catch (err) {
+        log(`Error serving index.html: ${err}`);
+        res.status(500).send('Server Error');
+      }
+    });
   }
 
   // ALWAYS serve the app on port 5000
