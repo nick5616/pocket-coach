@@ -14,6 +14,43 @@ import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePerso
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Health check endpoint for deployment verification
+  app.get('/api/health', async (req, res) => {
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      const deploymentInfoPath = path.resolve(process.cwd(), 'dist', 'deployment-info.json');
+      let deploymentInfo = null;
+      
+      try {
+        if (fs.existsSync(deploymentInfoPath)) {
+          deploymentInfo = JSON.parse(fs.readFileSync(deploymentInfoPath, 'utf-8'));
+        }
+      } catch (err) {
+        // Deployment info not available, that's okay
+      }
+      
+      const health = {
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        nodeVersion: process.version,
+        uptime: process.uptime(),
+        memoryUsage: process.memoryUsage(),
+        deployment: deploymentInfo
+      };
+      
+      res.json(health);
+    } catch (error) {
+      res.status(500).json({
+        status: 'error',
+        timestamp: new Date().toISOString(),
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+  
   // Auth middleware
   await setupAuth(app);
 

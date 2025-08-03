@@ -93,6 +93,14 @@ Email/password authentication with bcrypt hashing and PostgreSQL session store u
 **User Fix**: Clear browser cache completely and refresh page, or use incognito mode.
 
 **Recent Changes (August 2025)**:
+- ✅ **PRODUCTION DEPLOYMENT FIX v2.0 (August 3, 2025)**: Comprehensive solution for asset cache issues
+  - Enhanced server-side build integrity verification with explicit asset validation
+  - Created robust deployment script with cache-busting (clears npm, Vite, and build caches)
+  - Added 404 handling for missing assets with detailed logging and available asset listing
+  - Implemented deployment verification endpoint `/api/health` with build metadata
+  - Enhanced HTML cache-busting with comprehensive debugging information injection
+  - **Root Cause Identified**: Deployment cache conflicts between old asset references and new builds
+  - **Solution**: Complete cache clearing + fresh builds + asset validation pipeline
 - ✅ **PRODUCTION DEPLOYMENT FIX (August 1, 2025)**: Fixed blank screen and 404 asset errors in production
   - Restructured production static file serving to use `dist/public` directly instead of copying files
   - Added proper MIME type headers and cache control for hashed assets (JS/CSS files)  

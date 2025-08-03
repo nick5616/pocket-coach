@@ -140,14 +140,75 @@ console.warn("Missing file: ${req.path}");
     const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
     
     if (!fs.existsSync(distPath)) {
-      log("Build directory not found. Run 'npm run build' first.");
+      log("❌ Build directory not found. Run 'npm run build' first.");
       process.exit(1);
     }
     
-    log(`Serving static files from: ${distPath}`);
+    // Verify build integrity by checking for required files
+    const indexPath = path.resolve(distPath, "index.html");
+    const assetsPath = path.join(distPath, 'assets');
     
-    // Serve static assets with proper MIME types and cache headers
-    app.use('/assets', express.static(path.join(distPath, 'assets'), {
+    if (!fs.existsSync(indexPath)) {
+      log("❌ index.html not found in build directory. Build may be incomplete.");
+      process.exit(1);
+    }
+    
+    if (!fs.existsSync(assetsPath)) {
+      log("❌ Assets directory not found in build. Build may be incomplete.");
+      process.exit(1);
+    }
+    
+    // Log build information for debugging
+    try {
+      const htmlContent = fs.readFileSync(indexPath, 'utf-8');
+      const jsMatch = htmlContent.match(/assets\/(index-[^.]+\.js)/);
+      const cssMatch = htmlContent.match(/assets\/(index-[^.]+\.css)/);
+      
+      log(`✅ Production build verified:`);
+      log(`   📁 Build directory: ${distPath}`);
+      if (jsMatch) log(`   📄 JS asset: ${jsMatch[1]}`);
+      if (cssMatch) log(`   🎨 CSS asset: ${cssMatch[1]}`);
+      
+      // Verify assets actually exist
+      if (jsMatch && !fs.existsSync(path.join(assetsPath, jsMatch[1]))) {
+        log(`❌ Referenced JS file ${jsMatch[1]} does not exist in assets directory!`);
+        process.exit(1);
+      }
+      if (cssMatch && !fs.existsSync(path.join(assetsPath, cssMatch[1]))) {
+        log(`❌ Referenced CSS file ${cssMatch[1]} does not exist in assets directory!`);
+        process.exit(1);
+      }
+      
+      log(`✅ All referenced assets verified to exist on disk.`);
+    } catch (err) {
+      log(`⚠️  Could not verify build integrity: ${err}`);
+    }
+    
+    // Enhanced asset serving with better error handling
+    app.use('/assets', (req, res, next) => {
+      const assetPath = path.join(assetsPath, path.basename(req.path));
+      
+      // Check if the requested asset exists before serving
+      if (!fs.existsSync(assetPath)) {
+        log(`❌ Asset not found: ${req.path} (looking for: ${assetPath})`);
+        
+        // List available assets for debugging
+        try {
+          const availableAssets = fs.readdirSync(assetsPath);
+          log(`📋 Available assets: ${availableAssets.join(', ')}`);
+        } catch (e) {
+          log(`❌ Could not list assets directory: ${e}`);
+        }
+        
+        return res.status(404).json({
+          error: 'Asset not found',
+          requested: req.path,
+          message: 'This asset may be from an outdated build cache. Try clearing deployment cache and rebuilding.'
+        });
+      }
+      
+      next();
+    }, express.static(assetsPath, {
       setHeaders: (res, filePath) => {
         if (filePath.endsWith('.js')) {
           res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
@@ -169,26 +230,38 @@ console.warn("Missing file: ${req.path}");
       }
     }));
     
-    // Fallback to index.html for SPA routing with cache-busting
+    // Fallback to index.html for SPA routing with enhanced cache-busting
     app.use("*", (req, res) => {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
+      res.setHeader('ETag', ''); // Clear any ETag to prevent conditional requests
       
-      // Add timestamp to HTML to help with debugging cache issues
-      const indexPath = path.resolve(distPath, "index.html");
       try {
         let html = fs.readFileSync(indexPath, 'utf-8');
         
-        // Add cache-busting comment at the end
+        // Add comprehensive debugging info
         const timestamp = new Date().toISOString();
-        html = html.replace('</html>', `<!-- Build timestamp: ${timestamp} -->\n</html>`);
+        const buildInfo = `
+<!-- PocketCoach Build Info -->
+<!-- Build timestamp: ${timestamp} -->
+<!-- Server started: ${new Date().toISOString()} -->
+<!-- Environment: ${process.env.NODE_ENV || 'development'} -->
+<!-- Replit ID: ${process.env.REPL_ID || 'local'} -->
+<!-- Node version: ${process.version} -->
+</html>`;
+        
+        html = html.replace('</html>', buildInfo);
         
         res.setHeader('Content-Type', 'text/html; charset=UTF-8');
         res.send(html);
       } catch (err) {
-        log(`Error serving index.html: ${err}`);
-        res.status(500).send('Server Error');
+        log(`❌ Error serving index.html: ${err}`);
+        res.status(500).json({
+          error: 'Server Error',
+          message: 'Could not serve application HTML',
+          timestamp: new Date().toISOString()
+        });
       }
     });
   }
