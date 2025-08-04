@@ -240,12 +240,16 @@ console.warn("Missing file: ${req.path}");
       try {
         let html = fs.readFileSync(indexPath, 'utf-8');
         
+        // Add cache-busting timestamp to asset URLs
+        const timestamp = Date.now();
+        html = html.replace(/\/assets\/(index-[^.]+\.(js|css))/g, `/assets/$1?v=${timestamp}`);
+        
         // Add comprehensive debugging info
-        const timestamp = new Date().toISOString();
+        const serverStartTime = new Date().toISOString();
         const buildInfo = `
 <!-- PocketCoach Build Info -->
-<!-- Build timestamp: ${timestamp} -->
-<!-- Server started: ${new Date().toISOString()} -->
+<!-- Build timestamp: ${serverStartTime} -->
+<!-- Cache buster: ${timestamp} -->
 <!-- Environment: ${process.env.NODE_ENV || 'development'} -->
 <!-- Replit ID: ${process.env.REPL_ID || 'local'} -->
 <!-- Node version: ${process.version} -->
