@@ -184,29 +184,38 @@ console.warn("Missing file: ${req.path}");
       log(`⚠️  Could not verify build integrity: ${err}`);
     }
     
-    // Enhanced asset serving with better error handling
+    // Serve assets with proper error handling and logging
     app.use('/assets', (req, res, next) => {
-      const assetPath = path.join(assetsPath, path.basename(req.path));
+      // Strip query parameters for file lookup but preserve for cache-busting
+      const cleanPath = req.path.split('?')[0];
+      const assetFileName = path.basename(cleanPath);
+      const assetPath = path.join(assetsPath, assetFileName);
+      
+      log(`🔍 Asset request: ${req.path} -> looking for: ${assetPath}`);
       
       // Check if the requested asset exists before serving
       if (!fs.existsSync(assetPath)) {
-        log(`❌ Asset not found: ${req.path} (looking for: ${assetPath})`);
+        log(`❌ Asset not found: ${cleanPath} (full path: ${assetPath})`);
         
         // List available assets for debugging
         try {
           const availableAssets = fs.readdirSync(assetsPath);
-          log(`📋 Available assets: ${availableAssets.join(', ')}`);
+          log(`📋 Available assets in ${assetsPath}: ${availableAssets.join(', ')}`);
         } catch (e) {
           log(`❌ Could not list assets directory: ${e}`);
         }
         
         return res.status(404).json({
           error: 'Asset not found',
-          requested: req.path,
-          message: 'This asset may be from an outdated build cache. Try clearing deployment cache and rebuilding.'
+          requested: cleanPath,
+          availableAssets: fs.existsSync(assetsPath) ? fs.readdirSync(assetsPath) : [],
+          assetsPath: assetsPath,
+          message: 'Asset file does not exist on server. Check build process.'
         });
       }
       
+      // Asset exists, let express.static handle it
+      log(`✅ Found asset: ${assetFileName}`);
       next();
     }, express.static(assetsPath, {
       setHeaders: (res, filePath) => {
