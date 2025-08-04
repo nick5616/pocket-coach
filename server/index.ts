@@ -184,39 +184,58 @@ console.warn("Missing file: ${req.path}");
       log(`⚠️  Could not verify build integrity: ${err}`);
     }
     
-    // Serve assets with proper error handling and logging
+    // Smart asset serving that adapts to available files
     app.use('/assets', (req, res, next) => {
-      // Strip query parameters for file lookup but preserve for cache-busting
       const cleanPath = req.path.split('?')[0];
-      const assetFileName = path.basename(cleanPath);
-      const assetPath = path.join(assetsPath, assetFileName);
+      const requestedFile = path.basename(cleanPath);
+      const assetPath = path.join(assetsPath, requestedFile);
       
-      log(`🔍 Asset request: ${req.path} -> looking for: ${assetPath}`);
+      log(`🔍 Asset request: ${req.path}`);
       
-      // Check if the requested asset exists before serving
-      if (!fs.existsSync(assetPath)) {
-        log(`❌ Asset not found: ${cleanPath} (full path: ${assetPath})`);
-        
-        // List available assets for debugging
-        try {
-          const availableAssets = fs.readdirSync(assetsPath);
-          log(`📋 Available assets in ${assetsPath}: ${availableAssets.join(', ')}`);
-        } catch (e) {
-          log(`❌ Could not list assets directory: ${e}`);
-        }
-        
-        return res.status(404).json({
-          error: 'Asset not found',
-          requested: cleanPath,
-          availableAssets: fs.existsSync(assetsPath) ? fs.readdirSync(assetsPath) : [],
-          assetsPath: assetsPath,
-          message: 'Asset file does not exist on server. Check build process.'
-        });
+      // If exact file exists, serve it
+      if (fs.existsSync(assetPath)) {
+        log(`✅ Found exact asset: ${requestedFile}`);
+        return next();
       }
       
-      // Asset exists, let express.static handle it
-      log(`✅ Found asset: ${assetFileName}`);
-      next();
+      // If exact file doesn't exist, try to find a similar file (deployment hash mismatch fallback)
+      try {
+        const availableAssets = fs.readdirSync(assetsPath);
+        log(`🔄 Asset ${requestedFile} not found, checking available assets: ${availableAssets.join(', ')}`);
+        
+        // Try to find the correct asset by type (JS or CSS)
+        let fallbackAsset = null;
+        if (requestedFile.includes('.js')) {
+          fallbackAsset = availableAssets.find(file => file.startsWith('index-') && file.endsWith('.js'));
+        } else if (requestedFile.includes('.css')) {
+          fallbackAsset = availableAssets.find(file => file.startsWith('index-') && file.endsWith('.css'));
+        }
+        
+        if (fallbackAsset) {
+          log(`🎯 Serving fallback asset: ${fallbackAsset} instead of ${requestedFile}`);
+          const fallbackPath = path.join(assetsPath, fallbackAsset);
+          
+          // Set proper headers
+          if (fallbackAsset.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+          } else if (fallbackAsset.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css; charset=UTF-8');
+          }
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          
+          return res.sendFile(fallbackPath);
+        }
+      } catch (e) {
+        log(`❌ Error finding fallback asset: ${e}`);
+      }
+      
+      // No suitable asset found
+      log(`❌ No asset found for: ${requestedFile}`);
+      return res.status(404).json({
+        error: 'Asset not found',
+        requested: requestedFile,
+        message: 'No matching asset file found. This may be a deployment cache issue.'
+      });
     }, express.static(assetsPath, {
       setHeaders: (res, filePath) => {
         if (filePath.endsWith('.js')) {
@@ -224,7 +243,6 @@ console.warn("Missing file: ${req.path}");
         } else if (filePath.endsWith('.css')) {
           res.setHeader('Content-Type', 'text/css; charset=UTF-8');
         }
-        // Set proper cache headers for hashed assets
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
       }
     }));
