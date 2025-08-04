@@ -30,6 +30,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (err) {
         // Deployment info not available, that's okay
       }
+
+      // Check if build files exist
+      const distExists = fs.existsSync(path.resolve(process.cwd(), 'dist'));
+      const distPublicExists = fs.existsSync(path.resolve(process.cwd(), 'dist', 'public'));
+      const distIndexExists = fs.existsSync(path.resolve(process.cwd(), 'dist', 'index.js'));
+      
+      let assetsInfo = null;
+      try {
+        const assetsPath = path.resolve(process.cwd(), 'dist', 'public', 'assets');
+        if (fs.existsSync(assetsPath)) {
+          const assetFiles = fs.readdirSync(assetsPath);
+          assetsInfo = assetFiles;
+        }
+      } catch (err) {
+        assetsInfo = 'Error reading assets: ' + err;
+      }
       
       const health = {
         status: 'healthy',
@@ -38,7 +54,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         nodeVersion: process.version,
         uptime: process.uptime(),
         memoryUsage: process.memoryUsage(),
-        deployment: deploymentInfo
+        deployment: deploymentInfo,
+        buildFiles: {
+          distExists,
+          distPublicExists,
+          distIndexExists,
+          assetsInfo
+        },
+        allEnvVars: Object.keys(process.env).filter(key => key.includes('NODE') || key.includes('ENV')),
+        cwd: process.cwd()
       };
       
       res.json(health);
@@ -49,6 +73,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
+  });
+
+  // Simple diagnostic endpoint to check deployment mode
+  app.get('/api/debug', (req, res) => {
+    res.json({
+      nodeEnv: process.env.NODE_ENV,
+      isDevelopment: process.env.NODE_ENV === 'development',
+      isProduction: process.env.NODE_ENV === 'production',
+      serverStartTime: new Date().toISOString(),
+      headers: req.headers,
+      url: req.url
+    });
   });
   
   // Auth middleware
