@@ -77,7 +77,7 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // UNIVERSAL ASSET BLOCKING: Must happen BEFORE any static file serving or Vite middleware
+  // SMART ASSET HANDLING: Must happen BEFORE any static file serving or Vite middleware
   app.use((req, res, next) => {
     // Handle service worker requests that no longer exist
     if (req.path === '/sw.js') {
@@ -85,15 +85,57 @@ app.use((req, res, next) => {
       return res.status(404).send('Service worker not available');
     }
     
-    // Handle hashed asset files that are cached but don't exist
+    // Handle hashed asset files that might be cached but don't exist
     // Pattern matches: /assets/index-CgyiaBAf.js, /assets/main-ABC123XYZ.css, etc.
-    const hashedAssetPattern = /^\/assets\/[^\/]+\-[a-zA-Z0-9_]{8,12}\.(js|css)$/;
+    const hashedAssetPattern = /^\/assets\/([^\/]+\-[a-zA-Z0-9_]{8,12}\.(js|css))$/;
+    const match = hashedAssetPattern.exec(req.path);
     
-    if (hashedAssetPattern.test(req.path)) {
-      const mode = process.env.NODE_ENV === "production" ? "PRODUCTION" : "DEVELOPMENT";
-      log(`[${mode}] Cached asset blocked EARLY: ${req.path}`, "cache-fix");
+    if (match && process.env.NODE_ENV === "production") {
+      const requestedFile = match[1];
+      const assetsPath = path.resolve(import.meta.dirname, "..", "dist", "public", "assets");
+      const assetPath = path.join(assetsPath, requestedFile);
       
-      // Return proper content type with valid code to prevent syntax errors
+      log(`[PRODUCTION] Asset request: ${req.path}`, "cache-fix");
+      
+      // If exact file exists, let it through to normal static serving
+      if (fs.existsSync(assetPath)) {
+        log(`✅ Found exact asset: ${requestedFile}`, "cache-fix");
+        return next();
+      }
+      
+      // If exact file doesn't exist, try to find a fallback
+      try {
+        const availableAssets = fs.readdirSync(assetsPath);
+        log(`🔄 Asset ${requestedFile} not found, checking available assets: ${availableAssets.join(', ')}`, "cache-fix");
+        
+        // Try to find the correct asset by type (JS or CSS)
+        let fallbackAsset = null;
+        if (requestedFile.includes('.js')) {
+          fallbackAsset = availableAssets.find(file => file.startsWith('index-') && file.endsWith('.js'));
+        } else if (requestedFile.includes('.css')) {
+          fallbackAsset = availableAssets.find(file => file.startsWith('index-') && file.endsWith('.css'));
+        }
+        
+        if (fallbackAsset) {
+          log(`🎯 Serving fallback asset: ${fallbackAsset} instead of ${requestedFile}`, "cache-fix");
+          const fallbackPath = path.join(assetsPath, fallbackAsset);
+          
+          // Set proper headers
+          if (fallbackAsset.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+          } else if (fallbackAsset.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css; charset=UTF-8');
+          }
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          
+          return res.sendFile(fallbackPath);
+        }
+      } catch (e) {
+        log(`❌ Error finding fallback asset: ${e}`, "cache-fix");
+      }
+      
+      // No suitable asset found - return proper 404 with helpful content
+      log(`❌ No asset found for: ${requestedFile}`, "cache-fix");
       if (req.path.endsWith('.js')) {
         res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -184,59 +226,8 @@ console.warn("Missing file: ${req.path}");
       log(`⚠️  Could not verify build integrity: ${err}`);
     }
     
-    // Smart asset serving that adapts to available files
-    app.use('/assets', (req, res, next) => {
-      const cleanPath = req.path.split('?')[0];
-      const requestedFile = path.basename(cleanPath);
-      const assetPath = path.join(assetsPath, requestedFile);
-      
-      log(`🔍 Asset request: ${req.path}`);
-      
-      // If exact file exists, serve it
-      if (fs.existsSync(assetPath)) {
-        log(`✅ Found exact asset: ${requestedFile}`);
-        return next();
-      }
-      
-      // If exact file doesn't exist, try to find a similar file (deployment hash mismatch fallback)
-      try {
-        const availableAssets = fs.readdirSync(assetsPath);
-        log(`🔄 Asset ${requestedFile} not found, checking available assets: ${availableAssets.join(', ')}`);
-        
-        // Try to find the correct asset by type (JS or CSS)
-        let fallbackAsset = null;
-        if (requestedFile.includes('.js')) {
-          fallbackAsset = availableAssets.find(file => file.startsWith('index-') && file.endsWith('.js'));
-        } else if (requestedFile.includes('.css')) {
-          fallbackAsset = availableAssets.find(file => file.startsWith('index-') && file.endsWith('.css'));
-        }
-        
-        if (fallbackAsset) {
-          log(`🎯 Serving fallback asset: ${fallbackAsset} instead of ${requestedFile}`);
-          const fallbackPath = path.join(assetsPath, fallbackAsset);
-          
-          // Set proper headers
-          if (fallbackAsset.endsWith('.js')) {
-            res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
-          } else if (fallbackAsset.endsWith('.css')) {
-            res.setHeader('Content-Type', 'text/css; charset=UTF-8');
-          }
-          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-          
-          return res.sendFile(fallbackPath);
-        }
-      } catch (e) {
-        log(`❌ Error finding fallback asset: ${e}`);
-      }
-      
-      // No suitable asset found
-      log(`❌ No asset found for: ${requestedFile}`);
-      return res.status(404).json({
-        error: 'Asset not found',
-        requested: requestedFile,
-        message: 'No matching asset file found. This may be a deployment cache issue.'
-      });
-    }, express.static(assetsPath, {
+    // Serve assets with proper headers (fallback logic handled universally above)
+    app.use('/assets', express.static(assetsPath, {
       setHeaders: (res, filePath) => {
         if (filePath.endsWith('.js')) {
           res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
