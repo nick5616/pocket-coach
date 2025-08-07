@@ -230,6 +230,7 @@ function AppContent() {
           <Route path="/progress" component={Progress} />
           <Route path="/profile" component={ProfileSimple} />
           <Route path="/workouts" component={Workouts} />
+          <Route path="/workouts/:id" component={WorkoutJournal} />
           <Route path="/workout-journal/:id?" component={WorkoutJournal} />
           <Route path="/workouts/program/:programId" component={ProgramWorkout} />
           <Route>
