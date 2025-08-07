@@ -26,9 +26,9 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-// Add cache-busting headers only for production deployments
+// Simple cache control for HTML in production
 app.use((req, res, next) => {
-  if (process.env.NODE_ENV === "production" && !req.path.startsWith("/api") && !req.path.includes("/@")) {
+  if (process.env.NODE_ENV === "production" && (req.path === '/' || req.path.endsWith('.html'))) {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
@@ -77,80 +77,11 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // SMART ASSET HANDLING: Must happen BEFORE any static file serving or Vite middleware
+  // Simple service worker blocking
   app.use((req, res, next) => {
-    // Handle service worker requests that no longer exist
     if (req.path === '/sw.js') {
-      log("Service worker request blocked - returning 404", "cache-fix");
       return res.status(404).send('Service worker not available');
     }
-    
-    // Handle hashed asset files that might be cached but don't exist
-    // Pattern matches: /assets/index-CgyiaBAf.js, /assets/main-ABC123XYZ.css, etc.
-    const hashedAssetPattern = /^\/assets\/([^\/]+\-[a-zA-Z0-9_]{8,12}\.(js|css))$/;
-    const match = hashedAssetPattern.exec(req.path);
-    
-    if (match && process.env.NODE_ENV === "production") {
-      const requestedFile = match[1];
-      const assetsPath = path.resolve(import.meta.dirname, "..", "dist", "public", "assets");
-      const assetPath = path.join(assetsPath, requestedFile);
-      
-      log(`[PRODUCTION] Asset request: ${req.path}`, "cache-fix");
-      
-      // If exact file exists, let it through to normal static serving
-      if (fs.existsSync(assetPath)) {
-        log(`✅ Found exact asset: ${requestedFile}`, "cache-fix");
-        return next();
-      }
-      
-      // If exact file doesn't exist, try to find a fallback
-      try {
-        const availableAssets = fs.readdirSync(assetsPath);
-        log(`🔄 Asset ${requestedFile} not found, checking available assets: ${availableAssets.join(', ')}`, "cache-fix");
-        
-        // Try to find the correct asset by type (JS or CSS)
-        let fallbackAsset = null;
-        if (requestedFile.includes('.js')) {
-          fallbackAsset = availableAssets.find(file => file.startsWith('index-') && file.endsWith('.js'));
-        } else if (requestedFile.includes('.css')) {
-          fallbackAsset = availableAssets.find(file => file.startsWith('index-') && file.endsWith('.css'));
-        }
-        
-        if (fallbackAsset) {
-          log(`🎯 Serving fallback asset: ${fallbackAsset} instead of ${requestedFile}`, "cache-fix");
-          const fallbackPath = path.join(assetsPath, fallbackAsset);
-          
-          // Set proper headers
-          if (fallbackAsset.endsWith('.js')) {
-            res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
-          } else if (fallbackAsset.endsWith('.css')) {
-            res.setHeader('Content-Type', 'text/css; charset=UTF-8');
-          }
-          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-          
-          return res.sendFile(fallbackPath);
-        }
-      } catch (e) {
-        log(`❌ Error finding fallback asset: ${e}`, "cache-fix");
-      }
-      
-      // No suitable asset found - return proper 404 with helpful content
-      log(`❌ No asset found for: ${requestedFile}`, "cache-fix");
-      if (req.path.endsWith('.js')) {
-        res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-        return res.status(404).send(`// PocketCoach: Asset not found - cached file no longer exists
-console.error("Cached asset error - Please clear your browser cache and refresh the page");
-console.warn("Missing file: ${req.path}");
-// This prevents the 'Unexpected token <' error by providing valid JavaScript`);
-      } else if (req.path.endsWith('.css')) {
-        res.setHeader('Content-Type', 'text/css; charset=UTF-8');
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-        return res.status(404).send('/* PocketCoach: Asset not found - cached file no longer exists */');
-      }
-      return res.status(404).send('Asset not found - cached file from browser cache');
-    }
-    
     next();
   });
 
@@ -159,22 +90,7 @@ console.warn("Missing file: ${req.path}");
   // doesn't interfere with the other routes
   if (process.env.NODE_ENV === "development") {
 
-    // AGGRESSIVE cache-busting for HTML to force fresh asset references
-    app.use((req, res, next) => {
-      if (req.path === '/' || req.path.endsWith('.html')) {
-        // Force complete cache invalidation for HTML pages
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-        res.setHeader('Surrogate-Control', 'no-store');
-        res.setHeader('Vary', '*');
-      } else if (!req.path.startsWith("/api") && !req.path.includes("/@vite")) {
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-      }
-      next();
-    });
+
 
     await setupVite(app, server);
   } else {
@@ -226,65 +142,12 @@ console.warn("Missing file: ${req.path}");
       log(`⚠️  Could not verify build integrity: ${err}`);
     }
     
-    // Serve assets with proper headers (fallback logic handled universally above)
-    app.use('/assets', express.static(assetsPath, {
-      setHeaders: (res, filePath) => {
-        if (filePath.endsWith('.js')) {
-          res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
-        } else if (filePath.endsWith('.css')) {
-          res.setHeader('Content-Type', 'text/css; charset=UTF-8');
-        }
-        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-      }
-    }));
+    // Serve assets normally
+    app.use(express.static(distPath));
     
-    // Serve other static files (manifest, etc.)
-    app.use(express.static(distPath, {
-      setHeaders: (res, filePath) => {
-        if (filePath.endsWith('.html')) {
-          res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-        }
-      }
-    }));
-    
-    // Fallback to index.html for SPA routing with enhanced cache-busting
+    // Fallback to index.html for SPA routing
     app.use("*", (req, res) => {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-      res.setHeader('ETag', ''); // Clear any ETag to prevent conditional requests
-      
-      try {
-        let html = fs.readFileSync(indexPath, 'utf-8');
-        
-        // Add cache-busting timestamp to asset URLs
-        const timestamp = Date.now();
-        html = html.replace(/\/assets\/(index-[^.]+\.(js|css))/g, `/assets/$1?v=${timestamp}`);
-        
-        // Add comprehensive debugging info
-        const serverStartTime = new Date().toISOString();
-        const buildInfo = `
-<!-- PocketCoach Build Info -->
-<!-- Build timestamp: ${serverStartTime} -->
-<!-- Cache buster: ${timestamp} -->
-<!-- Environment: ${process.env.NODE_ENV || 'development'} -->
-<!-- Replit ID: ${process.env.REPL_ID || 'local'} -->
-<!-- Node version: ${process.version} -->
-</html>`;
-        
-        html = html.replace('</html>', buildInfo);
-        
-        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-        res.send(html);
-      } catch (err) {
-        log(`❌ Error serving index.html: ${err}`);
-        res.status(500).json({
-          error: 'Server Error',
-          message: 'Could not serve application HTML',
-          timestamp: new Date().toISOString()
-        });
-      }
+      res.sendFile(indexPath);
     });
   }
 
