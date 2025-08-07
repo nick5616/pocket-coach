@@ -395,60 +395,69 @@ export default function Home() {
                         cursor: "pointer",
                         transition: "all 0.2s ease",
                         border: "2px solid var(--success-200)",
-                        backgroundColor: "var(--success-50)",
                         height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
                       }}
                     >
                       <div
                         style={{
-                          width: "2.5rem",
-                          height: "2.5rem",
-                          background: "var(--success-100)",
-                          borderRadius: "var(--radius-xl)",
                           display: "flex",
                           alignItems: "center",
-                          justifyContent: "center",
-                          marginBottom: "var(--spacing-sm)",
+                          justifyContent: "space-between",
+                          height: "100%",
                         }}
                       >
-                        <Zap
+                        <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+                          <div
+                            style={{
+                              width: "2.5rem",
+                              height: "2.5rem",
+                              background: "var(--success-100)",
+                              borderRadius: "var(--radius-xl)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              marginRight: "var(--spacing-sm)",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <Zap
+                              style={{
+                                width: "1.25rem",
+                                height: "1.25rem",
+                                color: "var(--success-600)",
+                              }}
+                            />
+                          </div>
+                          <div style={{ minWidth: 0 }}>
+                            <h3
+                              className="text-heading-3"
+                              style={{ 
+                                marginBottom: "var(--spacing-xs)",
+                                fontSize: "0.75rem",
+                                lineHeight: "1.2",
+                              }}
+                            >
+                              Quick Workout
+                            </h3>
+                          </div>
+                        </div>
+                        <div
                           style={{
-                            width: "1.25rem",
-                            height: "1.25rem",
-                            color: "var(--success-600)",
+                            background: "var(--success-500)",
+                            color: "white",
+                            borderRadius: "50%",
+                            width: "1.5rem",
+                            height: "1.5rem",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
                           }}
-                        />
-                      </div>
-                      <h3
-                        className="text-heading-3"
-                        style={{ 
-                          marginBottom: "var(--spacing-xs)",
-                          textAlign: "center",
-                          fontSize: "0.75rem",
-                          lineHeight: "1",
-                        }}
-                      >
-                        Quick
-                      </h3>
-                      <div
-                        style={{
-                          background: "var(--success-500)",
-                          color: "white",
-                          borderRadius: "50%",
-                          width: "1.5rem",
-                          height: "1.5rem",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <ChevronRight
-                          style={{ width: "0.75rem", height: "0.75rem" }}
-                        />
+                        >
+                          <ChevronRight
+                            style={{ width: "0.75rem", height: "0.75rem" }}
+                          />
+                        </div>
                       </div>
                     </div>
                   </Link>
