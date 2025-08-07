@@ -308,10 +308,10 @@ export default function Home() {
               }}
             >
               {activeProgram ? (
-                <div style={{ display: "flex", gap: "var(--spacing-sm)", width: "100%" }}>
+                <>
                   <Link
                     href="/workout-journal"
-                    style={{ textDecoration: "none", width: "70%", flexShrink: 0 }}
+                    style={{ textDecoration: "none", width: "100%" }}
                   >
                     <div
                       className="card"
@@ -320,7 +320,7 @@ export default function Home() {
                         cursor: "pointer",
                         transition: "all 0.2s ease",
                         border: "2px solid var(--primary-200)",
-                        height: "100%",
+                        marginBottom: "var(--spacing-md)",
                       }}
                     >
                       <div
@@ -386,7 +386,7 @@ export default function Home() {
                   </Link>
                   <Link
                     href="/workout-journal"
-                    style={{ textDecoration: "none", width: "30%", flexShrink: 0 }}
+                    style={{ textDecoration: "none", width: "100%" }}
                   >
                     <div
                       className="card"
@@ -395,7 +395,6 @@ export default function Home() {
                         cursor: "pointer",
                         transition: "all 0.2s ease",
                         border: "2px solid var(--success-200)",
-                        height: "100%",
                       }}
                     >
                       <div
@@ -403,42 +402,37 @@ export default function Home() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "space-between",
-                          height: "100%",
                         }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center" }}>
                           <div
                             style={{
-                              width: "2.5rem",
-                              height: "2.5rem",
+                              width: "3rem",
+                              height: "3rem",
                               background: "var(--success-100)",
                               borderRadius: "var(--radius-xl)",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              marginRight: "var(--spacing-sm)",
-                              flexShrink: 0,
+                              marginRight: "var(--spacing-md)",
                             }}
                           >
                             <Zap
                               style={{
-                                width: "1.25rem",
-                                height: "1.25rem",
+                                width: "1.5rem",
+                                height: "1.5rem",
                                 color: "var(--success-600)",
                               }}
                             />
                           </div>
-                          <div style={{ minWidth: 0 }}>
+                          <div>
                             <h3
                               className="text-heading-3"
-                              style={{ 
-                                marginBottom: "var(--spacing-xs)",
-                                fontSize: "0.75rem",
-                                lineHeight: "1.2",
-                              }}
+                              style={{ marginBottom: "var(--spacing-xs)" }}
                             >
                               Quick Workout
                             </h3>
+                            <p className="text-body">Start a custom session</p>
                           </div>
                         </div>
                         <div
@@ -446,22 +440,21 @@ export default function Home() {
                             background: "var(--success-500)",
                             color: "white",
                             borderRadius: "50%",
-                            width: "1.5rem",
-                            height: "1.5rem",
+                            width: "2rem",
+                            height: "2rem",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            flexShrink: 0,
                           }}
                         >
                           <ChevronRight
-                            style={{ width: "0.75rem", height: "0.75rem" }}
+                            style={{ width: "0.875rem", height: "0.875rem" }}
                           />
                         </div>
                       </div>
                     </div>
                   </Link>
-                </div>
+                </>
               ) : (
                 <Link
                   href="/workout-journal"

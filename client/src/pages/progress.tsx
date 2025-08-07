@@ -75,7 +75,7 @@ export default function Progress() {
       
       if (daysDiff <= streak + 1) {
         streak++;
-        currentDate = workoutDate;
+        currentDate = new Date(workoutDate);
       } else {
         break;
       }
