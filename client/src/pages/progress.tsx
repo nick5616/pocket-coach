@@ -58,12 +58,38 @@ export default function Progress() {
   // Calculate overall progress stats
   const completedWorkouts = workouts.filter(w => w.isCompleted);
   
+  // Calculate real workout streak from actual data
+  const calculateCurrentStreak = () => {
+    if (completedWorkouts.length === 0) return 0;
+    
+    const today = new Date();
+    const sortedWorkouts = completedWorkouts
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    
+    let streak = 0;
+    let currentDate = new Date(today);
+    
+    for (const workout of sortedWorkouts) {
+      const workoutDate = new Date(workout.createdAt);
+      const daysDiff = Math.floor((currentDate.getTime() - workoutDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (daysDiff <= streak + 1) {
+        streak++;
+        currentDate = workoutDate;
+      } else {
+        break;
+      }
+    }
+    
+    return streak;
+  };
+  
   const progressStats = {
     totalWorkouts: completedWorkouts.length,
     totalTime: completedWorkouts.reduce((sum, w) => sum + (w.duration || 0), 0),
     totalVolume: completedWorkouts.reduce((sum, w) => sum + (w.totalVolume || 0), 0),
     totalCalories: completedWorkouts.reduce((sum, w) => sum + (w.calories || 0), 0),
-    currentStreak: 7, // Would be calculated from workout dates
+    currentStreak: calculateCurrentStreak(),
   };
 
   const handleMuscleSelect = (muscleGroup: MuscleGroup) => {
@@ -405,101 +431,143 @@ export default function Progress() {
 
           {selectedTab === 'insights' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
-              <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-                  <div style={{
-                    width: '2.5rem',
-                    height: '2.5rem',
-                    background: 'var(--primary-100)',
-                    borderRadius: 'var(--radius-lg)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: 'var(--spacing-md)',
-                    flexShrink: 0
-                  }}>
-                    <TrendingUp style={{ width: '1.25rem', height: '1.25rem', color: 'var(--primary-600)' }} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>Strength Gains Detected</h4>
-                    <p className="text-body">Your bench press has improved 8% over the last 3 weeks</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-                  <div style={{
-                    width: '2.5rem',
-                    height: '2.5rem',
-                    background: 'var(--warning)',
-                    borderRadius: 'var(--radius-lg)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: 'var(--spacing-md)',
-                    flexShrink: 0
-                  }}>
-                    <Flame style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>Consistency Champion</h4>
-                    <p className="text-body">7 day workout streak! Keep the momentum going</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-                  <div style={{
-                    width: '2.5rem',
-                    height: '2.5rem',
-                    background: 'var(--secondary-500)',
-                    borderRadius: 'var(--radius-lg)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: 'var(--spacing-md)',
-                    flexShrink: 0
-                  }}>
-                    <Zap style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>Volume Milestone</h4>
-                    <p className="text-body">You've lifted over 50,000 lbs this month!</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* AI Insights */}
-              <div className="card" style={{ 
-                padding: 'var(--spacing-lg)',
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
-                color: 'white',
-                border: 'none'
-              }}>
-                <h4 className="text-heading-3" style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  color: 'white',
-                  marginBottom: 'var(--spacing-md)' 
+              {completedWorkouts.length === 0 ? (
+                <div className="card" style={{ 
+                  padding: 'var(--spacing-2xl)', 
+                  textAlign: 'center',
+                  border: '2px dashed var(--gray-200)'
                 }}>
-                  <BarChart3 style={{ width: '1.25rem', height: '1.25rem', marginRight: 'var(--spacing-sm)' }} />
-                  AI Pattern Analysis
-                </h4>
-                <p className="text-body" style={{ color: 'rgba(255, 255, 255, 0.9)', marginBottom: 'var(--spacing-md)' }}>
-                  Your workout intensity has been increasing steadily. Consider adding a deload week to optimize recovery.
-                </p>
-                <button className="btn" style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  color: 'white',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  fontSize: '0.875rem'
-                }}>
-                  <TrendingUp style={{ width: '1rem', height: '1rem', marginRight: 'var(--spacing-sm)' }} />
-                  View Full Analysis
-                </button>
-              </div>
+                  <div style={{
+                    width: '4rem',
+                    height: '4rem',
+                    background: 'var(--gray-100)',
+                    borderRadius: 'var(--radius-xl)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto var(--spacing-lg)'
+                  }}>
+                    <BarChart3 style={{ width: '2rem', height: '2rem', color: 'var(--gray-400)' }} />
+                  </div>
+                  <h3 className="text-heading-3" style={{ marginBottom: 'var(--spacing-sm)' }}>No insights available</h3>
+                  <p className="text-body" style={{ marginBottom: 'var(--spacing-lg)' }}>
+                    Complete some workouts to see personalized insights and progress analysis!
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Real streak insight */}
+                  {progressStats.currentStreak > 0 && (
+                    <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                        <div style={{
+                          width: '2.5rem',
+                          height: '2.5rem',
+                          background: 'var(--warning)',
+                          borderRadius: 'var(--radius-lg)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginRight: 'var(--spacing-md)',
+                          flexShrink: 0
+                        }}>
+                          <Flame style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>
+                            {progressStats.currentStreak === 1 ? 'Great Start!' : 'Consistency Champion'}
+                          </h4>
+                          <p className="text-body">
+                            {progressStats.currentStreak} day workout streak! Keep the momentum going
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Real volume insight */}
+                  {progressStats.totalVolume > 0 && (
+                    <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                        <div style={{
+                          width: '2.5rem',
+                          height: '2.5rem',
+                          background: 'var(--secondary-500)',
+                          borderRadius: 'var(--radius-lg)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginRight: 'var(--spacing-md)',
+                          flexShrink: 0
+                        }}>
+                          <Weight style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>Training Volume</h4>
+                          <p className="text-body">
+                            You've lifted {Math.round(progressStats.totalVolume).toLocaleString()} lbs total across all workouts!
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Real workout frequency insight */}
+                  {progressStats.totalWorkouts >= 3 && (
+                    <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                        <div style={{
+                          width: '2.5rem',
+                          height: '2.5rem',
+                          background: 'var(--primary-100)',
+                          borderRadius: 'var(--radius-lg)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginRight: 'var(--spacing-md)',
+                          flexShrink: 0
+                        }}>
+                          <Activity style={{ width: '1.25rem', height: '1.25rem', color: 'var(--primary-600)' }} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>Training Progress</h4>
+                          <p className="text-body">
+                            {progressStats.totalWorkouts} workouts completed with {Math.round(progressStats.totalTime / 60)} hours of training time
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Time investment insight */}
+                  {progressStats.totalTime > 0 && (
+                    <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                        <div style={{
+                          width: '2.5rem',
+                          height: '2.5rem',
+                          background: 'var(--success)',
+                          borderRadius: 'var(--radius-lg)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginRight: 'var(--spacing-md)',
+                          flexShrink: 0
+                        }}>
+                          <Clock style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>Time Investment</h4>
+                          <p className="text-body">
+                            {Math.round(progressStats.totalTime / 60)} hours invested in your fitness journey. 
+                            Average workout: {Math.round(progressStats.totalTime / progressStats.totalWorkouts)} minutes
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
         </div>
