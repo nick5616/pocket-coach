@@ -12,6 +12,7 @@ import {
   Clock,
   Plus,
   ChevronRight,
+  Zap,
 } from "lucide-react";
 import LoadingScreen from "../components/loading-screen";
 import type { Workout, Goal } from "@shared/schema";
@@ -49,10 +50,7 @@ export default function Home() {
   const todayStats = {
     workouts: todaysWorkouts.length,
     duration: todaysWorkouts.reduce((acc, w) => acc + (w.duration || 0), 0),
-    exercises: todaysWorkouts.reduce(
-      (acc, w) => acc + (w.exercises?.length || 0),
-      0,
-    ),
+    exercises: 0, // This would need to be calculated from a separate exercises query
   };
 
   const inProgressWorkout = workouts.find((w) => !w.isCompleted);
@@ -310,80 +308,150 @@ export default function Home() {
               }}
             >
               {activeProgram ? (
-                <Link
-                  href="/workout-journal"
-                  style={{ textDecoration: "none" }}
-                >
-                  <div
-                    className="card"
-                    style={{
-                      padding: "var(--spacing-md)",
-                      cursor: "pointer",
-                      transition: "all 0.2s ease",
-                      border: "2px solid var(--primary-200)",
-                    }}
+                <div style={{ display: "flex", gap: "var(--spacing-md)" }}>
+                  <Link
+                    href="/workout-journal"
+                    style={{ textDecoration: "none", flex: "0 0 70%" }}
                   >
                     <div
+                      className="card"
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
+                        padding: "var(--spacing-md)",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        border: "2px solid var(--primary-200)",
+                        height: "100%",
                       }}
                     >
-                      <div style={{ display: "flex", alignItems: "center" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                          <div
+                            style={{
+                              width: "3rem",
+                              height: "3rem",
+                              background: "var(--primary-100)",
+                              borderRadius: "var(--radius-xl)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              marginRight: "var(--spacing-md)",
+                            }}
+                          >
+                            <Target
+                              style={{
+                                width: "1.5rem",
+                                height: "1.5rem",
+                                color: "var(--primary-600)",
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <h3
+                              className="text-heading-3"
+                              style={{ marginBottom: "var(--spacing-xs)" }}
+                            >
+                              Continue Program
+                            </h3>
+                            <p className="text-body">Today's scheduled workout</p>
+                          </div>
+                        </div>
                         <div
                           style={{
-                            width: "3rem",
-                            height: "3rem",
-                            background: "var(--primary-100)",
-                            borderRadius: "var(--radius-xl)",
+                            background: "var(--primary-500)",
+                            color: "white",
+                            borderRadius: "50%",
+                            width: "2rem",
+                            height: "2rem",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            marginRight: "var(--spacing-md)",
                           }}
                         >
-                          <Target
+                          <Play
                             style={{
-                              width: "1.5rem",
-                              height: "1.5rem",
-                              color: "var(--primary-600)",
+                              width: "0.875rem",
+                              height: "0.875rem",
+                              fill: "white",
                             }}
                           />
                         </div>
-                        <div>
-                          <h3
-                            className="text-heading-3"
-                            style={{ marginBottom: "var(--spacing-xs)" }}
-                          >
-                            Continue Program
-                          </h3>
-                          <p className="text-body">Today's scheduled workout</p>
-                        </div>
                       </div>
+                    </div>
+                  </Link>
+                  <Link
+                    href="/workout-journal"
+                    style={{ textDecoration: "none", flex: "0 0 30%" }}
+                  >
+                    <div
+                      className="card"
+                      style={{
+                        padding: "var(--spacing-md)",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        border: "2px solid var(--success-200)",
+                        backgroundColor: "var(--success-50)",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
                       <div
                         style={{
-                          background: "var(--primary-500)",
+                          width: "2.5rem",
+                          height: "2.5rem",
+                          background: "var(--success-100)",
+                          borderRadius: "var(--radius-xl)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginBottom: "var(--spacing-sm)",
+                        }}
+                      >
+                        <Zap
+                          style={{
+                            width: "1.25rem",
+                            height: "1.25rem",
+                            color: "var(--success-600)",
+                          }}
+                        />
+                      </div>
+                      <h3
+                        className="text-heading-3"
+                        style={{ 
+                          marginBottom: "var(--spacing-xs)",
+                          textAlign: "center",
+                          fontSize: "0.875rem",
+                        }}
+                      >
+                        Quick Workout
+                      </h3>
+                      <div
+                        style={{
+                          background: "var(--success-500)",
                           color: "white",
                           borderRadius: "50%",
-                          width: "2rem",
-                          height: "2rem",
+                          width: "1.5rem",
+                          height: "1.5rem",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Play
-                          style={{
-                            width: "0.875rem",
-                            height: "0.875rem",
-                            fill: "white",
-                          }}
+                        <ChevronRight
+                          style={{ width: "0.75rem", height: "0.75rem" }}
                         />
                       </div>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               ) : (
                 <Link
                   href="/workout-journal"

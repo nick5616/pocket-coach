@@ -31,6 +31,7 @@ import {
   DialogDescription,
 } from "@/components/Dialog";
 import { Checkbox } from "@/components/Checkbox";
+import { Progress } from "@/components/Progress";
 import { useToast } from "@/hooks/use-toast";
 import { ExerciseMuscleGroups } from "@/components/exercise-muscle-groups";
 import BottomNavigation from "@/components/bottom-navigation";
@@ -64,6 +65,7 @@ export default function WorkoutJournal() {
   // Form data states
   const [workoutName, setWorkoutName] = useState("");
   const [aiGenerateName, setAiGenerateName] = useState(false);
+  const [workoutDate, setWorkoutDate] = useState(new Date().toISOString().split('T')[0]);
   const [editExerciseName, setEditExerciseName] = useState("");
   const [editExerciseNotes, setEditExerciseNotes] = useState("");
   const [editingGroupIndex, setEditingGroupIndex] = useState<number | null>(null);
@@ -169,6 +171,7 @@ export default function WorkoutJournal() {
     mutationFn: async (data: {
       name: string;
       aiGenerateName: boolean;
+      date?: string;
     }) => {
       const response = await fetch("/api/workouts", {
         method: "POST",
@@ -290,6 +293,7 @@ export default function WorkoutJournal() {
       const workoutData = {
         name: workoutName || "Unnamed Workout",
         aiGenerateName: aiGenerateName,
+        date: workoutDate !== new Date().toISOString().split('T')[0] ? workoutDate : undefined,
       };
 
       const result = await createWorkoutMutation.mutateAsync(workoutData);
@@ -442,15 +446,21 @@ export default function WorkoutJournal() {
           // Create Workout Form
           <section className={styles.createWorkoutForm}>
             <form onSubmit={handleCreateWorkout}>
-              <div className={styles.dateDisplay}>
-                <div className={styles.dateLabel}>Today's workout</div>
-                <div className={styles.dateValue}>
-                  {new Date().toLocaleDateString("en-US", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+              <div className={styles.formGroup}>
+                <label htmlFor="workoutDate" className={styles.formLabel}>
+                  Workout Date
+                </label>
+                <Input
+                  id="workoutDate"
+                  type="date"
+                  value={workoutDate}
+                  onChange={(e) => setWorkoutDate(e.target.value)}
+                  disabled={!isEditing}
+                />
+                <div className={styles.dateHelper}>
+                  {workoutDate === new Date().toISOString().split('T')[0] 
+                    ? "Today's workout"
+                    : "Backfilling workout"}
                 </div>
               </div>
 
@@ -613,7 +623,7 @@ export default function WorkoutJournal() {
                 </div>
               ) : (
                 <div className={styles.programmedExercises}>
-                  {(todaysWorkout?.exercises || []).map((programmedEx, index) => {
+                  {(todaysWorkout?.exercises || []).map((programmedEx: any, index: number) => {
                     const currentExercise =
                       swappedExercises.get(index) || programmedEx;
                     const isSkipped = skippedExercises.has(index);

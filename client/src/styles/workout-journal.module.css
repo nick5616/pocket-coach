@@ -219,6 +219,13 @@
   color: #6b7280;
 }
 
+.dateHelper {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
 .workoutInput {
   padding: 1rem;
   margin-bottom: 1rem;
