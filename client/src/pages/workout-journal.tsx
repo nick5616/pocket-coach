@@ -423,7 +423,7 @@ export default function WorkoutJournal() {
           <div className={styles.headerLeft}>
             <Link href="/">
               <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft style={{ width: "1rem", height: "1rem" }} />
               </Button>
             </Link>
             <h1 className={styles.title}>
@@ -432,7 +432,7 @@ export default function WorkoutJournal() {
           </div>
           {workoutId && totalVolume > 0 && (
             <div className={styles.volumeIndicator}>
-              <Gem className="h-4 w-4" />
+              <Gem style={{ width: "1rem", height: "1rem" }} />
               <span className={styles.volumeText}>
                 {Math.round(totalVolume / 1000)}k kg
               </span>
@@ -773,7 +773,7 @@ export default function WorkoutJournal() {
                 {isWorkoutCompleted ? "Workout Summary" : "Completed Exercises"}
                 {isWorkoutCompleted && (
                   <span className={styles.completedBadge}>
-                    <CheckCircle className="h-4 w-4" />
+                    <CheckCircle style={{ width: "1rem", height: "1rem" }} />
                     Completed
                   </span>
                 )}
@@ -831,14 +831,14 @@ export default function WorkoutJournal() {
                                     setEditingSetData(initialSetData);
                                   }}
                                 >
-                                  <Edit className="h-4 w-4" />
+                                  <Edit style={{ width: "1rem", height: "1rem" }} />
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => setDeleteExerciseId(exerciseGroup.exercises[0].id)}
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  <Trash2 style={{ width: "1rem", height: "1rem" }} />
                                 </Button>
                               </>
                             )}

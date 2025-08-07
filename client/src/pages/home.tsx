@@ -308,10 +308,10 @@ export default function Home() {
               }}
             >
               {activeProgram ? (
-                <div style={{ display: "flex", gap: "var(--spacing-md)" }}>
+                <div style={{ display: "flex", gap: "var(--spacing-sm)", width: "100%" }}>
                   <Link
                     href="/workout-journal"
-                    style={{ textDecoration: "none", flex: "0 0 70%" }}
+                    style={{ textDecoration: "none", width: "70%", flexShrink: 0 }}
                   >
                     <div
                       className="card"
@@ -386,7 +386,7 @@ export default function Home() {
                   </Link>
                   <Link
                     href="/workout-journal"
-                    style={{ textDecoration: "none", flex: "0 0 30%" }}
+                    style={{ textDecoration: "none", width: "30%", flexShrink: 0 }}
                   >
                     <div
                       className="card"
@@ -428,10 +428,11 @@ export default function Home() {
                         style={{ 
                           marginBottom: "var(--spacing-xs)",
                           textAlign: "center",
-                          fontSize: "0.875rem",
+                          fontSize: "0.75rem",
+                          lineHeight: "1",
                         }}
                       >
-                        Quick Workout
+                        Quick
                       </h3>
                       <div
                         style={{

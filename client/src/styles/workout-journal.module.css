@@ -170,7 +170,9 @@
 }
 
 .createWorkoutForm {
-  padding: 1.5rem 0.5rem;
+  padding: 1.5rem 1rem;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .dateDisplay {
@@ -192,6 +194,8 @@
 
 .formGroup {
   margin-bottom: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .formLabel {
