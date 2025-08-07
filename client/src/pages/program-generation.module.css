@@ -4,6 +4,7 @@
   padding: 1rem;
   display: flex;
   flex-direction: column;
+  padding-bottom: 2rem; /* Add extra bottom padding for scrolling */
 }
 
 .header {
@@ -23,7 +24,7 @@
 
 .mainCard {
   max-width: 600px;
-  margin: 0 auto;
+  margin: 0 auto 2rem auto; /* Add bottom margin for scroll space */
   width: 100%;
   background: white;
   border-radius: 1rem;

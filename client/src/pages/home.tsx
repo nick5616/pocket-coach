@@ -570,7 +570,7 @@ export default function Home() {
                           className="text-heading-3"
                           style={{ marginBottom: "var(--spacing-xs)" }}
                         >
-                          Browse Programs
+                          Create or Browse Programs
                         </h3>
                         <p className="text-body">Structured training plans</p>
                       </div>
