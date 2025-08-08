@@ -73,20 +73,21 @@ export default function Programs() {
                   {activeProgram.difficulty}
                 </Badge>
               </div>
-              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <Button
                   onClick={() => setLocation(`/programs/modify?id=${activeProgram.id}`)}
                   size="sm"
                   variant="outline"
-                  style={{ borderColor: '#3b82f6', color: '#3b82f6' }}
+                  style={{ borderColor: '#3b82f6', color: '#3b82f6', width: '100%' }}
                 >
                   <Sparkles style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.5rem' }} />
-                  Modify Program
+                  Modify This Program
                 </Button>
                 <Button
                   onClick={() => setLocation("/programs/generate")}
                   size="sm"
                   variant="primary"
+                  style={{ width: '100%' }}
                 >
                   <Sparkles style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.5rem' }} />
                   Create New Program
