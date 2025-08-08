@@ -67,7 +67,18 @@ export default function ProgramGeneration() {
   const onSubmit = (data: ProgramGenerationData) => {
     console.log("Form submitted with data:", data);
     console.log("Form errors:", form.formState.errors);
+    console.log("Form is valid:", form.formState.isValid);
     generateProgramMutation.mutate(data);
+  };
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log("Button clicked!");
+    console.log("Current form values:", form.getValues());
+    console.log("Form errors:", form.formState.errors);
+    
+    // Trigger form validation and submission
+    form.handleSubmit(onSubmit)();
   };
 
   return (
@@ -222,7 +233,8 @@ export default function ProgramGeneration() {
             {/* Submit Button */}
             <div className={styles.buttonGroup}>
               <Button
-                type="submit"
+                type="button"
+                onClick={handleButtonClick}
                 disabled={generateProgramMutation.isPending}
                 size="lg"
                 variant="primary"
