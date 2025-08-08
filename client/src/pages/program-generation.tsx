@@ -65,6 +65,8 @@ export default function ProgramGeneration() {
   });
 
   const onSubmit = (data: ProgramGenerationData) => {
+    console.log("Form submitted with data:", data);
+    console.log("Form errors:", form.formState.errors);
     generateProgramMutation.mutate(data);
   };
 
@@ -106,7 +108,6 @@ export default function ProgramGeneration() {
                 placeholder="Describe what you want to achieve... For example: 'I want to build defined shoulders and improve my upper body strength' or 'I want to lose weight and build lean muscle'"
                 rows={4}
                 onFocus={() => setIsInputFocused(true)}
-                onBlur={() => setIsInputFocused(false)}
                 {...form.register("goals", {
                   onBlur: () => setIsInputFocused(false)
                 })}
@@ -150,7 +151,6 @@ export default function ProgramGeneration() {
                     <select 
                       className={styles.select}
                       onFocus={() => setIsInputFocused(true)}
-                      onBlur={() => setIsInputFocused(false)}
                       {...form.register("experience", {
                         onBlur: () => setIsInputFocused(false)
                       })}
@@ -172,7 +172,6 @@ export default function ProgramGeneration() {
                       placeholder="Let AI decide"
                       className={styles.input}
                       onFocus={() => setIsInputFocused(true)}
-                      onBlur={() => setIsInputFocused(false)}
                       {...form.register("availableDays", { 
                         valueAsNumber: true,
                         min: 1,
