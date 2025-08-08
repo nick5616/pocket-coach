@@ -981,14 +981,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // If activating a program, deactivate all other programs for this user first
       if (updates.isActive === true) {
-        const program = await storage.updateProgram(programId, { isActive: false });
-        if (program) {
-          // Get all user programs and deactivate them
-          const userPrograms = await storage.getUserPrograms(program.userId);
-          for (const userProgram of userPrograms) {
-            if (userProgram.id !== programId) {
-              await storage.updateProgram(userProgram.id, { isActive: false });
-            }
+        const userId = req.user!.id;
+        // Get all user programs and deactivate them
+        const userPrograms = await storage.getUserPrograms(userId);
+        for (const userProgram of userPrograms) {
+          if (userProgram.id !== programId) {
+            await storage.updateProgram(userProgram.id, { isActive: false });
           }
         }
       }

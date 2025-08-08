@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  padding-bottom: 8rem; /* Ensure enough space to scroll past bottom navigation */
+  padding-bottom: 12rem; /* Ensure enough space to scroll past bottom navigation */
 }
 
 .header {
@@ -27,7 +27,7 @@
 
 .mainCard {
   max-width: 600px;
-  margin: 0 auto 2rem auto; /* Add bottom margin for scroll space */
+  margin: 0 auto 4rem auto; /* Add bottom margin for scroll space */
   width: 100%;
   background: white;
   border-radius: 1rem;
@@ -226,6 +226,7 @@
 
 .buttonGroup {
   margin-top: 1rem;
+  margin-bottom: 4rem;
   padding-top: 1rem;
   border-top: 1px solid #e5e7eb;
 }

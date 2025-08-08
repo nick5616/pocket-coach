@@ -75,15 +75,6 @@ export default function Programs() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <Button
-                  onClick={() => setLocation(`/programs/modify?id=${activeProgram.id}`)}
-                  size="sm"
-                  variant="outline"
-                  style={{ borderColor: '#3b82f6', color: '#3b82f6', width: '100%' }}
-                >
-                  <Sparkles style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.5rem' }} />
-                  Modify This Program
-                </Button>
-                <Button
                   onClick={() => setLocation("/programs/generate")}
                   size="sm"
                   variant="primary"
@@ -91,6 +82,15 @@ export default function Programs() {
                 >
                   <Sparkles style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.5rem' }} />
                   Create New Program
+                </Button>
+                <Button
+                  onClick={() => setLocation(`/programs/modify?id=${activeProgram.id}`)}
+                  size="sm"
+                  variant="outline"
+                  style={{ borderColor: '#3b82f6', color: '#3b82f6', width: '100%' }}
+                >
+                  <Sparkles style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.5rem' }} />
+                  Modify This Program
                 </Button>
               </div>
             </CardContent>
@@ -139,7 +139,26 @@ export default function Programs() {
                     <Badge variant="outline">{program.daysPerWeek} days/week</Badge>
                   </div>
                   {!program.isActive && (
-                    <Button size="sm" variant="outline">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch(`/api/programs/${program.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({ isActive: true })
+                          });
+                          if (response.ok) {
+                            // Refresh the programs list
+                            window.location.reload();
+                          }
+                        } catch (error) {
+                          console.error('Failed to activate program:', error);
+                        }
+                      }}
+                    >
                       <Play style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.5rem' }} />
                       Activate
                     </Button>

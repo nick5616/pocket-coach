@@ -422,8 +422,8 @@ MODIFICATION GUIDELINES:
 
 Return the COMPLETE modified program in the same JSON format:
 {
-  "name": "Updated Program Name",
-  "description": "Updated description explaining changes made",
+  "name": "${currentProgram.name}",
+  "description": "${currentProgram.description} Modified based on your feedback.",
   "durationWeeks": 8,
   "difficulty": "beginner|intermediate|advanced",
   "focusAreas": ["Updated focus areas"],
