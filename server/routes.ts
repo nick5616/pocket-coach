@@ -931,13 +931,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { program, feedback } = req.body;
       
+      if (!program || !feedback) {
+        return res.status(400).json({ message: "Program and feedback are required" });
+      }
+      
+      console.log("Program modification request:", { programId: program?.id, feedback });
+      
       // Modify the program based on user feedback
       const modifiedProgram = await modifyProgram(program, feedback);
       
+      console.log("Program modification successful");
       res.json(modifiedProgram);
     } catch (error) {
       console.error("Program modification error:", error);
-      res.status(500).json({ message: "Failed to modify program" });
+      res.status(500).json({ message: "Failed to modify program", error: error.message });
     }
   });
 

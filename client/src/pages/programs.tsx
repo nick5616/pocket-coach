@@ -63,7 +63,7 @@ export default function Programs() {
               <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
                 {activeProgram.description}
               </p>
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                 <Badge variant="outline">
                   <Clock style={{ width: '0.75rem', height: '0.75rem', marginRight: '0.25rem' }} />
                   {activeProgram.duration}
@@ -72,6 +72,25 @@ export default function Programs() {
                   <Target style={{ width: '0.75rem', height: '0.75rem', marginRight: '0.25rem' }} />
                   {activeProgram.difficulty}
                 </Badge>
+              </div>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <Button
+                  onClick={() => setLocation(`/programs/modify?id=${activeProgram.id}`)}
+                  size="sm"
+                  variant="outline"
+                  style={{ borderColor: '#3b82f6', color: '#3b82f6' }}
+                >
+                  <Sparkles style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.5rem' }} />
+                  Modify Program
+                </Button>
+                <Button
+                  onClick={() => setLocation("/programs/generate")}
+                  size="sm"
+                  variant="primary"
+                >
+                  <Sparkles style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.5rem' }} />
+                  Create New Program
+                </Button>
               </div>
             </CardContent>
           </Card>
