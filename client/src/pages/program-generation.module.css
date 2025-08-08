@@ -4,7 +4,8 @@
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  padding-bottom: 2rem; /* Add extra bottom padding for scrolling */
+  overflow-y: auto;
+  padding-bottom: 8rem; /* Ensure enough space to scroll past bottom navigation */
 }
 
 .header {
@@ -12,14 +13,16 @@
 }
 
 .backButton {
-  color: white;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   backdrop-filter: blur(10px);
+  font-weight: 500 !important;
 }
 
 .backButton:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
 }
 
 .mainCard {
@@ -348,9 +351,14 @@
   }
   
   .backButton {
-    color: white;
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    color: white !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+  }
+  
+  .backButton:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
   }
 }
 
@@ -358,6 +366,11 @@
 @media (max-width: 640px) {
   .container {
     padding: 0.5rem;
+    padding-bottom: 10rem; /* Even more space on mobile */
+  }
+  
+  .mainCard {
+    margin-bottom: 4rem; /* More space on mobile */
   }
   
   .equipmentGrid {
@@ -366,5 +379,9 @@
   
   .equipmentItem {
     padding: 0.5rem;
+  }
+  
+  .buttonGroup {
+    margin-bottom: 2rem; /* Ensure button is visible on mobile */
   }
 }

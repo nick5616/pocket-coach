@@ -31,6 +31,7 @@ const equipmentOptions = [
 export default function ProgramGeneration() {
   const [, setLocation] = useLocation();
   const [showOptionalInfo, setShowOptionalInfo] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<ProgramGenerationData>({
@@ -38,7 +39,7 @@ export default function ProgramGeneration() {
     defaultValues: {
       goals: "",
       experience: "",
-      availableDays: 3,
+      availableDays: undefined, // Remove default 3 days
       equipment: [],
       isConfirmation: false,
     },
@@ -68,9 +69,10 @@ export default function ProgramGeneration() {
   };
 
   return (
-    <div className={`${styles.container} page`}>
-      <div className={styles.header}>
-        <Button
+    <>
+      <div className={`${styles.container} page`} style={{ paddingBottom: isInputFocused ? '6rem' : '2rem' }}>
+        <div className={styles.header}>
+          <Button
           variant="ghost"
           size="sm"
           onClick={() => setLocation("/programs")}
@@ -78,17 +80,17 @@ export default function ProgramGeneration() {
         >
           <ArrowLeft style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
           Back to Programs
-        </Button>
-      </div>
+          </Button>
+        </div>
 
-      <Card className={styles.mainCard}>
+        <Card className={styles.mainCard}>
         <CardHeader>
           <CardTitle className={styles.cardTitle}>
             <Sparkles className={styles.titleIcon} />
             Generate AI Program
           </CardTitle>
           <p className={styles.cardDescription}>
-            Describe your fitness goals and our AI will create a personalized program that understands what you really need to achieve them.
+            Describe your fitness goals and our AI will create a personalized program that understands what you really need to achieve them. You'll be able to review and tweak the program before finalizing it.
           </p>
         </CardHeader>
         <CardContent>
@@ -103,7 +105,11 @@ export default function ProgramGeneration() {
                 className={styles.textarea}
                 placeholder="Describe what you want to achieve... For example: 'I want to build defined shoulders and improve my upper body strength' or 'I want to lose weight and build lean muscle'"
                 rows={4}
-                {...form.register("goals")}
+                onFocus={() => setIsInputFocused(true)}
+                onBlur={() => setIsInputFocused(false)}
+                {...form.register("goals", {
+                  onBlur: () => setIsInputFocused(false)
+                })}
               />
               <div className={styles.helpText}>
                 <Info style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.25rem' }} />
@@ -143,7 +149,11 @@ export default function ProgramGeneration() {
                     <label className={styles.formLabel}>Experience Level</label>
                     <select 
                       className={styles.select}
-                      {...form.register("experience")}
+                      onFocus={() => setIsInputFocused(true)}
+                      onBlur={() => setIsInputFocused(false)}
+                      {...form.register("experience", {
+                        onBlur: () => setIsInputFocused(false)
+                      })}
                     >
                       <option value="">Select your experience (optional)</option>
                       <option value="beginner">Beginner (0-6 months)</option>
@@ -159,12 +169,15 @@ export default function ProgramGeneration() {
                       type="number"
                       min="1"
                       max="7"
-                      placeholder="3"
+                      placeholder="Let AI decide"
                       className={styles.input}
+                      onFocus={() => setIsInputFocused(true)}
+                      onBlur={() => setIsInputFocused(false)}
                       {...form.register("availableDays", { 
                         valueAsNumber: true,
                         min: 1,
-                        max: 7
+                        max: 7,
+                        onBlur: () => setIsInputFocused(false)
                       })}
                     />
                   </div>
@@ -232,6 +245,14 @@ export default function ProgramGeneration() {
           </form>
         </CardContent>
       </Card>
-    </div>
+      </div>
+      
+      {/* Hide bottom navigation when input is focused */}
+      {isInputFocused && (
+        <style>{`
+          nav[class*="navigation"] { display: none !important; }
+        `}</style>
+      )}
+    </>
   );
 }
