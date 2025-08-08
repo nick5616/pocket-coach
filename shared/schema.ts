@@ -226,7 +226,7 @@ export const programGenerationSchema = z.object({
   
   // Optional info
   experience: z.string().optional(),
-  availableDays: z.number().min(1).max(7).optional(),
+  availableDays: z.coerce.number().min(1).max(7).optional().nullable(),
   equipment: z.array(z.string()).optional(),
   
   // Internal use for confirmation flow

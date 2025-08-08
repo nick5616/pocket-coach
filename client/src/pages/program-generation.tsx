@@ -7,6 +7,7 @@ import { Button } from "@/components/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import ProgramGenerationLoading from "@/components/program-generation-loading";
 import { 
   Sparkles,
   ArrowLeft,
@@ -80,6 +81,11 @@ export default function ProgramGeneration() {
     // Trigger form validation and submission
     form.handleSubmit(onSubmit)();
   };
+
+  // Show loading screen when generating
+  if (generateProgramMutation.isPending) {
+    return <ProgramGenerationLoading />;
+  }
 
   return (
     <>
@@ -184,9 +190,7 @@ export default function ProgramGeneration() {
                       className={styles.input}
                       onFocus={() => setIsInputFocused(true)}
                       {...form.register("availableDays", { 
-                        valueAsNumber: true,
-                        min: 1,
-                        max: 7,
+                        setValueAs: (value) => value === '' ? undefined : Number(value),
                         onBlur: () => setIsInputFocused(false)
                       })}
                     />
@@ -243,7 +247,7 @@ export default function ProgramGeneration() {
                 {generateProgramMutation.isPending ? (
                   <>
                     <Sparkles className={styles.loadingIcon} />
-                    Analyzing your goals...
+                    Creating your personalized program...
                   </>
                 ) : (
                   <>
