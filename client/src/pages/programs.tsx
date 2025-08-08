@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import ProgramSwitchSplash from "@/components/program-switch-splash";
 import { Button } from "@/components/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { Badge } from "@/components/Badge";
@@ -17,6 +19,8 @@ import styles from "./programs.module.css";
 
 export default function Programs() {
   const [, setLocation] = useLocation();
+  const [showSplash, setShowSplash] = useState(false);
+  const [activatedProgram, setActivatedProgram] = useState<string>("");
 
   const { data: programs = [], isLoading } = useQuery<Program[]>({
     queryKey: ["/api/programs"],
@@ -30,6 +34,19 @@ export default function Programs() {
 
   if (isLoading) {
     return <LoadingScreen message="Loading your workout programs..." />;
+  }
+
+  // Show splash screen when activating program
+  if (showSplash) {
+    return (
+      <ProgramSwitchSplash 
+        programName={activatedProgram}
+        onComplete={() => {
+          setShowSplash(false);
+          window.location.reload();
+        }}
+      />
+    );
   }
 
   return (
@@ -74,15 +91,6 @@ export default function Programs() {
                 </Badge>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <Button
-                  onClick={() => setLocation("/programs/generate")}
-                  size="sm"
-                  variant="primary"
-                  style={{ width: '100%' }}
-                >
-                  <Sparkles style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.5rem' }} />
-                  Create New Program
-                </Button>
                 <Button
                   onClick={() => setLocation(`/programs/modify?id=${activeProgram.id}`)}
                   size="sm"
@@ -151,8 +159,9 @@ export default function Programs() {
                             body: JSON.stringify({ isActive: true })
                           });
                           if (response.ok) {
-                            // Refresh the programs list
-                            window.location.reload();
+                            // Show splash screen then refresh
+                            setActivatedProgram(program.name);
+                            setShowSplash(true);
                           }
                         } catch (error) {
                           console.error('Failed to activate program:', error);

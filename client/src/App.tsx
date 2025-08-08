@@ -11,6 +11,8 @@ import ProgramConfirmation from "./pages/program-confirmation";
 import Progress from "./pages/progress";
 import ProfileSimple from "./pages/profile-simple";
 import WorkoutJournal from "./pages/workout-journal";
+import WorkoutQuick from "./pages/workout-quick";
+import WorkoutProgram from "./pages/workout-program";
 import ProgramWorkout from "./pages/program-workout";
 import Workouts from "./pages/workouts";
 import BottomNavigation from "./components/bottom-navigation";
@@ -234,6 +236,8 @@ function AppContent() {
           <Route path="/workouts" component={Workouts} />
           <Route path="/workouts/:id" component={WorkoutJournal} />
           <Route path="/workout-journal/:id?" component={WorkoutJournal} />
+          <Route path="/workout-quick" component={WorkoutQuick} />
+          <Route path="/workout-program" component={WorkoutProgram} />
           <Route path="/workouts/program/:programId" component={ProgramWorkout} />
           <Route>
             <div style={{ padding: "2rem", textAlign: "center" }}>
