@@ -219,8 +219,10 @@
 
 .checkboxGroup {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  margin-top
 }
 
 .checkboxLabel {
@@ -578,24 +580,24 @@
   .workoutInput {
     background-color: #111827;
   }
-  
+
   .inputContainer {
     background-color: #1f2937;
     border-color: #374151;
   }
-  
+
   .inputFooter {
     border-top-color: #374151;
   }
-  
+
   .statusText {
     color: #9ca3af;
   }
-  
+
   .dialogSummary {
     background-color: #1f2937;
   }
-  
+
   .dialogTimeText {
     color: #9ca3af;
   }
@@ -744,44 +746,45 @@
     background-color: #1e293b;
     border-color: #374151;
   }
-  
+
   .setsHeader {
     background-color: #374151;
     color: #d1d5db;
   }
-  
+
   .exerciseSetRow {
     border-top-color: #374151;
   }
-  
+
   .exerciseSetRow:nth-child(even) {
     background-color: #1f2937;
   }
-  
+
   .setNumber {
     color: #94a3b8;
   }
-  
-  .setReps, .setWeight {
+
+  .setReps,
+  .setWeight {
     color: #f1f5f9;
   }
-  
+
   .setRpe {
     color: #a78bfa;
   }
-  
+
   .editExerciseNameInput {
     background-color: #1f2937;
     border-color: #60a5fa;
     color: #f9fafb;
   }
-  
+
   .setInput {
     background-color: #1f2937;
     border-color: #374151;
     color: #f9fafb;
   }
-  
+
   .setInput:focus {
     border-color: #60a5fa;
     box-shadow: 0 0 0 1px #60a5fa;
@@ -849,120 +852,120 @@
   .container {
     background-color: #111827;
   }
-  
+
   .header {
     background-color: #1f2937;
     border-bottom-color: #374151;
   }
-  
+
   .title {
     color: #f9fafb;
   }
-  
+
   .volumeIndicator {
     color: #60a5fa;
   }
-  
+
   .volumeText {
     color: #f3f4f6;
   }
-  
+
   .sectionTitle {
     color: #f9fafb;
   }
-  
+
   .completedBadge {
     background: #059669;
   }
-  
+
   .exerciseCard {
     background-color: #1e3a8a;
     border-color: #3b82f6;
   }
-  
+
   .exerciseCardSkipped {
     background-color: #374151;
     border-color: #4b5563;
   }
-  
+
   .exerciseName {
     color: #dbeafe;
   }
-  
+
   .exerciseNameSkipped {
     color: #9ca3af;
   }
-  
+
   .exerciseStats {
     color: #93c5fd;
   }
-  
+
   .exerciseStatsSkipped {
     color: #6b7280;
   }
-  
+
   .completedExerciseCard {
     background-color: #1f2937;
     border-color: #374151;
   }
-  
+
   .completedExerciseName {
     color: #f9fafb;
   }
-  
+
   .inputContainer {
     background-color: #1f2937;
     border-color: #374151;
   }
-  
+
   .inputFooter {
     border-top-color: #374151;
   }
-  
+
   .dateLabel {
     color: #9ca3af;
   }
-  
+
   .dateValue {
     color: #f9fafb;
   }
-  
+
   .formLabel {
     color: #d1d5db;
   }
-  
+
   .checkboxLabel {
     color: #d1d5db;
   }
-  
+
   .checkboxDescription {
     color: #9ca3af;
   }
-  
+
   .statusText {
     color: #9ca3af;
   }
-  
+
   .statText {
     color: #d1d5db;
   }
-  
+
   .rpeText {
     color: #d1d5db;
   }
-  
+
   .volumeText {
     color: #34d399;
   }
-  
+
   .exerciseNotes {
     color: #9ca3af;
   }
-  
+
   .demoText {
     color: #9ca3af;
   }
-  
+
   .exerciseStatsText {
     color: #93c5fd;
   }
@@ -978,7 +981,7 @@
   .exerciseRpeTextSkipped {
     color: #6b7280;
   }
-  
+
   .exerciseNotesContainer {
     background-color: #1e40af;
     border-left-color: #3b82f6;

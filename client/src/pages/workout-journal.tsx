@@ -64,14 +64,20 @@ export default function WorkoutJournal() {
 
   // Form data states
   const [workoutName, setWorkoutName] = useState("");
-  const [aiGenerateName, setAiGenerateName] = useState(false);
-  const [workoutDate, setWorkoutDate] = useState(new Date().toISOString().split('T')[0]);
+  const [isCustomName, setIsCustomName] = useState(false);
+  const [workoutDate, setWorkoutDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
   const [editExerciseName, setEditExerciseName] = useState("");
   const [editExerciseNotes, setEditExerciseNotes] = useState("");
-  const [editingGroupIndex, setEditingGroupIndex] = useState<number | null>(null);
+  const [editingGroupIndex, setEditingGroupIndex] = useState<number | null>(
+    null,
+  );
   const [editGroupName, setEditGroupName] = useState("");
   const [editGroupNotes, setEditGroupNotes] = useState("");
-  const [editingSetData, setEditingSetData] = useState<Record<number, { reps?: number; weight?: number; rpe?: number }>>({});
+  const [editingSetData, setEditingSetData] = useState<
+    Record<number, { reps?: number; weight?: number; rpe?: number }>
+  >({});
 
   const [skippedExercises, setSkippedExercises] = useState<Set<number>>(
     new Set(),
@@ -83,34 +89,35 @@ export default function WorkoutJournal() {
   // Group exercises by name for display
   // Helper function to title case strings
   const toTitleCase = (str: string) => {
-    return str.replace(/\w\S*/g, (txt) => 
-      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    return str.replace(
+      /\w\S*/g,
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
     );
   };
 
   const groupExercisesByName = (exercises: Exercise[]) => {
     const grouped = new Map<string, Exercise[]>();
-    
-    exercises.forEach(exercise => {
+
+    exercises.forEach((exercise) => {
       const name = exercise.name;
       if (!grouped.has(name)) {
         grouped.set(name, []);
       }
       grouped.get(name)!.push(exercise);
     });
-    
+
     return Array.from(grouped.entries()).map(([name, exerciseGroup]) => {
       // Collect all unique notes from exercises in this group
       const allNotes = exerciseGroup
-        .map(e => e.notes)
-        .filter(note => note && note.trim())
+        .map((e) => e.notes)
+        .filter((note) => note && note.trim())
         .filter((note, index, arr) => arr.indexOf(note) === index);
-      
+
       return {
         name: toTitleCase(name),
         exercises: exerciseGroup,
         muscleGroups: exerciseGroup[0]?.muscleGroups || [],
-        notes: allNotes.length > 0 ? allNotes.join('; ') : null
+        notes: allNotes.length > 0 ? allNotes.join("; ") : null,
       };
     });
   };
@@ -150,19 +157,23 @@ export default function WorkoutJournal() {
   const { data: activeProgram, isLoading: activeProgramLoading } = useQuery({
     queryKey: ["/api/programs/active"],
     queryFn: () =>
-      fetch("/api/programs/active", { credentials: "include" }).then((res) => res.json()),
+      fetch("/api/programs/active", { credentials: "include" }).then((res) =>
+        res.json(),
+      ),
     enabled: !workoutId,
   });
 
   const { data: todaysWorkout, isLoading: todaysWorkoutLoading } = useQuery({
     queryKey: ["/api/programs/active/today"],
     queryFn: () =>
-      fetch("/api/programs/active/today", { credentials: "include" }).then((res) => res.json()),
+      fetch("/api/programs/active/today", { credentials: "include" }).then(
+        (res) => res.json(),
+      ),
     enabled: !workoutId && !!activeProgram,
   });
 
   const totalVolume = calculateWorkoutVolume(exercises as Exercise[]);
-  
+
   // Check if workout is completed
   const isWorkoutCompleted = workout?.isCompleted || false;
 
@@ -280,7 +291,11 @@ export default function WorkoutJournal() {
   });
 
   // Show loading screen if any essential data is still loading
-  const isLoading = workoutLoading || exercisesLoading || activeProgramLoading || todaysWorkoutLoading;
+  const isLoading =
+    workoutLoading ||
+    exercisesLoading ||
+    activeProgramLoading ||
+    todaysWorkoutLoading;
 
   if (isLoading) {
     return <LoadingScreen message="Loading workout..." />;
@@ -292,8 +307,11 @@ export default function WorkoutJournal() {
     try {
       const workoutData = {
         name: workoutName || "Unnamed Workout",
-        aiGenerateName: aiGenerateName,
-        date: workoutDate !== new Date().toISOString().split('T')[0] ? workoutDate : undefined,
+        aiGenerateName: !isCustomName,
+        date:
+          workoutDate !== new Date().toISOString().split("T")[0]
+            ? workoutDate
+            : undefined,
       };
 
       const result = await createWorkoutMutation.mutateAsync(workoutData);
@@ -458,13 +476,32 @@ export default function WorkoutJournal() {
                   disabled={!isEditing}
                 />
                 <div className={styles.dateHelper}>
-                  {workoutDate === new Date().toISOString().split('T')[0] 
+                  {workoutDate === new Date().toISOString().split("T")[0]
                     ? "Today's workout"
                     : "Backfilling workout"}
                 </div>
               </div>
 
-              <div className={styles.formGroup}>
+              <div className={styles.checkboxGroup}>
+                <Checkbox
+                  id="customNameCheckbox"
+                  checked={isCustomName}
+                  onChange={(e) => setIsCustomName(e.target.checked)}
+                />
+                <div>
+                  <label
+                    htmlFor="customNameCheckbox"
+                    className={styles.checkboxLabel}
+                  >
+                    Custom name
+                  </label>
+                  <div className={styles.checkboxDescription}>
+                    Name this workout yourself
+                  </div>
+                </div>
+              </div>
+
+              {isCustomName && <div className={styles.formGroup}>
                 <label htmlFor="workoutName" className={styles.formLabel}>
                   Workout Name
                 </label>
@@ -476,33 +513,14 @@ export default function WorkoutJournal() {
                   onChange={(e) => setWorkoutName(e.target.value)}
                   disabled={!isEditing}
                 />
-              </div>
-
-              <div className={styles.checkboxGroup}>
-                <Checkbox
-                  id="aiGenerateName"
-                  checked={aiGenerateName}
-                  onChange={(e) => setAiGenerateName(e.target.checked)}
-                />
-                <div>
-                  <label
-                    htmlFor="aiGenerateName"
-                    className={styles.checkboxLabel}
-                  >
-                    Have AI name it later
-                  </label>
-                  <div className={styles.checkboxDescription}>
-                    AI will create a name based on your exercises
-                  </div>
-                </div>
-              </div>
+              </div>}
 
               <Button
                 type="submit"
                 style={{ width: "100%" }}
                 disabled={
                   createWorkoutMutation.isPending ||
-                  (!workoutName && !aiGenerateName)
+                  (!workoutName && isCustomName)
                 }
               >
                 {createWorkoutMutation.isPending
@@ -565,10 +583,7 @@ export default function WorkoutJournal() {
                                 <div className={styles.muscleGroupsContainer}>
                                   {currentExercise.muscleGroups.map(
                                     (muscle: string, idx: number) => (
-                                      <Badge
-                                        key={idx}
-                                        variant="secondary"
-                                      >
+                                      <Badge key={idx} variant="secondary">
                                         {muscle}
                                       </Badge>
                                     ),
@@ -623,113 +638,115 @@ export default function WorkoutJournal() {
                 </div>
               ) : (
                 <div className={styles.programmedExercises}>
-                  {(todaysWorkout?.exercises || []).map((programmedEx: any, index: number) => {
-                    const currentExercise =
-                      swappedExercises.get(index) || programmedEx;
-                    const isSkipped = skippedExercises.has(index);
+                  {(todaysWorkout?.exercises || []).map(
+                    (programmedEx: any, index: number) => {
+                      const currentExercise =
+                        swappedExercises.get(index) || programmedEx;
+                      const isSkipped = skippedExercises.has(index);
 
-                    return (
-                      <div
-                        key={index}
-                        className={
-                          isSkipped
-                            ? `${styles.programmedExerciseCard} ${styles.exerciseCardSkipped}`
-                            : styles.programmedExerciseCard
-                        }
-                      >
-                        <div className={styles.exerciseHeader}>
-                          <h3
-                            className={
-                              isSkipped
-                                ? `${styles.exerciseName} ${styles.exerciseNameSkipped}`
-                                : styles.exerciseName
-                            }
-                          >
-                            {currentExercise.name}
-                          </h3>
-                          <div className={styles.exerciseStatsContainer}>
-                            <span
+                      return (
+                        <div
+                          key={index}
+                          className={
+                            isSkipped
+                              ? `${styles.programmedExerciseCard} ${styles.exerciseCardSkipped}`
+                              : styles.programmedExerciseCard
+                          }
+                        >
+                          <div className={styles.exerciseHeader}>
+                            <h3
                               className={
                                 isSkipped
-                                  ? styles.exerciseStatsTextSkipped
-                                  : styles.exerciseStatsText
+                                  ? `${styles.exerciseName} ${styles.exerciseNameSkipped}`
+                                  : styles.exerciseName
                               }
                             >
-                              {currentExercise.sets} sets ×{" "}
-                              {currentExercise.reps} reps
-                            </span>
-                            <span
-                              className={
-                                isSkipped
-                                  ? styles.exerciseRpeTextSkipped
-                                  : styles.exerciseRpeText
-                              }
-                            >
-                              RPE {currentExercise.rpe}
-                            </span>
+                              {currentExercise.name}
+                            </h3>
+                            <div className={styles.exerciseStatsContainer}>
+                              <span
+                                className={
+                                  isSkipped
+                                    ? styles.exerciseStatsTextSkipped
+                                    : styles.exerciseStatsText
+                                }
+                              >
+                                {currentExercise.sets} sets ×{" "}
+                                {currentExercise.reps} reps
+                              </span>
+                              <span
+                                className={
+                                  isSkipped
+                                    ? styles.exerciseRpeTextSkipped
+                                    : styles.exerciseRpeText
+                                }
+                              >
+                                RPE {currentExercise.rpe}
+                              </span>
+                            </div>
+                            {currentExercise.muscleGroups &&
+                              currentExercise.muscleGroups.length > 0 && (
+                                <div className={styles.muscleGroupsContainer}>
+                                  {currentExercise.muscleGroups.map(
+                                    (muscle: string, idx: number) => (
+                                      <Badge key={idx} variant="secondary">
+                                        {muscle}
+                                      </Badge>
+                                    ),
+                                  )}
+                                </div>
+                              )}
                           </div>
-                          {currentExercise.muscleGroups &&
-                            currentExercise.muscleGroups.length > 0 && (
-                              <div className={styles.muscleGroupsContainer}>
-                                {currentExercise.muscleGroups.map(
-                                  (muscle: string, idx: number) => (
-                                    <Badge
-                                      key={idx}
-                                      variant="secondary"
-                                    >
-                                      {muscle}
-                                    </Badge>
-                                  ),
-                                )}
-                              </div>
-                            )}
+
+                          {/* 2x2 Action Buttons - Only show for active workouts */}
+                          {!isWorkoutCompleted && (
+                            <div className={styles.actionButtons}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={isSkipped}
+                                onClick={() =>
+                                  handleExactCompletion(currentExercise, index)
+                                }
+                              >
+                                As Prescribed
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={isSkipped}
+                                onClick={() =>
+                                  handleModifiedCompletion(
+                                    currentExercise,
+                                    index,
+                                  )
+                                }
+                              >
+                                📝 With Changes
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={isSkipped}
+                                onClick={() =>
+                                  handleSwapExercise(currentExercise, index)
+                                }
+                              >
+                                🔄 Swap Exercise
+                              </Button>
+                              <Button
+                                variant={isSkipped ? "secondary" : "outline"}
+                                size="sm"
+                                onClick={() => handleSkipExercise(index)}
+                              >
+                                {isSkipped ? "↩️ Unskip" : "⏭️ Skip Today"}
+                              </Button>
+                            </div>
+                          )}
                         </div>
-
-                        {/* 2x2 Action Buttons - Only show for active workouts */}
-                        {!isWorkoutCompleted && (
-                          <div className={styles.actionButtons}>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={isSkipped}
-                              onClick={() =>
-                                handleExactCompletion(currentExercise, index)
-                              }
-                            >
-                              As Prescribed
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={isSkipped}
-                              onClick={() =>
-                                handleModifiedCompletion(currentExercise, index)
-                              }
-                            >
-                              📝 With Changes
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={isSkipped}
-                              onClick={() =>
-                                handleSwapExercise(currentExercise, index)
-                              }
-                            >
-                              🔄 Swap Exercise
-                            </Button>
-                            <Button
-                              variant={isSkipped ? "secondary" : "outline"}
-                              size="sm"
-                              onClick={() => handleSkipExercise(index)}
-                            >
-                              {isSkipped ? "↩️ Unskip" : "⏭️ Skip Today"}
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                      );
+                    },
+                  )}
                 </div>
               )}
             </section>
@@ -754,7 +771,13 @@ export default function WorkoutJournal() {
                         disabled={!currentInput.trim() || isSending}
                         size="sm"
                       >
-                        <Send style={{ width: "1rem", height: "1rem", marginRight: "0.5rem" }} />
+                        <Send
+                          style={{
+                            width: "1rem",
+                            height: "1rem",
+                            marginRight: "0.5rem",
+                          }}
+                        />
                         Send to AI
                       </Button>
                     </div>
@@ -779,240 +802,307 @@ export default function WorkoutJournal() {
                 )}
               </h2>
               <div className={styles.completedExercises}>
-                {groupExercisesByName(exercises).map((exerciseGroup, groupIndex) => {
-                  const totalSets = exerciseGroup.exercises.length;
-                  const totalVolume = exerciseGroup.exercises.reduce((sum, ex) => 
-                    sum + (ex.weight || 0) * (ex.sets || 1) * (ex.reps || 0), 0
-                  );
-                  const avgRpe = exerciseGroup.exercises
-                    .filter(ex => ex.rpe)
-                    .reduce((sum, ex, _, arr) => sum + (ex.rpe || 0) / arr.length, 0);
+                {groupExercisesByName(exercises).map(
+                  (exerciseGroup, groupIndex) => {
+                    const totalSets = exerciseGroup.exercises.length;
+                    const totalVolume = exerciseGroup.exercises.reduce(
+                      (sum, ex) =>
+                        sum +
+                        (ex.weight || 0) * (ex.sets || 1) * (ex.reps || 0),
+                      0,
+                    );
+                    const avgRpe = exerciseGroup.exercises
+                      .filter((ex) => ex.rpe)
+                      .reduce(
+                        (sum, ex, _, arr) => sum + (ex.rpe || 0) / arr.length,
+                        0,
+                      );
 
-                  return (
-                    <div
-                      key={`${exerciseGroup.name}-${groupIndex}`}
-                      className={styles.completedExerciseCard}
-                    >
-                      {editingGroupIndex === groupIndex ? (
-                        <div className={styles.editModeContainer}>
-                          <Input
-                            value={editGroupName}
-                            onChange={(e) => setEditGroupName(e.target.value)}
-                            className={styles.editExerciseNameInput}
-                            placeholder="Exercise name"
-                          />
-                        </div>
-                      ) : (
-                        <div className={styles.completedExerciseHeader}>
-                          <div className={styles.completedExerciseInfo}>
-                            <h3 className={styles.completedExerciseTitle}>
-                              {exerciseGroup.name}
-                            </h3>
+                    return (
+                      <div
+                        key={`${exerciseGroup.name}-${groupIndex}`}
+                        className={styles.completedExerciseCard}
+                      >
+                        {editingGroupIndex === groupIndex ? (
+                          <div className={styles.editModeContainer}>
+                            <Input
+                              value={editGroupName}
+                              onChange={(e) => setEditGroupName(e.target.value)}
+                              className={styles.editExerciseNameInput}
+                              placeholder="Exercise name"
+                            />
                           </div>
-                          <div className={styles.completedExerciseActions}>
-                            {!isWorkoutCompleted && (
-                              <>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setEditingGroupIndex(groupIndex);
-                                    setEditGroupName(exerciseGroup.name);
-                                    setEditGroupNotes(exerciseGroup.notes || "");
-                                    // Initialize editing data for each set
-                                    const initialSetData: Record<number, { reps?: number; weight?: number; rpe?: number }> = {};
-                                    exerciseGroup.exercises.forEach(exercise => {
-                                      initialSetData[exercise.id] = {
-                                        reps: exercise.reps || undefined,
-                                        weight: exercise.weight || undefined,
-                                        rpe: exercise.rpe || undefined
-                                      };
-                                    });
-                                    setEditingSetData(initialSetData);
-                                  }}
-                                >
-                                  <Edit style={{ width: "1rem", height: "1rem" }} />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setDeleteExerciseId(exerciseGroup.exercises[0].id)}
-                                >
-                                  <Trash2 style={{ width: "1rem", height: "1rem" }} />
-                                </Button>
-                              </>
+                        ) : (
+                          <div className={styles.completedExerciseHeader}>
+                            <div className={styles.completedExerciseInfo}>
+                              <h3 className={styles.completedExerciseTitle}>
+                                {exerciseGroup.name}
+                              </h3>
+                            </div>
+                            <div className={styles.completedExerciseActions}>
+                              {!isWorkoutCompleted && (
+                                <>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      setEditingGroupIndex(groupIndex);
+                                      setEditGroupName(exerciseGroup.name);
+                                      setEditGroupNotes(
+                                        exerciseGroup.notes || "",
+                                      );
+                                      // Initialize editing data for each set
+                                      const initialSetData: Record<
+                                        number,
+                                        {
+                                          reps?: number;
+                                          weight?: number;
+                                          rpe?: number;
+                                        }
+                                      > = {};
+                                      exerciseGroup.exercises.forEach(
+                                        (exercise) => {
+                                          initialSetData[exercise.id] = {
+                                            reps: exercise.reps || undefined,
+                                            weight:
+                                              exercise.weight || undefined,
+                                            rpe: exercise.rpe || undefined,
+                                          };
+                                        },
+                                      );
+                                      setEditingSetData(initialSetData);
+                                    }}
+                                  >
+                                    <Edit
+                                      style={{ width: "1rem", height: "1rem" }}
+                                    />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      setDeleteExerciseId(
+                                        exerciseGroup.exercises[0].id,
+                                      )
+                                    }
+                                  >
+                                    <Trash2
+                                      style={{ width: "1rem", height: "1rem" }}
+                                    />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Muscle Groups */}
+                        {exerciseGroup.muscleGroups.length > 0 && (
+                          <div className={styles.completedMuscleGroups}>
+                            {exerciseGroup.muscleGroups.map((muscle, index) => (
+                              <Badge key={index} variant="secondary">
+                                {muscle}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Sets Display */}
+                        <div className={styles.exerciseSetsGrid}>
+                          <div className={styles.setsHeader}>
+                            <span className={styles.setHeaderItem}>Set</span>
+                            <span className={styles.setHeaderItem}>Reps</span>
+                            <span className={styles.setHeaderItem}>Weight</span>
+                            <span className={styles.setHeaderItem}>RPE</span>
+                            {editingGroupIndex === groupIndex && (
+                              <span className={styles.setHeaderItem}>
+                                Action
+                              </span>
                             )}
                           </div>
-                        </div>
-                      )}
-
-                      {/* Muscle Groups */}
-                      {exerciseGroup.muscleGroups.length > 0 && (
-                        <div className={styles.completedMuscleGroups}>
-                          {exerciseGroup.muscleGroups.map((muscle, index) => (
-                            <Badge key={index} variant="secondary">
-                              {muscle}
-                            </Badge>
+                          {exerciseGroup.exercises.map((exercise, setIndex) => (
+                            <div
+                              key={exercise.id}
+                              className={`${styles.exerciseSetRow} ${editingGroupIndex === groupIndex ? styles.exerciseSetRowEditing : ""}`}
+                            >
+                              <span className={styles.setNumber}>
+                                {setIndex + 1}
+                              </span>
+                              {editingGroupIndex === groupIndex ? (
+                                <>
+                                  <input
+                                    type="number"
+                                    value={
+                                      editingSetData[exercise.id]?.reps || ""
+                                    }
+                                    onChange={(e) =>
+                                      setEditingSetData((prev) => ({
+                                        ...prev,
+                                        [exercise.id]: {
+                                          ...prev[exercise.id],
+                                          reps: e.target.value
+                                            ? parseInt(e.target.value)
+                                            : undefined,
+                                        },
+                                      }))
+                                    }
+                                    className={styles.setInput}
+                                    placeholder="Reps"
+                                  />
+                                  <input
+                                    type="number"
+                                    value={
+                                      editingSetData[exercise.id]?.weight || ""
+                                    }
+                                    onChange={(e) =>
+                                      setEditingSetData((prev) => ({
+                                        ...prev,
+                                        [exercise.id]: {
+                                          ...prev[exercise.id],
+                                          weight: e.target.value
+                                            ? parseFloat(e.target.value)
+                                            : undefined,
+                                        },
+                                      }))
+                                    }
+                                    className={styles.setInput}
+                                    placeholder="Weight"
+                                  />
+                                  <input
+                                    type="number"
+                                    value={
+                                      editingSetData[exercise.id]?.rpe || ""
+                                    }
+                                    onChange={(e) =>
+                                      setEditingSetData((prev) => ({
+                                        ...prev,
+                                        [exercise.id]: {
+                                          ...prev[exercise.id],
+                                          rpe: e.target.value
+                                            ? parseInt(e.target.value)
+                                            : undefined,
+                                        },
+                                      }))
+                                    }
+                                    className={styles.setInput}
+                                    placeholder="RPE"
+                                    min="1"
+                                    max="10"
+                                  />
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      setDeleteExerciseId(exercise.id)
+                                    }
+                                    className={styles.deleteSetButton}
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </>
+                              ) : (
+                                <>
+                                  <span className={styles.setReps}>
+                                    {exercise.reps}
+                                  </span>
+                                  <span className={styles.setWeight}>
+                                    {exercise.weight
+                                      ? `${exercise.weight} lbs`
+                                      : "-"}
+                                  </span>
+                                  <span className={styles.setRpe}>
+                                    {exercise.rpe || "-"}
+                                  </span>
+                                </>
+                              )}
+                            </div>
                           ))}
                         </div>
-                      )}
 
-                      {/* Sets Display */}
-                      <div className={styles.exerciseSetsGrid}>
-                        <div className={styles.setsHeader}>
-                          <span className={styles.setHeaderItem}>Set</span>
-                          <span className={styles.setHeaderItem}>Reps</span>
-                          <span className={styles.setHeaderItem}>Weight</span>
-                          <span className={styles.setHeaderItem}>RPE</span>
-                          {editingGroupIndex === groupIndex && <span className={styles.setHeaderItem}>Action</span>}
-                        </div>
-                        {exerciseGroup.exercises.map((exercise, setIndex) => (
-                          <div key={exercise.id} className={`${styles.exerciseSetRow} ${editingGroupIndex === groupIndex ? styles.exerciseSetRowEditing : ''}`}>
-                            <span className={styles.setNumber}>{setIndex + 1}</span>
-                            {editingGroupIndex === groupIndex ? (
-                              <>
-                                <input 
-                                  type="number" 
-                                  value={editingSetData[exercise.id]?.reps || ''} 
-                                  onChange={(e) => setEditingSetData(prev => ({
-                                    ...prev,
-                                    [exercise.id]: {
-                                      ...prev[exercise.id],
-                                      reps: e.target.value ? parseInt(e.target.value) : undefined
-                                    }
-                                  }))}
-                                  className={styles.setInput}
-                                  placeholder="Reps"
-                                />
-                                <input 
-                                  type="number" 
-                                  value={editingSetData[exercise.id]?.weight || ''} 
-                                  onChange={(e) => setEditingSetData(prev => ({
-                                    ...prev,
-                                    [exercise.id]: {
-                                      ...prev[exercise.id],
-                                      weight: e.target.value ? parseFloat(e.target.value) : undefined
-                                    }
-                                  }))}
-                                  className={styles.setInput}
-                                  placeholder="Weight"
-                                />
-                                <input 
-                                  type="number" 
-                                  value={editingSetData[exercise.id]?.rpe || ''} 
-                                  onChange={(e) => setEditingSetData(prev => ({
-                                    ...prev,
-                                    [exercise.id]: {
-                                      ...prev[exercise.id],
-                                      rpe: e.target.value ? parseInt(e.target.value) : undefined
-                                    }
-                                  }))}
-                                  className={styles.setInput}
-                                  placeholder="RPE"
-                                  min="1"
-                                  max="10"
-                                />
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setDeleteExerciseId(exercise.id)}
-                                  className={styles.deleteSetButton}
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </>
-                            ) : (
-                              <>
-                                <span className={styles.setReps}>{exercise.reps}</span>
-                                <span className={styles.setWeight}>
-                                  {exercise.weight ? `${exercise.weight} lbs` : '-'}
-                                </span>
-                                <span className={styles.setRpe}>
-                                  {exercise.rpe || '-'}
-                                </span>
-                              </>
+                        {/* Summary Stats */}
+                        <div className={styles.completedExerciseStats}>
+                          <div className={styles.completedStatsLeft}>
+                            <span className={styles.completedStatsText}>
+                              {totalSets} sets total
+                            </span>
+                          </div>
+                          <div className={styles.completedStatsRight}>
+                            {avgRpe > 0 && (
+                              <span className={styles.completedRpeText}>
+                                Avg RPE {avgRpe.toFixed(1)}
+                              </span>
+                            )}
+                            {totalVolume > 0 && (
+                              <span className={styles.completedVolumeText}>
+                                Vol: {totalVolume} lbs
+                              </span>
                             )}
                           </div>
-                        ))}
+                        </div>
+
+                        {/* Notes Section */}
+                        {editingGroupIndex === groupIndex ? (
+                          <div className={styles.exerciseNotesContainer}>
+                            <div className={styles.exerciseNotesLabel}>
+                              Notes:
+                            </div>
+                            <Textarea
+                              value={editGroupNotes}
+                              onChange={(e) =>
+                                setEditGroupNotes(e.target.value)
+                              }
+                              placeholder="Add notes about this exercise..."
+                              rows={2}
+                            />
+                          </div>
+                        ) : exerciseGroup.notes ? (
+                          <div className={styles.exerciseNotesContainer}>
+                            <div className={styles.exerciseNotesLabel}>
+                              Notes:
+                            </div>
+                            <p className={styles.exerciseNotesText}>
+                              {exerciseGroup.notes}
+                            </p>
+                          </div>
+                        ) : null}
+
+                        {/* Edit Mode Buttons - Always at bottom when editing */}
+                        {editingGroupIndex === groupIndex && (
+                          <div className={styles.editModeButtons}>
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => {
+                                // Save logic here - update exercise names and set data
+                                console.log("Saving changes:", {
+                                  name: editGroupName,
+                                  notes: editGroupNotes,
+                                  setData: editingSetData,
+                                });
+                                setEditingGroupIndex(null);
+                                setEditingSetData({});
+                              }}
+                              className={styles.editModeButton}
+                            >
+                              Save Changes
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setEditingGroupIndex(null);
+                                setEditingSetData({});
+                              }}
+                              className={styles.editModeButton}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        )}
                       </div>
-
-                      {/* Summary Stats */}
-                      <div className={styles.completedExerciseStats}>
-                        <div className={styles.completedStatsLeft}>
-                          <span className={styles.completedStatsText}>
-                            {totalSets} sets total
-                          </span>
-                        </div>
-                        <div className={styles.completedStatsRight}>
-                          {avgRpe > 0 && (
-                            <span className={styles.completedRpeText}>
-                              Avg RPE {avgRpe.toFixed(1)}
-                            </span>
-                          )}
-                          {totalVolume > 0 && (
-                            <span className={styles.completedVolumeText}>
-                              Vol: {totalVolume} lbs
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Notes Section */}
-                      {editingGroupIndex === groupIndex ? (
-                        <div className={styles.exerciseNotesContainer}>
-                          <div className={styles.exerciseNotesLabel}>Notes:</div>
-                          <Textarea
-                            value={editGroupNotes}
-                            onChange={(e) => setEditGroupNotes(e.target.value)}
-                            placeholder="Add notes about this exercise..."
-                            rows={2}
-                          />
-                        </div>
-                      ) : exerciseGroup.notes ? (
-                        <div className={styles.exerciseNotesContainer}>
-                          <div className={styles.exerciseNotesLabel}>Notes:</div>
-                          <p className={styles.exerciseNotesText}>
-                            {exerciseGroup.notes}
-                          </p>
-                        </div>
-                      ) : null}
-
-                      {/* Edit Mode Buttons - Always at bottom when editing */}
-                      {editingGroupIndex === groupIndex && (
-                        <div className={styles.editModeButtons}>
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={() => {
-                              // Save logic here - update exercise names and set data
-                              console.log('Saving changes:', { 
-                                name: editGroupName, 
-                                notes: editGroupNotes, 
-                                setData: editingSetData 
-                              });
-                              setEditingGroupIndex(null);
-                              setEditingSetData({});
-                            }}
-                            className={styles.editModeButton}
-                          >
-                            Save Changes
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setEditingGroupIndex(null);
-                              setEditingSetData({});
-                            }}
-                            className={styles.editModeButton}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                    );
+                  },
+                )}
               </div>
             </section>
             {/* Complete Workout Button - Only show for active workouts */}
@@ -1023,7 +1113,13 @@ export default function WorkoutJournal() {
                   variant="primary"
                   style={{ width: "100%" }}
                 >
-                  <Trophy style={{ width: "1rem", height: "1rem", marginRight: "0.5rem" }} />
+                  <Trophy
+                    style={{
+                      width: "1rem",
+                      height: "1rem",
+                      marginRight: "0.5rem",
+                    }}
+                  />
                   Complete Workout
                 </Button>
               </section>
@@ -1036,7 +1132,10 @@ export default function WorkoutJournal() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Complete Workout</DialogTitle>
-            <p>Are you ready to finish this workout? AI will analyze your session and provide insights.</p>
+            <p>
+              Are you ready to finish this workout? AI will analyze your session
+              and provide insights.
+            </p>
           </DialogHeader>
 
           <div className={styles.dialogSummary}>
@@ -1102,7 +1201,7 @@ export default function WorkoutJournal() {
                     display: "block",
                     fontSize: "0.875rem",
                     fontWeight: 500,
-                    marginBottom: "0.5rem"
+                    marginBottom: "0.5rem",
                   }}
                 >
                   Exercise Name
@@ -1122,7 +1221,7 @@ export default function WorkoutJournal() {
                     display: "block",
                     fontSize: "0.875rem",
                     fontWeight: 500,
-                    marginBottom: "0.5rem"
+                    marginBottom: "0.5rem",
                   }}
                 >
                   Notes
@@ -1139,7 +1238,7 @@ export default function WorkoutJournal() {
                   type="button"
                   variant="outline"
                   onClick={() => setEditingExercise(null)}
-                  style={{flex: "1"}}
+                  style={{ flex: "1" }}
                 >
                   Cancel
                 </Button>
@@ -1185,7 +1284,7 @@ export default function WorkoutJournal() {
             <Button
               variant="outline"
               onClick={() => setDeleteExerciseId(null)}
-              style={{flex: "1"}}
+              style={{ flex: "1" }}
             >
               Cancel
             </Button>
