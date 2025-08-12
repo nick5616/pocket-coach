@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { Badge } from "@/components/Badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { 
+import {
   Sparkles,
   ArrowLeft,
   Edit3,
@@ -16,9 +16,12 @@ import {
   Calendar,
   Clock,
   Target,
-  Dumbbell
+  Dumbbell,
 } from "lucide-react";
-import { programConfirmationSchema, type ProgramConfirmationData } from "@shared/schema";
+import {
+  programConfirmationSchema,
+  type ProgramConfirmationData,
+} from "@shared/schema";
 import styles from "./program-confirmation.module.css";
 
 export default function ProgramConfirmation() {
@@ -38,18 +41,18 @@ export default function ProgramConfirmation() {
   // Extract program data from URL parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const dataParam = urlParams.get('data');
+    const dataParam = urlParams.get("data");
     if (dataParam) {
       try {
         const parsed = JSON.parse(decodeURIComponent(dataParam));
         setProgramData(parsed);
-        form.setValue('program', parsed);
+        form.setValue("program", parsed);
       } catch (error) {
-        console.error('Failed to parse program data:', error);
-        setLocation('/programs/generate');
+        console.error("Failed to parse program data:", error);
+        setLocation("/programs/generate");
       }
     } else {
-      setLocation('/programs/generate');
+      setLocation("/programs/generate");
     }
   }, []);
 
@@ -60,8 +63,8 @@ export default function ProgramConfirmation() {
     },
     onSuccess: (modifiedProgram) => {
       setProgramData(modifiedProgram);
-      form.setValue('program', modifiedProgram);
-      form.setValue('feedback', '');
+      form.setValue("program", modifiedProgram);
+      form.setValue("feedback", "");
       setIsEditing(false);
       toast({
         title: "Program Updated",
@@ -80,7 +83,9 @@ export default function ProgramConfirmation() {
 
   const confirmProgramMutation = useMutation({
     mutationFn: async (program: any) => {
-      const response = await apiRequest("POST", "/api/programs/confirm", { program });
+      const response = await apiRequest("POST", "/api/programs/confirm", {
+        program,
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -89,7 +94,7 @@ export default function ProgramConfirmation() {
         title: "Program Created!",
         description: "Your personalized workout program is ready to use.",
       });
-      setLocation('/programs');
+      setLocation("/programs");
     },
     onError: (error) => {
       console.error("Program confirmation error:", error);
@@ -102,7 +107,7 @@ export default function ProgramConfirmation() {
   });
 
   const handleModifyProgram = () => {
-    const feedback = form.getValues('feedback');
+    const feedback = form.getValues("feedback");
     if (!feedback.trim()) {
       toast({
         title: "Feedback Required",
@@ -111,10 +116,10 @@ export default function ProgramConfirmation() {
       });
       return;
     }
-    
+
     modifyProgramMutation.mutate({
       feedback,
-      program: programData
+      program: programData,
     });
   };
 
@@ -140,7 +145,9 @@ export default function ProgramConfirmation() {
           onClick={() => setLocation("/programs/generate")}
           className={styles.backButton}
         >
-          <ArrowLeft style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
+          <ArrowLeft
+            style={{ width: "1rem", height: "1rem", marginRight: "0.5rem" }}
+          />
           Back to Generator
         </Button>
       </div>
@@ -153,27 +160,43 @@ export default function ProgramConfirmation() {
               <Sparkles className={styles.titleIcon} />
               {programData.name}
             </CardTitle>
-            <p className={styles.cardDescription}>
-              {programData.description}
-            </p>
+            <p className={styles.cardDescription}>{programData.description}</p>
           </CardHeader>
           <CardContent>
             <div className={styles.programMeta}>
               {programData.durationWeeks && (
                 <Badge variant="outline" className={styles.metaBadge}>
-                  <Calendar style={{ width: '0.75rem', height: '0.75rem', marginRight: '0.25rem' }} />
+                  <Calendar
+                    style={{
+                      width: "0.75rem",
+                      height: "0.75rem",
+                      marginRight: "0.25rem",
+                    }}
+                  />
                   {programData.durationWeeks} weeks
                 </Badge>
               )}
               {programData.difficulty && (
                 <Badge variant="outline" className={styles.metaBadge}>
-                  <Target style={{ width: '0.75rem', height: '0.75rem', marginRight: '0.25rem' }} />
+                  <Target
+                    style={{
+                      width: "0.75rem",
+                      height: "0.75rem",
+                      marginRight: "0.25rem",
+                    }}
+                  />
                   {programData.difficulty}
                 </Badge>
               )}
               {programData.schedule?.days?.length && (
                 <Badge variant="outline" className={styles.metaBadge}>
-                  <Dumbbell style={{ width: '0.75rem', height: '0.75rem', marginRight: '0.25rem' }} />
+                  <Dumbbell
+                    style={{
+                      width: "0.75rem",
+                      height: "0.75rem",
+                      marginRight: "0.25rem",
+                    }}
+                  />
                   {programData.schedule.days.length} days/week
                 </Badge>
               )}
@@ -184,9 +207,7 @@ export default function ProgramConfirmation() {
         {/* Program Schedule */}
         <Card className={styles.scheduleCard}>
           <CardHeader>
-            <CardTitle className={styles.cardTitle}>
-              Weekly Schedule
-            </CardTitle>
+            <CardTitle className={styles.cardTitle}>Weekly Schedule</CardTitle>
           </CardHeader>
           <CardContent>
             <div className={styles.scheduleGrid}>
@@ -197,27 +218,42 @@ export default function ProgramConfirmation() {
                     <h5 className={styles.dayType}>{day.name}</h5>
                   </div>
                   <div className={styles.exercisesList}>
-                    {day.exercises?.map((exercise: any, exerciseIndex: number) => (
-                      <div key={exerciseIndex} className={styles.exerciseItem}>
-                        <div className={styles.exerciseName}>{exercise.name}</div>
-                        <div className={styles.exerciseDetails}>
-                          {exercise.sets && exercise.reps && (
-                            <span className={styles.exerciseSpec}>
-                              {exercise.sets} × {exercise.reps}
-                            </span>
-                          )}
-                          {exercise.restTime && (
-                            <span className={styles.restTime}>
-                              <Clock style={{ width: '0.75rem', height: '0.75rem', marginRight: '0.25rem' }} />
-                              {exercise.restTime}s rest
-                            </span>
+                    {day.exercises?.map(
+                      (exercise: any, exerciseIndex: number) => (
+                        <div
+                          key={exerciseIndex}
+                          className={styles.exerciseItem}
+                        >
+                          <div className={styles.exerciseName}>
+                            {exercise.name}
+                          </div>
+                          <div className={styles.exerciseDetails}>
+                            {exercise.sets && exercise.reps && (
+                              <span className={styles.exerciseSpec}>
+                                {exercise.sets} × {exercise.reps}
+                              </span>
+                            )}
+                            {exercise.restTime && (
+                              <span className={styles.restTime}>
+                                <Clock
+                                  style={{
+                                    width: "0.75rem",
+                                    height: "0.75rem",
+                                    marginRight: "0.25rem",
+                                  }}
+                                />
+                                {exercise.restTime}s rest
+                              </span>
+                            )}
+                          </div>
+                          {exercise.notes && (
+                            <div className={styles.exerciseNotes}>
+                              {exercise.notes}
+                            </div>
                           )}
                         </div>
-                        {exercise.notes && (
-                          <div className={styles.exerciseNotes}>{exercise.notes}</div>
-                        )}
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 </div>
               ))}
@@ -237,7 +273,10 @@ export default function ProgramConfirmation() {
             </p>
           </CardHeader>
           <CardContent>
-            <form onSubmit={form.handleSubmit(handleModifyProgram)} className={styles.feedbackForm}>
+            <form
+              onSubmit={form.handleSubmit(handleModifyProgram)}
+              className={styles.feedbackForm}
+            >
               <textarea
                 className={styles.feedbackTextarea}
                 placeholder="For example: 'Add more shoulder exercises' or 'Make it less intense' or 'Focus more on chest development'"
@@ -245,12 +284,15 @@ export default function ProgramConfirmation() {
                 {...form.register("feedback")}
                 disabled={modifyProgramMutation.isPending}
               />
-              
+
               <div className={styles.buttonGroup}>
                 <Button
                   type="submit"
                   variant="outline"
-                  disabled={modifyProgramMutation.isPending || !form.watch('feedback')?.trim()}
+                  disabled={
+                    modifyProgramMutation.isPending ||
+                    !form.watch("feedback")?.trim()
+                  }
                   className={styles.modifyButton}
                 >
                   {modifyProgramMutation.isPending ? (
@@ -260,12 +302,18 @@ export default function ProgramConfirmation() {
                     </>
                   ) : (
                     <>
-                      <Edit3 style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
+                      <Edit3
+                        style={{
+                          width: "1rem",
+                          height: "1rem",
+                          marginRight: "0.5rem",
+                        }}
+                      />
                       Modify Program
                     </>
                   )}
                 </Button>
-                
+
                 <Button
                   type="button"
                   variant="primary"
@@ -281,7 +329,13 @@ export default function ProgramConfirmation() {
                     </>
                   ) : (
                     <>
-                      <Check style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
+                      <Check
+                        style={{
+                          width: "1rem",
+                          height: "1rem",
+                          marginRight: "0.5rem",
+                        }}
+                      />
                       Confirm & Create Program
                     </>
                   )}
