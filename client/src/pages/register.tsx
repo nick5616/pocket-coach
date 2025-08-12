@@ -5,7 +5,7 @@ import { Button } from "@/components/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/Card";
 import { Input } from "@/components/Input";
 import { Dumbbell, Eye, EyeOff, ArrowLeft } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import styles from "@/styles/auth.module.css";
 
 export default function Register() {
   const [, setLocation] = useLocation();
@@ -90,47 +90,47 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="container mx-auto px-4 py-8">
+    <div className={styles.authContainer}>
+      <div className={styles.container}>
         {/* Header */}
-        <div className="flex items-center mb-8">
+        <div className={styles.header}>
           <Button
             onClick={goBack}
             variant="ghost"
             size="sm"
-            className="mr-4"
+            className={styles.backButton}
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
             Back
           </Button>
-          <div className="flex items-center">
-            <Dumbbell className="h-8 w-8 text-emerald-600 dark:text-emerald-400 mr-2" />
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className={styles.brandContainer}>
+            <Dumbbell className={styles.brandIcon} />
+            <h1 className={styles.brandTitle}>
               Pocket Coach
             </h1>
           </div>
         </div>
 
         {/* Registration Form */}
-        <div className="max-w-md mx-auto">
-          <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-2">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Create Your Account</CardTitle>
-              <CardDescription>
+        <div className={styles.formContainer}>
+          <Card className={styles.formCard}>
+            <CardHeader className={styles.formHeader}>
+              <CardTitle className={styles.formTitle}>Create Your Account</CardTitle>
+              <CardDescription className={styles.formDescription}>
                 Start your fitness journey with personalized AI coaching
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
+            <CardContent className={styles.formContent}>
+              <form onSubmit={handleSubmit} className={styles.form}>
                 {error && (
-                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
-                    <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
+                  <div className={styles.errorAlert}>
+                    <p className={styles.errorText}>{error}</p>
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <div className={styles.fieldGroup}>
+                  <div className={styles.field}>
+                    <label htmlFor="firstName" className={styles.label}>
                       First Name *
                     </label>
                     <Input
@@ -142,8 +142,8 @@ export default function Register() {
                       required
                     />
                   </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <div className={styles.field}>
+                    <label htmlFor="lastName" className={styles.label}>
                       Last Name
                     </label>
                     <Input
@@ -156,8 +156,8 @@ export default function Register() {
                   </div>
                 </div>
 
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <div className={styles.field}>
+                  <label htmlFor="email" className={styles.label}>
                     Email Address *
                   </label>
                   <Input
@@ -170,11 +170,11 @@ export default function Register() {
                   />
                 </div>
 
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <div className={styles.field}>
+                  <label htmlFor="password" className={styles.label}>
                     Password *
                   </label>
-                  <div className="relative">
+                  <div className={styles.inputContainer}>
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
@@ -186,18 +186,18 @@ export default function Register() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      className={styles.passwordToggle}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? <EyeOff style={{ width: '1rem', height: '1rem' }} /> : <Eye style={{ width: '1rem', height: '1rem' }} />}
                     </button>
                   </div>
                 </div>
 
-                <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <div className={styles.field}>
+                  <label htmlFor="confirmPassword" className={styles.label}>
                     Confirm Password *
                   </label>
-                  <div className="relative">
+                  <div className={styles.inputContainer}>
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
@@ -209,29 +209,29 @@ export default function Register() {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      className={styles.passwordToggle}
                     >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showConfirmPassword ? <EyeOff style={{ width: '1rem', height: '1rem' }} /> : <Eye style={{ width: '1rem', height: '1rem' }} />}
                     </button>
                   </div>
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className={`${styles.submitButton} ${styles.primaryButton}`}
                   size="lg"
                   disabled={registerMutation.isPending}
                 >
                   {registerMutation.isPending ? "Creating Account..." : "Create Account"}
                 </Button>
 
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                <div className={styles.authLink}>
+                  <p className={styles.authLinkText}>
                     Already have an account?{" "}
                     <button
                       type="button"
                       onClick={goToSignIn}
-                      className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-medium"
+                      className={styles.authLinkButton}
                     >
                       Sign in here
                     </button>
@@ -243,8 +243,8 @@ export default function Register() {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>By creating an account, you agree to our terms of service and privacy policy</p>
+        <div className={styles.footer}>
+          <p className={styles.footerText}>By creating an account, you agree to our terms of service and privacy policy</p>
         </div>
       </div>
     </div>

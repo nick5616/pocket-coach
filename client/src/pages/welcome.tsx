@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/Card";
 import { Dumbbell, Target, TrendingUp, Users } from "lucide-react";
+import styles from "@/styles/auth.module.css";
 
 export default function Welcome() {
   const [, setLocation] = useLocation();
@@ -27,55 +28,55 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="container mx-auto px-4 py-8">
+    <div className={styles.authContainer}>
+      <div className={styles.container}>
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-4">
-            <Dumbbell className="h-12 w-12 text-emerald-600 dark:text-emerald-400 mr-3" />
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+        <div className={styles.welcomeHeader}>
+          <div className={styles.welcomeBrandContainer}>
+            <Dumbbell className={styles.welcomeBrandIcon} />
+            <h1 className={styles.welcomeTitle}>
               Pocket Coach
             </h1>
           </div>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className={styles.welcomeDescription}>
             Transform your fitness journey with AI-powered workout programs, 
             intelligent tracking, and personalized coaching that adapts to your goals.
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <Card className="text-center border-emerald-200 dark:border-emerald-800">
+        <div className={styles.featuresGrid}>
+          <Card className={styles.featureCard}>
             <CardHeader>
-              <Target className="h-8 w-8 text-emerald-600 dark:text-emerald-400 mx-auto mb-2" />
-              <CardTitle className="text-lg">Smart Programs</CardTitle>
+              <Target className={styles.featureIcon} />
+              <CardTitle className={styles.featureTitle}>Smart Programs</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription>
+              <CardDescription className={styles.featureDescription}>
                 AI-generated workout programs tailored to your goals, experience level, and available equipment.
               </CardDescription>
             </CardContent>
           </Card>
 
-          <Card className="text-center border-blue-200 dark:border-blue-800">
+          <Card className={styles.featureCard}>
             <CardHeader>
-              <TrendingUp className="h-8 w-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-              <CardTitle className="text-lg">Progress Tracking</CardTitle>
+              <TrendingUp className={styles.featureIcon} />
+              <CardTitle className={styles.featureTitle}>Progress Tracking</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription>
+              <CardDescription className={styles.featureDescription}>
                 Track your workouts, monitor progress, and get insights that help you reach your fitness goals faster.
               </CardDescription>
             </CardContent>
           </Card>
 
-          <Card className="text-center border-indigo-200 dark:border-indigo-800">
+          <Card className={styles.featureCard}>
             <CardHeader>
-              <Users className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mx-auto mb-2" />
-              <CardTitle className="text-lg">Personal Coach</CardTitle>
+              <Users className={styles.featureIcon} />
+              <CardTitle className={styles.featureTitle}>Personal Coach</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription>
+              <CardDescription className={styles.featureDescription}>
                 Get personalized recommendations and adaptive programs that evolve with your fitness journey.
               </CardDescription>
             </CardContent>
@@ -83,23 +84,23 @@ export default function Welcome() {
         </div>
 
         {/* CTA Section */}
-        <div className="max-w-md mx-auto">
-          <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-2">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl">
+        <div className={styles.ctaContainer}>
+          <Card className={styles.ctaCard}>
+            <CardHeader>
+              <CardTitle className={styles.formTitle}>
                 {isReturningUser ? "Welcome Back!" : "Ready to Start?"}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className={styles.formDescription}>
                 {isReturningUser 
                   ? "Sign in to continue your fitness journey or create a new account."
                   : "Join thousands of users transforming their fitness with AI-powered coaching."
                 }
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className={styles.ctaActions}>
               <Button 
                 onClick={handleGetStarted}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                className={styles.primaryButton}
                 size="lg"
               >
                 {isReturningUser ? "Create Account" : "Get Started Free"}
@@ -109,7 +110,6 @@ export default function Welcome() {
                 <Button
                   onClick={handleSignIn}
                   variant="outline"
-                  className="w-full"
                   size="lg"
                 >
                   Sign In
@@ -117,11 +117,11 @@ export default function Welcome() {
               )}
               
               {!isReturningUser && (
-                <p className="text-sm text-center text-gray-500 dark:text-gray-400">
+                <p className={styles.authLinkText}>
                   Already have an account?{" "}
                   <button
                     onClick={handleSignIn}
-                    className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-medium"
+                    className={styles.authLinkButton}
                   >
                     Sign in here
                   </button>
@@ -132,8 +132,8 @@ export default function Welcome() {
         </div>
 
         {/* Footer */}
-        <div className="mt-16 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>Start your transformation today • No equipment required • Cancel anytime</p>
+        <div className={styles.welcomeFooter}>
+          <p className={styles.welcomeFooterText}>Start your transformation today • No equipment required • Cancel anytime</p>
         </div>
       </div>
     </div>

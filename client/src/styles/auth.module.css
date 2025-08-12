@@ -1,0 +1,425 @@
+/* Auth Pages Styles */
+
+.authContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0fff4 0%, #e6f3ff 100%);
+  padding: 2rem 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .authContainer {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.backButton {
+  margin-right: 1rem;
+}
+
+.brandContainer {
+  display: flex;
+  align-items: center;
+}
+
+.brandIcon {
+  width: 2rem;
+  height: 2rem;
+  color: #059669;
+  margin-right: 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .brandIcon {
+    color: #10b981;
+  }
+}
+
+.brandTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .brandTitle {
+    color: #f9fafb;
+  }
+}
+
+.formContainer {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.formCard {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .formCard {
+    background-color: rgba(31, 41, 55, 0.8);
+    border-color: #374151;
+  }
+}
+
+.formHeader {
+  text-align: center;
+  padding: 1.5rem 1.5rem 0 1.5rem;
+}
+
+.formTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .formTitle {
+    color: #f9fafb;
+  }
+}
+
+.formDescription {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .formDescription {
+    color: #9ca3af;
+  }
+}
+
+.formContent {
+  padding: 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.errorAlert {
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .errorAlert {
+    background-color: rgba(220, 38, 38, 0.1);
+    border-color: #dc2626;
+  }
+}
+
+.errorText {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .errorText {
+    color: #fca5a5;
+  }
+}
+
+.fieldGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .label {
+    color: #d1d5db;
+  }
+}
+
+.inputContainer {
+  position: relative;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+}
+
+.passwordToggle:hover {
+  color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  .passwordToggle {
+    color: #9ca3af;
+  }
+
+  .passwordToggle:hover {
+    color: #d1d5db;
+  }
+}
+
+.submitButton {
+  margin-top: 0.5rem;
+}
+
+.authLink {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.authLinkText {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .authLinkText {
+    color: #9ca3af;
+  }
+}
+
+.authLinkButton {
+  background: none;
+  border: none;
+  color: #059669;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.authLinkButton:hover {
+  color: #047857;
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: dark) {
+  .authLinkButton {
+    color: #10b981;
+  }
+
+  .authLinkButton:hover {
+    color: #34d399;
+  }
+}
+
+.footer {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.footerText {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .footerText {
+    color: #9ca3af;
+  }
+}
+
+/* Welcome Page Specific Styles */
+.welcomeHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.welcomeBrandContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.welcomeBrandIcon {
+  width: 3rem;
+  height: 3rem;
+  color: #059669;
+  margin-right: 0.75rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .welcomeBrandIcon {
+    color: #10b981;
+  }
+}
+
+.welcomeTitle {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .welcomeTitle {
+    color: #f9fafb;
+  }
+}
+
+.welcomeDescription {
+  font-size: 1.125rem;
+  color: #6b7280;
+  max-width: 32rem;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .welcomeDescription {
+    color: #9ca3af;
+  }
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.featureCard {
+  text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .featureCard {
+    border-color: #374151;
+  }
+}
+
+.featureIcon {
+  width: 2rem;
+  height: 2rem;
+  margin: 0 auto 0.5rem auto;
+  color: #059669;
+}
+
+@media (prefers-color-scheme: dark) {
+  .featureIcon {
+    color: #10b981;
+  }
+}
+
+.featureTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .featureTitle {
+    color: #f9fafb;
+  }
+}
+
+.featureDescription {
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .featureDescription {
+    color: #9ca3af;
+  }
+}
+
+.ctaContainer {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.ctaCard {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border: 2px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ctaCard {
+    background-color: rgba(31, 41, 55, 0.8);
+    border-color: #374151;
+  }
+}
+
+.ctaActions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.primaryButton {
+  background-color: #059669;
+  color: white;
+  border: none;
+}
+
+.primaryButton:hover {
+  background-color: #047857;
+}
+
+.welcomeFooter {
+  margin-top: 4rem;
+  text-align: center;
+}
+
+.welcomeFooterText {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .welcomeFooterText {
+    color: #9ca3af;
+  }
+}
