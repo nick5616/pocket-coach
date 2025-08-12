@@ -89,6 +89,25 @@ export default function Register() {
     setLocation("/");
   };
 
+  // Show loading splash screen during registration
+  if (registerMutation.isPending) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingContent}>
+          <div className={styles.loadingIconContainer}>
+            <Dumbbell className={styles.loadingIcon} />
+          </div>
+          <h2 className={styles.loadingTitle}>Creating Your Account</h2>
+          <p className={styles.loadingSubtitle}>Setting up your personalized fitness journey...</p>
+          <div className={styles.loadingBar}>
+            <div className={styles.loadingBarFill}></div>
+          </div>
+          <p className={styles.loadingNote}>This usually takes a few seconds</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.authContainer}>
       <div className={styles.container}>
