@@ -15,7 +15,7 @@ export default function ProgramGenerationLoading() {
         </div>
         
         <h2 className={styles.title}>Creating Your Program</h2>
-        <p className={styles.subtitle}>Our AI is analyzing your goals and designing a personalized workout program</p>
+        <p className={styles.subtitle}>Analyzing your goals and designing a personalized workout program</p>
         
         <div className={styles.progressSteps}>
           <div className={styles.step}>

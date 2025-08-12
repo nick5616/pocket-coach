@@ -117,7 +117,7 @@ export default function Register() {
             <CardHeader className={styles.formHeader}>
               <CardTitle className={styles.formTitle}>Create Your Account</CardTitle>
               <CardDescription className={styles.formDescription}>
-                Start your fitness journey with personalized AI coaching
+                Start your fitness journey with personalized coaching
               </CardDescription>
             </CardHeader>
             <CardContent className={styles.formContent}>

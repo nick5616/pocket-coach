@@ -123,7 +123,7 @@ export default function ProgramModify() {
               Modify Program: {program.name}
             </CardTitle>
             <p className={styles.cardDescription}>
-              Tell us what you'd like to change about your current program. Our AI will intelligently modify it while maintaining balance and effectiveness.
+              Tell us what you'd like to change about your current program. We'll intelligently modify it while maintaining balance and effectiveness.
             </p>
           </CardHeader>
           <CardContent>
@@ -145,7 +145,7 @@ export default function ProgramModify() {
                 />
                 <div className={styles.helpText}>
                   <Info style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.25rem' }} />
-                  Be specific about your needs. Our AI will analyze your request and make intelligent modifications to your program.
+                  Be specific about your needs. We'll analyze your request and make intelligent modifications to your program.
                 </div>
                 {form.formState.errors.feedback && (
                   <div className={styles.errorMessage}>

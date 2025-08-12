@@ -93,6 +93,11 @@ Email/password authentication with bcrypt hashing and PostgreSQL session store u
 **User Fix**: Clear browser cache completely and refresh page, or use incognito mode.
 
 **Recent Changes (August 2025)**:
+- ✅ **REMOVED AI BUZZWORDS (August 12, 2025)**: Systematically removed all "AI" references from user-facing text
+  - Updated program generation pages to focus on personalization and customization benefits
+  - Changed "AI-powered" messaging to emphasize actual functionality and user outcomes
+  - Maintained technical capabilities while presenting them in terms of user value
+  - Enhanced messaging to focus on "we'll analyze" vs "our AI will analyze"
 - ✅ **PRODUCTION DEPLOYMENT FIX v2.0 (August 3, 2025)**: Comprehensive solution for asset cache issues
   - Enhanced server-side build integrity verification with explicit asset validation
   - Created robust deployment script with cache-busting (clears npm, Vite, and build caches)

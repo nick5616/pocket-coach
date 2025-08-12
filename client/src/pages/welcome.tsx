@@ -39,8 +39,8 @@ export default function Welcome() {
             </h1>
           </div>
           <p className={styles.welcomeDescription}>
-            Transform your fitness journey with AI-powered workout programs, 
-            intelligent tracking, and personalized coaching that adapts to your goals.
+            Transform your fitness journey with personalized workout programs, 
+            intelligent tracking, and adaptive coaching that evolves with your progress.
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export default function Welcome() {
             </CardHeader>
             <CardContent>
               <CardDescription className={styles.featureDescription}>
-                AI-generated workout programs tailored to your goals, experience level, and available equipment.
+                Custom workout programs tailored to your goals, experience level, and available equipment.
               </CardDescription>
             </CardContent>
           </Card>
@@ -93,7 +93,7 @@ export default function Welcome() {
               <CardDescription className={styles.formDescription}>
                 {isReturningUser 
                   ? "Sign in to continue your fitness journey or create a new account."
-                  : "Join thousands of users transforming their fitness with AI-powered coaching."
+                  : "Join thousands of users transforming their fitness with personalized coaching."
                 }
               </CardDescription>
             </CardHeader>

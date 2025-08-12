@@ -106,10 +106,10 @@ export default function ProgramGeneration() {
         <CardHeader>
           <CardTitle className={styles.cardTitle}>
             <Sparkles className={styles.titleIcon} />
-            Generate AI Program
+            Generate Custom Program
           </CardTitle>
           <p className={styles.cardDescription}>
-            Describe your fitness goals and our AI will create a personalized program that understands what you really need to achieve them. You'll be able to review and tweak the program before finalizing it.
+            Describe your fitness goals and we'll create a personalized program that understands what you really need to achieve them. You'll be able to review and tweak the program before finalizing it.
           </p>
         </CardHeader>
         <CardContent>
@@ -131,7 +131,7 @@ export default function ProgramGeneration() {
               />
               <div className={styles.helpText}>
                 <Info style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.25rem' }} />
-                Be specific about your goals. Our AI will analyze what exercises and approach will best achieve what you want.
+                Be specific about your goals. We'll analyze what exercises and approach will best achieve what you want.
               </div>
               {form.formState.errors.goals && (
                 <div className={styles.errorMessage}>
