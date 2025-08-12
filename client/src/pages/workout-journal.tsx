@@ -501,19 +501,24 @@ export default function WorkoutJournal() {
                 </div>
               </div>
 
-              {isCustomName && <div className={styles.formGroup}>
-                <label htmlFor="workoutName" className={styles.formLabel}>
-                  Workout Name
-                </label>
-                <Input
-                  id="workoutName"
-                  type="text"
-                  placeholder="e.g., Push Day - Chest & Shoulders"
-                  value={workoutName}
-                  onChange={(e) => setWorkoutName(e.target.value)}
-                  disabled={!isEditing}
-                />
-              </div>}
+              {isCustomName && (
+                <div
+                  className={styles.formGroup}
+                  style={{ marginTop: "1.5rem" }}
+                >
+                  <label htmlFor="workoutName" className={styles.formLabel}>
+                    Workout Name
+                  </label>
+                  <Input
+                    id="workoutName"
+                    type="text"
+                    placeholder="e.g., Push Day - Chest & Shoulders"
+                    value={workoutName}
+                    onChange={(e) => setWorkoutName(e.target.value)}
+                    disabled={!isEditing}
+                  />
+                </div>
+              )}
 
               <Button
                 type="submit"
