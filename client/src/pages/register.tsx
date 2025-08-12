@@ -17,6 +17,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
 
   const registerMutation = useMutation({
     mutationFn: async (data: {
@@ -40,10 +41,13 @@ export default function Register() {
       return response.json();
     },
     onSuccess: () => {
-      // Registration successful, force reload to refresh auth state
-      window.location.href = "/";
+      // Registration successful, keep loading screen and redirect after delay
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1500); // Give extra time for the loading animation to complete
     },
     onError: (error: Error) => {
+      setIsCreatingAccount(false);
       setError(error.message);
     },
   });
@@ -73,6 +77,7 @@ export default function Register() {
       return;
     }
 
+    setIsCreatingAccount(true);
     registerMutation.mutate({
       email: email.trim(),
       password,
@@ -90,7 +95,7 @@ export default function Register() {
   };
 
   // Show loading splash screen during registration
-  if (registerMutation.isPending) {
+  if (registerMutation.isPending || isCreatingAccount) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingContent}>
@@ -98,7 +103,11 @@ export default function Register() {
             <Dumbbell className={styles.loadingIcon} />
           </div>
           <h2 className={styles.loadingTitle}>Creating Your Account</h2>
-          <p className={styles.loadingSubtitle}>Setting up your personalized fitness journey...</p>
+          <p className={styles.loadingSubtitle}>
+            {registerMutation.isPending 
+              ? "Setting up your personalized fitness journey..." 
+              : "Finalizing your account setup..."}
+          </p>
           <div className={styles.loadingBar}>
             <div className={styles.loadingBarFill}></div>
           </div>
