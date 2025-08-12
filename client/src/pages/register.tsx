@@ -40,8 +40,8 @@ export default function Register() {
       return response.json();
     },
     onSuccess: () => {
-      // Registration successful, navigate to home
-      setLocation("/");
+      // Registration successful, force reload to refresh auth state
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       setError(error.message);
