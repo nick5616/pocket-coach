@@ -108,14 +108,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Protected route example
   app.get("/api/protected", isAuthenticated, async (req, res) => {
-    const userId = req.user.id;
+    const userId = (req.user as any)?.id;
     res.json({ message: "This is a protected route", userId });
   });
 
   // Workout routes
   app.get("/api/workouts", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
       
       // Use optimized query that fetches workouts with exercises efficiently
@@ -452,18 +455,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Goal routes
   app.get("/api/goals", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.id;
-      const goals = await storage.getUserGoals(userId);
-      res.json(goals);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch goals" });
-    }
-  });
-
-  // Goals routes
-  app.get("/api/goals", isAuthenticated, async (req, res) => {
-    try {
-      const userId = req.user.id;
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const goals = await storage.getUserGoals(userId);
       res.json(goals);
     } catch (error) {
@@ -472,7 +467,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/goals", async (req, res) => {
+  app.post("/api/goals", isAuthenticated, async (req, res) => {
     try {
       const validatedData = insertGoalSchema.parse(req.body);
       const goal = await storage.createGoal(validatedData);
@@ -504,7 +499,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Achievements routes
   app.get("/api/achievements", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const achievements = await storage.getUserAchievements(userId);
       res.json(achievements);
     } catch (error) {
@@ -570,7 +568,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/programs", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const validatedData = insertProgramSchema.parse({
         ...req.body,
         userId: userId
@@ -589,7 +590,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/programs/:id/activate", isAuthenticated, async (req, res) => {
     try {
       const programId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       
       // Deactivate all other programs for this user first
       const userPrograms = await storage.getUserPrograms(userId);
@@ -616,7 +620,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // to prevent "active" from being interpreted as an ID parameter
   app.get("/api/programs/active/today", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const program = await storage.getActiveProgram(userId);
       
       if (!program) {
@@ -847,7 +854,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/programs/generate", isAuthenticated, async (req, res) => {
     try {
       const { goals, experience, availableDays, equipment } = req.body;
-      const userId = req.user!.id;
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
 
       // Generate program based on user's natural language goals
       const generatedProgram = await generatePersonalizedProgram(
@@ -882,14 +892,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(modifiedProgram);
     } catch (error) {
       console.error("Program modification error:", error);
-      res.status(500).json({ message: "Failed to modify program", error: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ message: "Failed to modify program", error: errorMessage });
     }
   });
 
   app.post("/api/programs/confirm", isAuthenticated, async (req, res) => {
     try {
       const { program } = req.body;
-      const userId = req.user!.id;
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
 
       // Save the confirmed program to database
       const savedProgram = await storage.createProgram({
@@ -912,14 +926,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/programs/:id", async (req, res) => {
+  app.patch("/api/programs/:id", isAuthenticated, async (req, res) => {
     try {
       const programId = parseInt(req.params.id);
       const updates = req.body;
       
       // If activating a program, deactivate all other programs for this user first
       if (updates.isActive === true) {
-        const userId = req.user!.id;
+        const userId = (req.user as any)?.id;
+        if (!userId) {
+          return res.status(401).json({ message: "User not authenticated" });
+        }
         // Get all user programs and deactivate them
         const userPrograms = await storage.getUserPrograms(userId);
         for (const userProgram of userPrograms) {
@@ -945,10 +962,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  // Achievement routes
-  app.get("/api/achievements", isAuthenticated, async (req, res) => {
+  // Additional achievement routes
+  app.get("/api/user/achievements", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
       const achievements = await storage.getUserAchievements(userId);
       res.json(achievements);
     } catch (error) {
