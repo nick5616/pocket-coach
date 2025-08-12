@@ -90,40 +90,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Auth routes
-  app.post('/api/auth/login', (req, res, next) => {
-    passport.authenticate('local', (err: any, user: any, info: any) => {
-      if (err) {
-        console.error("Login error:", err);
-        return res.status(500).json({ message: "Login failed" });
-      }
-      if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-      
-      req.logIn(user, (err) => {
-        if (err) {
-          console.error("Session creation error:", err);
-          return res.status(500).json({ message: "Login failed" });
-        }
-        
-        const { passwordHash, ...userWithoutPassword } = user;
-        res.json(userWithoutPassword);
-      });
-    })(req, res, next);
-  });
+  // Auth routes handled in auth.ts
 
 
 
-  app.post('/api/auth/logout', (req, res) => {
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ message: "Logout failed" });
-      }
-      res.clearCookie('connect.sid');
-      res.json({ message: "Logged out successfully" });
-    });
-  });
+
 
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
