@@ -1080,3 +1080,32 @@
     background-color: #1f2937;
   }
 }
+
+/* Loading states */
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.loadingText {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+@media (prefers-color-scheme: dark) {
+  .loadingState {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+  
+  .loadingText {
+    color: #9ca3af;
+  }
+}

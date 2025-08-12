@@ -290,14 +290,10 @@ export default function WorkoutJournal() {
     },
   });
 
-  // Show loading screen if any essential data is still loading
-  const isLoading =
-    workoutLoading ||
-    exercisesLoading ||
-    activeProgramLoading ||
-    todaysWorkoutLoading;
+  // Only show loading screen on initial load for existing workout
+  const isInitialLoading = workoutId && workoutLoading;
 
-  if (isLoading) {
+  if (isInitialLoading) {
     return <LoadingScreen message="Loading workout..." />;
   }
 
@@ -540,7 +536,15 @@ export default function WorkoutJournal() {
             {/* Programmed Exercises */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Programmed Exercises</h2>
-              {todaysWorkout?.workout?.exercises &&
+              {todaysWorkoutLoading ? (
+                <div className={styles.loadingState}>
+                  <div className={styles.loadingText}>Loading today's workout...</div>
+                </div>
+              ) : activeProgramLoading ? (
+                <div className={styles.loadingState}>
+                  <div className={styles.loadingText}>Loading your program...</div>
+                </div>
+              ) : todaysWorkout?.workout?.exercises &&
               todaysWorkout.workout.exercises.length > 0 ? (
                 <div className={styles.programmedExercises}>
                   {todaysWorkout.workout.exercises.map(
@@ -806,8 +810,13 @@ export default function WorkoutJournal() {
                   </span>
                 )}
               </h2>
-              <div className={styles.completedExercises}>
-                {groupExercisesByName(exercises).map(
+              {exercisesLoading ? (
+                <div className={styles.loadingState}>
+                  <div className={styles.loadingText}>Loading exercises...</div>
+                </div>
+              ) : (
+                <div className={styles.completedExercises}>
+                  {groupExercisesByName(exercises).map(
                   (exerciseGroup, groupIndex) => {
                     const totalSets = exerciseGroup.exercises.length;
                     const totalVolume = exerciseGroup.exercises.reduce(
@@ -1108,7 +1117,8 @@ export default function WorkoutJournal() {
                     );
                   },
                 )}
-              </div>
+                </div>
+              )}
             </section>
             {/* Complete Workout Button - Only show for active workouts */}
             {!isWorkoutCompleted && (
