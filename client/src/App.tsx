@@ -3,6 +3,9 @@ import { Switch, Route } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { ThemeProvider } from "./components/theme-provider";
+import Welcome from "./pages/welcome";
+import Register from "./pages/register";
+import Login from "./pages/login";
 import Home from "./pages/home";
 import Programs from "./pages/programs";
 import ProgramGeneration from "./pages/program-generation";
@@ -16,155 +19,6 @@ import WorkoutProgram from "./pages/workout-program";
 import ProgramWorkout from "./pages/program-workout";
 import Workouts from "./pages/workouts";
 import BottomNavigation from "./components/bottom-navigation";
-
-// Authentication Page Component
-function AuthPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        // Instead of window.location.reload(), refresh auth state
-        onLoginSuccess();
-      } else {
-        const errorData = await response.text();
-        setError(errorData || "Login failed");
-      }
-    } catch (err) {
-      setError("Network error. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div style={{
-      minHeight: "100dvh",
-      background: "linear-gradient(135deg, #f0fff4 0%, #e6f3ff 100%)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "1rem"
-    }}>
-      <div style={{
-        backgroundColor: "white",
-        borderRadius: "8px",
-        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-        padding: "2rem",
-        width: "100%",
-        maxWidth: "400px"
-      }}>
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <h1 style={{
-            fontSize: "2rem",
-            fontWeight: "bold",
-            color: "#1f2937",
-            marginBottom: "0.5rem"
-          }}>PocketCoach</h1>
-          <p style={{ color: "#6b7280" }}>Your Personal Fitness Journey</p>
-        </div>
-
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div>
-            <label style={{
-              display: "block",
-              fontSize: "0.875rem",
-              fontWeight: "500",
-              color: "#374151",
-              marginBottom: "0.5rem"
-            }}>
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem 0.75rem",
-                border: "1px solid #d1d5db",
-                borderRadius: "0.375rem",
-                fontSize: "1rem"
-              }}
-              required
-            />
-          </div>
-
-          <div>
-            <label style={{
-              display: "block",
-              fontSize: "0.875rem",
-              fontWeight: "500",
-              color: "#374151",
-              marginBottom: "0.5rem"
-            }}>
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem 0.75rem",
-                border: "1px solid #d1d5db",
-                borderRadius: "0.375rem",
-                fontSize: "1rem"
-              }}
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            style={{
-              width: "100%",
-              backgroundColor: "#059669",
-              color: "white",
-              padding: "0.75rem",
-              borderRadius: "0.375rem",
-              border: "none",
-              fontSize: "1rem",
-              cursor: "pointer",
-              opacity: isLoading ? 0.5 : 1
-            }}
-          >
-            {isLoading ? "Please wait..." : "Sign In"}
-          </button>
-
-          {error && (
-            <div style={{
-              color: "#dc2626",
-              fontSize: "0.875rem",
-              textAlign: "center"
-            }}>
-              {error}
-            </div>
-          )}
-        </form>
-
-
-      </div>
-    </div>
-  );
-}
-
-
 
 // Check authentication status
 function useAuth() {
@@ -203,7 +57,7 @@ function useAuth() {
 }
 
 function AppContent() {
-  const { user, isLoading, isAuthenticated, refreshAuth } = useAuth();
+  const { user, isLoading, isAuthenticated } = useAuth();
 
   if (isLoading) {
     return (
@@ -219,9 +73,17 @@ function AppContent() {
   }
 
   if (!isAuthenticated) {
-    return <AuthPage onLoginSuccess={refreshAuth} />;
+    // Show welcome/auth flow for unauthenticated users
+    return (
+      <Switch>
+        <Route path="/register" component={Register} />
+        <Route path="/login" component={Login} />
+        <Route component={Welcome} />
+      </Switch>
+    );
   }
 
+  // Show main app for authenticated users
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <div style={{ flex: 1, overflow: 'auto' }}>
@@ -239,6 +101,10 @@ function AppContent() {
           <Route path="/workout-quick" component={WorkoutQuick} />
           <Route path="/workout-program" component={WorkoutProgram} />
           <Route path="/workouts/program/:programId" component={ProgramWorkout} />
+          {/* Auth routes should redirect to home if user is authenticated */}
+          <Route path="/register" component={Home} />
+          <Route path="/login" component={Home} />
+          <Route path="/welcome" component={Home} />
           <Route>
             <div style={{ padding: "2rem", textAlign: "center" }}>
               <h1>Page Not Found</h1>
