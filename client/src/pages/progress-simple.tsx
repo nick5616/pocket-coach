@@ -65,19 +65,19 @@ export default function Progress() {
 
   return (
     <>
-      <main className="pb-20 bg-gray-50 min-h-screen">
+      <main className={styles.main}>
         {/* Header */}
-        <header className="bg-white shadow-sm border-b px-4 py-6">
-          <div className="flex items-center justify-between">
+        <header className={styles.header}>
+          <div className={styles.headerContent}>
             <div>
-              <h1 style={{fontSize: "1.5rem", fontWeight: "bold", color: "var(--text-primary)"}}>Progress</h1>
-              <p style={{color: "var(--text-secondary)", marginTop: "0.25rem"}}>
+              <h1 className={styles.headerTitle}>Progress</h1>
+              <p className={styles.headerSubtitle}>
                 Track your fitness achievements
               </p>
             </div>
-            <div className="flex items-center space-x-2">
-              <Award style={{width: "1.5rem", height: "1.5rem"}} text-yellow-500" />
-              <span style={{fontSize: "1.125rem", fontWeight: "600", color: "var(--text-primary)"}}>
+            <div className={styles.achievementsBadge}>
+              <Award style={{width: "1.5rem", height: "1.5rem", color: "var(--warning)"}} />
+              <span className={styles.achievementsCount}>
                 {achievements.length}
               </span>
             </div>
@@ -85,8 +85,8 @@ export default function Progress() {
         </header>
 
         {/* Tab Navigation */}
-        <section className="px-4 py-4 bg-white border-b">
-          <div className="grid grid-cols-4 gap-2">
+        <section className={styles.tabNav}>
+          <div className={styles.tabGrid}>
             <Button
               variant={selectedTab === "overview" ? "primary" : "outline"}
               onClick={() => setSelectedTab("overview")}
@@ -119,24 +119,24 @@ export default function Progress() {
         </section>
 
         {/* Tab Content */}
-        <section className="px-4 py-4">
+        <section className={styles.tabContent}>
           {selectedTab === "overview" && (
-            <div className="space-y-6">
-              <div style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "1rem"}}>
+            <div className={styles.overviewContent}>
+              <div className={styles.statsGrid}>
                 <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-blue-600">
+                  <CardContent className={styles.statCard}>
+                    <div className={`${styles.statValue} ${styles.statValueBlue}`}>
                       {workouts.length}
                     </div>
-                    <div className="text-sm text-gray-600">Total Workouts</div>
+                    <div className={styles.statLabel}>Total Workouts</div>
                   </CardContent>
                 </Card>
                 <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-green-600">
+                  <CardContent className={styles.statCard}>
+                    <div className={`${styles.statValue} ${styles.statValueGreen}`}>
                       {goals.filter((g) => g.status === "completed").length}
                     </div>
-                    <div className="text-sm text-gray-600">Goals Achieved</div>
+                    <div className={styles.statLabel}>Goals Achieved</div>
                   </CardContent>
                 </Card>
               </div>
@@ -149,11 +149,12 @@ export default function Progress() {
                   {workouts.slice(0, 3).map((workout) => (
                     <div
                       key={workout.id}
-                      className="flex items-center justify-between py-2 border-b last:border-b-0"
+                      style={{display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.5rem 0", borderBottom: "1px solid var(--border-primary)"}}
+                      className="last:border-b-0"
                     >
                       <div>
-                        <div className="font-medium">{workout.name}</div>
-                        <div className="text-sm text-gray-600">
+                        <div style={{fontWeight: "500", color: "var(--text-primary)"}}>{workout.name}</div>
+                        <div style={{fontSize: "0.875rem", color: "var(--text-secondary)"}}>
                           {new Date(workout.createdAt!).toLocaleDateString()}
                         </div>
                       </div>
@@ -174,17 +175,17 @@ export default function Progress() {
               {goals.map((goal) => (
                 <Card
                   key={goal.id}
-                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  style={{cursor: "pointer", transition: "box-shadow 0.2s"}}
                   onClick={() => setSelectedGoalId(goal.id)}
                 >
                   <CardContent className={styles.content}>
-                    <div className="flex items-center justify-between">
+                    <div style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
                       <div style={{flex: "1"}}>
-                        <h3 className="font-medium">{goal.title}</h3>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <h3 style={{fontWeight: "500", color: "var(--text-primary)"}}>{goal.title}</h3>
+                        <p style={{fontSize: "0.875rem", color: "var(--text-secondary)", marginTop: "0.25rem"}}>
                           {goal.description}
                         </p>
-                        <div className="flex items-center mt-2 space-x-4">
+                        <div style={{display: "flex", alignItems: "center", marginTop: "0.5rem", gap: "1rem"}}>
                           <Badge
                             variant={
                               goal.status === "completed"
@@ -194,13 +195,13 @@ export default function Progress() {
                           >
                             {goal.category}
                           </Badge>
-                          <span className="text-sm text-gray-500">
+                          <span style={{fontSize: "0.875rem", color: "var(--text-secondary)"}}>
                             {goal.currentValue || 0} / {goal.targetValue}{" "}
                             {goal.unit}
                           </span>
                         </div>
                       </div>
-                      <Target style={{width: "1.25rem", height: "1.25rem"}} text-gray-400" />
+                      <Target style={{width: "1.25rem", height: "1.25rem", color: "var(--text-tertiary)"}} />
                     </div>
                   </CardContent>
                 </Card>
@@ -209,8 +210,8 @@ export default function Progress() {
               {goals.length === 0 && (
                 <Card>
                   <CardContent style={{padding: "2rem", textAlign: "center"}}>
-                    <Target className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <Target style={{width: "3rem", height: "3rem", color: "var(--text-tertiary)", margin: "0 auto 1rem auto"}} />
+                    <h3 style={{fontSize: "1.125rem", fontWeight: "500", color: "var(--text-primary)", marginBottom: "0.5rem"}}>
                       No goals set
                     </h3>
                     <p style={{color: "var(--text-secondary)"}}>

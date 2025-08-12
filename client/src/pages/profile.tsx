@@ -30,6 +30,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import type { User as UserType, Goal, Achievement } from "@shared/schema";
+import styles from "./profile.module.css";
 
 const goalSchema = z.object({
   title: z.string().min(1, "Goal title is required"),
@@ -175,84 +176,57 @@ export default function Profile() {
 
   return (
     <>
-      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-8 z-40">
-        <h1 className="text-lg font-bold text-gray-900">Profile</h1>
+      <header className={styles.header}>
+        <h1>Profile</h1>
       </header>
 
-      <main className="pb-20">
+      <main className={styles.main}>
         {/* User Info */}
-        <section className="px-4 py-6" style={{
-          background: 'linear-gradient(135deg, #65a30d 0%, #16a34a 100%)',
-          color: 'white'
-        }}>
-          <div className="flex items-center mb-4">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{
-              backgroundColor: 'rgba(21, 128, 61, 0.7)',
-              border: '1px solid rgba(34, 197, 94, 0.4)'
-            }}>
+        <section className={styles.userSection}>
+          <div className={styles.userInfo}>
+            <div className={styles.avatar}>
               <User className="h-8 w-8" style={{color: '#ffffff'}} />
             </div>
             <div>
-              <h2 className="text-xl font-bold" style={{color: '#ffffff'}}>{user?.username || "User"}</h2>
-              <p className="font-medium" style={{color: '#ffffff', opacity: 0.9}}>{user?.email || "user@example.com"}</p>
+              <h2 className={styles.userName}>{user?.username || "User"}</h2>
+              <p className={styles.userEmail}>{user?.email || "user@example.com"}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div className="rounded-xl p-3 text-center" style={{
-              backgroundColor: 'rgba(21, 128, 61, 0.7)',
-              border: '1px solid rgba(34, 197, 94, 0.4)'
-            }}>
-              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{userStats.totalWorkouts}</div>
-              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Workouts</div>
+          <div className={styles.statsGrid}>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>{userStats.totalWorkouts}</div>
+              <div className={styles.statLabel}>Workouts</div>
             </div>
-            <div className="rounded-xl p-3 text-center" style={{
-              backgroundColor: 'rgba(21, 128, 61, 0.7)',
-              border: '1px solid rgba(34, 197, 94, 0.4)'
-            }}>
-              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{userStats.currentStreak}</div>
-              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Day Streak</div>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>{userStats.currentStreak}</div>
+              <div className={styles.statLabel}>Day Streak</div>
             </div>
-            <div className="rounded-xl p-3 text-center" style={{
-              backgroundColor: 'rgba(21, 128, 61, 0.7)',
-              border: '1px solid rgba(34, 197, 94, 0.4)'
-            }}>
-              <div className="text-2xl font-bold" style={{color: '#ffffff'}}>{userStats.achievements}</div>
-              <div className="text-xs font-medium" style={{color: '#ffffff', opacity: 0.9}}>Badges</div>
+            <div className={styles.statCard}>
+              <div className={styles.statValue}>{userStats.achievements}</div>
+              <div className={styles.statLabel}>Badges</div>
             </div>
           </div>
         </section>
 
         {/* Tabs */}
-        <section className="px-4 py-4">
-          <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+        <section className={styles.tabSection}>
+          <div className={styles.tabContainer}>
             <button
               onClick={() => setActiveTab("profile")}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                activeTab === "profile"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
+              className={`${styles.tab} ${activeTab === "profile" ? styles.active : styles.inactive}`}
             >
               Profile
             </button>
             <button
               onClick={() => setActiveTab("goals")}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                activeTab === "goals"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
+              className={`${styles.tab} ${activeTab === "goals" ? styles.active : styles.inactive}`}
             >
               Goals
             </button>
             <button
               onClick={() => setActiveTab("achievements")}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                activeTab === "achievements"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
+              className={`${styles.tab} ${activeTab === "achievements" ? styles.active : styles.inactive}`}
             >
               Badges
             </button>
@@ -260,9 +234,9 @@ export default function Profile() {
         </section>
 
         {/* Tab Content */}
-        <section className="px-4">
+        <section className={styles.tabContent}>
           {activeTab === "profile" && (
-            <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
+            <div className={styles.profileContent}>
               <Card>
                 <CardHeader>
                   <CardTitle className={styles.headerLeft}>
@@ -271,26 +245,26 @@ export default function Profile() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
-                  <div className="flex items-center justify-between">
+                  <div className={styles.settingsItem}>
                     <div>
                       <Label>Push Notifications</Label>
-                      <p className="text-sm text-gray-500">Get reminders about workouts</p>
+                      <p className={styles.settingsDescription}>Get reminders about workouts</p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   
-                  <div className="flex items-center justify-between">
+                  <div className={styles.settingsItem}>
                     <div>
                       <Label>Achievement Celebrations</Label>
-                      <p className="text-sm text-gray-500">Show achievement animations</p>
+                      <p className={styles.settingsDescription}>Show achievement animations</p>
                     </div>
                     <Switch defaultChecked />
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className={styles.settingsItem}>
                     <div>
                       <Label>AI Recommendations</Label>
-                      <p className="text-sm text-gray-500">Personalized workout suggestions</p>
+                      <p className={styles.settingsDescription}>Personalized workout suggestions</p>
                     </div>
                     <Switch defaultChecked />
                   </div>
@@ -305,15 +279,15 @@ export default function Profile() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent style={{display: "flex", flexDirection: "column", gap: "0.75rem"}}>
-                  <div className="flex items-center justify-between">
+                  <div className={styles.appInfoItem}>
                     <span>Version</span>
                     <span style={{color: "var(--text-secondary)"}}>1.0.0</span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className={styles.appInfoItem}>
                     <span>Storage Used</span>
                     <span style={{color: "var(--text-secondary)"}}>12.4 MB</span>
                   </div>
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" style={{width: "100%"}}>
                     <Download className="h-4 w-4 marginRight: "0.5rem"}} />
                     Export Data
                   </Button>
@@ -323,9 +297,9 @@ export default function Profile() {
           )}
 
           {activeTab === "goals" && (
-            <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Fitness Goals</h3>
+            <div className={styles.goalsContent}>
+              <div className={styles.goalsHeader}>
+                <h3 className={styles.goalsTitle}>Fitness Goals</h3>
                 <Button
                   onClick={() => {
                     setEditingGoal(null);
@@ -333,7 +307,7 @@ export default function Profile() {
                     setShowGoalDialog(true);
                   }}
                   size="sm"
-                  className="bg-duolingo-green hover:bg-duolingo-green/90"
+                  className={styles.addGoalButton}
                 >
                   <Plus className="h-4 w-4 mr-1" />
                   Add Goal
@@ -341,22 +315,22 @@ export default function Profile() {
               </div>
 
               {goals.length > 0 ? (
-                <div style={{display: "flex", flexDirection: "column", gap: "0.75rem"}}>
+                <div className={styles.goalsList}>
                   {goals.map((goal) => {
                     const progress = goal.targetValue ? 
                       Math.min(100, (goal.currentValue! / goal.targetValue) * 100) : 0;
                     
                     return (
-                      <Card key={goal.id}>
+                      <Card key={goal.id} className={styles.goalCard}>
                         <CardContent className={styles.content}>
                           <div className={styles.header}>
                             <div style={{flex: "1"}}>
-                              <h4 style={{fontWeight: "600", color: "var(--text-primary)"}}>{goal.title}</h4>
-                              <p className="text-sm text-gray-500 capitalize">
+                              <h4 className={styles.goalTitle}>{goal.title}</h4>
+                              <p className={styles.goalCategory}>
                                 {goal.category} {goal.muscleGroup && `• ${goal.muscleGroup}`}
                               </p>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className={styles.goalActions}>
                               <Button
                                 size="icon"
                                 variant="ghost"
@@ -368,32 +342,32 @@ export default function Profile() {
                                 size="icon"
                                 variant="ghost"
                                 onClick={() => deleteGoalMutation.mutate(goal.id)}
-                                className="text-red-500 hover:text-red-700"
+                                className={styles.deleteButton}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
 
-                          <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
+                          <div className={styles.progressSection}>
+                            <div className={styles.progressInfo}>
                               <span>Progress</span>
                               <span>
                                 {goal.currentValue || 0} / {goal.targetValue} {goal.unit}
                               </span>
                             </div>
-                            <Progress value={progress} className="h-2" />
-                            <div className="text-xs text-gray-500 text-right">
+                            <Progress value={progress} className={styles.progressBar} />
+                            <div className={styles.progressText}>
                               {Math.round(progress)}% complete
                             </div>
                           </div>
 
                           {goal.description && (
-                            <p className="text-sm text-gray-600 mt-3">{goal.description}</p>
+                            <p className={styles.goalDescription}>{goal.description}</p>
                           )}
 
                           {goal.targetDate && (
-                            <div className="flex items-center text-xs text-gray-500 mt-2">
+                            <div className={styles.goalDate}>
                               <Calendar className="h-3 w-3 mr-1" />
                               Target: {new Date(goal.targetDate).toLocaleDateString()}
                             </div>
@@ -404,20 +378,20 @@ export default function Profile() {
                   })}
                 </div>
               ) : (
-                <Card style={{border: "2px dashed var(--border-secondary)"}}>
-                  <CardContent style={{padding: "2rem", textAlign: "center"}}>
-                    <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Card className={styles.emptyGoals}>
+                  <CardContent className={styles.emptyGoalsContent}>
+                    <div className={styles.emptyIcon}>
                       <Target className="h-8 w-8 text-gray-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No goals yet</h3>
-                    <p className="text-gray-500 mb-4">
+                    <h3 className={styles.emptyTitle}>No goals yet</h3>
+                    <p className={styles.emptyDescription}>
                       Set your first fitness goal to track progress and stay motivated!
                     </p>
                     <Button
                       onClick={() => setShowGoalDialog(true)}
-                      className="bg-duolingo-green hover:bg-duolingo-green/90"
+                      className={styles.addGoalButton}
                     >
-                      <Plus className="h-4 w-4 marginRight: "0.5rem"}} />
+                      <Plus className="h-4 w-4" style={{marginRight: "0.5rem"}} />
                       Create First Goal
                     </Button>
                   </CardContent>
@@ -427,18 +401,18 @@ export default function Profile() {
           )}
 
           {activeTab === "achievements" && (
-            <div style={{display: "flex", flexDirection: "column", gap: "1rem"}}>
+            <div className={styles.achievementsContent}>
               <div style={{display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "1rem"}}>
                 <Card style={{textAlign: "center"}}>
                   <CardContent className={styles.content}>
                     <div style={{fontSize: "1.5rem", fontWeight: "bold", color: "var(--text-primary)"}}>{achievements.length}</div>
-                    <div className="text-sm text-gray-500">Total Badges</div>
+                    <div className={styles.statLabel}>Total Badges</div>
                   </CardContent>
                 </Card>
                 <Card style={{textAlign: "center"}}>
                   <CardContent className={styles.content}>
                     <div style={{fontSize: "1.5rem", fontWeight: "bold", color: "var(--text-primary)"}}>{userStats.longestStreak}</div>
-                    <div className="text-sm text-gray-500">Longest Streak</div>
+                    <div className={styles.statLabel}>Longest Streak</div>
                   </CardContent>
                 </Card>
               </div>
@@ -449,18 +423,18 @@ export default function Profile() {
                     <Card key={achievement.id}>
                       <CardContent className={styles.content}>
                         <div className={styles.headerLeft}>
-                          <div className="w-12 h-12 bg-duolingo-green/10 rounded-full flex items-center justify-center mr-4">
-                            <Trophy className="h-6 w-6 text-duolingo-green" />
+                          <div className={styles.achievementIcon}>
+                            <Trophy className="h-6 w-6" />
                           </div>
                           <div style={{flex: "1"}}>
-                            <h4 style={{fontWeight: "600", color: "var(--text-primary)"}}>{achievement.title}</h4>
-                            <p className="text-sm text-gray-600">{achievement.description}</p>
-                            <div className="text-xs text-gray-500 mt-1">
+                            <h4 className={styles.achievementName}>{achievement.title}</h4>
+                            <p className={styles.achievementDescription}>{achievement.description}</p>
+                            <div className={styles.achievementDate}>
                               {new Date(achievement.createdAt!).toLocaleDateString()}
                             </div>
                           </div>
                           {!achievement.isViewed && (
-                            <Badge className="bg-energetic-orange text-white">New!</Badge>
+                            <Badge style={{background: "var(--warning)", color: "white"}}>New!</Badge>
                           )}
                         </div>
                       </CardContent>
@@ -468,13 +442,13 @@ export default function Profile() {
                   ))}
                 </div>
               ) : (
-                <Card style={{border: "2px dashed var(--border-secondary)"}}>
-                  <CardContent style={{padding: "2rem", textAlign: "center"}}>
-                    <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Card className={styles.emptyGoals}>
+                  <CardContent className={styles.emptyGoalsContent}>
+                    <div className={styles.emptyIcon}>
                       <Award className="h-8 w-8 text-gray-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No badges yet</h3>
-                    <p style={{color: "var(--text-secondary)"}}>
+                    <h3 className={styles.emptyTitle}>No badges yet</h3>
+                    <p className={styles.emptyDescription}>
                       Complete workouts and reach your goals to earn achievement badges!
                     </p>
                   </CardContent>

@@ -25,7 +25,7 @@ import {
 import type { WorkoutStats, AIRecommendation } from "@/lib/types";
 import type { User, Workout, Goal, Achievement } from "@shared/schema";
 // Removed useAuth import
-import styles from "./home.module.css";
+import styles from "./home-old.module.css";
 
 export default function Home() {
   const [showAchievement, setShowAchievement] = useState(false);

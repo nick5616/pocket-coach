@@ -1,0 +1,335 @@
+/* Home Old page CSS module with color theme support */
+.main {
+  padding-bottom: 5rem;
+}
+
+.section {
+  padding: 0 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.centerText {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.primaryButton {
+  width: 100%;
+  height: 4rem;
+  background: var(--info);
+  color: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.primaryButton:hover {
+  background: var(--info);
+  opacity: 0.9;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.primaryButton:active {
+  transform: scale(0.95);
+}
+
+.primaryButtonContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.primaryButtonText {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.secondaryButton {
+  width: 100%;
+  height: 3rem;
+  border: 2px solid var(--border-secondary);
+  color: var(--text-primary);
+  background: var(--surface-primary);
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.secondaryButton:hover {
+  border-color: var(--border-primary);
+}
+
+.secondaryButtonContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.secondaryButtonText {
+  font-weight: 600;
+}
+
+.aiRecommendation {
+  background: linear-gradient(to right, #8b5cf6, #3b82f6);
+  border-radius: 1rem;
+  padding: 1rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.aiContent {
+  position: relative;
+  z-index: 10;
+}
+
+.aiHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.aiIcon {
+  width: 2rem;
+  height: 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+}
+
+.aiTitle {
+  font-weight: 600;
+}
+
+.aiMessage {
+  color: #e9d5ff;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.aiButton {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  color: white;
+  border: none;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.aiButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.aiDecoration1 {
+  position: absolute;
+  top: -1rem;
+  right: -1rem;
+  width: 5rem;
+  height: 5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.aiDecoration2 {
+  position: absolute;
+  right: -2rem;
+  bottom: -2rem;
+  width: 8rem;
+  height: 8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.workoutsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.viewAllButton {
+  background: none;
+  border: none;
+  color: var(--info);
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.viewAllButton:hover {
+  color: var(--info);
+  opacity: 0.8;
+}
+
+.workoutsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.emptyCard {
+  border: 2px dashed var(--border-secondary);
+}
+
+.emptyCardContent {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 3rem;
+  height: 3rem;
+  background: var(--surface-secondary);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem auto;
+}
+
+.emptyTitle {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.emptyDescription {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.emptyButton {
+  font-size: 0.875rem;
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.emptyButton:hover {
+  background: var(--success);
+  opacity: 0.9;
+}
+
+.progressTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.progressCard {
+  border: 2px dashed var(--border-secondary);
+}
+
+.progressCardContent {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.progressIcon {
+  width: 3rem;
+  height: 3rem;
+  background: var(--surface-secondary);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem auto;
+}
+
+.progressTitle {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.progressDescription {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.goalsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+/* Dark mode support */
+:root.dark .sectionTitle {
+  color: var(--text-primary-dark);
+}
+
+:root.dark .centerText {
+  color: var(--text-tertiary-dark);
+}
+
+:root.dark .secondaryButton {
+  border-color: var(--border-secondary-dark);
+  color: var(--text-primary-dark);
+  background: var(--surface-primary-dark);
+}
+
+:root.dark .secondaryButton:hover {
+  border-color: var(--border-primary-dark);
+}
+
+:root.dark .viewAllButton {
+  color: var(--info-dark);
+}
+
+:root.dark .emptyCard,
+:root.dark .progressCard {
+  border-color: var(--border-secondary-dark);
+}
+
+:root.dark .emptyIcon,
+:root.dark .progressIcon {
+  background: var(--surface-secondary-dark);
+}
+
+:root.dark .emptyTitle,
+:root.dark .progressTitle {
+  color: var(--text-primary-dark);
+}
+
+:root.dark .emptyDescription,
+:root.dark .progressDescription {
+  color: var(--text-secondary-dark);
+}
