@@ -40,8 +40,8 @@ export default function Register() {
       return response.json();
     },
     onSuccess: () => {
-      // Registration successful, redirect to app
-      window.location.reload(); // This will trigger the auth check in App.tsx
+      // Registration successful, navigate to home
+      setLocation("/");
     },
     onError: (error: Error) => {
       setError(error.message);
