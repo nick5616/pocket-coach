@@ -113,40 +113,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     })(req, res, next);
   });
 
-  app.post('/api/auth/register', async (req, res) => {
-    try {
-      const { email, password, firstName, lastName } = req.body;
-      
-      if (!email || !password) {
-        return res.status(400).json({ message: "Email and password required" });
-      }
-      
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
-      }
-      
-      const bcrypt = await import('bcrypt');
-      const passwordHash = await bcrypt.hash(password, 12);
-      
-      const user = await storage.createUser({
-        email,
-        passwordHash,
-        firstName,
-        lastName
-      });
-      
-      // Set session
-      (req.session as any).userId = user.id;
-      
-      const { passwordHash: _, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
-    } catch (error) {
-      console.error("Registration error:", error);
-      res.status(500).json({ message: "Registration failed" });
-    }
-  });
+
 
   app.post('/api/auth/logout', (req, res) => {
     req.session.destroy((err) => {
