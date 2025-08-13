@@ -1122,15 +1122,12 @@ export default function WorkoutJournal() {
                                           : setData.effort
                                         : undefined;
 
-                                      await apiRequest(`/api/exercises/${exercise.id}`, {
-                                        method: "PATCH",
-                                        body: JSON.stringify({
-                                          name: editGroupName,
-                                          notes: editGroupNotes,
-                                          reps: setData.reps,
-                                          weight: setData.weight,
-                                          rpe: rpeValue,
-                                        }),
+                                      await apiRequest("PATCH", `/api/exercises/${exercise.id}`, {
+                                        name: editGroupName,
+                                        notes: editGroupNotes,
+                                        reps: setData.reps,
+                                        weight: setData.weight,
+                                        rpe: rpeValue,
                                       });
                                     }
                                   }
