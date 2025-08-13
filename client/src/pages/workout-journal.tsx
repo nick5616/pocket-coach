@@ -15,6 +15,7 @@ import {
   Dumbbell,
   Hash,
   Weight,
+  Sparkles,
 } from "lucide-react";
 import { Link, useParams, useLocation } from "wouter";
 import LoadingScreen from "../components/loading-screen";
@@ -34,6 +35,7 @@ import { Checkbox } from "@/components/Checkbox";
 import { Progress } from "@/components/Progress";
 import { useToast } from "@/hooks/use-toast";
 import { ExerciseMuscleGroups } from "@/components/exercise-muscle-groups";
+import { ExerciseAIEditor } from "@/components/exercise-ai-editor";
 import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
 import { useUserPreferences, getEffortTrackingInfo, convertRirToRpe, convertRpeToRir } from "@/contexts/user-preferences-context";
@@ -88,6 +90,9 @@ export default function WorkoutJournal() {
   const [swappedExercises, setSwappedExercises] = useState<Map<number, any>>(
     new Map(),
   );
+  const [aiEditExerciseId, setAiEditExerciseId] = useState<number | null>(null);
+  const [aiEditExerciseName, setAiEditExerciseName] = useState("");
+  const [deleteExerciseId, setDeleteExerciseId] = useState<number | null>(null);
 
   // Group exercises by name for display
   // Helper function to title case strings
@@ -124,7 +129,6 @@ export default function WorkoutJournal() {
       };
     });
   };
-  const [deleteExerciseId, setDeleteExerciseId] = useState<number | null>(null);
 
   // Refs
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -909,6 +913,19 @@ export default function WorkoutJournal() {
                                   <Button
                                     variant="ghost"
                                     size="sm"
+                                    onClick={() => {
+                                      setAiEditExerciseId(exerciseGroup.exercises[0].id);
+                                      setAiEditExerciseName(exerciseGroup.exercises[0].name);
+                                    }}
+                                    title="Edit with AI"
+                                  >
+                                    <Sparkles
+                                      style={{ width: "1rem", height: "1rem" }}
+                                    />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
                                     onClick={() =>
                                       setDeleteExerciseId(
                                         exerciseGroup.exercises[0].id,
@@ -1361,6 +1378,24 @@ export default function WorkoutJournal() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* AI Exercise Editor Modal */}
+      <ExerciseAIEditor
+        exerciseId={aiEditExerciseId || 0}
+        exerciseName={aiEditExerciseName}
+        isOpen={aiEditExerciseId !== null}
+        onClose={() => {
+          setAiEditExerciseId(null);
+          setAiEditExerciseName("");
+        }}
+        onSuccess={() => {
+          // Refresh exercise data
+          queryClient.invalidateQueries({ 
+            queryKey: ["/api/exercises", { workoutId: parseInt(workoutId || "0") }] 
+          });
+        }}
+      />
+
       {!workoutId && <BottomNavigation />}
     </div>
   );

@@ -12,6 +12,7 @@ import {
   updateUserPreferencesSchema
 } from "@shared/schema";
 import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePersonalizedProgram, modifyProgram } from "./services/openai";
+import { editExerciseWithAI } from "./services/exercise-editor";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -422,6 +423,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete exercise" });
+    }
+  });
+
+  // Exercise editing with natural language AI
+  app.post("/api/exercises/:id/edit-with-ai", isAuthenticated, async (req, res) => {
+    const id = parseInt(req.params.id);
+    const { editInstruction } = req.body;
+
+    if (!editInstruction || typeof editInstruction !== 'string') {
+      return res.status(400).json({ message: "Edit instruction is required" });
+    }
+
+    try {
+      // Get current exercise data
+      const currentExercise = await storage.getExercise(id);
+      if (!currentExercise) {
+        return res.status(404).json({ message: "Exercise not found" });
+      }
+
+      // Use AI to edit the exercise
+      const editedExercise = await editExerciseWithAI({
+        name: currentExercise.name,
+        sets: currentExercise.sets || undefined,
+        reps: currentExercise.reps || undefined,
+        weight: currentExercise.weight || undefined,
+        rpe: currentExercise.rpe || undefined,
+        isBodyweight: currentExercise.isBodyweight || false,
+        baseWeight: currentExercise.baseWeight || 0,
+        muscleGroups: currentExercise.muscleGroups || [],
+        editInstruction
+      });
+
+      // Update the exercise in the database
+      const updatedExercise = await storage.updateExercise(id, {
+        name: editedExercise.name,
+        sets: editedExercise.sets,
+        reps: editedExercise.reps,
+        weight: editedExercise.weight,
+        rpe: editedExercise.rpe,
+        isBodyweight: editedExercise.isBodyweight,
+        baseWeight: editedExercise.baseWeight,
+        muscleGroups: editedExercise.muscleGroups
+      });
+
+      if (!updatedExercise) {
+        return res.status(500).json({ message: "Failed to update exercise" });
+      }
+
+      res.json({
+        exercise: updatedExercise,
+        changesSummary: editedExercise.changesSummary
+      });
+    } catch (error) {
+      console.error("Failed to edit exercise with AI:", error);
+      res.status(500).json({ message: "Failed to process edit instruction" });
     }
   });
 
