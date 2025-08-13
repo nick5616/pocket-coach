@@ -2,9 +2,31 @@
 
 .container {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 0.25rem;
   margin-top: 0.5rem;
+}
+
+.muscleGroups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.weightInfo {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.125rem;
+}
+
+.weightText {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  background: var(--surface-secondary);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--border-color);
 }
 
 .loadingContainer {
@@ -40,4 +62,12 @@
 /* Dark mode support */
 .loadingSkeleton.dark {
   background-color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  .weightText {
+    background: var(--surface-tertiary);
+    color: var(--text-muted);
+    border-color: var(--border-muted);
+  }
 }

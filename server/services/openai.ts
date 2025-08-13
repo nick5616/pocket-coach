@@ -175,10 +175,27 @@ CRITICAL PARSING RULES:
    - "pull-ups bodyweight x12 pretty hard, maybe 8.5" → Must include "rpe": 9 (round to nearest integer)
    - "push-ups 10 reps rpe 5" → Must include "rpe": 5 in the exercise object
 
-CRITICAL: ALWAYS include RPE field in exercise objects when mentioned by user. If RPE or RIR is mentioned, it MUST appear in the exercise object.
+7. BODYWEIGHT AND BASE WEIGHT DETECTION (MANDATORY):
+   Bodyweight exercises (isBodyweight: true, baseWeight: 0):
+   - push-ups, pull-ups, chin-ups, dips, bodyweight squats, lunges, burpees, mountain climbers, jumping jacks, planks
+   
+   Barbell exercises (isBodyweight: false, baseWeight: 45):
+   - barbell bench press, barbell squats, deadlifts, barbell rows, overhead press, barbell curls, barbell hip thrusts
+   
+   Smith machine exercises (isBodyweight: false, baseWeight: 25):
+   - smith machine bench press, smith machine squats, smith machine hip thrusts, smith machine rows
+   
+   Dumbbell/Cable exercises (isBodyweight: false, baseWeight: 0):
+   - dumbbell bench press, cable rows, lat pulldowns, tricep extensions, bicep curls (with dumbbells/cables)
 
-EXAMPLE INPUT: "push-ups 10 reps rpe 5"
-REQUIRED OUTPUT: {"name": "push-ups", "sets": 1, "reps": 10, "weight": null, "rpe": 5, "muscleGroups": ["chest", "shoulders", "triceps", "core"]}
+CRITICAL: ALWAYS include RPE, isBodyweight, and baseWeight fields in exercise objects.
+
+EXAMPLE INPUTS & REQUIRED OUTPUTS:
+"push-ups 10 reps rpe 5" → {"name": "push-ups", "sets": 1, "reps": 10, "weight": null, "rpe": 5, "isBodyweight": true, "baseWeight": 0, "muscleGroups": ["chest", "shoulders", "triceps", "core"]}
+
+"barbell bench press 185x8 rpe 7" → {"name": "barbell bench press", "sets": 1, "reps": 8, "weight": 185, "rpe": 7, "isBodyweight": false, "baseWeight": 45, "muscleGroups": ["chest", "shoulders", "triceps"]}
+
+"smith machine squats 135x12" → {"name": "smith machine squats", "sets": 1, "reps": 12, "weight": 135, "rpe": null, "isBodyweight": false, "baseWeight": 25, "muscleGroups": ["legs", "glutes"]}
 
 Extract exercises and return in this JSON format:
 {
@@ -189,23 +206,9 @@ Extract exercises and return in this JSON format:
       "reps": 5,
       "weight": 225,
       "rpe": 8,
+      "isBodyweight": false,
+      "baseWeight": 45,
       "muscleGroups": ["back", "legs", "glutes"]
-    },
-    {
-      "name": "bench press",
-      "sets": 1,
-      "reps": 8,
-      "weight": 185,
-      "rpe": 7,
-      "muscleGroups": ["chest", "shoulders", "triceps"]
-    },
-    {
-      "name": "squats",
-      "sets": 1,
-      "reps": 3,
-      "weight": 315,
-      "rpe": 9,
-      "muscleGroups": ["legs", "glutes"]
     },
     {
       "name": "push-ups",
@@ -213,7 +216,19 @@ Extract exercises and return in this JSON format:
       "reps": 10,
       "weight": null,
       "rpe": 5,
+      "isBodyweight": true,
+      "baseWeight": 0,
       "muscleGroups": ["chest", "shoulders", "triceps", "core"]
+    },
+    {
+      "name": "dumbbell bench press",
+      "sets": 1,
+      "reps": 8,
+      "weight": 50,
+      "rpe": 7,
+      "isBodyweight": false,
+      "baseWeight": 0,
+      "muscleGroups": ["chest", "shoulders", "triceps"]
     }
   ],
   "duration": 45,

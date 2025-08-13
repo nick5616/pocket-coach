@@ -25,6 +25,8 @@ export const users = pgTable("users", {
   currentStreak: integer("current_streak").default(0),
   // User Preferences
   effortTrackingPreference: varchar("effort_tracking_preference").default("rpe"), // "rpe", "rir", "none"
+  height: integer("height"), // height in inches
+  weight: real("weight"), // weight in pounds
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -70,6 +72,9 @@ export const exercises = pgTable("exercises", {
   restTime: integer("rest_time"), // in seconds
   notes: text("notes"),
   muscleGroups: text("muscle_groups").array(), // ["shoulders", "chest"]
+  isBodyweight: boolean("is_bodyweight").default(false), // true for exercises like push-ups
+  baseWeight: real("base_weight").default(0), // base weight of equipment (barbell=45lbs, smith machine=25lbs)
+  totalWeight: real("total_weight"), // calculated field: weight + baseWeight (or bodyweight if isBodyweight)
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -277,4 +282,6 @@ export const effortTrackingPreferenceSchema = z.enum(["rpe", "rir", "none"]);
 
 export const updateUserPreferencesSchema = z.object({
   effortTrackingPreference: effortTrackingPreferenceSchema.optional(),
+  height: z.number().positive().optional(), // height in inches
+  weight: z.number().positive().optional(), // weight in pounds
 });

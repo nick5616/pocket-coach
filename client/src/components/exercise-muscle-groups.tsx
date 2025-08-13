@@ -6,9 +6,18 @@ import styles from "./exercise-muscle-groups.module.css";
 interface ExerciseMuscleGroupsProps {
   exerciseName: string;
   className?: string;
+  isBodyweight?: boolean;
+  baseWeight?: number;
+  exerciseWeight?: number | null;
 }
 
-export function ExerciseMuscleGroups({ exerciseName, className = "" }: ExerciseMuscleGroupsProps) {
+export function ExerciseMuscleGroups({ 
+  exerciseName, 
+  className = "",
+  isBodyweight,
+  baseWeight,
+  exerciseWeight 
+}: ExerciseMuscleGroupsProps) {
   const { data: muscleGroupsData, isLoading } = useMuscleGroups(exerciseName);
   const [isDark, setIsDark] = useState(false);
 
@@ -42,13 +51,33 @@ export function ExerciseMuscleGroups({ exerciseName, className = "" }: ExerciseM
     return null;
   }
 
+  const getWeightDisplay = () => {
+    if (isBodyweight) {
+      return "Bodyweight";
+    }
+    if (baseWeight && baseWeight > 0) {
+      const totalWeight = (exerciseWeight || 0) + baseWeight;
+      return `${exerciseWeight || 0} + ${baseWeight} = ${totalWeight} lbs`;
+    }
+    return null;
+  };
+
+  const weightDisplay = getWeightDisplay();
+
   return (
     <div className={`${styles.container} ${className}`}>
-      {muscleGroupsData.muscleGroups.map((muscle: string, idx: number) => (
-        <Badge key={idx} variant="secondary">
-          {muscle}
-        </Badge>
-      ))}
+      <div className={styles.muscleGroups}>
+        {muscleGroupsData.muscleGroups.map((muscle: string, idx: number) => (
+          <Badge key={idx} variant="secondary">
+            {muscle}
+          </Badge>
+        ))}
+      </div>
+      {weightDisplay && (
+        <div className={styles.weightInfo}>
+          <span className={styles.weightText}>{weightDisplay}</span>
+        </div>
+      )}
     </div>
   );
 }

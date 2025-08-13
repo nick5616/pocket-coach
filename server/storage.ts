@@ -190,7 +190,7 @@ export class DatabaseStorage implements IStorage {
     await db.update(users).set({ currentStreak: streak }).where(eq(users.id, userId));
   }
 
-  async updateUserPreferences(userId: string, preferences: { effortTrackingPreference?: EffortTrackingPreference }): Promise<User | undefined> {
+  async updateUserPreferences(userId: string, preferences: { effortTrackingPreference?: EffortTrackingPreference; height?: number; weight?: number }): Promise<User | undefined> {
     await this.ensureInitialized();
     const [user] = await db.update(users)
       .set({ 

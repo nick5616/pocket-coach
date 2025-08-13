@@ -236,6 +236,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               reps: typeof repsArray[i] === 'number' ? repsArray[i] : undefined,
               weight: typeof weightsArray[i] === 'number' ? weightsArray[i] : undefined,
               rpe: typeof exerciseData.rpe === 'number' ? exerciseData.rpe : undefined,
+              isBodyweight: typeof exerciseData.isBodyweight === 'boolean' ? exerciseData.isBodyweight : false,
+              baseWeight: typeof exerciseData.baseWeight === 'number' ? exerciseData.baseWeight : 0,
               muscleGroups: Array.isArray(exerciseData.muscleGroups) ? exerciseData.muscleGroups : []
             };
             
@@ -251,6 +253,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             reps: typeof exerciseData.reps === 'number' ? exerciseData.reps : undefined,
             weight: typeof exerciseData.weight === 'number' ? exerciseData.weight : undefined,
             rpe: typeof exerciseData.rpe === 'number' ? exerciseData.rpe : undefined,
+            isBodyweight: typeof exerciseData.isBodyweight === 'boolean' ? exerciseData.isBodyweight : false,
+            baseWeight: typeof exerciseData.baseWeight === 'number' ? exerciseData.baseWeight : 0,
             muscleGroups: Array.isArray(exerciseData.muscleGroups) ? exerciseData.muscleGroups : []
           };
           
