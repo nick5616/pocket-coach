@@ -1118,15 +1118,37 @@ export default function WorkoutJournal() {
                             <Button
                               variant="primary"
                               size="sm"
-                              onClick={() => {
-                                // Save logic here - update exercise names and set data
-                                console.log("Saving changes:", {
-                                  name: editGroupName,
-                                  notes: editGroupNotes,
-                                  setData: editingSetData,
-                                });
-                                setEditingGroupIndex(null);
-                                setEditingSetData({});
+                              onClick={async () => {
+                                try {
+                                  // Update each exercise in the group
+                                  for (const exercise of exerciseGroup.exercises) {
+                                    const setData = editingSetData[exercise.id];
+                                    if (setData) {
+                                      await apiRequest(`/api/exercises/${exercise.id}`, {
+                                        method: "PATCH",
+                                        body: JSON.stringify({
+                                          name: editGroupName,
+                                          notes: editGroupNotes,
+                                          reps: setData.reps,
+                                          weight: setData.weight,
+                                          rpe: setData.rpe,
+                                          rir: setData.rir,
+                                        }),
+                                      });
+                                    }
+                                  }
+                                  // Invalidate queries to refresh data
+                                  await queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
+                                  toast({ title: "Exercise updated successfully" });
+                                  setEditingGroupIndex(null);
+                                  setEditingSetData({});
+                                } catch (error) {
+                                  console.error("Failed to save exercise:", error);
+                                  toast({ 
+                                    title: "Failed to save exercise", 
+                                    variant: "destructive" 
+                                  });
+                                }
                               }}
                               className={styles.editModeButton}
                             >

@@ -93,6 +93,18 @@ Email/password authentication with bcrypt hashing and PostgreSQL session store u
 **User Fix**: Clear browser cache completely and refresh page, or use incognito mode.
 
 **Recent Changes (August 2025)**:
+- ✅ **COMPREHENSIVE EFFORT TRACKING SYSTEM (August 13, 2025)**: Implemented user-configurable effort tracking preferences
+  - Added EffortTrackingPreference type with three options: RPE (1-10), RIR (reps in reserve), or none
+  - Created UserPreferencesProvider context with React Query integration for global state management
+  - Built EffortTrackingSettings component with radio button interface in profile page
+  - Updated workout journal to conditionally display effort tracking based on user preference:
+    * Headers dynamically show "RPE", "RIR", or no effort column
+    * Input fields adapt with proper validation ranges (RPE: 1-10, RIR: 0-10+)
+    * Display logic shows correct effort values for completed exercises
+    * Summary statistics show "Avg RPE" or "Avg RIR" depending on preference
+  - Enhanced database schema with RIR column and proper API validation
+  - Implemented comprehensive save logic that persists RPE/RIR values to PostgreSQL
+  - All preference changes propagate instantly across the entire application
 - ✅ **REMOVED AI BUZZWORDS (August 12, 2025)**: Systematically removed all "AI" references from user-facing text
   - Updated program generation pages to focus on personalization and customization benefits
   - Changed "AI-powered" messaging to emphasize actual functionality and user outcomes
