@@ -35,7 +35,6 @@ import { Checkbox } from "@/components/Checkbox";
 import { Progress } from "@/components/Progress";
 import { useToast } from "@/hooks/use-toast";
 import { ExerciseMuscleGroups } from "@/components/exercise-muscle-groups";
-import { ExerciseAIEditor } from "@/components/exercise-ai-editor";
 import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
 import { useUserPreferences, getEffortTrackingInfo, convertRirToRpe, convertRpeToRir } from "@/contexts/user-preferences-context";
@@ -90,9 +89,8 @@ export default function WorkoutJournal() {
   const [swappedExercises, setSwappedExercises] = useState<Map<number, any>>(
     new Map(),
   );
-  const [aiEditExerciseId, setAiEditExerciseId] = useState<number | null>(null);
-  const [aiEditExerciseName, setAiEditExerciseName] = useState("");
   const [deleteExerciseId, setDeleteExerciseId] = useState<number | null>(null);
+  const [aiEditInstruction, setAiEditInstruction] = useState("");
 
   // Group exercises by name for display
   // Helper function to title case strings
@@ -260,6 +258,38 @@ export default function WorkoutJournal() {
     },
   });
 
+  const aiEditMutation = useMutation({
+    mutationFn: async ({ exerciseId, instruction }: { exerciseId: number; instruction: string }) => {
+      const response = await apiRequest("POST", `/api/exercises/${exerciseId}/edit-with-ai`, {
+        editInstruction: instruction
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Exercise Updated!",
+        description: data.changesSummary || "Exercise successfully updated with your changes.",
+      });
+      
+      // Refresh exercise data
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/exercises", { workoutId: parseInt(workoutId || "0") }] 
+      });
+      
+      // Close dialog and clear instruction
+      setEditingExercise(null);
+      setAiEditInstruction("");
+    },
+    onError: (error: any) => {
+      console.error("AI edit error:", error);
+      toast({
+        title: "Edit Failed",
+        description: "Could not process your edit instruction. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
   const createExerciseFromProgramMutation = useMutation({
     mutationFn: async (data: {
       workoutId: string;
@@ -296,6 +326,16 @@ export default function WorkoutJournal() {
       toast({ title: "Exercise swapped successfully" });
     },
   });
+
+  // Handler functions
+  const handleAiEdit = () => {
+    if (!editingExercise || !aiEditInstruction.trim()) return;
+    
+    aiEditMutation.mutate({
+      exerciseId: editingExercise.id,
+      instruction: aiEditInstruction.trim()
+    });
+  };
 
   // Only show loading screen on initial load for existing workout
   const isInitialLoading = workoutId && workoutLoading;
@@ -910,19 +950,7 @@ export default function WorkoutJournal() {
                                       style={{ width: "1rem", height: "1rem" }}
                                     />
                                   </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      setAiEditExerciseId(exerciseGroup.exercises[0].id);
-                                      setAiEditExerciseName(exerciseGroup.exercises[0].name);
-                                    }}
-                                    title="Edit with AI"
-                                  >
-                                    <Sparkles
-                                      style={{ width: "1rem", height: "1rem" }}
-                                    />
-                                  </Button>
+
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -1265,72 +1293,132 @@ export default function WorkoutJournal() {
       {/* Exercise Edit Dialog */}
       <Dialog
         open={!!editingExercise}
-        onOpenChange={() => setEditingExercise(null)}
+        onOpenChange={() => {
+          setEditingExercise(null);
+          setAiEditInstruction("");
+        }}
       >
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Exercise</DialogTitle>
           </DialogHeader>
 
           {editingExercise && (
-            <form onSubmit={handleUpdateExercise}>
-              <div style={{ marginBottom: "1rem" }}>
-                <label
-                  htmlFor="exerciseName"
-                  style={{
-                    display: "block",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  Exercise Name
-                </label>
-                <Input
-                  id="exerciseName"
-                  type="text"
-                  value={editExerciseName}
-                  onChange={(e) => setEditExerciseName(e.target.value)}
-                />
+            <div className="space-y-6">
+              {/* AI Editing Section */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-4 h-4 text-blue-500" />
+                  <h3 className="text-lg font-semibold">Quick Edit with Natural Language</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-3">
+                  Tell me what to change in plain English. Examples: "change weight to 135", "make it 3 sets", "RPE was actually 8"
+                </p>
+                <div className="space-y-3">
+                  <Textarea
+                    placeholder="What would you like to change? (e.g., 'change weight to 135 pounds', 'make it 3 sets instead of 4')"
+                    value={aiEditInstruction}
+                    onChange={(e) => setAiEditInstruction(e.target.value)}
+                    rows={2}
+                    className="resize-none"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleAiEdit}
+                    disabled={!aiEditInstruction.trim() || aiEditMutation.isPending}
+                    className="w-full"
+                  >
+                    {aiEditMutation.isPending ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Update Exercise
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
 
-              <div style={{ marginBottom: "1rem" }}>
-                <label
-                  htmlFor="exerciseNotes"
-                  style={{
-                    display: "block",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  Notes
-                </label>
-                <Textarea
-                  id="exerciseNotes"
-                  value={editExerciseNotes}
-                  onChange={(e) => setEditExerciseNotes(e.target.value)}
-                />
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="bg-white px-2 text-gray-500">or edit manually</span>
+                </div>
               </div>
 
-              <div className="flex space-x-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setEditingExercise(null)}
-                  style={{ flex: "1" }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="flex-1 bg-green-500 hover:bg-green-600 text-white"
-                  disabled={updateExerciseMutation.isPending}
-                >
-                  {updateExerciseMutation.isPending ? "Saving..." : "Save"}
-                </Button>
+              {/* Manual Editing Section */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Manual Edit</h3>
+                <form onSubmit={handleUpdateExercise}>
+                  <div style={{ marginBottom: "1rem" }}>
+                    <label
+                      htmlFor="exerciseName"
+                      style={{
+                        display: "block",
+                        fontSize: "0.875rem",
+                        fontWeight: 500,
+                        marginBottom: "0.5rem",
+                      }}
+                    >
+                      Exercise Name
+                    </label>
+                    <Input
+                      id="exerciseName"
+                      type="text"
+                      value={editExerciseName}
+                      onChange={(e) => setEditExerciseName(e.target.value)}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: "1rem" }}>
+                    <label
+                      htmlFor="exerciseNotes"
+                      style={{
+                        display: "block",
+                        fontSize: "0.875rem",
+                        fontWeight: 500,
+                        marginBottom: "0.5rem",
+                      }}
+                    >
+                      Notes
+                    </label>
+                    <Textarea
+                      id="exerciseNotes"
+                      value={editExerciseNotes}
+                      onChange={(e) => setEditExerciseNotes(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setEditingExercise(null);
+                        setAiEditInstruction("");
+                      }}
+                      style={{ flex: "1" }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                      disabled={updateExerciseMutation.isPending}
+                    >
+                      {updateExerciseMutation.isPending ? "Saving..." : "Save"}
+                    </Button>
+                  </div>
+                </form>
               </div>
-            </form>
+            </div>
           )}
         </DialogContent>
       </Dialog>
@@ -1379,22 +1467,7 @@ export default function WorkoutJournal() {
         </DialogContent>
       </Dialog>
 
-      {/* AI Exercise Editor Modal */}
-      <ExerciseAIEditor
-        exerciseId={aiEditExerciseId || 0}
-        exerciseName={aiEditExerciseName}
-        isOpen={aiEditExerciseId !== null}
-        onClose={() => {
-          setAiEditExerciseId(null);
-          setAiEditExerciseName("");
-        }}
-        onSuccess={() => {
-          // Refresh exercise data
-          queryClient.invalidateQueries({ 
-            queryKey: ["/api/exercises", { workoutId: parseInt(workoutId || "0") }] 
-          });
-        }}
-      />
+
 
       {!workoutId && <BottomNavigation />}
     </div>
