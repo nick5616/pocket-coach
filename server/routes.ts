@@ -8,7 +8,8 @@ import {
   insertWorkoutSchema, 
   insertExerciseSchema, 
   insertGoalSchema,
-  insertProgramSchema 
+  insertProgramSchema,
+  updateUserPreferencesSchema
 } from "@shared/schema";
 import { analyzeWorkout, parseWorkoutJournal, generateWorkoutName, generatePersonalizedProgram, modifyProgram } from "./services/openai";
 
@@ -103,6 +104,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // User Preferences routes
+  app.patch('/api/auth/user/preferences', isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const validatedData = updateUserPreferencesSchema.parse(req.body);
+      const updatedUser = await storage.updateUserPreferences(userId, validatedData);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json(updatedUser);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid preference data", errors: error.errors });
+      }
+      console.error("Error updating user preferences:", error);
+      res.status(500).json({ message: "Failed to update user preferences" });
     }
   });
 

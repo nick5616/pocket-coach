@@ -36,6 +36,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ExerciseMuscleGroups } from "@/components/exercise-muscle-groups";
 import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
+import { useUserPreferences, getEffortTrackingInfo } from "@/contexts/user-preferences-context";
 import { type Workout, type Exercise } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import styles from "@/styles/workout-journal.module.css";
@@ -45,6 +46,8 @@ export default function WorkoutJournal() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { effortTrackingPreference } = useUserPreferences();
+  const effortTrackingInfo = getEffortTrackingInfo(effortTrackingPreference);
 
   // Form states
   const [isEditing, setIsEditing] = useState(true);
@@ -76,7 +79,7 @@ export default function WorkoutJournal() {
   const [editGroupName, setEditGroupName] = useState("");
   const [editGroupNotes, setEditGroupNotes] = useState("");
   const [editingSetData, setEditingSetData] = useState<
-    Record<number, { reps?: number; weight?: number; rpe?: number }>
+    Record<number, { reps?: number; weight?: number; rpe?: number; rir?: number }>
   >({});
 
   const [skippedExercises, setSkippedExercises] = useState<Set<number>>(
@@ -825,12 +828,21 @@ export default function WorkoutJournal() {
                         (ex.weight || 0) * (ex.sets || 1) * (ex.reps || 0),
                       0,
                     );
-                    const avgRpe = exerciseGroup.exercises
-                      .filter((ex) => ex.rpe)
-                      .reduce(
-                        (sum, ex, _, arr) => sum + (ex.rpe || 0) / arr.length,
-                        0,
+                    const effortValues = exerciseGroup.exercises
+                      .filter((ex) => 
+                        effortTrackingPreference === "rpe" 
+                          ? ex.rpe 
+                          : effortTrackingPreference === "rir"
+                          ? ex.rir
+                          : false
                       );
+                    const avgEffort = effortValues.length > 0
+                      ? effortValues.reduce(
+                          (sum, ex) => sum + (
+                            effortTrackingPreference === "rpe" ? (ex.rpe || 0) : (ex.rir || 0)
+                          ), 0
+                        ) / effortValues.length
+                      : 0;
 
                     return (
                       <div
@@ -872,6 +884,7 @@ export default function WorkoutJournal() {
                                           reps?: number;
                                           weight?: number;
                                           rpe?: number;
+                                          rir?: number;
                                         }
                                       > = {};
                                       exerciseGroup.exercises.forEach(
@@ -881,6 +894,7 @@ export default function WorkoutJournal() {
                                             weight:
                                               exercise.weight || undefined,
                                             rpe: exercise.rpe || undefined,
+                                            rir: exercise.rir || undefined,
                                           };
                                         },
                                       );
@@ -927,7 +941,9 @@ export default function WorkoutJournal() {
                             <span className={styles.setHeaderItem}>Set</span>
                             <span className={styles.setHeaderItem}>Reps</span>
                             <span className={styles.setHeaderItem}>Weight</span>
-                            <span className={styles.setHeaderItem}>RPE</span>
+                            {effortTrackingPreference !== "none" && (
+                              <span className={styles.setHeaderItem}>{effortTrackingInfo.label}</span>
+                            )}
                             {editingGroupIndex === groupIndex && (
                               <span className={styles.setHeaderItem}>
                                 Action
@@ -982,27 +998,39 @@ export default function WorkoutJournal() {
                                     className={styles.setInput}
                                     placeholder="Weight"
                                   />
-                                  <input
-                                    type="number"
-                                    value={
-                                      editingSetData[exercise.id]?.rpe || ""
-                                    }
-                                    onChange={(e) =>
-                                      setEditingSetData((prev) => ({
-                                        ...prev,
-                                        [exercise.id]: {
-                                          ...prev[exercise.id],
-                                          rpe: e.target.value
-                                            ? parseInt(e.target.value)
-                                            : undefined,
-                                        },
-                                      }))
-                                    }
-                                    className={styles.setInput}
-                                    placeholder="RPE"
-                                    min="1"
-                                    max="10"
-                                  />
+                                  {effortTrackingPreference !== "none" && (
+                                    <input
+                                      type="number"
+                                      value={
+                                        effortTrackingPreference === "rpe"
+                                          ? editingSetData[exercise.id]?.rpe || ""
+                                          : editingSetData[exercise.id]?.rir || ""
+                                      }
+                                      onChange={(e) =>
+                                        setEditingSetData((prev) => ({
+                                          ...prev,
+                                          [exercise.id]: {
+                                            ...prev[exercise.id],
+                                            ...(effortTrackingPreference === "rpe"
+                                              ? {
+                                                  rpe: e.target.value
+                                                    ? parseInt(e.target.value)
+                                                    : undefined,
+                                                }
+                                              : {
+                                                  rir: e.target.value
+                                                    ? parseInt(e.target.value)
+                                                    : undefined,
+                                                }),
+                                          },
+                                        }))
+                                      }
+                                      className={styles.setInput}
+                                      placeholder={effortTrackingInfo.placeholder}
+                                      min={effortTrackingInfo.min}
+                                      max={effortTrackingInfo.max}
+                                    />
+                                  )}
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -1024,9 +1052,13 @@ export default function WorkoutJournal() {
                                       ? `${exercise.weight} lbs`
                                       : "-"}
                                   </span>
-                                  <span className={styles.setRpe}>
-                                    {exercise.rpe || "-"}
-                                  </span>
+                                  {effortTrackingPreference !== "none" && (
+                                    <span className={styles.setRpe}>
+                                      {effortTrackingPreference === "rpe"
+                                        ? exercise.rpe || "-"
+                                        : exercise.rir || "-"}
+                                    </span>
+                                  )}
                                 </>
                               )}
                             </div>
@@ -1041,9 +1073,9 @@ export default function WorkoutJournal() {
                             </span>
                           </div>
                           <div className={styles.completedStatsRight}>
-                            {avgRpe > 0 && (
+                            {effortTrackingPreference !== "none" && avgEffort > 0 && (
                               <span className={styles.completedRpeText}>
-                                Avg RPE {avgRpe.toFixed(1)}
+                                Avg {effortTrackingInfo.label} {avgEffort.toFixed(1)}
                               </span>
                             )}
                             {totalVolume > 0 && (

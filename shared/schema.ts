@@ -23,6 +23,8 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   currentStreak: integer("current_streak").default(0),
+  // User Preferences
+  effortTrackingPreference: varchar("effort_tracking_preference").default("rpe"), // "rpe", "rir", "none"
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -65,6 +67,7 @@ export const exercises = pgTable("exercises", {
   reps: integer("reps"),
   weight: real("weight"),
   rpe: integer("rpe"), // Rate of Perceived Exertion (1-10)
+  rir: integer("rir"), // Reps in Reserve (0-10+)
   restTime: integer("rest_time"), // in seconds
   notes: text("notes"),
   muscleGroups: text("muscle_groups").array(), // ["shoulders", "chest"]
@@ -267,3 +270,12 @@ export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
 
 export type ProgramGenerationData = z.infer<typeof programGenerationSchema>;
 export type ProgramConfirmationData = z.infer<typeof programConfirmationSchema>;
+
+// User Preferences
+export type EffortTrackingPreference = "rpe" | "rir" | "none";
+
+export const effortTrackingPreferenceSchema = z.enum(["rpe", "rir", "none"]);
+
+export const updateUserPreferencesSchema = z.object({
+  effortTrackingPreference: effortTrackingPreferenceSchema.optional(),
+});

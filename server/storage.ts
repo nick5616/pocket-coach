@@ -7,7 +7,8 @@ import {
   type Program, type InsertProgram,
   type Achievement, type InsertAchievement,
   type MuscleGroup, type InsertMuscleGroup,
-  type ExerciseMuscleMapping, type InsertExerciseMuscleMapping
+  type ExerciseMuscleMapping, type InsertExerciseMuscleMapping,
+  type EffortTrackingPreference, updateUserPreferencesSchema
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
@@ -19,6 +20,7 @@ export interface IStorage {
   createUser(user: { email: string; passwordHash: string; firstName?: string | null; lastName?: string | null; }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserStreak(userId: string, streak: number): Promise<void>;
+  updateUserPreferences(userId: string, preferences: { effortTrackingPreference?: EffortTrackingPreference }): Promise<User | undefined>;
 
   // Goals
   getUserGoals(userId: string): Promise<Goal[]>;
@@ -186,6 +188,18 @@ export class DatabaseStorage implements IStorage {
   async updateUserStreak(userId: string, streak: number): Promise<void> {
     await this.ensureInitialized();
     await db.update(users).set({ currentStreak: streak }).where(eq(users.id, userId));
+  }
+
+  async updateUserPreferences(userId: string, preferences: { effortTrackingPreference?: EffortTrackingPreference }): Promise<User | undefined> {
+    await this.ensureInitialized();
+    const [user] = await db.update(users)
+      .set({ 
+        ...preferences,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user || undefined;
   }
 
   // Goals

@@ -3,6 +3,7 @@ import { Switch, Route } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { ThemeProvider } from "./components/theme-provider";
+import { UserPreferencesProvider } from "./contexts/user-preferences-context";
 import Welcome from "./pages/welcome";
 import Register from "./pages/register";
 import Login from "./pages/login";
@@ -131,16 +132,18 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <div style={{
-          height: '100vh',
-          width: '100%',
-          margin: '0',
-          position: 'relative',
-          backgroundColor: 'var(--bg-primary, #ffffff)',
-          transition: 'all 0.2s ease'
-        }}>
-          <AppContent />
-        </div>
+        <UserPreferencesProvider>
+          <div style={{
+            height: '100vh',
+            width: '100%',
+            margin: '0',
+            position: 'relative',
+            backgroundColor: 'var(--bg-primary, #ffffff)',
+            transition: 'all 0.2s ease'
+          }}>
+            <AppContent />
+          </div>
+        </UserPreferencesProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

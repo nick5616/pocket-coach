@@ -6,13 +6,15 @@ import { Button } from "../components/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
 import LoadingScreen from "../components/loading-screen";
 import { useTheme } from "../components/theme-provider";
+import { EffortTrackingSettings } from "../components/effort-tracking-settings";
 import BottomNavigation from "../components/bottom-navigation";
 import styles from "./profile-simple.module.css";
+import type { User } from "@shared/schema";
 
 export default function Profile() {
   const { theme, setTheme } = useTheme();
   
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading } = useQuery<User>({
     queryKey: ["/api/auth/user"],
   });
 
@@ -114,6 +116,13 @@ export default function Profile() {
             </CardHeader>
             <CardContent>
               <ThemeToggle />
+            </CardContent>
+          </Card>
+
+          {/* Effort Tracking Settings */}
+          <Card>
+            <CardContent>
+              <EffortTrackingSettings />
             </CardContent>
           </Card>
 
