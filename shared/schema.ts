@@ -66,8 +66,7 @@ export const exercises = pgTable("exercises", {
   sets: integer("sets"),
   reps: integer("reps"),
   weight: real("weight"),
-  rpe: integer("rpe"), // Rate of Perceived Exertion (1-10)
-  rir: integer("rir"), // Reps in Reserve (0-10+)
+  rpe: integer("rpe"), // Rate of Perceived Exertion (1-10) - normalized storage format
   restTime: integer("rest_time"), // in seconds
   notes: text("notes"),
   muscleGroups: text("muscle_groups").array(), // ["shoulders", "chest"]

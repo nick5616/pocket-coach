@@ -36,7 +36,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ExerciseMuscleGroups } from "@/components/exercise-muscle-groups";
 import BottomNavigation from "@/components/bottom-navigation";
 import AchievementModal from "@/components/achievement-modal";
-import { useUserPreferences, getEffortTrackingInfo } from "@/contexts/user-preferences-context";
+import { useUserPreferences, getEffortTrackingInfo, convertRirToRpe, convertRpeToRir } from "@/contexts/user-preferences-context";
 import { type Workout, type Exercise } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import styles from "@/styles/workout-journal.module.css";
@@ -79,7 +79,7 @@ export default function WorkoutJournal() {
   const [editGroupName, setEditGroupName] = useState("");
   const [editGroupNotes, setEditGroupNotes] = useState("");
   const [editingSetData, setEditingSetData] = useState<
-    Record<number, { reps?: number; weight?: number; rpe?: number; rir?: number }>
+    Record<number, { reps?: number; weight?: number; effort?: number }>
   >({});
 
   const [skippedExercises, setSkippedExercises] = useState<Set<number>>(
@@ -828,20 +828,17 @@ export default function WorkoutJournal() {
                         (ex.weight || 0) * (ex.sets || 1) * (ex.reps || 0),
                       0,
                     );
-                    const effortValues = exerciseGroup.exercises
-                      .filter((ex) => 
-                        effortTrackingPreference === "rpe" 
-                          ? ex.rpe 
-                          : effortTrackingPreference === "rir"
-                          ? ex.rir
-                          : false
-                      );
-                    const avgEffort = effortValues.length > 0
-                      ? effortValues.reduce(
-                          (sum, ex) => sum + (
-                            effortTrackingPreference === "rpe" ? (ex.rpe || 0) : (ex.rir || 0)
-                          ), 0
-                        ) / effortValues.length
+                    const rpeValues = exerciseGroup.exercises
+                      .filter((ex) => ex.rpe);
+                    const avgEffort = rpeValues.length > 0
+                      ? rpeValues.reduce((sum, ex) => {
+                          const rpe = ex.rpe || 0;
+                          // Convert RPE to display format based on user preference
+                          const displayValue = effortTrackingPreference === "rir" 
+                            ? convertRpeToRir(rpe) 
+                            : rpe;
+                          return sum + displayValue;
+                        }, 0) / rpeValues.length
                       : 0;
 
                     return (
@@ -883,18 +880,22 @@ export default function WorkoutJournal() {
                                         {
                                           reps?: number;
                                           weight?: number;
-                                          rpe?: number;
-                                          rir?: number;
+                                          effort?: number;
                                         }
                                       > = {};
                                       exerciseGroup.exercises.forEach(
                                         (exercise) => {
+                                          // Convert RPE to display format based on user preference
+                                          const effortValue = exercise.rpe
+                                            ? effortTrackingPreference === "rir"
+                                              ? convertRpeToRir(exercise.rpe)
+                                              : exercise.rpe
+                                            : undefined;
+                                          
                                           initialSetData[exercise.id] = {
                                             reps: exercise.reps || undefined,
-                                            weight:
-                                              exercise.weight || undefined,
-                                            rpe: exercise.rpe || undefined,
-                                            rir: exercise.rir || undefined,
+                                            weight: exercise.weight || undefined,
+                                            effort: effortValue,
                                           };
                                         },
                                       );
@@ -1001,27 +1002,15 @@ export default function WorkoutJournal() {
                                   {effortTrackingPreference !== "none" && (
                                     <input
                                       type="number"
-                                      value={
-                                        effortTrackingPreference === "rpe"
-                                          ? editingSetData[exercise.id]?.rpe || ""
-                                          : editingSetData[exercise.id]?.rir || ""
-                                      }
+                                      value={editingSetData[exercise.id]?.effort || ""}
                                       onChange={(e) =>
                                         setEditingSetData((prev) => ({
                                           ...prev,
                                           [exercise.id]: {
                                             ...prev[exercise.id],
-                                            ...(effortTrackingPreference === "rpe"
-                                              ? {
-                                                  rpe: e.target.value
-                                                    ? parseInt(e.target.value)
-                                                    : undefined,
-                                                }
-                                              : {
-                                                  rir: e.target.value
-                                                    ? parseInt(e.target.value)
-                                                    : undefined,
-                                                }),
+                                            effort: e.target.value
+                                              ? parseInt(e.target.value)
+                                              : undefined,
                                           },
                                         }))
                                       }
@@ -1054,9 +1043,11 @@ export default function WorkoutJournal() {
                                   </span>
                                   {effortTrackingPreference !== "none" && (
                                     <span className={styles.setRpe}>
-                                      {effortTrackingPreference === "rpe"
-                                        ? exercise.rpe || "-"
-                                        : exercise.rir || "-"}
+                                      {exercise.rpe
+                                        ? effortTrackingPreference === "rir"
+                                          ? convertRpeToRir(exercise.rpe)
+                                          : exercise.rpe
+                                        : "-"}
                                     </span>
                                   )}
                                 </>
@@ -1124,6 +1115,13 @@ export default function WorkoutJournal() {
                                   for (const exercise of exerciseGroup.exercises) {
                                     const setData = editingSetData[exercise.id];
                                     if (setData) {
+                                      // Convert effort value to RPE for database storage
+                                      const rpeValue = setData.effort
+                                        ? effortTrackingPreference === "rir"
+                                          ? convertRirToRpe(setData.effort)
+                                          : setData.effort
+                                        : undefined;
+
                                       await apiRequest(`/api/exercises/${exercise.id}`, {
                                         method: "PATCH",
                                         body: JSON.stringify({
@@ -1131,8 +1129,7 @@ export default function WorkoutJournal() {
                                           notes: editGroupNotes,
                                           reps: setData.reps,
                                           weight: setData.weight,
-                                          rpe: setData.rpe,
-                                          rir: setData.rir,
+                                          rpe: rpeValue,
                                         }),
                                       });
                                     }

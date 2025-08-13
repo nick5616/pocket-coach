@@ -128,3 +128,13 @@ export const getEffortTrackingInfo = (preference: EffortTrackingPreference) => {
       };
   }
 };
+
+// Convert RIR to RPE for database storage (RIR 0 = RPE 10, RIR 5 = RPE 5)
+export const convertRirToRpe = (rir: number): number => {
+  return Math.max(1, Math.min(10, 10 - rir));
+};
+
+// Convert RPE to RIR for display when user prefers RIR (RPE 10 = RIR 0, RPE 5 = RIR 5)
+export const convertRpeToRir = (rpe: number): number => {
+  return Math.max(0, 10 - rpe);
+};
