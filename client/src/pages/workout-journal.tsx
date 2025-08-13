@@ -1303,6 +1303,10 @@ export default function WorkoutJournal() {
             <DialogTitle>Edit Exercise</DialogTitle>
           </DialogHeader>
 
+          <div style={{ background: "red", color: "white", padding: "10px", margin: "10px 0" }}>
+            DEBUG: Modal is rendering - Exercise: {editingExercise?.name}
+          </div>
+
           {editingExercise && (
             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
               {/* AI Editing Section */}
