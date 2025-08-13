@@ -1298,44 +1298,52 @@ export default function WorkoutJournal() {
           setAiEditInstruction("");
         }}
       >
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent style={{ maxWidth: "42rem", maxHeight: "80vh", overflowY: "auto" }}>
           <DialogHeader>
             <DialogTitle>Edit Exercise</DialogTitle>
           </DialogHeader>
 
           {editingExercise && (
-            <div className="space-y-6">
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
               {/* AI Editing Section */}
               <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-4 h-4 text-blue-500" />
-                  <h3 className="text-lg font-semibold">Quick Edit with Natural Language</h3>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                  <Sparkles style={{ width: "1rem", height: "1rem", color: "#3b82f6" }} />
+                  <h3 style={{ fontSize: "1.125rem", fontWeight: 600, margin: 0 }}>Quick Edit with Natural Language</h3>
                 </div>
-                <p className="text-sm text-gray-600 mb-3">
+                <p style={{ fontSize: "0.875rem", color: "#6b7280", marginBottom: "0.75rem", margin: 0 }}>
                   Tell me what to change in plain English. Examples: "change weight to 135", "make it 3 sets", "RPE was actually 8"
                 </p>
-                <div className="space-y-3">
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                   <Textarea
                     placeholder="What would you like to change? (e.g., 'change weight to 135 pounds', 'make it 3 sets instead of 4')"
                     value={aiEditInstruction}
                     onChange={(e) => setAiEditInstruction(e.target.value)}
                     rows={2}
-                    className="resize-none"
+                    style={{ resize: "none" }}
                   />
                   <Button
                     type="button"
                     onClick={handleAiEdit}
                     disabled={!aiEditInstruction.trim() || aiEditMutation.isPending}
-                    className="w-full"
+                    style={{ width: "100%" }}
                   >
                     {aiEditMutation.isPending ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        <div style={{ 
+                          width: "1rem", 
+                          height: "1rem", 
+                          border: "2px solid white", 
+                          borderTop: "2px solid transparent", 
+                          borderRadius: "50%", 
+                          animation: "spin 1s linear infinite",
+                          marginRight: "0.5rem" 
+                        }} />
                         Processing...
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-4 h-4 mr-2" />
+                        <Sparkles style={{ width: "1rem", height: "1rem", marginRight: "0.5rem" }} />
                         Update Exercise
                       </>
                     )}
@@ -1344,18 +1352,18 @@ export default function WorkoutJournal() {
               </div>
 
               {/* Divider */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-gray-300" />
+              <div style={{ position: "relative", padding: "1rem 0" }}>
+                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center" }}>
+                  <span style={{ width: "100%", borderTop: "1px solid #d1d5db" }} />
                 </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-white px-2 text-gray-500">or edit manually</span>
+                <div style={{ position: "relative", display: "flex", justifyContent: "center", fontSize: "0.875rem" }}>
+                  <span style={{ background: "white", padding: "0 0.5rem", color: "#6b7280" }}>or edit manually</span>
                 </div>
               </div>
 
               {/* Manual Editing Section */}
               <div>
-                <h3 className="text-lg font-semibold mb-3">Manual Edit</h3>
+                <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginBottom: "0.75rem", marginTop: 0 }}>Manual Edit</h3>
                 <form onSubmit={handleUpdateExercise}>
                   <div style={{ marginBottom: "1rem" }}>
                     <label
