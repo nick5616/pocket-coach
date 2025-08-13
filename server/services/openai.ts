@@ -167,6 +167,19 @@ CRITICAL PARSING RULES:
 
 5. ALWAYS extract muscle groups for each exercise
 
+6. RPE/RIR EXTRACTION (MANDATORY): Look for effort indicators and ALWAYS include them in exercise objects:
+   - "bench press 135x10 rpe 8" → Must include "rpe": 8 in the exercise object
+   - "squats 225 for 5 reps rpe 9" → Must include "rpe": 9 in the exercise object
+   - "deadlifts 315x3 rir 2" → Must include "rpe": 8 (convert RIR to RPE: RPE = 10 - RIR)
+   - "overhead press 95x8 felt like 7/10" → Must include "rpe": 7 in the exercise object
+   - "pull-ups bodyweight x12 pretty hard, maybe 8.5" → Must include "rpe": 9 (round to nearest integer)
+   - "push-ups 10 reps rpe 5" → Must include "rpe": 5 in the exercise object
+
+CRITICAL: ALWAYS include RPE field in exercise objects when mentioned by user. If RPE or RIR is mentioned, it MUST appear in the exercise object.
+
+EXAMPLE INPUT: "push-ups 10 reps rpe 5"
+REQUIRED OUTPUT: {"name": "push-ups", "sets": 1, "reps": 10, "weight": null, "rpe": 5, "muscleGroups": ["chest", "shoulders", "triceps", "core"]}
+
 Extract exercises and return in this JSON format:
 {
   "exercises": [
@@ -175,6 +188,7 @@ Extract exercises and return in this JSON format:
       "sets": 1,
       "reps": 5,
       "weight": 225,
+      "rpe": 8,
       "muscleGroups": ["back", "legs", "glutes"]
     },
     {
@@ -182,6 +196,7 @@ Extract exercises and return in this JSON format:
       "sets": 1,
       "reps": 8,
       "weight": 185,
+      "rpe": 7,
       "muscleGroups": ["chest", "shoulders", "triceps"]
     },
     {
@@ -189,7 +204,16 @@ Extract exercises and return in this JSON format:
       "sets": 1,
       "reps": 3,
       "weight": 315,
+      "rpe": 9,
       "muscleGroups": ["legs", "glutes"]
+    },
+    {
+      "name": "push-ups",
+      "sets": 1,
+      "reps": 10,
+      "weight": null,
+      "rpe": 5,
+      "muscleGroups": ["chest", "shoulders", "triceps", "core"]
     }
   ],
   "duration": 45,
@@ -207,7 +231,7 @@ Duration in minutes if mentioned, otherwise omit.
       messages: [
         {
           role: "system",
-          content: "You are an expert at parsing workout logs from exhausted gym users. Use semantic understanding to identify exercises without relying on punctuation or formatting. When exercises have multiple weights/reps mentioned, create separate entries for each set. Standardize exercise names and be precise with data extraction."
+          content: "You are an expert at parsing workout logs from exhausted gym users. Use semantic understanding to identify exercises without relying on punctuation or formatting. When exercises have multiple weights/reps mentioned, create separate entries for each set. Standardize exercise names and be precise with data extraction. CRITICAL: Always extract RPE/RIR values when mentioned by users and include them in the exercise objects."
         },
         {
           role: "user",
@@ -219,6 +243,26 @@ Duration in minutes if mentioned, otherwise omit.
     });
 
     const result = JSON.parse(response.choices[0].message.content || "{}");
+    
+    // Post-process to ensure RPE extraction from journal text if AI missed it
+    if (result.exercises && Array.isArray(result.exercises)) {
+      result.exercises = result.exercises.map((exercise: any) => {
+        // If RPE is missing but mentioned in the original text, try to extract it
+        if (!exercise.rpe) {
+          const rpeMatch = journalText.toLowerCase().match(new RegExp(`${exercise.name.toLowerCase()}.*?rpe\\s*(\\d+)`, 'i'));
+          const ririMatch = journalText.toLowerCase().match(new RegExp(`${exercise.name.toLowerCase()}.*?rir\\s*(\\d+)`, 'i'));
+          
+          if (rpeMatch) {
+            exercise.rpe = parseInt(rpeMatch[1]);
+          } else if (ririMatch) {
+            // Convert RIR to RPE: RPE = 10 - RIR
+            exercise.rpe = Math.max(1, Math.min(10, 10 - parseInt(ririMatch[1])));
+          }
+        }
+        return exercise;
+      });
+    }
+    
     return result;
   } catch (error) {
     console.error("OpenAI parsing error:", error);

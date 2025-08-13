@@ -93,17 +93,23 @@ Email/password authentication with bcrypt hashing and PostgreSQL session store u
 **User Fix**: Clear browser cache completely and refresh page, or use incognito mode.
 
 **Recent Changes (August 2025)**:
-- ✅ **COMPREHENSIVE EFFORT TRACKING SYSTEM (August 13, 2025)**: Implemented user-configurable effort tracking preferences
+- ✅ **COMPREHENSIVE EFFORT TRACKING SYSTEM (August 13, 2025)**: Implemented user-configurable effort tracking with RPE normalization
   - Added EffortTrackingPreference type with three options: RPE (1-10), RIR (reps in reserve), or none
   - Created UserPreferencesProvider context with React Query integration for global state management
   - Built EffortTrackingSettings component with radio button interface in profile page
-  - Updated workout journal to conditionally display effort tracking based on user preference:
-    * Headers dynamically show "RPE", "RIR", or no effort column
+  - **RPE Database Normalization**: All effort data stored as RPE (1-10) in database for consistency
+    * RIR values converted to RPE before storage using formula: RPE = 10 - RIR
+    * RPE values converted back to RIR for display when user prefers RIR interface
+    * Ensures historical data consistency and simplified analytics
+  - Updated workout journal with conditional effort tracking display:
+    * Headers dynamically show "RPE", "RIR", or no effort column based on user preference
     * Input fields adapt with proper validation ranges (RPE: 1-10, RIR: 0-10+)
-    * Display logic shows correct effort values for completed exercises
+    * Display logic converts between RPE/RIR formats automatically
     * Summary statistics show "Avg RPE" or "Avg RIR" depending on preference
-  - Enhanced database schema with RIR column and proper API validation
-  - Implemented comprehensive save logic that persists RPE/RIR values to PostgreSQL
+  - Enhanced OpenAI workout parsing to extract RPE/RIR from natural language input
+    * Added regex post-processing to catch effort values AI model might miss
+    * Supports formats like "push-ups 10 reps rpe 5" and "deadlifts 225x5 rir 3"
+  - Fixed API call format bugs in workout journal exercise editing
   - All preference changes propagate instantly across the entire application
 - ✅ **REMOVED AI BUZZWORDS (August 12, 2025)**: Systematically removed all "AI" references from user-facing text
   - Updated program generation pages to focus on personalization and customization benefits
