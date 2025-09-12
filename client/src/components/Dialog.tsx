@@ -1,5 +1,5 @@
 import { ReactNode, HTMLAttributes } from "react";
-import styles from "../styles/components.module.css";
+import styles from "./dialog.module.css";
 
 interface DialogProps {
   open?: boolean;
