@@ -56,44 +56,21 @@ export async function analyzeWorkout(
       : 'No previous workouts recorded';
 
     const prompt = `
-You are an expert AI fitness coach analyzing a workout session. Provide comprehensive, actionable insights based on the complete training context.
+Analyze this workout and provide insights.
 
-CURRENT WORKOUT NOTES:
-${workoutNotes}
+WORKOUT: ${workoutNotes}
+EXERCISES: ${exercises.map(ex => `${ex.name} ${ex.sets}x${ex.reps}${ex.weight ? ` at ${ex.weight}lbs` : ''}${ex.rpe ? ` RPE${ex.rpe}` : ''}`).join(', ')}
+GOALS: ${userGoals.map(goal => goal.title).join(', ')}
 
-EXERCISES PERFORMED TODAY:
-${exercises.map(ex => `- ${ex.name}: ${ex.sets ? `${ex.sets} sets` : ''} ${ex.reps ? `of ${ex.reps} reps` : ''} ${ex.weight ? `at ${ex.weight}lbs` : ''} ${ex.rpe ? `(RPE: ${ex.rpe})` : ''}`).join('\n')}
-
-RECENT WORKOUT HISTORY (Last 5 sessions):
-${workoutHistory}
-
-USER GOALS:
-${userGoals.map(goal => `- ${goal.title} (${goal.category}${goal.muscleGroup ? `, ${goal.muscleGroup}` : ''}): ${goal.currentValue || 0}/${goal.targetValue || 'no target'}`).join('\n')}
-
-ANALYSIS REQUIREMENTS:
-1. Compare today's performance with recent training history
-2. Identify patterns, improvements, or concerning trends
-3. Consider recovery time between sessions and muscle groups trained
-4. Evaluate progress toward stated goals
-5. Recommend specific progressions based on performance data
-
-Provide your analysis in the following JSON format:
+Return JSON:
 {
-  "nextWorkoutRecommendation": "Specific recommendation for the next workout session",
-  "keyInsights": ["insight 1", "insight 2", "insight 3"],
-  "progressions": [
-    {
-      "exercise": "exercise name",
-      "recommendation": "specific progression recommendation",
-      "reasoning": "why this progression makes sense"
-    }
-  ],
-  "focusAreas": ["muscle group or area to focus on next"],
+  "nextWorkoutRecommendation": "Brief next session advice",
+  "keyInsights": ["2-3 key observations"],
+  "progressions": [{"exercise": "name", "recommendation": "brief suggestion"}],
+  "focusAreas": ["main areas to work on"],
   "estimatedCalories": 250,
   "totalVolume": 12500
 }
-
-Make recommendations motivational and specific. Consider progressive overload principles, recovery needs, and the user's stated goals.
 `;
 
     const response = await openai.chat.completions.create({
@@ -143,102 +120,34 @@ export async function parseWorkoutJournal(journalText: string): Promise<{
 }> {
   try {
     const prompt = `
-Parse the following free-form workout journal entry and extract structured exercise data. The user wrote this while exhausted in the gym, so use semantic understanding rather than relying on punctuation or delimiters.
+Parse this workout journal entry into structured data.
 
-JOURNAL ENTRY:
-${journalText}
+JOURNAL: ${journalText}
 
-CRITICAL PARSING RULES:
-1. SEMANTIC DETECTION: Identify exercises based on context and exercise names, not just punctuation. Examples:
-   - "deadlifts 225x5 bench press 185x8 squats 315x3" should be parsed as 3 separate exercises
-   - "did some pullups then moved to lat pulldowns 100lbs for 12 also did bicep curls" should be 3 exercises
-   - "bench 135 for 10 then 155 for 8 then 175 for 5" should be 3 separate entries for bench press
+Extract exercises, sets, reps, weight, RPE, and muscle groups. For multiple weights of same exercise, create separate entries.
 
-2. WEIGHT PROGRESSIONS: For exercises with multiple weights mentioned, create separate entries for each weight:
-   - "cable low row 45 for 12, 100 for 12, 145 for 10, 175 for 6" = 4 separate cable low row entries
-   - "squats worked up to 315 did 225x5, 275x3, 315x1" = 3 separate squat entries
-
-3. CONSISTENT SETS: For uniform sets/reps (e.g., "pull-ups 4x8"), create one entry with sets=4, reps=8
-
-4. EXERCISE NAME NORMALIZATION: Standardize exercise names:
-   - "pullups", "pull ups", "pull-ups" → "pull-ups"
-   - "lat pulldown", "lat pull down" → "lat pulldown"
-   - "bicep curls", "biceps curls" → "bicep curls"
-
-5. ALWAYS extract muscle groups for each exercise
-
-6. RPE/RIR EXTRACTION (MANDATORY): Look for effort indicators and ALWAYS include them in exercise objects:
-   - "bench press 135x10 rpe 8" → Must include "rpe": 8 in the exercise object
-   - "squats 225 for 5 reps rpe 9" → Must include "rpe": 9 in the exercise object
-   - "deadlifts 315x3 rir 2" → Must include "rpe": 8 (convert RIR to RPE: RPE = 10 - RIR)
-   - "overhead press 95x8 felt like 7/10" → Must include "rpe": 7 in the exercise object
-   - "pull-ups bodyweight x12 pretty hard, maybe 8.5" → Must include "rpe": 9 (round to nearest integer)
-   - "push-ups 10 reps rpe 5" → Must include "rpe": 5 in the exercise object
-
-7. BODYWEIGHT AND BASE WEIGHT DETECTION (MANDATORY):
-   Bodyweight exercises (isBodyweight: true, baseWeight: 0):
-   - push-ups, pull-ups, chin-ups, dips, bodyweight squats, lunges, burpees, mountain climbers, jumping jacks, planks
-   
-   Barbell exercises (isBodyweight: false, baseWeight: 45):
-   - barbell bench press, barbell squats, deadlifts, barbell rows, overhead press, barbell curls, barbell hip thrusts
-   
-   Smith machine exercises (isBodyweight: false, baseWeight: 25):
-   - smith machine bench press, smith machine squats, smith machine hip thrusts, smith machine rows
-   
-   Dumbbell/Cable exercises (isBodyweight: false, baseWeight: 0):
-   - dumbbell bench press, cable rows, lat pulldowns, tricep extensions, bicep curls (with dumbbells/cables)
-
-CRITICAL: ALWAYS include RPE, isBodyweight, and baseWeight fields in exercise objects.
-
-EXAMPLE INPUTS & REQUIRED OUTPUTS:
-"push-ups 10 reps rpe 5" → {"name": "push-ups", "sets": 1, "reps": 10, "weight": null, "rpe": 5, "isBodyweight": true, "baseWeight": 0, "muscleGroups": ["chest", "shoulders", "triceps", "core"]}
-
-"barbell bench press 185x8 rpe 7" → {"name": "barbell bench press", "sets": 1, "reps": 8, "weight": 185, "rpe": 7, "isBodyweight": false, "baseWeight": 45, "muscleGroups": ["chest", "shoulders", "triceps"]}
-
-"smith machine squats 135x12" → {"name": "smith machine squats", "sets": 1, "reps": 12, "weight": 135, "rpe": null, "isBodyweight": false, "baseWeight": 25, "muscleGroups": ["legs", "glutes"]}
-
-Extract exercises and return in this JSON format:
+Return JSON:
 {
   "exercises": [
     {
-      "name": "deadlifts",
-      "sets": 1,
-      "reps": 5,
-      "weight": 225,
-      "rpe": 8,
-      "isBodyweight": false,
-      "baseWeight": 45,
-      "muscleGroups": ["back", "legs", "glutes"]
-    },
-    {
-      "name": "push-ups",
-      "sets": 1,
+      "name": "exercise name",
+      "sets": 3,
       "reps": 10,
-      "weight": null,
-      "rpe": 5,
-      "isBodyweight": true,
-      "baseWeight": 0,
-      "muscleGroups": ["chest", "shoulders", "triceps", "core"]
-    },
-    {
-      "name": "dumbbell bench press",
-      "sets": 1,
-      "reps": 8,
-      "weight": 50,
+      "weight": 135,
       "rpe": 7,
       "isBodyweight": false,
       "baseWeight": 0,
-      "muscleGroups": ["chest", "shoulders", "triceps"]
+      "muscleGroups": ["chest"]
     }
   ],
   "duration": 45,
   "intensity": "moderate",
-  "summary": "Brief summary of the workout"
+  "summary": "Brief summary"
 }
 
-Muscle groups: chest, back, shoulders, biceps, triceps, legs, glutes, core, calves
-Intensity levels: light, moderate, high, very_high
-Duration in minutes if mentioned, otherwise omit.
+Muscle groups: chest, back, shoulders, arms, legs, core
+Bodyweight exercises: push-ups, pull-ups, dips, planks
+Barbell exercises have baseWeight: 45
 `;
 
     const response = await openai.chat.completions.create({

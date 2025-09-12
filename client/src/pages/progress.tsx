@@ -5,7 +5,6 @@ import { Badge } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/Dialog";
 import BottomNavigation from "@/components/bottom-navigation";
-import BodyVisualization from "@/components/body-visualization";
 import LoadingScreen from "../components/loading-screen";
 import styles from "@/styles/progress.module.css";
 import { 
@@ -176,13 +175,30 @@ export default function Progress() {
                   )}
                 </h3>
                 
-                {/* Placeholder for BodyVisualization */}
-                <div className={styles.bodyVisualizationPlaceholder}>
-                  <div className={styles.placeholderContent}>
-                    <Activity className={styles.placeholderIcon} />
-                    <h4 className={`text-heading-3 ${styles.placeholderTitle}`}>Body Visualization</h4>
-                    <p className="text-body">Interactive muscle group heat map coming soon</p>
-                  </div>
+                {/* Simple Muscle Group Grid */}
+                <div className={styles.muscleGroupGrid}>
+                  {["Chest", "Back", "Shoulders", "Arms", "Legs", "Core"].map((muscleGroup, index) => (
+                    <div 
+                      key={muscleGroup} 
+                      className={`${styles.muscleGroupCard} ${selectedMuscles.includes(index + 1) ? styles.selected : ''}`}
+                      onClick={() => {
+                        setSelectedMuscles(prev => 
+                          prev.includes(index + 1) 
+                            ? prev.filter(id => id !== index + 1)
+                            : [...prev, index + 1]
+                        );
+                      }}
+                    >
+                      <Activity className={styles.muscleGroupIcon} />
+                      <span className={styles.muscleGroupName}>{muscleGroup}</span>
+                      <div className={styles.muscleGroupProgress}>
+                        <div 
+                          className={styles.progressBar}
+                          style={{ width: `${Math.random() * 60 + 20}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
                 
                 {selectedMuscles.length > 0 && (
