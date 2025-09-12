@@ -101,13 +101,31 @@ body {
   --text-primary: var(--gray-900);
   --text-secondary: var(--gray-600);
   --text-tertiary: var(--gray-500);
+  --text-inverse: #ffffff;
   --bg-primary: #ffffff;
   --bg-secondary: var(--gray-50);
   --bg-tertiary: var(--gray-100);
+  --bg-accent: #f0fdf4;
   --surface-primary: #ffffff;
   --surface-secondary: var(--gray-50);
+  --surface-raised: #ffffff;
   --border-primary: var(--gray-200);
   --border-secondary: var(--gray-300);
+  --border-accent: #bbf7d0;
+
+  /* Shadow colors */
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-color-strong: rgba(0, 0, 0, 0.15);
+
+  /* Common gradients */
+  --gradient-primary: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--secondary-600) 0%, var(--secondary-500) 100%);
+  --gradient-accent: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+
+  /* Glass effects */
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-backdrop: blur(10px);
 }
 
 /* Dark theme */
@@ -115,105 +133,99 @@ body {
   --text-primary: var(--gray-100);
   --text-secondary: var(--gray-400);
   --text-tertiary: var(--gray-500);
-  --bg-primary: var(--gray-900);
-  --bg-secondary: var(--gray-800);
-  --bg-tertiary: var(--gray-700);
-  --surface-primary: var(--gray-800);
-  --surface-secondary: var(--gray-700);
-  --border-primary: var(--gray-700);
-  --border-secondary: var(--gray-600);
-}
-
-/* Theme Variables - Light Mode (Default) */
-:root {
-  /* Background Colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-tertiary: #f1f5f9;
-  --bg-accent: #f0fdf4;
-  
-  /* Text Colors */
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
   --text-inverse: #ffffff;
-  
-  /* Border Colors */
-  --border-primary: #e5e7eb;
-  --border-secondary: #d1d5db;
-  --border-accent: #bbf7d0;
-  
-  /* Card & Surface Colors */
-  --surface-primary: #ffffff;
-  --surface-secondary: #f9fafb;
-  --surface-raised: #ffffff;
-  
-  /* Shadow Colors */
-  --shadow-color: rgba(0, 0, 0, 0.1);
-  --shadow-color-strong: rgba(0, 0, 0, 0.15);
-}
-
-/* Dark Mode Theme */
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Background Colors */
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-tertiary: #334155;
-    --bg-accent: #064e3b;
-    
-    /* Text Colors */
-    --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
-    --text-tertiary: #94a3b8;
-    --text-inverse: #0f172a;
-    
-    /* Border Colors */
-    --border-primary: #334155;
-    --border-secondary: #475569;
-    --border-accent: #10b981;
-    
-    /* Card & Surface Colors */
-    --surface-primary: #1e293b;
-    --surface-secondary: #0f172a;
-    --surface-raised: #334155;
-    
-    /* Shadow Colors */
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --shadow-color-strong: rgba(0, 0, 0, 0.5);
-  }
-}
-
-/* Manual Dark Mode Override */
-.dark {
-  /* Background Colors */
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
   --bg-tertiary: #334155;
   --bg-accent: #064e3b;
-  
-  /* Text Colors */
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-tertiary: #94a3b8;
-  --text-inverse: #0f172a;
-  
-  /* Border Colors */
-  --border-primary: #334155;
-  --border-secondary: #475569;
-  --border-accent: #10b981;
-  
-  /* Card & Surface Colors */
   --surface-primary: #1e293b;
   --surface-secondary: #0f172a;
   --surface-raised: #334155;
-  
-  /* Shadow Colors */
+  --border-primary: #334155;
+  --border-secondary: #475569;
+  --border-accent: #10b981;
+
+  /* Shadow colors */
   --shadow-color: rgba(0, 0, 0, 0.3);
   --shadow-color-strong: rgba(0, 0, 0, 0.5);
+
+  /* Glass effects for dark mode */
+  --glass-bg: rgba(0, 0, 0, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.1);
 }
 
-/* Utility Classes */
+/* Layout Utilities */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.stack-sm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.stack-lg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Glass Surface */
+.glass-surface {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-backdrop);
+  border-radius: var(--radius-lg);
+}
+
+/* Shared Stat Card */
+.stat-card-shared {
+  background: var(--surface-primary);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-md);
+  text-align: center;
+  border: 2px solid var(--border-primary);
+  transition: all 0.2s ease;
+}
+
+.stat-card-shared:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.stat-card-shared .stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-600);
+  line-height: 1;
+  margin-bottom: var(--spacing-xs);
+}
+
+.stat-card-shared .stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* Standard Utility Classes */
 .container {
   max-width: 100%;
   margin: 0 auto;
