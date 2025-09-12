@@ -126,6 +126,9 @@ body {
   --glass-bg: rgba(255, 255, 255, 0.15);
   --glass-border: rgba(255, 255, 255, 0.2);
   --glass-backdrop: blur(10px);
+
+  /* Overlay effects */
+  --overlay: rgba(0, 0, 0, 0.8);
 }
 
 /* Dark theme */

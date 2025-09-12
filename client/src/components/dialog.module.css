@@ -1,0 +1,68 @@
+/* Dialog Components */
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-color: var(--overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+}
+
+.dialogContent {
+  position: relative;
+  z-index: 50;
+  display: grid;
+  width: 100%;
+  max-width: 32rem;
+  gap: var(--spacing-md);
+  border: 1px solid var(--border-primary);
+  background-color: var(--surface-primary);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-xl);
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 640px) {
+  .dialogContent {
+    width: 95vw;
+    max-width: 95vw;
+  }
+}
+
+.dialogHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  text-align: center;
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.dialogFooter {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-sm);
+}
+
+@media (min-width: 640px) {
+  .dialogFooter {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+.dialogTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.dialogDescription {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-sm);
+}
