@@ -6,10 +6,8 @@
   padding: 2rem 1rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  .authContainer {
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  }
+:global(.dark) .authContainer {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
 }
 
 .container {
@@ -40,10 +38,8 @@
   margin-right: 0.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  .brandIcon {
-    color: #10b981;
-  }
+:global(.dark) .brandIcon {
+  color: #10b981;
 }
 
 .brandTitle {
@@ -53,10 +49,8 @@
   margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .brandTitle {
-    color: #f9fafb;
-  }
+:global(.dark) .brandTitle {
+  color: #f9fafb;
 }
 
 .formContainer {
@@ -72,11 +66,9 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-  .formCard {
-    background-color: rgba(31, 41, 55, 0.8);
-    border-color: #374151;
-  }
+:global(.dark) .formCard {
+  background-color: rgba(31, 41, 55, 0.8);
+  border-color: #374151;
 }
 
 .formHeader {
@@ -91,10 +83,8 @@
   margin: 0 0 0.5rem 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .formTitle {
-    color: #f9fafb;
-  }
+:global(.dark) .formTitle {
+  color: #f9fafb;
 }
 
 .formDescription {
@@ -103,10 +93,8 @@
   margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .formDescription {
-    color: #9ca3af;
-  }
+:global(.dark) .formDescription {
+  color: #9ca3af;
 }
 
 .formContent {
@@ -126,11 +114,9 @@
   padding: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  .errorAlert {
-    background-color: rgba(220, 38, 38, 0.1);
-    border-color: #dc2626;
-  }
+:global(.dark) .errorAlert {
+  background-color: rgba(220, 38, 38, 0.1);
+  border-color: #dc2626;
 }
 
 .errorText {
@@ -139,10 +125,8 @@
   margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .errorText {
-    color: #fca5a5;
-  }
+:global(.dark) .errorText {
+  color: #fca5a5;
 }
 
 .fieldGroup {
@@ -164,10 +148,8 @@
   margin-bottom: 0.25rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  .label {
-    color: #d1d5db;
-  }
+:global(.dark) .label {
+  color: #d1d5db;
 }
 
 .inputContainer {
@@ -190,14 +172,12 @@
   color: #374151;
 }
 
-@media (prefers-color-scheme: dark) {
-  .passwordToggle {
-    color: #9ca3af;
-  }
+:global(.dark) .passwordToggle {
+  color: #9ca3af;
+}
 
-  .passwordToggle:hover {
-    color: #d1d5db;
-  }
+:global(.dark) .passwordToggle:hover {
+  color: #d1d5db;
 }
 
 .submitButton {
@@ -215,10 +195,8 @@
   margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .authLinkText {
-    color: #9ca3af;
-  }
+:global(.dark) .authLinkText {
+  color: #9ca3af;
 }
 
 .authLinkButton {
@@ -236,14 +214,12 @@
   text-decoration: underline;
 }
 
-@media (prefers-color-scheme: dark) {
-  .authLinkButton {
-    color: #10b981;
-  }
+:global(.dark) .authLinkButton {
+  color: #10b981;
+}
 
-  .authLinkButton:hover {
-    color: #34d399;
-  }
+:global(.dark) .authLinkButton:hover {
+  color: #34d399;
 }
 
 .footer {
@@ -257,10 +233,8 @@
   margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .footerText {
-    color: #9ca3af;
-  }
+:global(.dark) .footerText {
+  color: #9ca3af;
 }
 
 /* Welcome Page Specific Styles */
@@ -283,10 +257,8 @@
   margin-right: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  .welcomeBrandIcon {
-    color: #10b981;
-  }
+:global(.dark) .welcomeBrandIcon {
+  color: #10b981;
 }
 
 .welcomeTitle {
@@ -296,10 +268,8 @@
   margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .welcomeTitle {
-    color: #f9fafb;
-  }
+:global(.dark) .welcomeTitle {
+  color: #f9fafb;
 }
 
 .welcomeDescription {
@@ -310,10 +280,8 @@
   line-height: 1.6;
 }
 
-@media (prefers-color-scheme: dark) {
-  .welcomeDescription {
-    color: #9ca3af;
-  }
+:global(.dark) .welcomeDescription {
+  color: #9ca3af;
 }
 
 .featuresGrid {
@@ -328,10 +296,8 @@
   border: 1px solid #e5e7eb;
 }
 
-@media (prefers-color-scheme: dark) {
-  .featureCard {
-    border-color: #374151;
-  }
+:global(.dark) .featureCard {
+  border-color: #374151;
 }
 
 .featureIcon {

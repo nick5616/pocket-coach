@@ -15,31 +15,19 @@ html {
 }
 
 body {
-  background-color: #f8fafc;
-  color: #1e293b;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   font-size: 16px;
   line-height: 1.6;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #0f172a;
-    color: #e2e8f0;
-  }
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   line-height: 1.25;
-  color: #0f172a;
-}
-
-@media (prefers-color-scheme: dark) {
-  h1, h2, h3, h4, h5, h6 {
-    color: #f1f5f9;
-  }
+  color: var(--text-primary);
+  transition: color 0.2s ease;
 }
 
 h1 { font-size: 2.25rem; }
@@ -51,34 +39,20 @@ h6 { font-size: 1rem; }
 
 p {
   margin-bottom: 1rem;
-  color: #475569;
-}
-
-@media (prefers-color-scheme: dark) {
-  p {
-    color: #cbd5e1;
-  }
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
 }
 
 /* Links */
 a {
-  color: #3b82f6;
+  color: var(--secondary-500);
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 a:hover {
-  color: #2563eb;
+  color: var(--secondary-600);
   text-decoration: underline;
-}
-
-@media (prefers-color-scheme: dark) {
-  a {
-    color: #60a5fa;
-  }
-  
-  a:hover {
-    color: #3b82f6;
-  }
 }
 
 /* Buttons */
@@ -100,31 +74,18 @@ button:disabled {
 input, textarea, select {
   font-family: inherit;
   font-size: inherit;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
   padding: 0.5rem 0.75rem;
-  background-color: #ffffff;
-  color: #1f2937;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--surface-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--secondary-500);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-@media (prefers-color-scheme: dark) {
-  input, textarea, select {
-    border-color: #4b5563;
-    background-color: #1f2937;
-    color: #f9fafb;
-  }
-  
-  input:focus, textarea:focus, select:focus {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
-  }
 }
 
 /* Essential app-wide utilities */

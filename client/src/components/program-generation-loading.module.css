@@ -13,10 +13,8 @@
   padding: 2rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  .loadingContainer {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  }
+:global(.dark) .loadingContainer {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
 
 .loadingContent {
@@ -41,10 +39,8 @@
   animation: pulse 2s infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  .mainIcon {
-    color: #34d399;
-  }
+:global(.dark) .mainIcon {
+  color: #34d399;
 }
 
 .floatingIcons {
@@ -63,10 +59,8 @@
   animation: float 3s ease-in-out infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  .floatingIcon {
-    color: #9ca3af;
-  }
+:global(.dark) .floatingIcon {
+  color: #9ca3af;
 }
 
 .floatingIcon2 {
@@ -88,10 +82,8 @@
   margin-bottom: 0.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  .title {
-    color: #f9fafb;
-  }
+:global(.dark) .title {
+  color: #f9fafb;
 }
 
 .subtitle {
@@ -100,10 +92,8 @@
   line-height: 1.5;
 }
 
-@media (prefers-color-scheme: dark) {
-  .subtitle {
-    color: #9ca3af;
-  }
+:global(.dark) .subtitle {
+  color: #9ca3af;
 }
 
 .progressSteps {
@@ -121,10 +111,8 @@
   color: #4b5563;
 }
 
-@media (prefers-color-scheme: dark) {
-  .step {
-    color: #d1d5db;
-  }
+:global(.dark) .step {
+  color: #d1d5db;
 }
 
 .stepIcon {
@@ -139,10 +127,8 @@
   flex-shrink: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .stepIcon {
-    background: #374151;
-  }
+:global(.dark) .stepIcon {
+  background: #374151;
 }
 
 .loadingBar {
@@ -154,10 +140,8 @@
   margin-bottom: 1rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  .loadingBar {
-    background: #374151;
-  }
+:global(.dark) .loadingBar {
+  background: #374151;
 }
 
 .loadingBarFill {
@@ -167,10 +151,8 @@
   animation: progress 3s ease-in-out infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  .loadingBarFill {
-    background: linear-gradient(90deg, #34d399, #60a5fa);
-  }
+:global(.dark) .loadingBarFill {
+  background: linear-gradient(90deg, #34d399, #60a5fa);
 }
 
 .note {
@@ -178,10 +160,8 @@
   color: #9ca3af;
 }
 
-@media (prefers-color-scheme: dark) {
-  .note {
-    color: #6b7280;
-  }
+:global(.dark) .note {
+  color: #6b7280;
 }
 
 /* Animations */

@@ -115,12 +115,10 @@
 }
 
 /* Dark mode */
-@media (prefers-color-scheme: dark) {
-  .card {
-    border-color: var(--gray-700);
-  }
-  
-  .footer {
-    border-top-color: var(--gray-700);
-  }
+:global(.dark) .card {
+  border-color: var(--border-secondary);
+}
+
+:global(.dark) .footer {
+  border-top-color: var(--border-secondary);
 }

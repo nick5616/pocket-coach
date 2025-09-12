@@ -22,20 +22,56 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = window.document.documentElement;
+    
+    const applyTheme = (themeToApply: Theme) => {
+      root.classList.remove("light", "dark");
+      
+      if (themeToApply === "system") {
+        // Use matchMedia for better mobile browser compatibility
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        const systemTheme = mediaQuery.matches ? "dark" : "light";
+        root.classList.add(systemTheme);
+        return systemTheme;
+      }
+      
+      root.classList.add(themeToApply);
+      return themeToApply;
+    };
 
-    root.classList.remove("light", "dark");
+    // Apply initial theme
+    const appliedTheme = applyTheme(theme);
 
+    // Listen for system preference changes when using system theme
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      
+      const handleChange = (e: MediaQueryListEvent) => {
+        // Only update if still using system theme
+        if (theme === "system") {
+          root.classList.remove("light", "dark");
+          const newSystemTheme = e.matches ? "dark" : "light";
+          root.classList.add(newSystemTheme);
+        }
+      };
 
-      root.classList.add(systemTheme);
-      return;
+      // Add listener for system preference changes
+      if (mediaQuery.addListener) {
+        // Fallback for older browsers
+        mediaQuery.addListener(handleChange);
+      } else {
+        // Modern approach
+        mediaQuery.addEventListener("change", handleChange);
+      }
+
+      // Cleanup function
+      return () => {
+        if (mediaQuery.removeListener) {
+          mediaQuery.removeListener(handleChange);
+        } else {
+          mediaQuery.removeEventListener("change", handleChange);
+        }
+      };
     }
-
-    root.classList.add(theme);
   }, [theme]);
 
   const value = {
