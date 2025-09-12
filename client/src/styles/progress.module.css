@@ -1,0 +1,406 @@
+/* Progress Page Styles */
+
+/* Stats Overview Section */
+.statsSection {
+  background: var(--gradient-primary);
+  color: var(--text-inverse);
+  padding: var(--spacing-xl) var(--spacing-md);
+}
+
+.statsTitle {
+  color: var(--text-inverse);
+  margin-bottom: var(--spacing-lg);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.statCard {
+  background-color: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  color: var(--text-inverse);
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-inverse);
+  margin-bottom: var(--spacing-xs);
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Tab Navigation */
+.tabContainer {
+  margin-bottom: var(--spacing-xl);
+}
+
+.tabNavigation {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xs);
+  gap: var(--spacing-xs);
+}
+
+.tabButton {
+  margin: 0;
+  font-size: 0.75rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+/* Content Sections */
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.cardWithPadding {
+  padding: var(--spacing-lg);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.sectionIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: var(--spacing-sm);
+}
+
+.clearButton {
+  margin-left: auto;
+  font-size: 0.75rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+/* Body Visualization */
+.bodyVisualizationPlaceholder {
+  height: 20rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--border-secondary);
+}
+
+.placeholderContent {
+  text-align: center;
+}
+
+.placeholderIcon {
+  width: 3rem;
+  height: 3rem;
+  color: var(--text-tertiary);
+  margin: 0 auto var(--spacing-md);
+}
+
+.placeholderTitle {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Selected Muscles Section */
+.selectedMusclesSection {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--bg-accent);
+  border-radius: var(--radius-lg);
+}
+
+.selectedMusclesTitle {
+  color: var(--accent-600);
+  margin-bottom: var(--spacing-md);
+}
+
+.musclesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.muscleBadge {
+  background: var(--accent-100);
+  color: var(--accent-700);
+}
+
+.generateButton {
+  width: 100%;
+}
+
+.generateButtonIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: var(--spacing-sm);
+}
+
+/* Quick Actions */
+.quickActionsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.actionButton {
+  width: 100%;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+}
+
+.actionButtonContent {
+  display: flex;
+  align-items: center;
+}
+
+.actionIcon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: var(--spacing-sm);
+}
+
+.chevronIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Goals Section */
+.goalCard {
+  padding: var(--spacing-lg);
+}
+
+.goalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.goalHeaderLeft {
+  display: flex;
+  align-items: center;
+}
+
+.goalIconContainer {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--primary-100);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--spacing-md);
+}
+
+.goalIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--primary-600);
+}
+
+.goalCategory {
+  text-transform: capitalize;
+}
+
+.goalProgressSection {
+  margin-bottom: var(--spacing-md);
+}
+
+.goalProgressHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.goalProgressBar {
+  width: 100%;
+  height: 0.5rem;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.goalProgressFill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: var(--radius-sm);
+}
+
+.goalDescription {
+  margin-bottom: var(--spacing-md);
+}
+
+.goalDate {
+  display: flex;
+  align-items: center;
+}
+
+.goalDateIcon {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-right: var(--spacing-xs);
+  color: var(--text-tertiary);
+}
+
+/* Icon Container Variants */
+.iconContainer {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--spacing-md);
+  flex-shrink: 0;
+}
+
+.iconContainerPrimary {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--spacing-md);
+  flex-shrink: 0;
+  background: var(--primary-100);
+}
+
+.iconContainerWarning {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--spacing-md);
+  flex-shrink: 0;
+  background: var(--warning);
+}
+
+.iconContainerSecondary {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--spacing-md);
+  flex-shrink: 0;
+  background: var(--secondary-500);
+}
+
+.iconContainerLarge {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--spacing-lg);
+  background: var(--bg-tertiary);
+}
+
+/* Empty States */
+.emptyState {
+  padding: var(--spacing-2xl);
+  text-align: center;
+  border: 2px dashed var(--border-secondary);
+}
+
+.emptyStateTitle {
+  margin-bottom: var(--spacing-sm);
+}
+
+.emptyStateDescription {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Insights Section */
+.insightCard {
+  padding: var(--spacing-lg);
+}
+
+.insightHeader {
+  display: flex;
+  align-items: flex-start;
+}
+
+.insightIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: white;
+}
+
+.insightIcon.activity {
+  color: var(--primary-600);
+}
+
+.insightContent {
+  flex: 1;
+}
+
+.insightTitle {
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Container Helpers */
+.containerTopPadding {
+  padding-top: var(--spacing-xl);
+}
+
+/* Dynamic Badge Classes */
+.badgeSuccess {
+  background: var(--success);
+  color: white;
+}
+
+.badgeWarning {
+  background: var(--warning);
+  color: white;
+}
+
+.badgeNeutral {
+  background: var(--text-tertiary);
+  color: white;
+}
+
+/* Progress Fill Variants */
+.progressFillSuccess {
+  background: var(--success);
+}
+
+.progressFillWarning {
+  background: var(--warning);
+}
+
+.progressFillNeutral {
+  background: var(--text-tertiary);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .tabNavigation {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 24rem;
+    margin: 0 auto;
+  }
+}

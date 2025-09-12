@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/D
 import BottomNavigation from "@/components/bottom-navigation";
 import BodyVisualization from "@/components/body-visualization";
 import LoadingScreen from "../components/loading-screen";
+import styles from "@/styles/progress.module.css";
 import { 
   Target, 
   Calendar, 
@@ -109,82 +110,51 @@ export default function Progress() {
 
       <div className="page-content">
         {/* Stats Overview */}
-        <section style={{
-          background: 'linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%)',
-          color: 'white',
-          padding: 'var(--spacing-xl) var(--spacing-md)'
-        }}>
+        <section className={styles.statsSection}>
           <div className="container">
-            <h2 className="text-heading-2" style={{ color: 'white', marginBottom: 'var(--spacing-lg)' }}>Your Stats</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--spacing-md)' }}>
-              <div className="stat-card" style={{ 
-                backgroundColor: 'rgba(255, 255, 255, 0.15)', 
-                borderColor: 'rgba(255, 255, 255, 0.2)',
-                color: 'white'
-              }}>
-                <div className="stat-value" style={{ color: 'white' }}>{progressStats.totalWorkouts}</div>
-                <div className="stat-label" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Total Workouts</div>
+            <h2 className={`text-heading-2 ${styles.statsTitle}`}>Your Stats</h2>
+            <div className={styles.statsGrid}>
+              <div className={styles.statCard}>
+                <div className={styles.statValue}>{progressStats.totalWorkouts}</div>
+                <div className={styles.statLabel}>Total Workouts</div>
               </div>
-              <div className="stat-card" style={{ 
-                backgroundColor: 'rgba(255, 255, 255, 0.15)', 
-                borderColor: 'rgba(255, 255, 255, 0.2)',
-                color: 'white'
-              }}>
-                <div className="stat-value" style={{ color: 'white' }}>{Math.round(progressStats.totalTime / 60)}h</div>
-                <div className="stat-label" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Time Trained</div>
+              <div className={styles.statCard}>
+                <div className={styles.statValue}>{Math.round(progressStats.totalTime / 60)}h</div>
+                <div className={styles.statLabel}>Time Trained</div>
               </div>
-              <div className="stat-card" style={{ 
-                backgroundColor: 'rgba(255, 255, 255, 0.15)', 
-                borderColor: 'rgba(255, 255, 255, 0.2)',
-                color: 'white'
-              }}>
-                <div className="stat-value" style={{ color: 'white' }}>
+              <div className={styles.statCard}>
+                <div className={styles.statValue}>
                   {progressStats.totalVolume > 0 ? `${Math.round(progressStats.totalVolume / 1000)}K` : "0"}
                 </div>
-                <div className="stat-label" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Volume (lbs)</div>
+                <div className={styles.statLabel}>Volume (lbs)</div>
               </div>
-              <div className="stat-card" style={{ 
-                backgroundColor: 'rgba(255, 255, 255, 0.15)', 
-                borderColor: 'rgba(255, 255, 255, 0.2)',
-                color: 'white'
-              }}>
-                <div className="stat-value" style={{ color: 'white' }}>{progressStats.currentStreak}</div>
-                <div className="stat-label" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Day Streak</div>
+              <div className={styles.statCard}>
+                <div className={styles.statValue}>{progressStats.currentStreak}</div>
+                <div className={styles.statLabel}>Day Streak</div>
               </div>
             </div>
           </div>
         </section>
 
-        <div className="container" style={{ paddingTop: 'var(--spacing-xl)' }}>
+        <div className={`container ${styles.containerTopPadding}`}>
           {/* Tab Navigation */}
-          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              width: '100%',
-              background: 'var(--gray-100)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'var(--spacing-xs)',
-              gap: 'var(--spacing-xs)'
-            }}>
+          <div className={styles.tabContainer}>
+            <div className={styles.tabNavigation}>
               <button
-                className={`btn ${selectedTab === 'body' ? 'btn-primary' : 'btn-secondary'}`}
+                className={`btn ${selectedTab === 'body' ? 'btn-primary' : 'btn-secondary'} ${styles.tabButton}`}
                 onClick={() => setSelectedTab('body')}
-                style={{ margin: 0, fontSize: '0.75rem', padding: 'var(--spacing-xs) var(--spacing-sm)' }}
               >
                 Body Map
               </button>
               <button
-                className={`btn ${selectedTab === 'goals' ? 'btn-primary' : 'btn-secondary'}`}
+                className={`btn ${selectedTab === 'goals' ? 'btn-primary' : 'btn-secondary'} ${styles.tabButton}`}
                 onClick={() => setSelectedTab('goals')}
-                style={{ margin: 0, fontSize: '0.75rem', padding: 'var(--spacing-xs) var(--spacing-sm)' }}
               >
                 Goals
               </button>
               <button
-                className={`btn ${selectedTab === 'insights' ? 'btn-primary' : 'btn-secondary'}`}
+                className={`btn ${selectedTab === 'insights' ? 'btn-primary' : 'btn-secondary'} ${styles.tabButton}`}
                 onClick={() => setSelectedTab('insights')}
-                style={{ margin: 0, fontSize: '0.75rem', padding: 'var(--spacing-xs) var(--spacing-sm)' }}
               >
                 Insights
               </button>
@@ -193,21 +163,16 @@ export default function Progress() {
 
           {/* Tab Content */}
           {selectedTab === 'body' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+            <div className={styles.tabContent}>
               {/* Body Visualization */}
-              <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
-                <h3 className="text-heading-3" style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  marginBottom: 'var(--spacing-lg)' 
-                }}>
-                  <Activity style={{ width: '1.25rem', height: '1.25rem', marginRight: 'var(--spacing-sm)', color: 'var(--secondary-600)' }} />
+              <div className={`card ${styles.cardWithPadding}`}>
+                <h3 className={`text-heading-3 ${styles.sectionHeader}`}>
+                  <Activity className={styles.sectionIcon} style={{ color: 'var(--secondary-600)' }} />
                   Muscle Group Progress
                   {selectedMuscles.length > 0 && (
                     <button
-                      className="btn btn-secondary"
+                      className={`btn btn-secondary ${styles.clearButton}`}
                       onClick={() => setSelectedMuscles([])}
-                      style={{ marginLeft: 'auto', fontSize: '0.75rem', padding: 'var(--spacing-xs) var(--spacing-sm)' }}
                     >
                       Clear Selection
                     </button>
@@ -215,47 +180,33 @@ export default function Progress() {
                 </h3>
                 
                 {/* Placeholder for BodyVisualization */}
-                <div style={{
-                  height: '20rem',
-                  background: 'var(--gray-50)',
-                  borderRadius: 'var(--radius-lg)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px dashed var(--gray-200)'
-                }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <Activity style={{ width: '3rem', height: '3rem', color: 'var(--gray-400)', margin: '0 auto var(--spacing-md)' }} />
-                    <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-sm)' }}>Body Visualization</h4>
+                <div className={styles.bodyVisualizationPlaceholder}>
+                  <div className={styles.placeholderContent}>
+                    <Activity className={styles.placeholderIcon} />
+                    <h4 className={`text-heading-3 ${styles.placeholderTitle}`}>Body Visualization</h4>
                     <p className="text-body">Interactive muscle group heat map coming soon</p>
                   </div>
                 </div>
                 
                 {selectedMuscles.length > 0 && (
-                  <div style={{
-                    marginTop: 'var(--spacing-lg)',
-                    padding: 'var(--spacing-lg)',
-                    background: 'var(--secondary-50)',
-                    borderRadius: 'var(--radius-lg)'
-                  }}>
-                    <h4 className="text-heading-3" style={{ color: 'var(--secondary-700)', marginBottom: 'var(--spacing-md)' }}>
+                  <div className={styles.selectedMusclesSection}>
+                    <h4 className={`text-heading-3 ${styles.selectedMusclesTitle}`}>
                       Selected Muscle Groups
                     </h4>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-lg)' }}>
+                    <div className={styles.musclesList}>
                       {selectedMuscles.map(muscleId => (
-                        <Badge key={muscleId} style={{ background: 'var(--secondary-100)', color: 'var(--secondary-700)' }}>
+                        <Badge key={muscleId} className={styles.muscleBadge}>
                           Muscle {muscleId}
                         </Badge>
                       ))}
                     </div>
                     <button
-                      className="btn btn-primary"
+                      className={`btn btn-primary ${styles.generateButton}`}
                       onClick={() => {
                         console.log("Generate program for muscles:", selectedMuscles);
                       }}
-                      style={{ width: '100%' }}
                     >
-                      <Plus style={{ width: '1rem', height: '1rem', marginRight: 'var(--spacing-sm)' }} />
+                      <Plus className={styles.generateButtonIcon} />
                       Generate Program for Selected Muscles
                     </button>
                   </div>
@@ -263,38 +214,26 @@ export default function Progress() {
               </div>
 
               {/* Quick Actions */}
-              <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
-                <h3 className="text-heading-3" style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  marginBottom: 'var(--spacing-lg)' 
-                }}>
-                  <Target style={{ width: '1.25rem', height: '1.25rem', marginRight: 'var(--spacing-sm)', color: 'var(--primary-600)' }} />
+              <div className={`card ${styles.cardWithPadding}`}>
+                <h3 className={`text-heading-3 ${styles.sectionHeader}`}>
+                  <Target className={styles.sectionIcon} style={{ color: 'var(--primary-600)' }} />
                   Quick Actions
                 </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-                  <button className="btn btn-secondary" style={{ 
-                    width: '100%', 
-                    justifyContent: 'space-between',
-                    padding: 'var(--spacing-md)'
-                  }}>
-                    <span style={{ display: 'flex', alignItems: 'center' }}>
-                      <Plus style={{ width: '1rem', height: '1rem', marginRight: 'var(--spacing-sm)' }} />
+                <div className={styles.quickActionsGrid}>
+                  <button className={`btn btn-secondary ${styles.actionButton}`}>
+                    <span className={styles.actionButtonContent}>
+                      <Plus className={styles.actionIcon} />
                       Start Targeted Workout
                     </span>
-                    <ChevronRight style={{ width: '1rem', height: '1rem' }} />
+                    <ChevronRight className={styles.chevronIcon} />
                   </button>
                   
-                  <button className="btn btn-secondary" style={{ 
-                    width: '100%', 
-                    justifyContent: 'space-between',
-                    padding: 'var(--spacing-md)'
-                  }}>
-                    <span style={{ display: 'flex', alignItems: 'center' }}>
-                      <Target style={{ width: '1rem', height: '1rem', marginRight: 'var(--spacing-sm)' }} />
+                  <button className={`btn btn-secondary ${styles.actionButton}`}>
+                    <span className={styles.actionButtonContent}>
+                      <Target className={styles.actionIcon} />
                       Set Muscle Group Goal
                     </span>
-                    <ChevronRight style={{ width: '1rem', height: '1rem' }} />
+                    <ChevronRight className={styles.chevronIcon} />
                   </button>
                 </div>
               </div>
@@ -309,67 +248,50 @@ export default function Progress() {
                     Math.min(100, (goal.currentValue! / goal.targetValue) * 100) : 0;
                   
                   return (
-                    <div key={goal.id} className="card" style={{ padding: 'var(--spacing-lg)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--spacing-md)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <div style={{
-                            width: '2.5rem',
-                            height: '2.5rem',
-                            background: 'var(--primary-100)',
-                            borderRadius: 'var(--radius-lg)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginRight: 'var(--spacing-md)'
-                          }}>
-                            <Target style={{ width: '1.25rem', height: '1.25rem', color: 'var(--primary-600)' }} />
+                    <div key={goal.id} className={`card ${styles.goalCard}`}>
+                      <div className={styles.goalHeader}>
+                        <div className={styles.goalHeaderLeft}>
+                          <div className={styles.goalIconContainer}>
+                            <Target className={styles.goalIcon} />
                           </div>
                           <div>
                             <h4 className="text-heading-3">{goal.title}</h4>
-                            <p className="text-body" style={{ textTransform: 'capitalize' }}>{goal.category}</p>
+                            <p className={`text-body ${styles.goalCategory}`}>{goal.category}</p>
                           </div>
                         </div>
-                        <Badge style={{
-                          background: progress >= 80 ? 'var(--success)' :
-                                    progress >= 50 ? 'var(--warning)' : 'var(--gray-400)',
-                          color: 'white'
-                        }}>
+                        <Badge className={
+                          progress >= 80 ? styles.badgeSuccess :
+                          progress >= 50 ? styles.badgeWarning : styles.badgeNeutral
+                        }>
                           {Math.round(progress)}%
                         </Badge>
                       </div>
 
-                      <div style={{ marginBottom: 'var(--spacing-md)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
+                      <div className={styles.goalProgressSection}>
+                        <div className={styles.goalProgressHeader}>
                           <span className="text-body">Progress</span>
                           <span className="text-body">
                             {goal.currentValue || 0} / {goal.targetValue} {goal.unit}
                           </span>
                         </div>
-                        <div style={{
-                          width: '100%',
-                          height: '0.5rem',
-                          background: 'var(--gray-200)',
-                          borderRadius: 'var(--radius-sm)',
-                          overflow: 'hidden'
-                        }}>
-                          <div style={{
-                            width: `${progress}%`,
-                            height: '100%',
-                            background: progress >= 80 ? 'var(--success)' :
-                                      progress >= 50 ? 'var(--warning)' : 'var(--gray-400)',
-                            transition: 'width 0.3s ease',
-                            borderRadius: 'var(--radius-sm)'
-                          }} />
+                        <div className={styles.goalProgressBar}>
+                          <div 
+                            className={`${styles.goalProgressFill} ${
+                              progress >= 80 ? styles.progressFillSuccess :
+                              progress >= 50 ? styles.progressFillWarning : styles.progressFillNeutral
+                            }`}
+                            style={{ width: `${progress}%` }}
+                          />
                         </div>
                       </div>
 
                       {goal.description && (
-                        <p className="text-body" style={{ marginBottom: 'var(--spacing-md)' }}>{goal.description}</p>
+                        <p className={`text-body ${styles.goalDescription}`}>{goal.description}</p>
                       )}
 
                       {goal.targetDate && (
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <Calendar style={{ width: '0.875rem', height: '0.875rem', marginRight: 'var(--spacing-xs)', color: 'var(--gray-400)' }} />
+                        <div className={styles.goalDate}>
+                          <Calendar className={styles.goalDateIcon} />
                           <span className="text-caption">
                             Target: {new Date(goal.targetDate).toLocaleDateString()}
                           </span>
@@ -379,25 +301,12 @@ export default function Progress() {
                   );
                 })
               ) : (
-                <div className="card" style={{ 
-                  padding: 'var(--spacing-2xl)', 
-                  textAlign: 'center',
-                  border: '2px dashed var(--gray-200)'
-                }}>
-                  <div style={{
-                    width: '4rem',
-                    height: '4rem',
-                    background: 'var(--gray-100)',
-                    borderRadius: 'var(--radius-xl)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto var(--spacing-lg)'
-                  }}>
-                    <Target style={{ width: '2rem', height: '2rem', color: 'var(--gray-400)' }} />
+                <div className={`card ${styles.emptyState}`}>
+                  <div className={styles.iconContainerLarge}>
+                    <Target className={styles.insightIcon} style={{ color: 'var(--text-tertiary)', width: '2rem', height: '2rem' }} />
                   </div>
-                  <h3 className="text-heading-3" style={{ marginBottom: 'var(--spacing-sm)' }}>No goals set</h3>
-                  <p className="text-body" style={{ marginBottom: 'var(--spacing-lg)' }}>
+                  <h3 className={`text-heading-3 ${styles.emptyStateTitle}`}>No goals set</h3>
+                  <p className={`text-body ${styles.emptyStateDescription}`}>
                     Set fitness goals to track your progress and stay motivated!
                   </p>
                 </div>
@@ -406,27 +315,14 @@ export default function Progress() {
           )}
 
           {selectedTab === 'insights' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+            <div className={styles.tabContent}>
               {completedWorkouts.length === 0 ? (
-                <div className="card" style={{ 
-                  padding: 'var(--spacing-2xl)', 
-                  textAlign: 'center',
-                  border: '2px dashed var(--gray-200)'
-                }}>
-                  <div style={{
-                    width: '4rem',
-                    height: '4rem',
-                    background: 'var(--gray-100)',
-                    borderRadius: 'var(--radius-xl)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto var(--spacing-lg)'
-                  }}>
-                    <BarChart3 style={{ width: '2rem', height: '2rem', color: 'var(--gray-400)' }} />
+                <div className={`card ${styles.emptyState}`}>
+                  <div className={styles.iconContainerLarge}>
+                    <BarChart3 className={styles.insightIcon} style={{ color: 'var(--text-tertiary)', width: '2rem', height: '2rem' }} />
                   </div>
-                  <h3 className="text-heading-3" style={{ marginBottom: 'var(--spacing-sm)' }}>No insights available</h3>
-                  <p className="text-body" style={{ marginBottom: 'var(--spacing-lg)' }}>
+                  <h3 className={`text-heading-3 ${styles.emptyStateTitle}`}>No insights available</h3>
+                  <p className={`text-body ${styles.emptyStateDescription}`}>
                     Complete some workouts to see personalized insights and progress analysis!
                   </p>
                 </div>
@@ -434,23 +330,13 @@ export default function Progress() {
                 <>
                   {/* Real streak insight */}
                   {progressStats.currentStreak > 0 && (
-                    <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
-                      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-                        <div style={{
-                          width: '2.5rem',
-                          height: '2.5rem',
-                          background: 'var(--warning)',
-                          borderRadius: 'var(--radius-lg)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginRight: 'var(--spacing-md)',
-                          flexShrink: 0
-                        }}>
-                          <Flame style={{ width: '1.25rem', height: '1.25rem', color: 'white' }} />
+                    <div className={`card ${styles.insightCard}`}>
+                      <div className={styles.insightHeader}>
+                        <div className={styles.iconContainerWarning}>
+                          <Flame className={styles.insightIcon} />
                         </div>
-                        <div style={{ flex: 1 }}>
-                          <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>
+                        <div className={styles.insightContent}>
+                          <h4 className={`text-heading-3 ${styles.insightTitle}`}>
                             {progressStats.currentStreak === 1 ? 'Great Start!' : 'Consistency Champion'}
                           </h4>
                           <p className="text-body">
@@ -463,7 +349,7 @@ export default function Progress() {
 
                   {/* Real volume insight */}
                   {progressStats.totalVolume > 0 && (
-                    <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                    <div className={`card ${styles.insightCard}`}>
                       <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                         <div style={{
                           width: '2.5rem',
@@ -490,23 +376,13 @@ export default function Progress() {
 
                   {/* Real workout frequency insight */}
                   {progressStats.totalWorkouts >= 3 && (
-                    <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
-                      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-                        <div style={{
-                          width: '2.5rem',
-                          height: '2.5rem',
-                          background: 'var(--primary-100)',
-                          borderRadius: 'var(--radius-lg)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginRight: 'var(--spacing-md)',
-                          flexShrink: 0
-                        }}>
-                          <Activity style={{ width: '1.25rem', height: '1.25rem', color: 'var(--primary-600)' }} />
+                    <div className={`card ${styles.insightCard}`}>
+                      <div className={styles.insightHeader}>
+                        <div className={styles.iconContainerPrimary}>
+                          <Activity className={styles.insightIcon} style={{ color: 'var(--primary-600)' }} />
                         </div>
-                        <div style={{ flex: 1 }}>
-                          <h4 className="text-heading-3" style={{ marginBottom: 'var(--spacing-xs)' }}>Training Progress</h4>
+                        <div className={styles.insightContent}>
+                          <h4 className={`text-heading-3 ${styles.insightTitle}`}>Training Progress</h4>
                           <p className="text-body">
                             {progressStats.totalWorkouts} workouts completed with {Math.round(progressStats.totalTime / 60)} hours of training time
                           </p>
