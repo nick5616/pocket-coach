@@ -146,7 +146,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
       }
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const limit = req.query.limit ? Math.min(Math.max(parseInt(req.query.limit as string) || 100, 1), 500) : 100;
       
       // Use optimized query that fetches workouts with exercises efficiently
       const workoutsWithExercises = await storage.getUserWorkoutsWithExercises(userId, limit);

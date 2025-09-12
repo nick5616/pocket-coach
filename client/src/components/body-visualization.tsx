@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import styles from './body-visualization.module.css';
 
@@ -42,10 +42,12 @@ export default function BodyVisualization({
       const response = await fetch(`/api/progress/heat-map?userId=${userId}`);
       if (!response.ok) throw new Error('Failed to fetch heat map data');
       return response.json();
-    }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes cache for muscle data
+    cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
 
-  const getHeatColor = (intensity: number): string => {
+  const getHeatColor = useCallback((intensity: number): string => {
     if (intensity === 0) return '#f3f4f6'; // No activity - gray
     
     // Create heat map from blue (low) to red (high)
@@ -60,17 +62,17 @@ export default function BodyVisualization({
     
     const index = Math.min(Math.floor(intensity * colors.length), colors.length - 1);
     return colors[index];
-  };
+  }, []);
 
-  const handleMuscleClick = (muscleGroup: MuscleGroup) => {
+  const handleMuscleClick = useCallback((muscleGroup: MuscleGroup) => {
     if (onMuscleSelect) {
       onMuscleSelect(muscleGroup);
     }
-  };
+  }, [onMuscleSelect]);
 
-  const getMuscleData = (svgId: string): HeatMapData | undefined => {
+  const getMuscleData = useCallback((svgId: string): HeatMapData | undefined => {
     return heatMapData?.find(data => data.muscleGroup.svgId === svgId);
-  };
+  }, [heatMapData]);
 
   if (isLoading) {
     return (

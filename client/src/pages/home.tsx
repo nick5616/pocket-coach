@@ -22,11 +22,12 @@ export default function Home() {
   const { data: workouts = [], isLoading: workoutsLoading } = useQuery<
     Workout[]
   >({
-    queryKey: ["/api/workouts"],
+    queryKey: ["/api/workouts", { limit: 100 }],
   });
 
   const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
     queryKey: ["/api/goals"],
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
 
   const { data: activeProgram } = useQuery({

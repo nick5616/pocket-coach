@@ -25,7 +25,8 @@ export default function Workouts() {
   const [filterStatus, setFilterStatus] = useState<"all" | "completed" | "in-progress">("all");
 
   const { data: workouts = [], isLoading } = useQuery<WorkoutWithExercises[]>({
-    queryKey: ["/api/workouts"],
+    queryKey: ["/api/workouts", { limit: 50 }],
+    staleTime: 2 * 60 * 1000, // 2 minutes cache
   });
 
   const filteredWorkouts = workouts.filter((workout) => {

@@ -35,14 +35,16 @@ export default function Progress() {
     queryKey: ["/api/goals", { userId }],
     queryFn: () =>
       fetch(`/api/goals?userId=${userId}`).then((res) => res.json()),
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
 
   const { data: workouts = [], isLoading: workoutsLoading } = useQuery<
     Workout[]
   >({
-    queryKey: ["/api/workouts", { userId }],
+    queryKey: ["/api/workouts", { userId, limit: 100 }],
     queryFn: () =>
-      fetch(`/api/workouts?userId=${userId}`).then((res) => res.json()),
+      fetch(`/api/workouts?userId=${userId}&limit=100`).then((res) => res.json()),
+    staleTime: 2 * 60 * 1000, // 2 minutes cache
   });
 
   const { data: achievements = [], isLoading: achievementsLoading } = useQuery<
@@ -51,6 +53,7 @@ export default function Progress() {
     queryKey: ["/api/achievements", { userId }],
     queryFn: () =>
       fetch(`/api/achievements?userId=${userId}`).then((res) => res.json()),
+    staleTime: 10 * 60 * 1000, // 10 minutes cache for achievements
   });
 
   const selectedGoal = goals.find((g) => g.id === selectedGoalId);

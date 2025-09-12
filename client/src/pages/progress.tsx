@@ -39,11 +39,13 @@ export default function Progress() {
   const [showMuscleDetails, setShowMuscleDetails] = useState(false);
   
   const { data: workouts = [], isLoading: workoutsLoading } = useQuery<Workout[]>({
-    queryKey: ["/api/workouts"],
+    queryKey: ["/api/workouts", { limit: 200 }],
+    staleTime: 3 * 60 * 1000, // 3 minutes cache for progress
   });
 
   const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
     queryKey: ["/api/goals"],
+    staleTime: 5 * 60 * 1000, // 5 minutes cache for goals
   });
 
   const { data: muscleProgress, isLoading: progressLoading } = useQuery<MuscleProgress>({
