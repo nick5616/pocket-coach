@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Link, useParams, useLocation } from "wouter";
 import LoadingScreen from "../components/loading-screen";
+import LoadingSkeleton from "../components/loading-skeleton";
 
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
@@ -584,13 +585,9 @@ export default function WorkoutJournal() {
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Programmed Exercises</h2>
               {todaysWorkoutLoading ? (
-                <div className={styles.loadingState}>
-                  <div className={styles.loadingText}>Loading today's workout...</div>
-                </div>
+                <LoadingSkeleton variant="workout" count={3} />
               ) : activeProgramLoading ? (
-                <div className={styles.loadingState}>
-                  <div className={styles.loadingText}>Loading your program...</div>
-                </div>
+                <LoadingSkeleton variant="workout" count={2} />
               ) : todaysWorkout?.workout?.exercises &&
               todaysWorkout.workout.exercises.length > 0 ? (
                 <div className={styles.programmedExercises}>

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { Badge } from "@/components/Badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import LoadingSkeleton from "../components/loading-skeleton";
 import {
   Sparkles,
   ArrowLeft,
@@ -107,7 +108,7 @@ export default function ProgramConfirmation() {
   });
 
   const handleModifyProgram = () => {
-    const feedback = form.getValues("feedback");
+    const feedback = form.getValues("feedback") || "";
     if (!feedback.trim()) {
       toast({
         title: "Feedback Required",
@@ -118,7 +119,7 @@ export default function ProgramConfirmation() {
     }
 
     modifyProgramMutation.mutate({
-      feedback,
+      feedback: feedback.trim(),
       program: programData,
     });
   };
@@ -129,9 +130,10 @@ export default function ProgramConfirmation() {
 
   if (!programData) {
     return (
-      <div className={styles.loading}>
-        <Sparkles className={styles.loadingIcon} />
-        <p>Loading your program...</p>
+      <div className="page">
+        <div style={{ padding: "2rem" }}>
+          <LoadingSkeleton variant="program" count={1} />
+        </div>
       </div>
     );
   }

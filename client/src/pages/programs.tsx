@@ -83,7 +83,7 @@ export default function Programs() {
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                 <Badge variant="outline">
                   <Clock style={{ width: '0.75rem', height: '0.75rem', marginRight: '0.25rem' }} />
-                  {activeProgram.duration}
+                  {activeProgram.durationWeeks} weeks
                 </Badge>
                 <Badge variant="outline">
                   <Target style={{ width: '0.75rem', height: '0.75rem', marginRight: '0.25rem' }} />
@@ -142,9 +142,11 @@ export default function Programs() {
                     {program.description}
                   </p>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-                    <Badge variant="outline">{program.duration}</Badge>
+                    <Badge variant="outline">{program.durationWeeks} weeks</Badge>
                     <Badge variant="outline">{program.difficulty}</Badge>
-                    <Badge variant="outline">{program.daysPerWeek} days/week</Badge>
+                    {program.focusAreas && program.focusAreas.length > 0 && (
+                      <Badge variant="outline">{program.focusAreas[0]}</Badge>
+                    )}
                   </div>
                   {!program.isActive && (
                     <Button 

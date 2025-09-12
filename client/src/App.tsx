@@ -20,6 +20,7 @@ import WorkoutProgram from "./pages/workout-program";
 import ProgramWorkout from "./pages/program-workout";
 import Workouts from "./pages/workouts";
 import BottomNavigation from "./components/bottom-navigation";
+import LoadingScreen from "./components/loading-screen";
 
 // Check authentication status
 function useAuth() {
@@ -61,16 +62,7 @@ function AppContent() {
   const { user, isLoading, isAuthenticated } = useAuth();
 
   if (isLoading) {
-    return (
-      <div style={{
-        height: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }}>
-        <div>Loading...</div>
-      </div>
-    );
+    return <LoadingScreen message="Starting your fitness journey..." />;
   }
 
   if (!isAuthenticated) {
