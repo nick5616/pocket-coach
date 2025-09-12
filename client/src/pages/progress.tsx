@@ -21,6 +21,7 @@ import {
   Weight,
   BarChart3
 } from "lucide-react";
+import { calculateCurrentStreak } from "../lib/stats";
 import type { Workout, Goal, MuscleGroup } from "@shared/schema";
 
 interface MuscleProgress {
@@ -58,38 +59,13 @@ export default function Progress() {
   // Calculate overall progress stats
   const completedWorkouts = workouts.filter(w => w.isCompleted);
   
-  // Calculate real workout streak from actual data
-  const calculateCurrentStreak = () => {
-    if (completedWorkouts.length === 0) return 0;
-    
-    const today = new Date();
-    const sortedWorkouts = completedWorkouts
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    
-    let streak = 0;
-    let currentDate = new Date(today);
-    
-    for (const workout of sortedWorkouts) {
-      const workoutDate = new Date(workout.createdAt);
-      const daysDiff = Math.floor((currentDate.getTime() - workoutDate.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (daysDiff <= streak + 1) {
-        streak++;
-        currentDate = new Date(workoutDate);
-      } else {
-        break;
-      }
-    }
-    
-    return streak;
-  };
   
   const progressStats = {
     totalWorkouts: completedWorkouts.length,
     totalTime: completedWorkouts.reduce((sum, w) => sum + (w.duration || 0), 0),
     totalVolume: completedWorkouts.reduce((sum, w) => sum + (w.totalVolume || 0), 0),
     totalCalories: completedWorkouts.reduce((sum, w) => sum + (w.calories || 0), 0),
-    currentStreak: calculateCurrentStreak(),
+    currentStreak: calculateCurrentStreak(completedWorkouts),
   };
 
   const handleMuscleSelect = (muscleGroup: MuscleGroup) => {

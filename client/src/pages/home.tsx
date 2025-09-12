@@ -15,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import LoadingScreen from "../components/loading-screen";
+import { calculateCurrentStreak } from "../lib/stats";
 import type { Workout, Goal } from "@shared/schema";
 
 export default function Home() {
@@ -45,7 +46,7 @@ export default function Home() {
   );
 
   const completedWorkouts = workouts.filter((w) => w.isCompleted);
-  const currentStreak = 7; // Would be calculated from workout dates
+  const currentStreak = calculateCurrentStreak(completedWorkouts);
 
   const todayStats = {
     workouts: todaysWorkouts.length,
