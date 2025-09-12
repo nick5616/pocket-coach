@@ -31,22 +31,32 @@
   gap: 0.25rem;
   color: #64748b;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.15s ease;
   padding: 0.5rem;
   position: relative;
   outline: none; /* Remove green outline */
   border: none; /* Remove any border */
   background: none; /* Ensure no background */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  min-height: 3rem;
 }
 
-.navItem:focus {
-  outline: none; /* Explicitly remove focus outline */
-  box-shadow: none; /* Remove any focus box-shadow */
+.navItem:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 0.5rem;
 }
 
 .navItem:hover {
   color: #3b82f6;
   transform: translateY(-1px);
+}
+
+.navItem:active {
+  color: #2563eb;
+  transform: scale(0.98);
 }
 
 .navItemActive {
