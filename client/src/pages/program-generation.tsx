@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/Card";
 import { useToast } from "@/hooks/use-toast";
+import { useAutoSave, useOfflineStatus } from "@/hooks/use-auto-save";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import ProgramGenerationLoading from "@/components/program-generation-loading";
 import { 
@@ -13,7 +14,9 @@ import {
   ArrowLeft,
   ChevronDown,
   ChevronUp,
-  Info
+  Info,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { programGenerationSchema, type ProgramGenerationData } from "@shared/schema";
 import styles from "./program-generation.module.css";
@@ -33,7 +36,9 @@ export default function ProgramGeneration() {
   const [, setLocation] = useLocation();
   const [showOptionalInfo, setShowOptionalInfo] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const { toast } = useToast();
+  const isOffline = useOfflineStatus();
 
   const form = useForm<ProgramGenerationData>({
     resolver: zodResolver(programGenerationSchema),
@@ -46,12 +51,38 @@ export default function ProgramGeneration() {
     },
   });
 
+  // Auto-save functionality
+  const { saveData, restoreData, clearSavedData, hasSavedData } = useAutoSave({
+    key: 'program-generation-form',
+    data: form.watch(),
+    enabled: true,
+    interval: 5000, // Save every 5 seconds
+    onSave: () => {
+      // Optional: Show subtle feedback that data was saved
+    },
+    onRestore: (savedData) => {
+      // Restore form data
+      Object.keys(savedData).forEach(key => {
+        form.setValue(key as keyof ProgramGenerationData, savedData[key]);
+      });
+    }
+  });
+
+  // Check for saved data on mount
+  useEffect(() => {
+    if (hasSavedData()) {
+      setShowRestoreDialog(true);
+    }
+  }, [hasSavedData]);
+
   const generateProgramMutation = useMutation({
     mutationFn: async (data: ProgramGenerationData) => {
       const response = await apiRequest("POST", "/api/programs/generate", data);
       return response.json();
     },
     onSuccess: (generatedProgram) => {
+      // Clear auto-saved data on successful submission
+      clearSavedData();
       // Navigate to confirmation page with generated program data
       setLocation(`/programs/confirm?data=${encodeURIComponent(JSON.stringify(generatedProgram))}`);
     },
@@ -87,8 +118,80 @@ export default function ProgramGeneration() {
     return <ProgramGenerationLoading />;
   }
 
+  // Handle restore dialog actions
+  const handleRestoreData = () => {
+    restoreData();
+    setShowRestoreDialog(false);
+    toast({
+      title: "Data Restored",
+      description: "Your previous progress has been restored.",
+    });
+  };
+
+  const handleDiscardData = () => {
+    clearSavedData();
+    setShowRestoreDialog(false);
+  };
+
   return (
     <>
+      {/* Restore Dialog */}
+      {showRestoreDialog && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '1rem'
+        }}>
+          <Card style={{ maxWidth: '28rem', width: '100%' }}>
+            <CardHeader>
+              <CardTitle>Restore Previous Progress?</CardTitle>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                We found some unsaved progress from your last session. Would you like to restore it?
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                <Button variant="ghost" onClick={handleDiscardData}>
+                  Start Fresh
+                </Button>
+                <Button onClick={handleRestoreData}>
+                  Restore Progress
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Offline Status Indicator */}
+      {isOffline && (
+        <div style={{
+          position: 'fixed',
+          top: '1rem',
+          right: '1rem',
+          backgroundColor: 'var(--warning)',
+          color: 'white',
+          padding: '0.5rem 1rem',
+          borderRadius: '0.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          zIndex: 100,
+          fontSize: '0.875rem'
+        }}>
+          <WifiOff style={{ width: '1rem', height: '1rem' }} />
+          Offline - Changes saved locally
+        </div>
+      )}
+
       <div className={`${styles.container} page`} style={{ paddingBottom: isInputFocused ? '6rem' : '2rem' }}>
         <div className={styles.header}>
           <Button
