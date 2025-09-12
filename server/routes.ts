@@ -158,10 +158,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/workouts/:id", async (req, res) => {
+  app.get("/api/workouts/:id", isAuthenticated, async (req, res) => {
     try {
+      const userId = (req.user as any)?.id;
       const workout = await storage.getWorkout(parseInt(req.params.id));
-      if (!workout) {
+      if (!workout || workout.userId !== userId) {
         return res.status(404).json({ message: "Workout not found" });
       }
       
@@ -197,9 +198,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/workouts/:id/journal", async (req, res) => {
+  app.post("/api/workouts/:id/journal", isAuthenticated, async (req, res) => {
     try {
+      const userId = (req.user as any)?.id;
       const workoutId = parseInt(req.params.id);
+      const workout = await storage.getWorkout(workoutId);
+      if (!workout || workout.userId !== userId) {
+        return res.status(404).json({ message: "Workout not found" });
+      }
       const { content } = req.body;
       
       if (!content) {
@@ -210,13 +216,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const parsedData = await parseWorkoutJournal(content);
       
       // Update workout with parsed data
-      const workout = await storage.updateWorkout(workoutId, {
+      const updatedWorkout = await storage.updateWorkout(workoutId, {
         notes: content,
         duration: parsedData.duration
       });
 
-      if (!workout) {
-        return res.status(404).json({ message: "Workout not found" });
+      if (!updatedWorkout) {
+        return res.status(404).json({ message: "Failed to update workout" });
       }
 
       // Create exercises from parsed data
@@ -271,10 +277,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/workouts/:id/complete", async (req, res) => {
+  app.post("/api/workouts/:id/complete", isAuthenticated, async (req, res) => {
     try {
+      const userId = (req.user as any)?.id;
       const workoutId = parseInt(req.params.id);
       const workout = await storage.getWorkout(workoutId);
+      if (!workout || workout.userId !== userId) {
+        return res.status(404).json({ message: "Workout not found" });
+      }
       
       if (!workout) {
         return res.status(404).json({ message: "Workout not found" });

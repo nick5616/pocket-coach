@@ -33,8 +33,6 @@ export default function Progress() {
 
   const { data: goals = [], isLoading: goalsLoading } = useQuery<Goal[]>({
     queryKey: ["/api/goals", { userId }],
-    queryFn: () =>
-      fetch(`/api/goals?userId=${userId}`).then((res) => res.json()),
     staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
 
@@ -42,8 +40,6 @@ export default function Progress() {
     Workout[]
   >({
     queryKey: ["/api/workouts", { userId, limit: 100 }],
-    queryFn: () =>
-      fetch(`/api/workouts?userId=${userId}&limit=100`).then((res) => res.json()),
     staleTime: 2 * 60 * 1000, // 2 minutes cache
   });
 
@@ -51,8 +47,6 @@ export default function Progress() {
     Achievement[]
   >({
     queryKey: ["/api/achievements", { userId }],
-    queryFn: () =>
-      fetch(`/api/achievements?userId=${userId}`).then((res) => res.json()),
     staleTime: 10 * 60 * 1000, // 10 minutes cache for achievements
   });
 

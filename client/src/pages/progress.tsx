@@ -50,13 +50,8 @@ export default function Progress() {
 
   const { data: muscleProgress, isLoading: progressLoading } = useQuery<MuscleProgress>({
     queryKey: ["/api/muscle-groups", selectedMuscle?.id, "progress"],
-    queryFn: async () => {
-      if (!selectedMuscle) return null;
-      const response = await fetch(`/api/muscle-groups/${selectedMuscle.id}/progress`);
-      if (!response.ok) throw new Error('Failed to fetch muscle progress');
-      return response.json();
-    },
     enabled: !!selectedMuscle,
+    staleTime: 3 * 60 * 1000, // 3 minutes cache for muscle progress
   });
 
   // Calculate overall progress stats

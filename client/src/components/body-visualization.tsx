@@ -37,14 +37,8 @@ export default function BodyVisualization({
   const [hoveredMuscle, setHoveredMuscle] = useState<MuscleGroup | null>(null);
 
   const { data: heatMapData, isLoading } = useQuery<HeatMapData[]>({
-    queryKey: ['/api/progress/heat-map', userId],
-    queryFn: async () => {
-      const response = await fetch(`/api/progress/heat-map?userId=${userId}`);
-      if (!response.ok) throw new Error('Failed to fetch heat map data');
-      return response.json();
-    },
+    queryKey: ['/api/progress/heat-map', { userId }],
     staleTime: 5 * 60 * 1000, // 5 minutes cache for muscle data
-    cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
 
   const getHeatColor = useCallback((intensity: number): string => {
