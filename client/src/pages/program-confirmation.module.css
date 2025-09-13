@@ -357,10 +357,6 @@
     align-items: stretch;
   }
   
-  .confirmButton {
-    order: -1;
-  }
-  
   .programMeta {
     gap: 0.5rem;
   }
