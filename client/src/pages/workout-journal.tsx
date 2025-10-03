@@ -92,6 +92,11 @@ export default function WorkoutJournal() {
   );
   const [deleteExerciseId, setDeleteExerciseId] = useState<number | null>(null);
   const [aiEditInstruction, setAiEditInstruction] = useState("");
+  
+  // Card-based navigation states
+  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+  const [completedExercises, setCompletedExercises] = useState<Set<number>>(new Set());
+  const [showGestureHints, setShowGestureHints] = useState(true);
 
   // Group exercises by name for display
   // Helper function to title case strings
@@ -505,188 +510,432 @@ export default function WorkoutJournal() {
       {/* Content */}
       <main className={styles.main}>
         {!workoutId ? (
-          // Create Workout Form
-          <section className={styles.createWorkoutForm}>
-            <form onSubmit={handleCreateWorkout}>
-              <div className={styles.formGroup}>
-                <label htmlFor="workoutDate" className={styles.formLabel}>
-                  Workout Date
-                </label>
-                <Input
-                  id="workoutDate"
-                  type="date"
-                  value={workoutDate}
-                  onChange={(e) => setWorkoutDate(e.target.value)}
-                  disabled={!isEditing}
-                />
-                <div className={styles.dateHelper}>
-                  {workoutDate === new Date().toISOString().split("T")[0]
-                    ? "Today's workout"
-                    : "Backfilling workout"}
-                </div>
-              </div>
-
-              <div className={styles.checkboxGroup}>
-                <Checkbox
-                  id="customNameCheckbox"
-                  checked={isCustomName}
-                  onChange={(e) => setIsCustomName(e.target.checked)}
-                />
-                <div>
-                  <label
-                    htmlFor="customNameCheckbox"
-                    className={styles.checkboxLabel}
-                  >
-                    Custom name
-                  </label>
-                  <div className={styles.checkboxDescription}>
-                    Name this workout yourself
-                  </div>
-                </div>
-              </div>
-
-              {isCustomName && (
-                <div
-                  className={styles.formGroup}
-                  style={{ marginTop: "1.5rem" }}
-                >
-                  <label htmlFor="workoutName" className={styles.formLabel}>
-                    Workout Name
-                  </label>
-                  <Input
-                    id="workoutName"
-                    type="text"
-                    placeholder="e.g., Push Day - Chest & Shoulders"
-                    value={workoutName}
-                    onChange={(e) => setWorkoutName(e.target.value)}
-                    disabled={!isEditing}
-                  />
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                style={{ width: "100%" }}
-                disabled={
-                  createWorkoutMutation.isPending ||
-                  (!workoutName && isCustomName)
-                }
-              >
-                {createWorkoutMutation.isPending
-                  ? "Creating..."
-                  : "Start Workout"}
-              </Button>
-            </form>
-          </section>
-        ) : (
-          // Workout Journal
+          // Before Workout Creation
           <div>
-            {/* Programmed Exercises */}
-            <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Programmed Exercises</h2>
-              {todaysWorkoutLoading ? (
-                <LoadingSkeleton variant="workout" count={3} />
-              ) : activeProgramLoading ? (
-                <LoadingSkeleton variant="workout" count={2} />
-              ) : todaysWorkout?.workout?.exercises &&
-              todaysWorkout.workout.exercises.length > 0 ? (
-                <div className={styles.programmedExercises}>
-                  {todaysWorkout.workout.exercises.map(
-                    (programmedEx: any, index: number) => {
-                      const currentExercise =
-                        swappedExercises.get(index) || programmedEx;
-                      const isSkipped = skippedExercises.has(index);
+            {/* Show programmed exercises if available */}
+            {todaysWorkout?.workout?.exercises && todaysWorkout.workout.exercises.length > 0 ? (
+              <section className={styles.section}>
+                <div style={{ minHeight: "400px", position: "relative" }}>
+                  {/* Progress Indicator */}
+                  <div style={{ marginBottom: "1rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                      <h2 className={styles.sectionTitle}>Today's Workout</h2>
+                      <span style={{ fontSize: "0.875rem", color: "var(--gray-600)" }}>
+                        {currentExerciseIndex + 1} of {todaysWorkout.workout.exercises.length}
+                      </span>
+                    </div>
+                    <Progress 
+                      value={((currentExerciseIndex + 1) / todaysWorkout.workout.exercises.length) * 100} 
+                      style={{ height: "6px" }}
+                    />
+                  </div>
 
-                      return (
-                        <div
-                          key={index}
-                          className={
-                            isSkipped
-                              ? `${styles.programmedExerciseCard} ${styles.exerciseCardSkipped}`
-                              : styles.programmedExerciseCard
-                          }
-                        >
-                          <div className={styles.exerciseHeader}>
-                            <h3
-                              className={
-                                isSkipped
-                                  ? `${styles.exerciseName} ${styles.exerciseNameSkipped}`
-                                  : styles.exerciseName
+                  {/* Current Exercise Card */}
+                  {(() => {
+                    const programmedEx = todaysWorkout.workout.exercises[currentExerciseIndex];
+                    if (!programmedEx) return null;
+                    
+                    const currentExercise = swappedExercises.get(currentExerciseIndex) || programmedEx;
+                    const isSkipped = skippedExercises.has(currentExerciseIndex);
+                    const isCompleted = completedExercises.has(currentExerciseIndex);
+
+                    return (
+                      <motion.div
+                        key={currentExerciseIndex}
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.7}
+                        onDragEnd={async (e, { offset, velocity }) => {
+                          const swipeThreshold = 100;
+                          if (offset.x > swipeThreshold) {
+                            // Swipe right - complete as prescribed
+                            // First create workout if it doesn't exist
+                            if (!workoutId) {
+                              try {
+                                const result = await createWorkoutMutation.mutateAsync({
+                                  date: workoutDate,
+                                  name: workoutName || (isCustomName ? "Untitled Workout" : null)
+                                });
+                                const newWorkoutId = result.id;
+                                // Now complete the exercise with the new workout ID
+                                await createExerciseFromProgramMutation.mutateAsync({
+                                  workoutId: newWorkoutId,
+                                  programmedExercise: currentExercise
+                                });
+                                // Navigate to workout page with new ID
+                                setLocation(`/workout-journal/${newWorkoutId}`);
+                              } catch (error) {
+                                console.error('Error creating workout/exercise:', error);
+                                toast({
+                                  title: "Error",
+                                  description: "Failed to create workout. Please try again.",
+                                  variant: "destructive"
+                                });
                               }
-                            >
+                            } else {
+                              handleExactCompletion(currentExercise, currentExerciseIndex);
+                              setCompletedExercises(prev => new Set(prev).add(currentExerciseIndex));
+                              if (currentExerciseIndex < todaysWorkout.workout.exercises.length - 1) {
+                                setTimeout(() => setCurrentExerciseIndex(prev => prev + 1), 300);
+                              }
+                            }
+                          } else if (offset.x < -swipeThreshold) {
+                            // Swipe left - skip
+                            if (!workoutId) {
+                              // Create workout first if needed
+                              try {
+                                const result = await createWorkoutMutation.mutateAsync({
+                                  date: workoutDate,
+                                  name: workoutName || (isCustomName ? "Untitled Workout" : null)
+                                });
+                                // Navigate to workout page with new ID
+                                setLocation(`/workout-journal/${result.id}`);
+                              } catch (error) {
+                                console.error('Error creating workout:', error);
+                                toast({
+                                  title: "Error",
+                                  description: "Failed to create workout. Please try again.",
+                                  variant: "destructive"
+                                });
+                              }
+                            } else {
+                              handleSkipExercise(currentExerciseIndex);
+                              if (currentExerciseIndex < todaysWorkout.workout.exercises.length - 1) {
+                                setTimeout(() => setCurrentExerciseIndex(prev => prev + 1), 300);
+                              }
+                            }
+                          }
+                        }}
+                        style={{
+                          position: "relative",
+                          cursor: "grab",
+                          touchAction: "pan-y"
+                        }}
+                        whileTap={{ cursor: "grabbing" }}
+                        data-testid="exercise-card-current"
+                      >
+                        <div
+                          className={`${styles.programmedExerciseCard} ${isSkipped ? styles.exerciseCardSkipped : ""} ${isCompleted ? styles.exerciseCardCompleted : ""}`}
+                          onClick={() => !isSkipped && handleModifiedCompletion(currentExercise, currentExerciseIndex)}
+                          style={{
+                            padding: "2rem 1.5rem",
+                            borderRadius: "1rem",
+                            boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+                            background: isCompleted ? "var(--success-50)" : isSkipped ? "var(--gray-100)" : "white",
+                            border: isCompleted ? "2px solid var(--success-500)" : "2px solid var(--gray-200)"
+                          }}
+                        >
+                          {/* Swipe Hints */}
+                          {showGestureHints && !isCompleted && !isSkipped && (
+                            <div style={{ position: "absolute", top: "1rem", left: "1rem", right: "1rem", display: "flex", justifyContent: "space-between", opacity: 0.6, pointerEvents: "none" }}>
+                              <span style={{ fontSize: "0.75rem", color: "var(--gray-500)" }}>← Skip</span>
+                              <span style={{ fontSize: "0.75rem", color: "var(--success-600)" }}>Complete ✓ →</span>
+                            </div>
+                          )}
+
+                          <div style={{ marginTop: showGestureHints && !isCompleted && !isSkipped ? "1.5rem" : "0" }}>
+                            <h3 style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "1rem", color: isSkipped ? "var(--gray-400)" : "var(--gray-900)" }}>
                               {currentExercise.name}
                             </h3>
-                            <div
-                              className={
-                                isSkipped
-                                  ? `${styles.exerciseStats} ${styles.exerciseStatsSkipped}`
-                                  : styles.exerciseStats
-                              }
-                            >
-                              <span>
-                                {currentExercise.sets} sets ×{" "}
-                                {currentExercise.reps} reps
+                            <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem", fontSize: "1.125rem" }}>
+                              <span style={{ color: isSkipped ? "var(--gray-400)" : "var(--gray-700)" }}>
+                                {currentExercise.sets} sets × {currentExercise.reps} reps
                               </span>
-                              <span className={styles.exerciseRpe}>
+                              <span style={{ color: isSkipped ? "var(--gray-400)" : "var(--primary-600)", fontWeight: "600" }}>
                                 RPE {currentExercise.rpe}
                               </span>
                             </div>
-                            {currentExercise.muscleGroups &&
-                              currentExercise.muscleGroups.length > 0 && (
-                                <div className={styles.muscleGroupsContainer}>
-                                  {currentExercise.muscleGroups.map(
-                                    (muscle: string, idx: number) => (
-                                      <Badge key={idx} variant="secondary">
-                                        {muscle}
-                                      </Badge>
-                                    ),
-                                  )}
-                                </div>
-                              )}
+                            {currentExercise.muscleGroups && currentExercise.muscleGroups.length > 0 && (
+                              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                                {currentExercise.muscleGroups.map((muscle: string, idx: number) => (
+                                  <Badge key={idx} variant="secondary">{muscle}</Badge>
+                                ))}
+                              </div>
+                            )}
                           </div>
 
-                          <div className={styles.actionButtons}>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={isSkipped}
-                              onClick={() =>
-                                handleExactCompletion(currentExercise, index)
-                              }
-                            >
-                              As Prescribed
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={isSkipped}
-                              onClick={() =>
-                                handleModifiedCompletion(currentExercise, index)
-                              }
-                            >
-                              📝 With Changes
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={isSkipped}
-                              onClick={() =>
-                                handleSwapExercise(currentExercise, index)
-                              }
-                            >
-                              🔄 Swap Exercise
-                            </Button>
-                            <Button
-                              variant={isSkipped ? "secondary" : "outline"}
-                              size="sm"
-                              onClick={() => handleSkipExercise(index)}
-                            >
-                              {isSkipped ? "↩️ Unskip" : "⏭️ Skip Today"}
-                            </Button>
-                          </div>
+                          {/* Tap to Adjust Hint */}
+                          {!isCompleted && !isSkipped && (
+                            <div style={{ marginTop: "1.5rem", padding: "0.75rem", background: "var(--gray-50)", borderRadius: "0.5rem", textAlign: "center" }}>
+                              <span style={{ fontSize: "0.875rem", color: "var(--gray-600)" }}>👆 Tap card to adjust values</span>
+                            </div>
+                          )}
                         </div>
-                      );
-                    },
+                      </motion.div>
+                    );
+                  })()}
+
+                  {/* Next Exercise Preview */}
+                  {currentExerciseIndex < todaysWorkout.workout.exercises.length - 1 && (
+                    <div style={{ marginTop: "1rem", opacity: 0.6, transform: "scale(0.95)", pointerEvents: "none" }}>
+                      <div style={{ padding: "1rem", background: "var(--gray-50)", borderRadius: "0.75rem", border: "1px solid var(--gray-200)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--gray-500)", marginBottom: "0.5rem" }}>↓ Next</div>
+                        <h4 style={{ fontSize: "1rem", fontWeight: "600", color: "var(--gray-700)" }}>
+                          {todaysWorkout.workout.exercises[currentExerciseIndex + 1].name}
+                        </h4>
+                        <div style={{ fontSize: "0.875rem", color: "var(--gray-600)", marginTop: "0.25rem" }}>
+                          {todaysWorkout.workout.exercises[currentExerciseIndex + 1].sets} sets × {todaysWorkout.workout.exercises[currentExerciseIndex + 1].reps} reps
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Navigation Dots */}
+                  {todaysWorkout.workout.exercises.length > 1 && (
+                    <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "1.5rem" }}>
+                      {todaysWorkout.workout.exercises.map((_: any, idx: number) => (
+                        <button
+                          key={idx}
+                          onClick={() => setCurrentExerciseIndex(idx)}
+                          data-testid={`exercise-dot-${idx}`}
+                          style={{
+                            width: idx === currentExerciseIndex ? "2rem" : "0.5rem",
+                            height: "0.5rem",
+                            borderRadius: "0.25rem",
+                            background: completedExercises.has(idx) ? "var(--success-500)" : 
+                                       skippedExercises.has(idx) ? "var(--gray-400)" :
+                                       idx === currentExerciseIndex ? "var(--primary-500)" : "var(--gray-300)",
+                            border: "none",
+                            cursor: "pointer",
+                            transition: "all 0.3s ease"
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </section>
+            ) : (
+              // Create Workout Form (when no programmed exercises)
+              <section className={styles.createWorkoutForm}>
+                <form onSubmit={handleCreateWorkout}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="workoutDate" className={styles.formLabel}>
+                      Workout Date
+                    </label>
+                    <Input
+                      id="workoutDate"
+                      type="date"
+                      value={workoutDate}
+                      onChange={(e) => setWorkoutDate(e.target.value)}
+                      disabled={!isEditing}
+                    />
+                    <div className={styles.dateHelper}>
+                      {workoutDate === new Date().toISOString().split("T")[0]
+                        ? "Today's workout"
+                        : "Backfilling workout"}
+                    </div>
+                  </div>
+
+                  <div className={styles.checkboxGroup}>
+                    <Checkbox
+                      id="customNameCheckbox"
+                      checked={isCustomName}
+                      onChange={(e) => setIsCustomName(e.target.checked)}
+                    />
+                    <div>
+                      <label
+                        htmlFor="customNameCheckbox"
+                        className={styles.checkboxLabel}
+                      >
+                        Custom name
+                      </label>
+                      <div className={styles.checkboxDescription}>
+                        Name this workout yourself
+                      </div>
+                    </div>
+                  </div>
+
+                  {isCustomName && (
+                    <div
+                      className={styles.formGroup}
+                      style={{ marginTop: "1.5rem" }}
+                    >
+                      <label htmlFor="workoutName" className={styles.formLabel}>
+                        Workout Name
+                      </label>
+                      <Input
+                        id="workoutName"
+                        type="text"
+                        placeholder="e.g., Push Day - Chest & Shoulders"
+                        value={workoutName}
+                        onChange={(e) => setWorkoutName(e.target.value)}
+                        disabled={!isEditing}
+                      />
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    style={{ width: "100%" }}
+                    disabled={
+                      createWorkoutMutation.isPending ||
+                      (!workoutName && isCustomName)
+                    }
+                  >
+                    {createWorkoutMutation.isPending
+                      ? "Creating..."
+                      : "Start Workout"}
+                  </Button>
+                </form>
+              </section>
+            )}
+          </div>
+        ) : (
+          // Workout Journal
+          <div>
+            {/* Programmed Exercises - Card Stack */}
+            <section className={styles.section}>
+              {workoutLoading || exercisesLoading ? (
+                <LoadingSkeleton variant="workout" count={3} />
+              ) : workout?.isCompleted ? (
+                <div style={{ textAlign: "center", padding: "2rem", color: "var(--gray-500)" }}>
+                  <p>This workout has been completed</p>
+                </div>
+              ) : exercises && exercises.length > 0 ? (
+                <div style={{ minHeight: "400px", position: "relative" }}>
+                  {/* Progress Indicator */}
+                  <div style={{ marginBottom: "1rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                      <h2 className={styles.sectionTitle}>Today's Workout</h2>
+                      <span style={{ fontSize: "0.875rem", color: "var(--gray-600)" }}>
+                        {currentExerciseIndex + 1} of {exercises.length}
+                      </span>
+                    </div>
+                    <Progress 
+                      value={((currentExerciseIndex + 1) / exercises.length) * 100} 
+                      style={{ height: "6px" }}
+                    />
+                  </div>
+
+                  {/* Current Exercise Card */}
+                  {(() => {
+                    const programmedEx = exercises[currentExerciseIndex];
+                    if (!programmedEx) return null;
+                    
+                    const currentExercise = swappedExercises.get(currentExerciseIndex) || programmedEx;
+                    const isSkipped = skippedExercises.has(currentExerciseIndex);
+                    const isCompleted = completedExercises.has(currentExerciseIndex);
+
+                    return (
+                      <motion.div
+                        key={currentExerciseIndex}
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.7}
+                        onDragEnd={(e, { offset, velocity }) => {
+                          const swipeThreshold = 100;
+                          if (offset.x > swipeThreshold) {
+                            // Swipe right - complete as prescribed
+                            handleExactCompletion(currentExercise, currentExerciseIndex);
+                            setCompletedExercises(prev => new Set(prev).add(currentExerciseIndex));
+                            if (currentExerciseIndex < exercises.length - 1) {
+                              setTimeout(() => setCurrentExerciseIndex(prev => prev + 1), 300);
+                            }
+                          } else if (offset.x < -swipeThreshold) {
+                            // Swipe left - skip
+                            handleSkipExercise(currentExerciseIndex);
+                            if (currentExerciseIndex < exercises.length - 1) {
+                              setTimeout(() => setCurrentExerciseIndex(prev => prev + 1), 300);
+                            }
+                          }
+                        }}
+                        style={{
+                          position: "relative",
+                          cursor: "grab",
+                          touchAction: "pan-y"
+                        }}
+                        whileTap={{ cursor: "grabbing" }}
+                        data-testid="exercise-card-current"
+                      >
+                        <div
+                          className={`${styles.programmedExerciseCard} ${isSkipped ? styles.exerciseCardSkipped : ""} ${isCompleted ? styles.exerciseCardCompleted : ""}`}
+                          onClick={() => !isSkipped && handleModifiedCompletion(currentExercise, currentExerciseIndex)}
+                          style={{
+                            padding: "2rem 1.5rem",
+                            borderRadius: "1rem",
+                            boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+                            background: isCompleted ? "var(--success-50)" : isSkipped ? "var(--gray-100)" : "white",
+                            border: isCompleted ? "2px solid var(--success-500)" : "2px solid var(--gray-200)"
+                          }}
+                        >
+                          {/* Swipe Hints */}
+                          {showGestureHints && !isCompleted && !isSkipped && (
+                            <div style={{ position: "absolute", top: "1rem", left: "1rem", right: "1rem", display: "flex", justifyContent: "space-between", opacity: 0.6, pointerEvents: "none" }}>
+                              <span style={{ fontSize: "0.75rem", color: "var(--gray-500)" }}>← Skip</span>
+                              <span style={{ fontSize: "0.75rem", color: "var(--success-600)" }}>Complete ✓ →</span>
+                            </div>
+                          )}
+
+                          <div style={{ marginTop: showGestureHints && !isCompleted && !isSkipped ? "1.5rem" : "0" }}>
+                            <h3 style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "1rem", color: isSkipped ? "var(--gray-400)" : "var(--gray-900)" }}>
+                              {currentExercise.name}
+                            </h3>
+                            <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem", fontSize: "1.125rem" }}>
+                              <span style={{ color: isSkipped ? "var(--gray-400)" : "var(--gray-700)" }}>
+                                {currentExercise.sets} sets × {currentExercise.reps} reps
+                              </span>
+                              <span style={{ color: isSkipped ? "var(--gray-400)" : "var(--primary-600)", fontWeight: "600" }}>
+                                RPE {currentExercise.rpe}
+                              </span>
+                            </div>
+                            {currentExercise.muscleGroups && currentExercise.muscleGroups.length > 0 && (
+                              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                                {currentExercise.muscleGroups.map((muscle: string, idx: number) => (
+                                  <Badge key={idx} variant="secondary">{muscle}</Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Tap to Adjust Hint */}
+                          {!isCompleted && !isSkipped && (
+                            <div style={{ marginTop: "1.5rem", padding: "0.75rem", background: "var(--gray-50)", borderRadius: "0.5rem", textAlign: "center" }}>
+                              <span style={{ fontSize: "0.875rem", color: "var(--gray-600)" }}>👆 Tap card to adjust values</span>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    );
+                  })()}
+
+                  {/* Next Exercise Preview */}
+                  {currentExerciseIndex < exercises.length - 1 && (
+                    <div style={{ marginTop: "1rem", opacity: 0.6, transform: "scale(0.95)", pointerEvents: "none" }}>
+                      <div style={{ padding: "1rem", background: "var(--gray-50)", borderRadius: "0.75rem", border: "1px solid var(--gray-200)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--gray-500)", marginBottom: "0.5rem" }}>↓ Next</div>
+                        <h4 style={{ fontSize: "1rem", fontWeight: "600", color: "var(--gray-700)" }}>
+                          {exercises[currentExerciseIndex + 1].name}
+                        </h4>
+                        <div style={{ fontSize: "0.875rem", color: "var(--gray-600)", marginTop: "0.25rem" }}>
+                          {exercises[currentExerciseIndex + 1].sets} sets × {exercises[currentExerciseIndex + 1].reps} reps
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Navigation Dots */}
+                  {exercises.length > 1 && (
+                    <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "1.5rem" }}>
+                      {exercises.map((_: any, idx: number) => (
+                        <button
+                          key={idx}
+                          onClick={() => setCurrentExerciseIndex(idx)}
+                          data-testid={`exercise-dot-${idx}`}
+                          style={{
+                            width: idx === currentExerciseIndex ? "2rem" : "0.5rem",
+                            height: "0.5rem",
+                            borderRadius: "0.25rem",
+                            background: completedExercises.has(idx) ? "var(--success-500)" : 
+                                       skippedExercises.has(idx) ? "var(--gray-400)" :
+                                       idx === currentExerciseIndex ? "var(--primary-500)" : "var(--gray-300)",
+                            border: "none",
+                            cursor: "pointer",
+                            transition: "all 0.3s ease"
+                          }}
+                        />
+                      ))}
+                    </div>
                   )}
                 </div>
               ) : (

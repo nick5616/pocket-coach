@@ -123,7 +123,11 @@
 .exerciseCardSkipped {
   background-color: #f3f4f6;
   border-color: #d1d5db;
-  opacity: 0.6;
+}
+
+.exerciseCardCompleted {
+  background-color: #ecfdf5;
+  border-color: #10b981;
 }
 
 .exerciseHeader {
