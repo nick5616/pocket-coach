@@ -410,8 +410,8 @@ export default function WorkoutJournal() {
           workoutId: result.id,
           programmedExercise: programmedEx,
         });
-        // Stay on the same page, just refetch data
-        queryClient.invalidateQueries({ queryKey: ["/api/workouts", result.id] });
+        // Navigate to the workout to stay in the workout flow
+        setLocation(`/workout-journal/${result.id}`);
       } else {
         await createExerciseFromProgramMutation.mutateAsync({
           workoutId: workoutId,
@@ -489,8 +489,8 @@ export default function WorkoutJournal() {
         
         setCompletedExercises(prev => new Set(prev).add(modifyingExercise.index));
         setModifyingExercise(null);
-        // Stay on the same page, just refetch data
-        queryClient.invalidateQueries({ queryKey: ["/api/workouts", newWorkoutId] });
+        // Navigate to the workout to stay in the workout flow
+        setLocation(`/workout-journal/${newWorkoutId}`);
       } catch (error) {
         console.error('Error creating workout/exercise:', error);
         toast({
