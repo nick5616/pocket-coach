@@ -620,8 +620,8 @@ export default function WorkoutJournal() {
       </header>
       {/* Content */}
       <main className={styles.main}>
-        {/* Show programmed exercises if available - regardless of workoutId */}
-        {todaysWorkout?.workout?.exercises && todaysWorkout.workout.exercises.length > 0 ? (
+        {/* Show programmed exercises if available AND workout is not completed */}
+        {todaysWorkout?.workout?.exercises && todaysWorkout.workout.exercises.length > 0 && !workout?.isCompleted ? (
           <section className={styles.section}>
                 {/* Progress Indicator */}
                 <div style={{ marginBottom: "1.5rem" }}>
@@ -831,8 +831,15 @@ export default function WorkoutJournal() {
                 </form>
               </section>
             ) : (
-              <div style={{ textAlign: "center", padding: "2rem" }}>
-                <p>Workout completed</p>
+              <div className={styles.completedWorkoutMessage}>
+                <CheckCircle style={{ width: "3rem", height: "3rem", margin: "0 auto 1rem", color: "#10b981" }} />
+                <h3 className={styles.completedWorkoutTitle}>Workout Completed!</h3>
+                <p className={styles.completedWorkoutText}>Great job finishing your workout.</p>
+                <Link href="/">
+                  <Button style={{ width: "100%", maxWidth: "300px" }}>
+                    Return to Dashboard
+                  </Button>
+                </Link>
               </div>
             )}
       </main>
