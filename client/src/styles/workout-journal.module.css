@@ -1383,3 +1383,39 @@
     color: #6ee7b7;
   }
 }
+
+.completedWorkoutMessage {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+@media (prefers-color-scheme: dark) {
+  .completedWorkoutMessage {
+    color: #9ca3af;
+  }
+}
+
+.completedWorkoutTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+@media (prefers-color-scheme: dark) {
+  .completedWorkoutTitle {
+    color: #f9fafb;
+  }
+}
+
+.completedWorkoutText {
+  margin-bottom: 1.5rem;
+  color: #6b7280;
+}
+
+@media (prefers-color-scheme: dark) {
+  .completedWorkoutText {
+    color: #9ca3af;
+  }
+}

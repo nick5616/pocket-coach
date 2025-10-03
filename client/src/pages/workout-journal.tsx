@@ -620,8 +620,84 @@ export default function WorkoutJournal() {
       </header>
       {/* Content */}
       <main className={styles.main}>
-        {/* Show programmed exercises if available AND workout is not completed */}
-        {todaysWorkout?.workout?.exercises && todaysWorkout.workout.exercises.length > 0 && !workout?.isCompleted ? (
+        {/* Show exercises: actual exercises if workout exists, programmed exercises if starting fresh */}
+        {workoutId && exercises && exercises.length > 0 && !workout?.isCompleted ? (
+          // Show ACTUAL exercises from created workout
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>Your Workout</h2>
+            <div className={styles.completedExercises}>
+              {groupExercisesByName(exercises).map((group, groupIndex) => (
+                <div key={groupIndex} className={styles.completedExerciseCard}>
+                  <div className={styles.completedExerciseHeader}>
+                    <div className={styles.completedExerciseInfo}>
+                      <h3 className={styles.completedExerciseTitle}>
+                        {group.name}
+                      </h3>
+                      {group.muscleGroups && group.muscleGroups.length > 0 && (
+                        <div className={styles.completedMuscleGroups}>
+                          {group.muscleGroups.map((muscle, idx) => (
+                            <Badge key={idx} variant="secondary">
+                              {muscle}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {/* Exercise Sets Grid */}
+                  <div className={styles.exerciseSetsGrid}>
+                    <div className={styles.setsHeader}>
+                      <div className={styles.setHeaderItem}>Set</div>
+                      <div className={styles.setHeaderItem}>Reps</div>
+                      <div className={styles.setHeaderItem}>Weight</div>
+                      {effortTrackingPreference !== "none" && (
+                        <div className={styles.setHeaderItem}>
+                          {effortTrackingPreference === "rir" ? "RIR" : "RPE"}
+                        </div>
+                      )}
+                    </div>
+                    {group.exercises.map((exercise, setIndex) => (
+                      <div key={exercise.id} className={styles.exerciseSetRow}>
+                        <div className={styles.setNumber}>{setIndex + 1}</div>
+                        <div className={styles.setReps}>{exercise.reps || "-"}</div>
+                        <div className={styles.setWeight}>
+                          {exercise.weight ? `${exercise.weight} lbs` : "BW"}
+                        </div>
+                        {effortTrackingPreference !== "none" && (
+                          <div className={styles.setRpe}>
+                            {exercise.rpe
+                              ? effortTrackingPreference === "rir"
+                                ? convertRpeToRir(exercise.rpe)
+                                : exercise.rpe
+                              : "-"}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {group.notes && (
+                    <div className={styles.exerciseNotesContainer}>
+                      <div className={styles.exerciseNotesLabel}>Notes</div>
+                      <div className={styles.exerciseNotesText}>{group.notes}</div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            {/* Complete Workout Button */}
+            <div style={{ marginTop: "2rem", paddingBottom: "2rem" }}>
+              <Button
+                onClick={() => setShowCompleteDialog(true)}
+                style={{ width: "100%" }}
+                data-testid="button-complete-workout"
+              >
+                <Trophy style={{ width: "1.25rem", height: "1.25rem", marginRight: "0.5rem" }} />
+                Complete Workout
+              </Button>
+            </div>
+          </section>
+        ) : todaysWorkout?.workout?.exercises && todaysWorkout.workout.exercises.length > 0 && !workoutId ? (
+          // Show PROGRAMMED exercises from program template (for starting new workout)
           <section className={styles.section}>
                 {/* Progress Indicator */}
                 <div style={{ marginBottom: "1.5rem" }}>
