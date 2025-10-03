@@ -707,30 +707,6 @@ export default function WorkoutJournal() {
                       );
                     })()}
                   </div>
-
-                  {/* Navigation Dots */}
-                  {todaysWorkout.workout.exercises.length > 1 && (
-                    <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "1.5rem" }}>
-                      {todaysWorkout.workout.exercises.map((_: any, idx: number) => (
-                        <button
-                          key={idx}
-                          onClick={() => setCurrentExerciseIndex(idx)}
-                          data-testid={`exercise-dot-${idx}`}
-                          style={{
-                            width: idx === currentExerciseIndex ? "2rem" : "0.5rem",
-                            height: "0.5rem",
-                            borderRadius: "0.25rem",
-                            background: completedExercises.has(idx) ? "var(--success-500)" : 
-                                       skippedExercises.has(idx) ? "var(--gray-400)" :
-                                       idx === currentExerciseIndex ? "var(--primary-500)" : "var(--gray-300)",
-                            border: "none",
-                            cursor: "pointer",
-                            transition: "all 0.3s ease"
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
                 </div>
               </section>
             ) : (
@@ -974,30 +950,6 @@ export default function WorkoutJournal() {
                       );
                     })()}
                   </div>
-
-                  {/* Navigation Dots */}
-                  {exercises.length > 1 && (
-                    <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "1.5rem" }}>
-                      {exercises.map((_: any, idx: number) => (
-                        <button
-                          key={idx}
-                          onClick={() => setCurrentExerciseIndex(idx)}
-                          data-testid={`exercise-dot-${idx}`}
-                          style={{
-                            width: idx === currentExerciseIndex ? "2rem" : "0.5rem",
-                            height: "0.5rem",
-                            borderRadius: "0.25rem",
-                            background: completedExercises.has(idx) ? "var(--success-500)" : 
-                                       skippedExercises.has(idx) ? "var(--gray-400)" :
-                                       idx === currentExerciseIndex ? "var(--primary-500)" : "var(--gray-300)",
-                            border: "none",
-                            cursor: "pointer",
-                            transition: "all 0.3s ease"
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div className={styles.programmedExercises}>
