@@ -93,6 +93,12 @@ export default function WorkoutJournal() {
   const [deleteExerciseId, setDeleteExerciseId] = useState<number | null>(null);
   const [aiEditInstruction, setAiEditInstruction] = useState("");
   
+  // Exercise modification sheet state
+  const [modifyingExercise, setModifyingExercise] = useState<{ exercise: any; index: number } | null>(null);
+  const [modifiedSets, setModifiedSets] = useState<number>(0);
+  const [modifiedReps, setModifiedReps] = useState<number>(0);
+  const [modifiedRpe, setModifiedRpe] = useState<number>(0);
+  
   // Card-based navigation states
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [completedExercises, setCompletedExercises] = useState<Set<number>>(new Set());
@@ -382,9 +388,10 @@ export default function WorkoutJournal() {
   };
 
   const handleModifiedCompletion = (programmedEx: any, index: number) => {
-    const exerciseText = `${programmedEx.name} - ${programmedEx.sets} sets × ${programmedEx.reps} reps @ RPE `;
-    setCurrentInput(exerciseText);
-    inputRef.current?.focus();
+    setModifyingExercise({ exercise: programmedEx, index });
+    setModifiedSets(programmedEx.sets);
+    setModifiedReps(programmedEx.reps);
+    setModifiedRpe(programmedEx.rpe);
   };
 
   const handleSwapExercise = async (programmedEx: any, index: number) => {
@@ -411,6 +418,67 @@ export default function WorkoutJournal() {
       newSkippedExercises.add(index);
     }
     setSkippedExercises(newSkippedExercises);
+  };
+
+  const handleSaveModifiedExercise = async () => {
+    if (!modifyingExercise) return;
+    
+    const modifiedExercise = {
+      ...modifyingExercise.exercise,
+      sets: modifiedSets,
+      reps: modifiedReps,
+      rpe: modifiedRpe
+    };
+
+    // If workout doesn't exist yet, create it first
+    if (!workoutId) {
+      try {
+        const result = await createWorkoutMutation.mutateAsync({
+          date: workoutDate,
+          name: workoutName || (isCustomName ? "Untitled Workout" : ""),
+          aiGenerateName: !isCustomName && !workoutName
+        });
+        const newWorkoutId = result.id;
+        
+        // Complete exercise with modified values
+        await createExerciseFromProgramMutation.mutateAsync({
+          workoutId: newWorkoutId,
+          programmedExercise: modifiedExercise
+        });
+        
+        setModifyingExercise(null);
+        setLocation(`/workout-journal/${newWorkoutId}`);
+      } catch (error) {
+        console.error('Error creating workout/exercise:', error);
+        toast({
+          title: "Error",
+          description: "Failed to create workout. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } else {
+      // Complete exercise with modified values in existing workout
+      try {
+        await createExerciseFromProgramMutation.mutateAsync({
+          workoutId: workoutId,
+          programmedExercise: modifiedExercise
+        });
+        setCompletedExercises(prev => new Set(prev).add(modifyingExercise.index));
+        setModifyingExercise(null);
+        
+        // Auto-advance to next exercise
+        if (modifyingExercise.index < (exercises?.length || todaysWorkout?.workout?.exercises?.length || 0) - 1) {
+          setTimeout(() => setCurrentExerciseIndex(prev => prev + 1), 300);
+        }
+      } catch (error) {
+        console.error('Error completing exercise:', error);
+        toast({
+          title: "Error",
+          description: "Failed to complete exercise. Please try again.",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const handleUpdateExercise = async (e: React.FormEvent) => {
@@ -599,7 +667,8 @@ export default function WorkoutJournal() {
                                 try {
                                   const result = await createWorkoutMutation.mutateAsync({
                                     date: workoutDate,
-                                    name: workoutName || (isCustomName ? "Untitled Workout" : undefined)
+                                    name: workoutName || (isCustomName ? "Untitled Workout" : ""),
+                                    aiGenerateName: !isCustomName && !workoutName
                                   });
                                   const newWorkoutId = result.id;
                                   await createExerciseFromProgramMutation.mutateAsync({
@@ -628,7 +697,8 @@ export default function WorkoutJournal() {
                                 try {
                                   const result = await createWorkoutMutation.mutateAsync({
                                     date: workoutDate,
-                                    name: workoutName || (isCustomName ? "Untitled Workout" : undefined)
+                                    name: workoutName || (isCustomName ? "Untitled Workout" : ""),
+                                    aiGenerateName: !isCustomName && !workoutName
                                   });
                                   setLocation(`/workout-journal/${result.id}`);
                                 } catch (error) {
@@ -1693,6 +1763,133 @@ export default function WorkoutJournal() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Exercise Modification Bottom Sheet */}
+      <Dialog
+        open={!!modifyingExercise}
+        onOpenChange={() => setModifyingExercise(null)}
+      >
+        <DialogContent style={{ maxWidth: "500px" }}>
+          <DialogHeader>
+            <DialogTitle>Adjust Exercise</DialogTitle>
+            <DialogDescription>
+              Modify the sets, reps, or RPE for this exercise
+            </DialogDescription>
+          </DialogHeader>
+
+          {modifyingExercise && (
+            <div style={{ padding: "1rem 0" }}>
+              <h3 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "1.5rem", textAlign: "center" }}>
+                {modifyingExercise.exercise.name}
+              </h3>
+
+              {/* Sets Control */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", marginBottom: "0.75rem", textAlign: "center" }}>
+                  Sets
+                </label>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setModifiedSets(Math.max(1, modifiedSets - 1))}
+                    style={{ width: "60px", height: "60px", fontSize: "1.5rem" }}
+                  >
+                    −
+                  </Button>
+                  <span style={{ fontSize: "2rem", fontWeight: "700", minWidth: "60px", textAlign: "center" }}>
+                    {modifiedSets}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setModifiedSets(modifiedSets + 1)}
+                    style={{ width: "60px", height: "60px", fontSize: "1.5rem" }}
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+
+              {/* Reps Control */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", marginBottom: "0.75rem", textAlign: "center" }}>
+                  Reps
+                </label>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setModifiedReps(Math.max(1, modifiedReps - 1))}
+                    style={{ width: "60px", height: "60px", fontSize: "1.5rem" }}
+                  >
+                    −
+                  </Button>
+                  <span style={{ fontSize: "2rem", fontWeight: "700", minWidth: "60px", textAlign: "center" }}>
+                    {modifiedReps}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setModifiedReps(modifiedReps + 1)}
+                    style={{ width: "60px", height: "60px", fontSize: "1.5rem" }}
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+
+              {/* RPE Control */}
+              <div style={{ marginBottom: "2rem" }}>
+                <label style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", marginBottom: "0.75rem", textAlign: "center" }}>
+                  RPE
+                </label>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setModifiedRpe(Math.max(1, modifiedRpe - 1))}
+                    style={{ width: "60px", height: "60px", fontSize: "1.5rem" }}
+                  >
+                    −
+                  </Button>
+                  <span style={{ fontSize: "2rem", fontWeight: "700", minWidth: "60px", textAlign: "center", color: "var(--primary-600)" }}>
+                    {modifiedRpe}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setModifiedRpe(Math.min(10, modifiedRpe + 1))}
+                    style={{ width: "60px", height: "60px", fontSize: "1.5rem" }}
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: "flex", gap: "1rem" }}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setModifyingExercise(null)}
+                  style={{ flex: 1, height: "50px", fontSize: "1rem" }}
+                >
+                  Back
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleSaveModifiedExercise}
+                  style={{ flex: 1, height: "50px", fontSize: "1rem", background: "var(--success-500)", color: "white" }}
+                >
+                  Complete
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Achievement Modal */}
       {currentAchievement && (
         <AchievementModal
