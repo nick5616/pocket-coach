@@ -554,7 +554,7 @@ export default function WorkoutJournal() {
                               try {
                                 const result = await createWorkoutMutation.mutateAsync({
                                   date: workoutDate,
-                                  name: workoutName || (isCustomName ? "Untitled Workout" : null)
+                                  name: workoutName || (isCustomName ? "Untitled Workout" : undefined)
                                 });
                                 const newWorkoutId = result.id;
                                 // Now complete the exercise with the new workout ID
@@ -586,7 +586,7 @@ export default function WorkoutJournal() {
                               try {
                                 const result = await createWorkoutMutation.mutateAsync({
                                   date: workoutDate,
-                                  name: workoutName || (isCustomName ? "Untitled Workout" : null)
+                                  name: workoutName || (isCustomName ? "Untitled Workout" : undefined)
                                 });
                                 // Navigate to workout page with new ID
                                 setLocation(`/workout-journal/${result.id}`);
@@ -609,7 +609,7 @@ export default function WorkoutJournal() {
                         style={{
                           position: "relative",
                           cursor: "grab",
-                          touchAction: "pan-y"
+                          touchAction: "none"
                         }}
                         whileTap={{ cursor: "grabbing" }}
                         data-testid="exercise-card-current"
@@ -843,7 +843,7 @@ export default function WorkoutJournal() {
                         style={{
                           position: "relative",
                           cursor: "grab",
-                          touchAction: "pan-y"
+                          touchAction: "none"
                         }}
                         whileTap={{ cursor: "grabbing" }}
                         data-testid="exercise-card-current"
