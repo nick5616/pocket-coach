@@ -231,7 +231,13 @@ export default function WorkoutJournal() {
         setShowAchievement(true);
       }
       queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
-      setLocation("/");
+      queryClient.invalidateQueries({ queryKey: ["/api/programs/active"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/programs/active/today"] });
+      // Stay on workout page - don't navigate away
+      toast({
+        title: "Workout Complete!",
+        description: "Great work! Your progress has been saved.",
+      });
     },
   });
 
@@ -316,11 +322,17 @@ export default function WorkoutJournal() {
         throw new Error("Failed to create exercise from program");
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      // Invalidate all relevant queries to refresh the exercise list
       queryClient.invalidateQueries({
-        queryKey: ["/api/workouts", workoutId, "exercises"],
+        queryKey: ["/api/workouts", variables.workoutId, "exercises"],
       });
-      toast({ title: "Exercise completed successfully" });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/workouts", variables.workoutId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/workouts"],
+      });
     },
   });
 
