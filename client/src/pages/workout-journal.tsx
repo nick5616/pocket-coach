@@ -378,12 +378,32 @@ export default function WorkoutJournal() {
 
   const handleExactCompletion = async (programmedEx: any, index: number) => {
     try {
-      await createExerciseFromProgramMutation.mutateAsync({
-        workoutId: workoutId!,
-        programmedExercise: programmedEx,
-      });
+      // Create workout if it doesn't exist yet
+      if (!workoutId) {
+        const result = await createWorkoutMutation.mutateAsync({
+          date: workoutDate,
+          name: workoutName || (isCustomName ? "Untitled Workout" : ""),
+          aiGenerateName: !isCustomName && !workoutName
+        });
+        await createExerciseFromProgramMutation.mutateAsync({
+          workoutId: result.id,
+          programmedExercise: programmedEx,
+        });
+        // Stay on the same page, just refetch data
+        queryClient.invalidateQueries({ queryKey: ["/api/workouts", result.id] });
+      } else {
+        await createExerciseFromProgramMutation.mutateAsync({
+          workoutId: workoutId,
+          programmedExercise: programmedEx,
+        });
+      }
     } catch (error) {
       console.error("Failed to complete exercise:", error);
+      toast({
+        title: "Error",
+        description: "Failed to complete exercise. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -446,8 +466,10 @@ export default function WorkoutJournal() {
           programmedExercise: modifiedExercise
         });
         
+        setCompletedExercises(prev => new Set(prev).add(modifyingExercise.index));
         setModifyingExercise(null);
-        setLocation(`/workout-journal/${newWorkoutId}`);
+        // Stay on the same page, just refetch data
+        queryClient.invalidateQueries({ queryKey: ["/api/workouts", newWorkoutId] });
       } catch (error) {
         console.error('Error creating workout/exercise:', error);
         toast({
@@ -583,201 +605,140 @@ export default function WorkoutJournal() {
             {/* Show programmed exercises if available */}
             {todaysWorkout?.workout?.exercises && todaysWorkout.workout.exercises.length > 0 ? (
               <section className={styles.section}>
-                <div style={{ minHeight: "400px", position: "relative" }}>
-                  {/* Progress Indicator */}
-                  <div style={{ marginBottom: "1rem" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-                      <h2 className={styles.sectionTitle}>Today's Workout</h2>
-                      <span style={{ fontSize: "0.875rem", color: "var(--gray-600)" }}>
-                        {currentExerciseIndex + 1} of {todaysWorkout.workout.exercises.length}
-                      </span>
-                    </div>
-                    <Progress 
-                      value={(completedExercises.size / todaysWorkout.workout.exercises.length) * 100} 
-                      style={{ height: "6px" }}
-                    />
+                {/* Progress Indicator */}
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                    <h2 className={styles.sectionTitle}>Today's Workout</h2>
+                    <span className={styles.progressText}>
+                      {completedExercises.size} / {todaysWorkout.workout.exercises.length} complete
+                    </span>
                   </div>
+                  <Progress 
+                    value={(completedExercises.size / todaysWorkout.workout.exercises.length) * 100} 
+                    style={{ height: "8px" }}
+                  />
+                </div>
 
-                  {/* Card Stack - iMessage Style */}
-                  <div style={{ position: "relative", minHeight: "350px", paddingBottom: "2rem" }}>
-                    {/* Background Cards (stack effect) */}
-                    {[2, 1].map((offset) => {
-                      const idx = currentExerciseIndex + offset;
-                      if (idx >= todaysWorkout.workout.exercises.length) return null;
-                      const ex = todaysWorkout.workout.exercises[idx];
-                      
-                      return (
+                {/* All Exercises List - Swipeable Cards */}
+                <div className={styles.exerciseList}>
+                  {todaysWorkout.workout.exercises.map((programmedEx: any, index: number) => {
+                    const currentExercise = swappedExercises.get(index) || programmedEx;
+                    const isSkipped = skippedExercises.has(index);
+                    const isCompleted = completedExercises.has(index);
+                    const rpeValue = currentExercise.rpe || 0;
+                    const displayValue = effortTrackingPreference === "rir" && rpeValue > 0 
+                      ? convertRpeToRir(rpeValue) 
+                      : rpeValue;
+                    const displayLabel = effortTrackingPreference === "rir" ? "RIR" : "RPE";
+
+                    return (
+                      <motion.div
+                        key={index}
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.7}
+                        onDragEnd={async (e, { offset }) => {
+                          if (isCompleted) return; // Can't swipe completed exercises
+                          
+                          const swipeThreshold = 100;
+                          if (offset.x > swipeThreshold) {
+                            // Swipe right - complete as prescribed
+                            setCompletedExercises(prev => new Set(prev).add(index));
+                            await handleExactCompletion(currentExercise, index);
+                          } else if (offset.x < -swipeThreshold) {
+                            // Swipe left - skip
+                            handleSkipExercise(index);
+                          }
+                        }}
+                        style={{
+                          cursor: isCompleted ? "default" : "grab",
+                          touchAction: "none",
+                          marginBottom: "1rem"
+                        }}
+                        whileTap={{ cursor: isCompleted ? "default" : "grabbing" }}
+                        data-testid={`exercise-card-${index}`}
+                      >
                         <div
-                          key={`bg-card-${idx}`}
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: "50%",
-                            transform: `translateX(-50%) translateY(${offset * 8}px) rotate(${offset === 2 ? -3 : -1.5}deg) scale(${offset === 2 ? 0.9 : 0.95})`,
-                            width: "100%",
-                            maxWidth: "500px",
-                            zIndex: offset === 2 ? 1 : 2,
-                            opacity: offset === 2 ? 0.5 : 0.7,
-                            pointerEvents: "none"
-                          }}
+                          className={`${styles.swipeableExerciseCard} ${isSkipped ? styles.exerciseCardSkipped : ""} ${isCompleted ? styles.exerciseCardCompleted : ""}`}
+                          onClick={() => !isSkipped && !isCompleted && handleModifiedCompletion(currentExercise, index)}
                         >
-                          <div style={{
-                            padding: "2rem 1.5rem",
-                            borderRadius: "1rem",
-                            boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                            background: "white",
-                            border: "2px solid var(--gray-200)"
-                          }}>
-                            <h3 style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "1rem", color: "var(--gray-900)" }}>
-                              {ex.name}
-                            </h3>
-                            <div style={{ display: "flex", gap: "1rem", fontSize: "1.125rem" }}>
-                              <span style={{ color: "var(--gray-700)" }}>
-                                {ex.sets} sets × {ex.reps} reps
-                              </span>
-                              <span style={{ color: "var(--primary-600)", fontWeight: "600" }}>
-                                RPE {ex.rpe}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    {/* Current Exercise Card (front) */}
-                    {(() => {
-                      const programmedEx = todaysWorkout.workout.exercises[currentExerciseIndex];
-                      if (!programmedEx) return null;
-                      
-                      const currentExercise = swappedExercises.get(currentExerciseIndex) || programmedEx;
-                      const isSkipped = skippedExercises.has(currentExerciseIndex);
-                      const isCompleted = completedExercises.has(currentExerciseIndex);
-
-                      return (
-                        <motion.div
-                          key={currentExerciseIndex}
-                          drag="x"
-                          dragConstraints={{ left: 0, right: 0 }}
-                          dragElastic={0.7}
-                          onDragEnd={async (e, { offset, velocity }) => {
-                            const swipeThreshold = 100;
-                            if (offset.x > swipeThreshold) {
-                              // Swipe right - complete as prescribed
-                              if (!workoutId) {
-                                try {
-                                  const result = await createWorkoutMutation.mutateAsync({
-                                    date: workoutDate,
-                                    name: workoutName || (isCustomName ? "Untitled Workout" : ""),
-                                    aiGenerateName: !isCustomName && !workoutName
-                                  });
-                                  const newWorkoutId = result.id;
-                                  await createExerciseFromProgramMutation.mutateAsync({
-                                    workoutId: newWorkoutId,
-                                    programmedExercise: currentExercise
-                                  });
-                                  setLocation(`/workout-journal/${newWorkoutId}`);
-                                } catch (error) {
-                                  console.error('Error creating workout/exercise:', error);
-                                  toast({
-                                    title: "Error",
-                                    description: "Failed to create workout. Please try again.",
-                                    variant: "destructive"
-                                  });
-                                }
-                              } else {
-                                handleExactCompletion(currentExercise, currentExerciseIndex);
-                                setCompletedExercises(prev => new Set(prev).add(currentExerciseIndex));
-                                if (currentExerciseIndex < todaysWorkout.workout.exercises.length - 1) {
-                                  setTimeout(() => setCurrentExerciseIndex(prev => prev + 1), 300);
-                                }
-                              }
-                            } else if (offset.x < -swipeThreshold) {
-                              // Swipe left - skip
-                              if (!workoutId) {
-                                try {
-                                  const result = await createWorkoutMutation.mutateAsync({
-                                    date: workoutDate,
-                                    name: workoutName || (isCustomName ? "Untitled Workout" : ""),
-                                    aiGenerateName: !isCustomName && !workoutName
-                                  });
-                                  setLocation(`/workout-journal/${result.id}`);
-                                } catch (error) {
-                                  console.error('Error creating workout:', error);
-                                  toast({
-                                    title: "Error",
-                                    description: "Failed to create workout. Please try again.",
-                                    variant: "destructive"
-                                  });
-                                }
-                              } else {
-                                handleSkipExercise(currentExerciseIndex);
-                                if (currentExerciseIndex < todaysWorkout.workout.exercises.length - 1) {
-                                  setTimeout(() => setCurrentExerciseIndex(prev => prev + 1), 300);
-                                }
-                              }
-                            }
-                          }}
-                          style={{
-                            position: "relative",
-                            cursor: "grab",
-                            touchAction: "none",
-                            zIndex: 3
-                          }}
-                          whileTap={{ cursor: "grabbing" }}
-                          data-testid="exercise-card-current"
-                        >
-                          <div
-                            className={`${styles.programmedExerciseCard} ${isSkipped ? styles.exerciseCardSkipped : ""} ${isCompleted ? styles.exerciseCardCompleted : ""}`}
-                            onClick={() => !isSkipped && handleModifiedCompletion(currentExercise, currentExerciseIndex)}
-                            style={{
-                              padding: "2rem 1.5rem",
-                              borderRadius: "1rem",
-                              boxShadow: "0 10px 25px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
-                              background: isCompleted ? "var(--success-50)" : isSkipped ? "var(--gray-100)" : "white",
-                              border: isCompleted ? "2px solid var(--success-500)" : "2px solid var(--gray-200)"
-                            }}
-                          >
-                            {/* Swipe Hints */}
-                            {showGestureHints && !isCompleted && !isSkipped && (
-                              <div style={{ position: "absolute", top: "1rem", left: "1rem", right: "1rem", display: "flex", justifyContent: "space-between", opacity: 0.6, pointerEvents: "none" }}>
-                                <span style={{ fontSize: "0.75rem", color: "var(--gray-500)" }}>← Skip</span>
-                                <span style={{ fontSize: "0.75rem", color: "var(--success-600)" }}>Complete ✓ →</span>
-                              </div>
+                          {/* Exercise Number Badge */}
+                          <div className={styles.exerciseNumber}>
+                            {isCompleted ? (
+                              <CheckCircle style={{ width: "1.25rem", height: "1.25rem", color: "var(--success-600)" }} />
+                            ) : (
+                              <span>{index + 1}</span>
                             )}
+                          </div>
 
-                            <div style={{ marginTop: showGestureHints && !isCompleted && !isSkipped ? "1.5rem" : "0" }}>
-                              <h3 style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "1rem", color: isSkipped ? "var(--gray-400)" : "var(--gray-900)" }}>
-                                {currentExercise.name}
-                              </h3>
-                              <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem", fontSize: "1.125rem" }}>
-                                <span style={{ color: isSkipped ? "var(--gray-400)" : "var(--gray-700)" }}>
-                                  {currentExercise.sets} sets × {currentExercise.reps} reps
+                          {/* Swipe Hints - Show only on first incomplete exercise */}
+                          {showGestureHints && !isCompleted && !isSkipped && completedExercises.size === 0 && index === 0 && (
+                            <div className={styles.swipeHints}>
+                              <span className={styles.swipeHintLeft}>← Skip</span>
+                              <span className={styles.swipeHintRight}>Complete ✓ →</span>
+                            </div>
+                          )}
+
+                          <div className={styles.exerciseCardContent}>
+                            <h3 className={`${styles.exerciseName} ${isSkipped ? styles.skippedText : ""} ${isCompleted ? styles.completedText : ""}`}>
+                              {currentExercise.name}
+                            </h3>
+                            <div className={styles.exerciseDetails}>
+                              <span className={isSkipped ? styles.skippedText : ""}>
+                                {currentExercise.sets} sets × {currentExercise.reps} reps
+                              </span>
+                              {effortTrackingPreference !== "none" && (
+                                <span className={`${styles.exerciseEffort} ${isSkipped ? styles.skippedText : ""}`}>
+                                  {displayLabel} {displayValue > 0 ? displayValue : "-"}
                                 </span>
-                                <span style={{ color: isSkipped ? "var(--gray-400)" : "var(--primary-600)", fontWeight: "600" }}>
-                                  RPE {currentExercise.rpe}
-                                </span>
-                              </div>
-                              {currentExercise.muscleGroups && currentExercise.muscleGroups.length > 0 && (
-                                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                                  {currentExercise.muscleGroups.map((muscle: string, idx: number) => (
-                                    <Badge key={idx} variant="secondary">{muscle}</Badge>
-                                  ))}
-                                </div>
                               )}
                             </div>
-
-                            {/* Tap to Adjust Hint */}
-                            {!isCompleted && !isSkipped && (
-                              <div style={{ marginTop: "1.5rem", padding: "0.75rem", background: "var(--gray-50)", borderRadius: "0.5rem", textAlign: "center" }}>
-                                <span style={{ fontSize: "0.875rem", color: "var(--gray-600)" }}>👆 Tap card to adjust values</span>
+                            {currentExercise.muscleGroups && currentExercise.muscleGroups.length > 0 && (
+                              <div className={styles.muscleGroupsRow}>
+                                {currentExercise.muscleGroups.map((muscle: string, idx: number) => (
+                                  <Badge key={idx} variant="secondary">{muscle}</Badge>
+                                ))}
                               </div>
                             )}
                           </div>
-                        </motion.div>
-                      );
-                    })()}
-                  </div>
+
+                          {/* Status indicator */}
+                          {isSkipped && (
+                            <div className={styles.statusBadge}>
+                              <span>Skipped</span>
+                            </div>
+                          )}
+                          {isCompleted && !isSkipped && (
+                            <div className={styles.statusBadgeCompleted}>
+                              <span>✓</span>
+                            </div>
+                          )}
+
+                          {/* Tap to edit hint */}
+                          {!isCompleted && !isSkipped && (
+                            <div className={styles.tapHint}>
+                              👆 Tap to adjust
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </div>
+
+                {/* Complete Workout Button */}
+                {completedExercises.size > 0 && (
+                  <div style={{ marginTop: "2rem", paddingBottom: "2rem" }}>
+                    <Button
+                      onClick={() => setShowCompleteDialog(true)}
+                      style={{ width: "100%" }}
+                      data-testid="button-complete-workout"
+                    >
+                      <Trophy style={{ width: "1.25rem", height: "1.25rem", marginRight: "0.5rem" }} />
+                      Complete Workout
+                    </Button>
+                  </div>
+                )}
               </section>
             ) : (
               // Create Workout Form (when no programmed exercises)

@@ -11,10 +11,23 @@
   overflow-x: hidden;
 }
 
+@media (prefers-color-scheme: dark) {
+  .container {
+    background-color: #111827;
+  }
+}
+
 .header {
   background-color: #ffffff;
   border-bottom: 1px solid #e5e7eb;
   padding: 0.75rem 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .header {
+    background-color: #1f2937;
+    border-bottom-color: #374151;
+  }
 }
 
 .headerContent {
@@ -34,6 +47,12 @@
   font-size: 1.125rem;
   font-weight: 600;
   color: #111827;
+}
+
+@media (prefers-color-scheme: dark) {
+  .title {
+    color: #f3f4f6;
+  }
 }
 
 .volumeIndicator {
@@ -64,6 +83,12 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sectionTitle {
+    color: #f3f4f6;
+  }
 }
 
 .completedBadge {
@@ -1111,5 +1136,250 @@
   
   .loadingText {
     color: #9ca3af;
+  }
+}
+
+/* New Swipeable Exercise List Styles */
+.progressText {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+@media (prefers-color-scheme: dark) {
+  .progressText {
+    color: #9ca3af;
+  }
+}
+
+.exerciseList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.swipeableExerciseCard {
+  position: relative;
+  padding: 1.5rem 1.25rem;
+  border-radius: 1rem;
+  background-color: #ffffff;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .swipeableExerciseCard {
+    background-color: #1f2937;
+    border-color: #374151;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.swipeableExerciseCard:active {
+  transform: scale(0.98);
+}
+
+.exerciseCardSkipped {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  opacity: 0.7;
+}
+
+@media (prefers-color-scheme: dark) {
+  .exerciseCardSkipped {
+    background-color: #111827;
+    border-color: #4b5563;
+  }
+}
+
+.exerciseCardCompleted {
+  background-color: #ecfdf5;
+  border-color: #10b981;
+}
+
+@media (prefers-color-scheme: dark) {
+  .exerciseCardCompleted {
+    background-color: #064e3b;
+    border-color: #059669;
+  }
+}
+
+.exerciseNumber {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .exerciseNumber {
+    background-color: #2563eb;
+  }
+}
+
+.swipeHints {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  right: 4rem;
+  display: flex;
+  justify-content: space-between;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.swipeHintLeft {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+@media (prefers-color-scheme: dark) {
+  .swipeHintLeft {
+    color: #9ca3af;
+  }
+}
+
+.swipeHintRight {
+  font-size: 0.75rem;
+  color: #10b981;
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+  .swipeHintRight {
+    color: #34d399;
+  }
+}
+
+.exerciseCardContent {
+  margin-top: 0.5rem;
+}
+
+.exerciseName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #111827;
+}
+
+@media (prefers-color-scheme: dark) {
+  .exerciseName {
+    color: #f3f4f6;
+  }
+}
+
+.exerciseDetails {
+  display: flex;
+  gap: 1rem;
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 0.75rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .exerciseDetails {
+    color: #9ca3af;
+  }
+}
+
+.exerciseEffort {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .exerciseEffort {
+    color: #60a5fa;
+  }
+}
+
+.muscleGroupsRow {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.statusBadge {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  background-color: #fee2e2;
+  color: #991b1b;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .statusBadge {
+    background-color: #7f1d1d;
+    color: #fca5a5;
+  }
+}
+
+.statusBadgeCompleted {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  background-color: #d1fae5;
+  color: #065f46;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+@media (prefers-color-scheme: dark) {
+  .statusBadgeCompleted {
+    background-color: #064e3b;
+    color: #6ee7b7;
+  }
+}
+
+.tapHint {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tapHint {
+    background-color: #111827;
+    color: #9ca3af;
+  }
+}
+
+.skippedText {
+  color: #9ca3af !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .skippedText {
+    color: #6b7280 !important;
+  }
+}
+
+.completedText {
+  color: #065f46;
+}
+
+@media (prefers-color-scheme: dark) {
+  .completedText {
+    color: #6ee7b7;
   }
 }

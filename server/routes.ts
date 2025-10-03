@@ -500,11 +500,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { getExerciseMuscleGroups } = await import('./services/muscle-groups.js');
       const muscleGroups = await getExerciseMuscleGroups(programmedExercise.name);
       
+      // Parse reps - handle ranges like "8-10" by taking middle value
+      let reps = programmedExercise.reps;
+      if (typeof reps === 'string' && reps.includes('-')) {
+        const [min, max] = reps.split('-').map(Number);
+        reps = Math.round((min + max) / 2);
+      } else if (typeof reps === 'string') {
+        reps = parseInt(reps, 10);
+      }
+      
       const exercise = await storage.createExercise({
         workoutId,
         name: programmedExercise.name,
         sets: programmedExercise.sets,
-        reps: programmedExercise.reps,
+        reps: reps,
         weight: programmedExercise.weight || null,
         rpe: programmedExercise.rpe || null,
         restTime: programmedExercise.restTime || null,
