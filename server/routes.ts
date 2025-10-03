@@ -502,12 +502,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Parse sets - handle ranges like "3-4" by taking middle value
       let sets = programmedExercise.sets;
+      console.log('[DEBUG] Original sets value:', sets, 'type:', typeof sets);
       if (typeof sets === 'string' && sets.includes('-')) {
         const [min, max] = sets.split('-').map(Number);
         sets = Math.round((min + max) / 2);
       } else if (typeof sets === 'string') {
         sets = parseInt(sets, 10);
+      } else if (typeof sets === 'number') {
+        sets = Math.round(sets); // Ensure integer
       }
+      console.log('[DEBUG] Parsed sets value:', sets);
       
       // Parse reps - handle ranges like "8-10" by taking middle value
       let reps = programmedExercise.reps;
