@@ -643,11 +643,6 @@ export default function WorkoutJournal() {
                     const currentExercise = swappedExercises.get(index) || programmedEx;
                     const isSkipped = skippedExercises.has(index);
                     const isCompleted = completedExercises.has(index);
-                    const rpeValue = currentExercise.rpe || 0;
-                    const displayValue = effortTrackingPreference === "rir" && rpeValue > 0 
-                      ? convertRpeToRir(rpeValue) 
-                      : rpeValue;
-                    const displayLabel = effortTrackingPreference === "rir" ? "RIR" : "RPE";
 
                     return (
                       <motion.div
@@ -713,11 +708,6 @@ export default function WorkoutJournal() {
                               <span className={isSkipped ? styles.skippedText : ""}>
                                 {currentExercise.sets} sets × {currentExercise.reps} reps
                               </span>
-                              {effortTrackingPreference !== "none" && (
-                                <span className={`${styles.exerciseEffort} ${isSkipped ? styles.skippedText : ""}`}>
-                                  {displayLabel} {displayValue > 0 ? displayValue : "-"}
-                                </span>
-                              )}
                             </div>
                             {currentExercise.muscleGroups && currentExercise.muscleGroups.length > 0 && (
                               <div className={styles.muscleGroupsRow}>
