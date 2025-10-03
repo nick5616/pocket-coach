@@ -1,66 +1,66 @@
 {
-  "name": "Pocket Coach - AI Fitness Companion",
-  "short_name": "Pocket Coach",
-  "description": "Your AI-powered fitness coach that transforms workout journaling into personalized training recommendations",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#58CC02",
-  "theme_color": "#58CC02",
-  "orientation": "portrait-primary",
-  "categories": ["health", "fitness", "lifestyle"],
-  "lang": "en-US",
-  "dir": "ltr",
-  "icons": [
-    {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiM1OENDMDIiLz4KPHN2ZyB4PSIxNiIgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHA+CjxyZWN0IHg9IjMiIHk9IjgiIHdpZHRoPSI2IiBoZWlnaHQ9IjgiIHJ4PSIxIi8+CjxyZWN0IHg9IjE1IiB5PSI4IiB3aWR0aD0iNiIgaGVpZ2h0PSI4IiByeD0iMSIvPgo8cmVjdCB4PSI5IiB5PSI2IiB3aWR0aD0iNiIgaGVpZ2h0PSIxMiIgcng9IjEiLz4KPC9wPgo8L3N2Zz4KPC9zdmc+",
-      "sizes": "64x64",
-      "type": "image/svg+xml"
-    },
-    {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iNDgiIGZpbGw9IiM1OENDMDIiLz4KPHN2ZyB4PSI0OCIgeT0iNDgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHA+CjxyZWN0IHg9IjMiIHk9IjgiIHdpZHRoPSI2IiBoZWlnaHQ9IjgiIHJ4PSIxIi8+CjxyZWN0IHg9IjE1IiB5PSI4IiB3aWR0aD0iNiIgaGVpZ2h0PSI4IiByeD0iMSIvPgo8cmVjdCB4PSI5IiB5PSI2IiB3aWR0aD0iNiIgaGVpZ2h0PSIxMiIgcng9IjEiLz4KPC9wPgo8L3N2Zz4KPC9zdmc+",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
-    },
-    {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTI4IiBmaWxsPSIjNThDQzAyIi8+CjxzdmcgeD0iMTI4IiB5PSIxMjgiIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPgo8cD4KPHJlY3QgeD0iMyIgeT0iOCIgd2lkdGg9IjYiIGhlaWdodD0iOCIgcng9IjEiLz4KPHJlY3QgeD0iMTUiIHk9IjgiIHdpZHRoPSI2IiBoZWlnaHQ9IjgiIHJ4PSIxIi8+CjxyZWN0IHg9IjkiIHk9IjYiIHdpZHRoPSI2IiBoZWlnaHQ9IjEyIiByeD0iMSIvPgo8L3A+Cjwvc3ZnPgo8L3N2Zz4=",
-      "sizes": "512x512",
-      "type": "image/svg+xml"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjUyMCIgdmlld0JveD0iMCAwIDI0MCA1MjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNDAiIGhlaWdodD0iNTIwIiBmaWxsPSIjRjlGQUZCIi8+CjxyZWN0IHdpZHRoPSIyNDAiIGhlaWdodD0iMzIiIGZpbGw9IiM1OENDMDIiLz4KPHN2ZyB4PSI4IiB5PSI0MCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzU4Q0MwMiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Im0zIDggNiA2IDQtNiA1IDEyIDMtMTEiLz48L3N2Zz4KPHR4dCB4PSI0OCIgeT0iNjAiIGZpbGw9IiMxMTExMTEiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZm9udC13ZWlnaHQ9ImJvbGQiPlBvY2tldCBDb2FjaDwvdHh0Pgo8dGV4dCB4PSI0OCIgeT0iNzgiIGZpbGw9IiM2NjY2NjYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiI+N0RheSBTdHJlYWshIPCfgKU8L3RleHQ+Cjx0ZXh0IHg9IjE2IiB5PSIxMjAiIGZpbGw9IiMxMTExMTEiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkFJLVBvd2VyZWQgRml0bmVzcyBDb2FjaDwvdGV4dD4KPHRleHQgeD0iMTYiIHk9IjE0MCIgZmlsbD0iIzY2NjY2NiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIj5UcmFuc2Zvcm0geW91ciB3b3Jrb3V0IGpvdXJuYWxzPC90ZXh0Pgo8dGV4dCB4PSIxNiIgeT0iMTU2IiBmaWxsPSIjNjY2NjY2IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiPmludG8gcGVyc29uYWxpemVkIHJlY29tbWVuZGF0aW9uczwvdGV4dD4KPC9zdmc+",
-      "sizes": "240x520",
-      "type": "image/svg+xml",
-      "form_factor": "narrow"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Start Workout",
-      "short_name": "Workout",
-      "description": "Begin a new workout session",
-      "url": "/workout-journal",
-      "icons": [
+    "name": "Pocket Coach - AI Fitness Companion",
+    "short_name": "Pocket Coach",
+    "description": "Your AI-powered fitness coach that transforms workout journaling into personalized training recommendations",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#58CC02",
+    "theme_color": "#58CC02",
+    "orientation": "portrait-primary",
+    "categories": ["health", "fitness", "lifestyle"],
+    "lang": "en-US",
+    "dir": "ltr",
+    "icons": [
         {
-          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMjQiIGZpbGw9IiMxQ0IwRjYiLz4KPHN2ZyB4PSIyNCIgeT0iMjQiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHBvbHlnb24gcG9pbnRzPSI1LDMgMTksNTIiLz4KPC9zdmc+Cjwvc3ZnPg==",
-          "sizes": "96x96",
-          "type": "image/svg+xml"
-        }
-      ]
-    },
-    {
-      "name": "View Progress",
-      "short_name": "Progress",
-      "description": "Check your fitness progress",
-      "url": "/progress",
-      "icons": [
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
         {
-          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMjQiIGZpbGw9IiNGRjk2MDAiLz4KPHN2ZyB4PSIyNCIgeT0iMjQiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHBvbHlsaW5lIHBvaW50cz0iMjIsMTIgMTgsOTQgOSw5IDQsMTQiLz4KPC9zdmc+Cjwvc3ZnPg==",
-          "sizes": "96x96",
-          "type": "image/svg+xml"
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/icon-180x180.png",
+            "sizes": "180x180",
+            "type": "image/png"
         }
-      ]
-    }
-  ]
+    ],
+    "screenshots": [
+        {
+            "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjUyMCIgdmlld0JveD0iMCAwIDI0MCA1MjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNDAiIGhlaWdodD0iNTIwIiBmaWxsPSIjRjlGQUZCIi8+CjxyZWN0IHdpZHRoPSIyNDAiIGhlaWdodD0iMzIiIGZpbGw9IiM1OENDMDIiLz4KPHN2ZyB4PSI4IiB5PSI0MCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzU4Q0MwMiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Im0zIDggNiA2IDQtNiA1IDEyIDMtMTEiLz48L3N2Zz4KPHR4dCB4PSI0OCIgeT0iNjAiIGZpbGw9IiMxMTExMTEiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZm9udC13ZWlnaHQ9ImJvbGQiPlBvY2tldCBDb2FjaDwvdHh0Pgo8dGV4dCB4PSI0OCIgeT0iNzgiIGZpbGw9IiM2NjY2NjYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiI+N0RheSBTdHJlYWshIPCfgKU8L3RleHQ+Cjx0ZXh0IHg9IjE2IiB5PSIxMjAiIGZpbGw9IiMxMTExMTEiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkFJLVBvd2VyZWQgRml0bmVzcyBDb2FjaDwvdGV4dD4KPHRleHQgeD0iMTYiIHk9IjE0MCIgZmlsbD0iIzY2NjY2NiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIj5UcmFuc2Zvcm0geW91ciB3b3Jrb3V0IGpvdXJuYWxzPC90ZXh0Pgo8dGV4dCB4PSIxNiIgeT0iMTU2IiBmaWxsPSIjNjY2NjY2IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiPmludG8gcGVyc29uYWxpemVkIHJlY29tbWVuZGF0aW9uczwvdGV4dD4KPC9zdmc+",
+            "sizes": "240x520",
+            "type": "image/svg+xml",
+            "form_factor": "narrow"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Start Workout",
+            "short_name": "Workout",
+            "description": "Begin a new workout session",
+            "url": "/workout-journal",
+            "icons": [
+                {
+                    "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMjQiIGZpbGw9IiMxQ0IwRjYiLz4KPHN2ZyB4PSIyNCIgeT0iMjQiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHBvbHlnb24gcG9pbnRzPSI1LDMgMTksNTIiLz4KPC9zdmc+Cjwvc3ZnPg==",
+                    "sizes": "96x96",
+                    "type": "image/svg+xml"
+                }
+            ]
+        },
+        {
+            "name": "View Progress",
+            "short_name": "Progress",
+            "description": "Check your fitness progress",
+            "url": "/progress",
+            "icons": [
+                {
+                    "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMjQiIGZpbGw9IiNGRjk2MDAiLz4KPHN2ZyB4PSIyNCIgeT0iMjQiIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KPHBvbHlsaW5lIHBvaW50cz0iMjIsMTIgMTgsOTQgOSw5IDQsMTQiLz4KPC9zdmc+Cjwvc3ZnPg==",
+                    "sizes": "96x96",
+                    "type": "image/svg+xml"
+                }
+            ]
+        }
+    ]
 }
