@@ -1,9 +1,18 @@
 import { Link, useLocation } from "wouter";
 import { Home, Dumbbell, BarChart3, PenTool, User } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import type { Workout } from "@shared/schema";
 import styles from "./bottom-navigation.module.css";
 
 export default function BottomNavigation() {
   const [location] = useLocation();
+  
+  // Check if there's an active workout (check all workouts, not just recent ones)
+  const { data: workouts = [] } = useQuery<Workout[]>({
+    queryKey: ["/api/workouts", { limit: 100 }],
+  });
+  
+  const hasActiveWorkout = workouts.some((w) => !w.isCompleted);
 
   const navItems = [
     { 
@@ -12,7 +21,8 @@ export default function BottomNavigation() {
       label: "Home",
       svgClass: styles.homeSvg,
       svgPath: "M2 8c0-1 1-2 2-2h0.5c1 0 2 1 2 2v4c0 1-1 2-2 2H4c-1 0-2-1-2-2V8z M8 6c0-1 1-2 2-2h4c1 0 2 1 2 2v8c0 1-1 2-2 2h-4c-1 0-2-1-2-2V6z M20 4c0-1 1-2 2-2h4c1 0 2 1 2 2v12c0 1-1 2-2 2h-4c-1 0-2-1-2-2V4z",
-      gradient: "homeGradient"
+      gradient: "homeGradient",
+      isWorkoutTab: false
     },
     { 
       path: "/workout-journal", 
@@ -20,7 +30,8 @@ export default function BottomNavigation() {
       label: "Workout",
       svgClass: styles.workoutSvg,
       svgPath: "M6 2c2 0 4 2 4 4s-2 4-4 4-4-2-4-4 2-4 4-4z M14 6c1.5 0 3 1.5 3 3s-1.5 3-3 3-3-1.5-3-3 1.5-3 3-3z M22 4c1.5 0 3 1.5 3 3s-1.5 3-3 3-3-1.5-3-3 1.5-3 3-3z",
-      gradient: "workoutGradient"
+      gradient: "workoutGradient",
+      isWorkoutTab: true
     },
     { 
       path: "/workouts", 
@@ -28,7 +39,8 @@ export default function BottomNavigation() {
       label: "History",
       svgClass: styles.historySvg,
       svgPath: "M2 8 Q6 4 12 8 Q18 12 24 8 Q30 4 36 8 Q42 12 48 8",
-      gradient: "historyGradient"
+      gradient: "historyGradient",
+      isWorkoutTab: false
     },
     { 
       path: "/progress", 
@@ -36,7 +48,8 @@ export default function BottomNavigation() {
       label: "Progress",
       svgClass: styles.progressSvg,
       svgPath: "M4 12h4v4H4z M12 8h4v8h-4z M20 4h4v12h-4z M28 10h4v6h-4z M36 6h4v10h-4z",
-      gradient: "progressGradient"
+      gradient: "progressGradient",
+      isWorkoutTab: false
     },
     { 
       path: "/profile", 
@@ -44,20 +57,23 @@ export default function BottomNavigation() {
       label: "Profile",
       svgClass: styles.profileSvg,
       svgPath: "M24 12c0-6.6-5.4-12-12-12S0 5.4 0 12s5.4 12 12 12 12-5.4 12-12z M16 8c0-2.2-1.8-4-4-4s-4 1.8-4 4 1.8 4 4 4 4-1.8 4-4z M32 16c0-4.4-3.6-8-8-8s-8 3.6-8 8 3.6 8 8 8 8-3.6 8-8z",
-      gradient: "profileGradient"
+      gradient: "profileGradient",
+      isWorkoutTab: false
     },
   ];
 
   return (
     <nav className={styles.navigation}>
       <div className={styles.navList}>
-        {navItems.map(({ path, icon: Icon, label, svgClass, svgPath, gradient }, index) => {
+        {navItems.map(({ path, icon: Icon, label, svgClass, svgPath, gradient, isWorkoutTab }, index) => {
           const isActive = location === path;
+          const showActiveWorkoutIndicator = isWorkoutTab && hasActiveWorkout;
           return (
             <Link
               key={path}
               href={path}
-              className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
+              className={`${styles.navItem} ${isActive ? styles.navItemActive : ""} ${showActiveWorkoutIndicator ? styles.navItemWorkoutActive : ""}`}
+              data-testid={`nav-${label.toLowerCase()}`}
             >
               <div className={styles.navSvgContainer}>
                 <svg 

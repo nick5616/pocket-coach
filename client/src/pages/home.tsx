@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useState } from "react";
 import {
   Dumbbell,
   Target,
@@ -13,12 +14,23 @@ import {
   Plus,
   ChevronRight,
   Zap,
+  AlertCircle,
 } from "lucide-react";
 import LoadingScreen from "../components/loading-screen";
 import { calculateCurrentStreak } from "../lib/stats";
 import type { Workout, Goal } from "@shared/schema";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/Dialog";
+import { Button } from "@/components/Button";
 
 export default function Home() {
+  const [, setLocation] = useLocation();
+  const [showWorkoutWarning, setShowWorkoutWarning] = useState(false);
   const { data: workouts = [], isLoading: workoutsLoading } = useQuery<
     Workout[]
   >({
@@ -56,6 +68,14 @@ export default function Home() {
   };
 
   const inProgressWorkout = workouts.find((w) => !w.isCompleted);
+
+  const handleStartWorkout = () => {
+    if (inProgressWorkout) {
+      setShowWorkoutWarning(true);
+    } else {
+      setLocation("/workout-journal");
+    }
+  };
 
   return (
     <div className="page">
@@ -311,27 +331,25 @@ export default function Home() {
             >
               {activeProgram ? (
                 <>
-                  <Link
-                    href="/workout-journal"
-                    style={{ textDecoration: "none", width: "100%" }}
+                  <div
+                    onClick={handleStartWorkout}
+                    className="card"
+                    data-testid="button-continue-program"
+                    style={{
+                      padding: "var(--spacing-md)",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      border: "2px solid var(--primary-200)",
+                      marginBottom: "var(--spacing-md)",
+                    }}
                   >
                     <div
-                      className="card"
                       style={{
-                        padding: "var(--spacing-md)",
-                        cursor: "pointer",
-                        transition: "all 0.2s ease",
-                        border: "2px solid var(--primary-200)",
-                        marginBottom: "var(--spacing-md)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
                       }}
                     >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        }}
-                      >
                         <div style={{ display: "flex", alignItems: "center" }}>
                           <div
                             style={{
@@ -385,27 +403,24 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-                  </Link>
-                  <Link
-                    href="/workout-journal"
-                    style={{ textDecoration: "none", width: "100%" }}
+                  <div
+                    onClick={handleStartWorkout}
+                    className="card"
+                    data-testid="button-quick-workout"
+                    style={{
+                      padding: "var(--spacing-md)",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      border: "2px solid var(--success-200)",
+                    }}
                   >
                     <div
-                      className="card"
                       style={{
-                        padding: "var(--spacing-md)",
-                        cursor: "pointer",
-                        transition: "all 0.2s ease",
-                        border: "2px solid var(--success-200)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
                       }}
                     >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        }}
-                      >
                         <div style={{ display: "flex", alignItems: "center" }}>
                           <div
                             style={{
@@ -455,29 +470,26 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-                  </Link>
                 </>
               ) : (
-                <Link
-                  href="/workout-journal"
-                  style={{ textDecoration: "none" }}
+                <div
+                  onClick={handleStartWorkout}
+                  className="card"
+                  data-testid="button-start-new-workout"
+                  style={{
+                    padding: "var(--spacing-md)",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    border: "2px solid var(--primary-200)",
+                  }}
                 >
                   <div
-                    className="card"
                     style={{
-                      padding: "var(--spacing-md)",
-                      cursor: "pointer",
-                      transition: "all 0.2s ease",
-                      border: "2px solid var(--primary-200)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
                       <div style={{ display: "flex", alignItems: "center" }}>
                         <div
                           style={{
@@ -527,7 +539,6 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                </Link>
               )}
 
               <Link href="/programs" style={{ textDecoration: "none" }}>
@@ -809,6 +820,45 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      {/* Warning Dialog for In-Progress Workout */}
+      <Dialog open={showWorkoutWarning} onOpenChange={setShowWorkoutWarning}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <AlertCircle style={{ width: "1.25rem", height: "1.25rem", color: "var(--warning)" }} />
+                Workout In Progress
+              </div>
+            </DialogTitle>
+            <DialogDescription>
+              You have an active workout: <strong>{inProgressWorkout?.name || "Untitled Workout"}</strong>
+              <br /><br />
+              Please complete or finish your current workout before starting a new one.
+            </DialogDescription>
+          </DialogHeader>
+          <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
+            <Button
+              onClick={() => {
+                setShowWorkoutWarning(false);
+                setLocation(`/workout-journal/${inProgressWorkout?.id}`);
+              }}
+              style={{ flex: 1 }}
+              data-testid="button-resume-existing-workout"
+            >
+              Resume Workout
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowWorkoutWarning(false)}
+              style={{ flex: 1 }}
+              data-testid="button-cancel-new-workout"
+            >
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
