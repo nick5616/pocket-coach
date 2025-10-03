@@ -289,9 +289,17 @@ export default function WorkoutJournal() {
         description: data.changesSummary || "Exercise successfully updated with your changes.",
       });
       
-      // Refresh exercise data
+      // Refresh exercise data with correct query keys
+      if (workoutId) {
+        queryClient.invalidateQueries({ 
+          queryKey: ["/api/workouts", workoutId, "exercises"] 
+        });
+        queryClient.invalidateQueries({ 
+          queryKey: ["/api/workouts", workoutId] 
+        });
+      }
       queryClient.invalidateQueries({ 
-        queryKey: ["/api/exercises", { workoutId: parseInt(workoutId || "0") }] 
+        queryKey: ["/api/workouts"] 
       });
       
       // Close dialog and clear instruction
