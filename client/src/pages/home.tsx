@@ -67,7 +67,8 @@ export default function Home() {
     exercises: 0, // This would need to be calculated from a separate exercises query
   };
 
-  const inProgressWorkout = workouts.find((w) => !w.isCompleted);
+  // Only show in-progress workouts that have exercises (ignore empty/abandoned workouts)
+  const inProgressWorkout = workouts.find((w) => !w.isCompleted && w.exercises && w.exercises.length > 0);
 
   const handleStartWorkout = () => {
     if (inProgressWorkout) {
