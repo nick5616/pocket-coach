@@ -515,12 +515,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Parse reps - handle ranges like "8-10" by taking middle value
       let reps = programmedExercise.reps;
+      console.log('[DEBUG] Original reps value:', reps, 'type:', typeof reps);
       if (typeof reps === 'string' && reps.includes('-')) {
         const [min, max] = reps.split('-').map(Number);
         reps = Math.round((min + max) / 2);
       } else if (typeof reps === 'string') {
         reps = parseInt(reps, 10);
+      } else if (typeof reps === 'number') {
+        reps = Math.round(reps); // Ensure integer
       }
+      console.log('[DEBUG] Parsed reps value:', reps);
       
       const exercise = await storage.createExercise({
         workoutId,
