@@ -525,7 +525,7 @@ export default function WorkoutJournal() {
                       </span>
                     </div>
                     <Progress 
-                      value={((currentExerciseIndex + 1) / todaysWorkout.workout.exercises.length) * 100} 
+                      value={(completedExercises.size / todaysWorkout.workout.exercises.length) * 100} 
                       style={{ height: "6px" }}
                     />
                   </div>
@@ -803,7 +803,7 @@ export default function WorkoutJournal() {
                       </span>
                     </div>
                     <Progress 
-                      value={((currentExerciseIndex + 1) / exercises.length) * 100} 
+                      value={(completedExercises.size / exercises.length) * 100} 
                       style={{ height: "6px" }}
                     />
                   </div>
